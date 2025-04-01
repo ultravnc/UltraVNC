@@ -1026,7 +1026,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -1041,7 +1041,7 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -1135,7 +1135,7 @@ vncClientThread::InitAuthenticate()
 		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
@@ -4464,7 +4464,7 @@ vncClientThread::run(void* arg)
 	LogeventFn Logevent = 0;
 	char szCurrentDir[MAX_PATH];
 	strcpy_s(szCurrentDir, winvncFolder);
-	strcat_s(szCurrentDir, "\\logging.dll");
+	strcat_s(szCurrentDir, "\\loggingV2.dll");
 	HMODULE hModule = LoadLibrary(szCurrentDir);
 	if (hModule)
 	{

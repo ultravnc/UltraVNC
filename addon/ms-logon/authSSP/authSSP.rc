@@ -57,7 +57,7 @@ BEGIN
             VALUE "FileVersion", STR_FILEVERSION
             VALUE "InternalName", "authSSP\0"
             VALUE "LegalCopyright", STR_COPYRIGHT
-            VALUE "OriginalFilename", "authSSP.dll\0"
+            VALUE "OriginalFilename", "authSSPV2.dll\0"
             VALUE "ProductName", "UltraVNC authSSP\0"
             VALUE "ProductVersion", STR_PRODUCTVERSION
 #if isRC == 1

@@ -104,12 +104,12 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 {
 	int result = 0;
 	HMODULE hModuleAuthSSP = NULL;
-	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSD in authSSP.dll,
+	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSD in authSSPV2.dll,
 	// else call "old" MS-Logon method.
 	if (IsNewMSLogon()) {
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\authSSP.dll");
+		strcat_s(szCurrentDir, "\\authSSPV2.dll");
 		
 		hModuleAuthSSP = LoadLibrary(szCurrentDir);
 		if (hModuleAuthSSP) {
@@ -124,7 +124,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 		}
 		else {
 			LPCTSTR sz_ID_AUTHSSP_NOT_FO = // to be moved to localization.h
-				"You selected MS-Logon, but authSSP.dll\nwas not found.Check you installation";
+				"You selected MS-Logon, but authSSPV2.dll\nwas not found.Check you installation";
 			MessageBoxSecure(NULL, sz_ID_AUTHSSP_NOT_FO, sz_ID_WARNING, MB_OK);
 		}
 	}
@@ -491,7 +491,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 		
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -519,7 +519,7 @@ accessOK://full access
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 		
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
@@ -550,7 +550,7 @@ accessOK2://readonly
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\logging.dll");
+		strcat_s(szCurrentDir, "\\loggingV2.dll");
 
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)

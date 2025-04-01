@@ -53,7 +53,7 @@ BEGIN
             VALUE "FileVersion", STR_FILEVERSION
             VALUE "InternalName", "logging\0"
             VALUE "LegalCopyright", STR_COPYRIGHT
-            VALUE "OriginalFilename", "logging.dll\0"
+            VALUE "OriginalFilename", "loggingV2.dll\0"
             VALUE "ProductName", "UltraVNC logging\0"
             VALUE "ProductVersion", STR_PRODUCTVERSION
 #if isRC == 1

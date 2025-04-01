@@ -68,7 +68,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D50AEB07-5F5E-4401-9B50-C1660E693833}</ProjectGuid>
-    <ProjectName>logging</ProjectName>
+    <ProjectName>loggingV2</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
