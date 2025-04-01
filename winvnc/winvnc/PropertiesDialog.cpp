@@ -19,8 +19,9 @@
 #include <string>
 #include <windowsx.h>
 #include "winvnc.h"
-#include "HelperFunctions.h"
 #include "UltraVNCService.h"
+#include "HelperFunctions.h"
+
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
@@ -1185,7 +1186,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_CHECKDRIVER:
 		CheckVideoDriver(1);
 		return TRUE;
-
+#ifndef SC_20
 	case IDC_INSTALL_SERVICE:
 		UltraVNCService::install_service();
 		Sleep(3000);
@@ -1196,6 +1197,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		Sleep(3000);
 		setServiceStatusText(hwnd);
 		break;
+
 	case IDC_START_SERVICE:
 	{
 		char command[MAX_PATH + 32]; // 29 January 2008 jdp
@@ -1214,7 +1216,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		setServiceStatusText(hwnd);
 	}
 		break;
-
+#endif
 	case IDC_BLANK:
 	{
 		// only enable alpha blanking if blanking is enabled
@@ -2264,6 +2266,7 @@ void PropertiesDialog::LogToEdit(const std::string & message)
 
 void PropertiesDialog::setServiceStatusText(HWND hwnd)
 {
+#ifndef SC_20
 	if (GetDlgItem(hwnd, IDC_SERVICE_STATUS)) {
 		bool installed = processHelper::IsServiceInstalled();
 		bool running = processHelper::IsServiceRunning();
@@ -2293,7 +2296,7 @@ void PropertiesDialog::setServiceStatusText(HWND hwnd)
 
 		
 	}
-	
+#endif	
 }
 
 

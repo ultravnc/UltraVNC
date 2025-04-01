@@ -809,7 +809,7 @@ namespace processHelper {
 
 		return result;
 	}
-
+#ifndef SC_20
 	bool IsServiceRunning() {
 		bool isRunning = false;
 
@@ -842,7 +842,7 @@ namespace processHelper {
 
 		return isRunning;
 	}
-
+#endif
 	bool IsServiceInstalled()
 	{
 		bool serviceInstalled = false;
