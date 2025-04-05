@@ -704,7 +704,7 @@ void SessionDialog::getAppData(char * buffer)
 
 void SessionDialog::IfHostExistLoadSettings(char *hostname)
 {
-	
+	SetDefaults();
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	int port;
 	ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &port);
