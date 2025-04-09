@@ -176,7 +176,7 @@ void SettingsManager::setDefaults()
 	m_pref_EnableRemoteInputs = TRUE;
 	m_pref_DisableLocalInputs = FALSE;
 	m_pref_EnableJapInput = FALSE;
-	m_pref_EnableUnicodeInput = FALSE;
+	m_pref_EnableUnicodeInput = TRUE;
 	m_pref_EnableWin8Helper = FALSE;
 	m_pref_clearconsole = FALSE;
 	m_pref_LockSettings = -1;
