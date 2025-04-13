@@ -617,7 +617,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				vncEditSecurityFn vncEditSecurity = 0;
 				char szCurrentDir[MAX_PATH]{};
 				strcpy_s(szCurrentDir, winvncFolder);
-				strcat_s(szCurrentDir, "\\authSSPV2.dll");
+				strcat_s(szCurrentDir, "\\authSSPV.dll");
 				HMODULE hModule = LoadLibrary(szCurrentDir);
 				if (hModule) {
 					vncEditSecurity = (vncEditSecurityFn)GetProcAddress(hModule, "vncEditSecurity");

@@ -1026,11 +1026,11 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILED");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILEDV2");
 			Logevent((char*)m_client->GetClientNameName(), settings->getLogFile());
 			FreeLibrary(hModule);
 		}
@@ -1041,14 +1041,14 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
 			if (!isconnected) {
-				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGCONN");
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGCONNV2");
 			} else {
-				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONV2");
 			}
 			Logevent((char*)m_client->GetClientNameName(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled, settings->getLogFile());
 			FreeLibrary(hModule);
@@ -1135,11 +1135,11 @@ vncClientThread::InitAuthenticate()
 		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFO");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFOV2");
 			
 			if (Logevent)
 				Logevent((char*)m_client->infoMsg, settings->getLogFile());
@@ -4464,11 +4464,11 @@ vncClientThread::run(void* arg)
 	LogeventFn Logevent = 0;
 	char szCurrentDir[MAX_PATH];
 	strcpy_s(szCurrentDir, winvncFolder);
-	strcat_s(szCurrentDir, "\\loggingV2.dll");
+	strcat_s(szCurrentDir, "\\logging.dll");
 	HMODULE hModule = LoadLibrary(szCurrentDir);
 	if (hModule)
 	{
-		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
+		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXITV2");
 		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled, settings->getLogFile());
 		FreeLibrary(hModule);
 	}

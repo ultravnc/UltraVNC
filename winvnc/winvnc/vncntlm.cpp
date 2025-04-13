@@ -104,7 +104,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 {
 	int result = 0;
 	HMODULE hModuleAuthSSP = NULL;
-	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSD in authSSPV2.dll,
+	// Marscha@2004 - authSSP: if "New MS-Logon" is checked, call CUPSDV2 in authSSP.dll,
 	// else call "old" MS-Logon method.
 	if (IsNewMSLogon()) {
 		char szCurrentDir[MAX_PATH];
@@ -113,7 +113,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 		
 		hModuleAuthSSP = LoadLibrary(szCurrentDir);
 		if (hModuleAuthSSP) {
-			CheckUserPasswordSDUni = (CheckUserPasswordSDUniFn)GetProcAddress(hModuleAuthSSP, "CUPSD");
+			CheckUserPasswordSDUni = (CheckUserPasswordSDUniFn)GetProcAddress(hModuleAuthSSP, "CUPSDV2");
 			vnclog.Print(LL_INTINFO, VNCLOG("GetProcAddress"));
 			CoInitialize(NULL);
 			result = CheckUserPasswordSDUni(userin, password, machine, settings->getLogFile());
@@ -491,12 +491,12 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 		
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILEDUSER");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILEDUSERV2");
 			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
@@ -519,12 +519,12 @@ accessOK://full access
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 		
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSER");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSERV2");
 			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
@@ -550,12 +550,12 @@ accessOK2://readonly
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\loggingV2.dll");
+		strcat_s(szCurrentDir, "\\logging.dll");
 
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSER");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONUSERV2");
 			Logevent((char*)clientname, userin, settings->getLogFile());
 			FreeLibrary(hModule);
 		}

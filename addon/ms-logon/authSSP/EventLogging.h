@@ -59,4 +59,5 @@ public:
 
 };
 
-void LOG(TCHAR* szMslogonLog, long EvenID, const TCHAR *format, ...);
+void LOGV2(TCHAR* szMslogonLog, long EvenID, const TCHAR *format, ...);
+void LOG(long EvenID, const TCHAR* format, ...);

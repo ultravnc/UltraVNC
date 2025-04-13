@@ -2,4 +2,5 @@ LIBRARY   AuthSSP
 
              EXPORTS
  			   CUPSD
+               CUPSDV2
 			   vncEditSecurity

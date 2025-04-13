@@ -101,7 +101,7 @@ void EventLogging::AddEventSourceToRegistry(LPCTSTR lpszSourceName)
     } RegCloseKey(hk);
 }
 
-void LOG(TCHAR *szMslogonLog, long EventID, const TCHAR *format, ...) {
+void LOGV2(TCHAR *szMslogonLog, long EventID, const TCHAR *format, ...) {
     FILE *file;
 	LPCTSTR ps[3];
 	TCHAR textbuf[2 * MAXLEN] = _T("");
@@ -139,4 +139,52 @@ void LOG(TCHAR *szMslogonLog, long EventID, const TCHAR *format, ...) {
 		fclose(file);
 	}
 }
-  
+ 
+void LOG(long EventID, const TCHAR* format, ...) {
+	FILE* file;
+	TCHAR szMslogonLog[MAX_PATH];
+	LPCTSTR ps[3];
+	TCHAR textbuf[2 * MAXLEN] = _T("");
+	char texttowrite[2 * MAXLEN] = "";
+	TCHAR szTimestamp[MAXLEN] = _T("");
+	TCHAR szText[MAXLEN] = _T("");
+	SYSTEMTIME time;
+
+	va_list ap;
+	va_start(ap, format);
+	_vstprintf_s(szText, format, ap);
+	va_end(ap);
+	// Prepend timestamp to message
+	GetLocalTime(&time);
+	_stprintf_s(szTimestamp, _T("%.2d/%.2d/%d %.2d:%.2d:%.2d\t"),
+		time.wDay, time.wMonth, time.wYear, time.wHour, time.wMinute, time.wSecond);
+	_tcscpy_s(textbuf, szTimestamp);
+	_tcscat_s(textbuf, szText);
+	ps[0] = textbuf;
+	EventLogging log;
+	log.AddEventSourceToRegistry(NULL);
+	log.LogIt(1, EventID, ps, 1, NULL, 0);
+	if (GetModuleFileName(NULL, szMslogonLog, MAX_PATH))
+	{
+		TCHAR* p = _tcsrchr(szMslogonLog, '\\');
+		if (p != NULL)
+		{
+			*p = '\0';
+			_tcscat_s(szMslogonLog, _T("\\mslogon.log"));
+		}
+	}
+	file = _tfopen(szMslogonLog, _T("a"));
+	if (file != NULL)
+	{
+
+		// Write ANSI
+#if defined UNICODE || defined _UNICODE
+		size_t pnconv;
+		wcstombs_s(&pnconv, texttowrite, 512, textbuf, 2 * MAXLEN);
+#else
+		strcpy(texttowrite, texttowrite);
+#endif
+		fwrite(texttowrite, sizeof(char), strlen(texttowrite), file);
+		fclose(file);
+	}
+}
