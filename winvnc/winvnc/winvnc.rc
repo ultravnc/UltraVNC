@@ -655,7 +655,7 @@ BEGIN
     LTEXT           "Administration password",IDC_STATIC,12,44,78,8
     CONTROL         "Allow users to view and make property changes using this password",IDC_ALLOWUSERSSETTINGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
-    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,199,20
+    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,312,15
     PUSHBUTTON      "SET/CHANGE...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
     PUSHBUTTON      "CLEAR",IDC_ADMINCLEAR,171,41,50,14
 END
