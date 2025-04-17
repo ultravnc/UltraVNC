@@ -109,7 +109,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 	if (IsNewMSLogon()) {
 		char szCurrentDir[MAX_PATH];
 		strcpy_s(szCurrentDir, winvncFolder);
-		strcat_s(szCurrentDir, "\\authSSPV2.dll");
+		strcat_s(szCurrentDir, "\\authSSP.dll");
 		
 		hModuleAuthSSP = LoadLibrary(szCurrentDir);
 		if (hModuleAuthSSP) {
@@ -124,7 +124,7 @@ int CheckUserGroupPasswordUni(char* userin, char* password, const char* machine)
 		}
 		else {
 			LPCTSTR sz_ID_AUTHSSP_NOT_FO = // to be moved to localization.h
-				"You selected MS-Logon, but authSSPV2.dll\nwas not found.Check you installation";
+				"You selected MS-Logon, but authSSP.dll\nwas not found.Check you installation";
 			MessageBoxSecure(NULL, sz_ID_AUTHSSP_NOT_FO, sz_ID_WARNING, MB_OK);
 		}
 	}
