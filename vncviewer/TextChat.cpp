@@ -266,7 +266,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
 		}
 		else{
-			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor);
+			SetTextFormat(false, false, 0xb4, "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", dwColor);
 		}
 		// [<--v1.0.2-jp1 fix]
 
@@ -288,7 +288,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
 		}
 		else{
-			SetTextFormat(false, false, 0xb4, "‚l‚r ‚oƒSƒVƒbƒN", dwColor != GREY ? BLACK : GREY);	
+			SetTextFormat(false, false, 0xb4, "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", dwColor != GREY ? BLACK : GREY);
 		}
 		// [<--v1.0.2-jp1 fix]
 
