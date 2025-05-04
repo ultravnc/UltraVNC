@@ -2064,12 +2064,15 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			settings->setQueryDisableTime(atoi(disabletime));
 	}
 
-	if (GetDlgItem(hwnd, IDC_SERVICE_COMMANDLINE) && GetDlgItem(hwnd, IDC_EDITQUERYTEXT)) {
+	if (GetDlgItem(hwnd, IDC_SERVICE_COMMANDLINE)) {
 		char temp[1024]{};
-		char temp2[512]{};
 		GetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, temp, 1024);
-		GetDlgItemText(hwnd, IDC_EDITQUERYTEXT, temp2, 512);
 		settings->setService_commandline(temp);
+	}
+
+	if (GetDlgItem(hwnd, IDC_EDITQUERYTEXT)) {
+		char temp2[512]{};
+		GetDlgItemText(hwnd, IDC_EDITQUERYTEXT, temp2, 512);
 		settings->setAccept_reject_mesg(temp2);
 	}
 
