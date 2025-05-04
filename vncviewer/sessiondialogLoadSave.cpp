@@ -205,6 +205,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	WritePrivateProfileString("options", "InfoMsg", InfoMsg, fname);
 	saveInt("AutoReconnect",		autoReconnect,	fname);
 	saveInt("FileTransferTimeout",  FTTimeout,    fname);
+	saveInt("ListenPort", listenport, fname);
 	saveInt("ThrottleMouse",		throttleMouse,    fname); 
 	saveInt("KeepAliveInterval",    keepAliveInterval,    fname);	
 	saveInt("AutoAcceptIncoming",	fAutoAcceptIncoming, fname);  
@@ -300,6 +301,7 @@ void SessionDialog::LoadFromFile(char *fname)
   FTTimeout  =			readInt("FileTransferTimeout", FTTimeout, fname);
   if (FTTimeout > 600)
       FTTimeout = 600; // cap at 1 minute
+  listenport = readInt("ListenPort", listenport, fname);
   keepAliveInterval  =	readInt("KeepAliveInterval", keepAliveInterval, fname);
   if (keepAliveInterval >= (FTTimeout - KEEPALIVE_HEADROOM))
       keepAliveInterval = (FTTimeout  - KEEPALIVE_HEADROOM); 
@@ -722,6 +724,7 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	}
 	else
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
+	InitDlgProcListen();
 }
 
 void SessionDialog::SetDefaults()
