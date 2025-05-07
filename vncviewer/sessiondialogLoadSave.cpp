@@ -92,7 +92,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
 	m_pMRU->AddItem(hostname);
-	InitMRU(hwnd);
+	//InitMRU(hwnd);
 }
 
 void SessionDialog::SettingsFromUI()
