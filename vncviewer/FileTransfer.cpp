@@ -1276,6 +1276,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
+			if (strlen(ofDirT) < 1)
+				return;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
 			p = strrchr(ofDirT, '\\');
 			if (p == NULL) return;
@@ -1427,6 +1429,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
+			if (strlen(ofDirT) < 1)
+				return;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
 			p = strrchr(ofDirT, '\\');
 			if (p == NULL)

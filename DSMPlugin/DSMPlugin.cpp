@@ -317,7 +317,8 @@ int CDSMPlugin::ListPlugins(HWND hComboBox)
 	}
 	else
 		return 0;
-
+	if (strlen(szCurrentDir) < 1)
+		return 0;
     if (szCurrentDir[strlen(szCurrentDir) - 1] != '\\') strcat_s(szCurrentDir, "\\");
 	strcat_s(szCurrentDir, "*.dsm"); // The DSMplugin dlls must have this extension
 	
