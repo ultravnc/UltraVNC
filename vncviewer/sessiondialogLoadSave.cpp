@@ -720,6 +720,8 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	FILE *file = fopen(buffer, "r");
 	if (strlen(hostname) != 0 && file ) {
 		fclose(file);
+		SetDefaults();
+		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
 		LoadFromFile(buffer);		
 	}
 	else
