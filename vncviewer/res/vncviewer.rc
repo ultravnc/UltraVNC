@@ -737,6 +737,17 @@ BEGIN
     LTEXT           "Port",IDC_STATIC,4,27,17,8
 END
 
+IDD_CONFIG DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "1",IDC_DEFAULTCONFIG,4,49,232,13
+    CONTROL         "Use only options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,82,10
+    LTEXT           "Default config file",IDC_SLIDERRES,4,35,124,8
+    LTEXT           "Custom config file",IDC_STATIC,4,66,110,8
+    LTEXT           "2",IDC_CUSTOMCONFIG,4,79,232,18
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1028,6 +1039,13 @@ BEGIN
     END
 
     IDD_LISTEN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_CONFIG, DIALOG
     BEGIN
         RIGHTMARGIN, 236
         VERTGUIDE, 4

@@ -344,6 +344,10 @@
 #define IDC_UVVERSION                   2077
 #define IDC_UVVERSION2                  2078
 #define IDC_IPV6                        2079
+#define IDD_CONFIG                      2080
+#define IDC_DEFAULTCONFIG               2080
+#define IDC_CUSTOMCONFIG                2081
+#define IDC_CHECKCONFIG                 2082
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -667,7 +671,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        241
 #define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2080
+#define _APS_NEXT_CONTROL_VALUE         2083
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

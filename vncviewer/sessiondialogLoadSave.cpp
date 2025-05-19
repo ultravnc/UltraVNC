@@ -104,6 +104,7 @@ void SessionDialog::SettingsFromUI()
 	ReadDlgProcSecurity();
 	ReadDlgProcListen();
 	ReadDlgProc();
+	ReadDlgProcConfig();
 }
 
 void SessionDialog::SettingsToUI(bool initMruNeeded)
@@ -114,6 +115,7 @@ void SessionDialog::SettingsToUI(bool initMruNeeded)
 	InitDlgProcMisc();
 	InitDlgProcSecurity();	
 	InitDlgProcListen();
+	InitDlgProcConfig();
 	InitDlgProc(true, initMruNeeded);		
 }
 
@@ -214,6 +216,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("GiiEnable", giiEnable, fname);
 #endif
 	saveInt("RequireEncryption",	fRequireEncryption, fname);
+	saveInt("UseOnlyDefaultConfigFile", fUseOnlyDefaultConfigFile, fname);
 	saveInt("restricted",			restricted,		fname);  //hide menu
 	saveInt("ipv6",					ipv6, fname);  //hide menu
 	saveInt("AllowUntrustedServers", AllowUntrustedServers, fname);
@@ -312,6 +315,7 @@ void SessionDialog::LoadFromFile(char *fname)
   fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
+  fUseOnlyDefaultConfigFile = readInt("UseCustomConfigFile", (int)fUseOnlyDefaultConfigFile, fname) ? true : false;
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
@@ -706,7 +710,7 @@ void SessionDialog::getAppData(char * buffer)
 
 void SessionDialog::IfHostExistLoadSettings(char *hostname)
 {
-	SetDefaults();
+	//SetDefaults();
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	int port;
 	ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &port);
@@ -718,14 +722,18 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	strcat_s(buffer,"\\UltraVNC\\");
 	strcat_s(buffer,fname);
 	FILE *file = fopen(buffer, "r");
-	if (strlen(hostname) != 0 && file ) {
+	strcpy_s(customConfigFile, buffer);
+	if (strlen(hostname) != 0 && file && !m_pOpt->m_UseOnlyDefaultConfigFile) {
 		fclose(file);
 		SetDefaults();
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
-		LoadFromFile(buffer);		
+		LoadFromFile(buffer);
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG),customConfigFile);
 	}
-	else
+	else {
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), "");
+	}
 	InitDlgProcListen();
 }
 
@@ -789,6 +797,7 @@ void SessionDialog::SetDefaults()
 	fAutoAcceptIncoming = false;
 	fAutoAcceptNoDSM = false;
 	fRequireEncryption = false;
+	fUseOnlyDefaultConfigFile = true;
 	preemptiveUpdates = false;
 	scale_num = 100;
 	scale_den = 100;

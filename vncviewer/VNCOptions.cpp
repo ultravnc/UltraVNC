@@ -243,6 +243,7 @@ VNCOptions::VNCOptions()
 	m_fAutoAcceptIncoming = false;
 	m_fAutoAcceptNoDSM = false;
 	m_fRequireEncryption = false;
+	m_UseOnlyDefaultConfigFile = true;
 	m_preemptiveUpdates = false;
 	m_saved_scale_num = 100;
 	m_saved_scale_den = 100;
@@ -453,6 +454,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = s.m_fRequireEncryption;
+	m_UseOnlyDefaultConfigFile = s.m_UseOnlyDefaultConfigFile;
 
 	//adzm 2010-07-04
 	m_preemptiveUpdates = s.m_preemptiveUpdates;
@@ -1226,6 +1228,8 @@ void VNCOptions::SaveOptions(char* fname)
 
 	//adzm 2010-05-12
 	saveInt("RequireEncryption", m_fRequireEncryption, fname);
+	saveInt("UseOnlyDefaultConfigFile", m_UseOnlyDefaultConfigFile, fname);
+	
 
 	//adzm 2010-07-04
 	saveInt("PreemptiveUpdates", m_preemptiveUpdates, fname);
@@ -1337,6 +1341,8 @@ void VNCOptions::LoadOptions(char* fname)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = readInt("RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
+	m_UseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)m_UseOnlyDefaultConfigFile, fname) ? true : false;
+	
 
 	//adzm 2010-07-04
 	m_preemptiveUpdates = readInt("PreemptiveUpdates", (int)m_preemptiveUpdates, fname) ? true : false;

@@ -148,6 +148,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoAcceptIncoming = m_pOpt->m_fAutoAcceptIncoming;
 	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
 	fRequireEncryption = m_pOpt->m_fRequireEncryption;
+	fUseOnlyDefaultConfigFile = m_pOpt->m_UseOnlyDefaultConfigFile;
 	restricted = m_pOpt->m_restricted;
 	ipv6 = m_pOpt->m_ipv6;
 	AllowUntrustedServers = m_pOpt->m_AllowUntrustedServers;
@@ -279,7 +280,10 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			_this->SetDefaults();
 			return TRUE;
 		case IDC_SAVE:
-			_this->SaveConnection(hwnd, false);
+			if (_this->fUseOnlyDefaultConfigFile)
+				_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
+			else
+				_this->SaveConnection(hwnd, false);				
 			break;
 		case IDC_SAVEAS:
 			_this->SaveConnection(hwnd, true);
@@ -700,6 +704,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
+	m_pOpt->m_UseOnlyDefaultConfigFile = fUseOnlyDefaultConfigFile;
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;

@@ -31,6 +31,7 @@ char *infomsg2;
 int g_error_nr2;
 bool	g_disable_sponsor=false;
 extern char buildtime[];
+void convertToISO8601(const char* input, char* output, size_t size);
 
 // Process the About dialog.
 static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg, 
@@ -43,7 +44,12 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 			//CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);            
-			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
+			SetForegroundWindow(hwnd);
+			extern char buildtime[];
+			char isoTime[20];  // Buffer for ISO output
+			convertToISO8601(buildtime, isoTime, sizeof(isoTime));
+			SetDlgItemText(hwnd, IDC_BUILDTIME, isoTime);
+
             SetDlgItemText(hwnd, IDC_Message2, infomsg2);
 			if ( (strcmp(infomsg2,"Your connection has been rejected.")==0)) g_error_nr2=1000;
 			if ( (strcmp(infomsg2,"Local loop-back connections are disabled.")==0)) g_error_nr2=1001;

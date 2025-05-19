@@ -150,6 +150,7 @@ public:
 	bool m_fAutoAcceptIncoming;
 	bool m_fAutoAcceptNoDSM;
 	bool m_fRequireEncryption;
+	bool m_UseOnlyDefaultConfigFile;
 	bool m_preemptiveUpdates;
 	void CheckProxyAndHost();
 #ifdef _Gii
