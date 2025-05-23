@@ -207,7 +207,11 @@ void SettingsManager::setDefaults()
 	m_pref_RequireMSLogon = false;
 	m_pref_Secure = false;
 	m_pref_NewMSLogon = false;
+#ifdef SC_20
+	m_pref_ReverseAuthRequired = false;
+#else
 	m_pref_ReverseAuthRequired = true;
+#endif
 
 	m_pref_DisableTrayIcon = false;
 	m_pref_Rdpmode = 0;
