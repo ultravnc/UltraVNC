@@ -606,6 +606,7 @@ private:
 	}
 };
 
+const int secTypePlain = 256;
 const int secTypeTLSNone = 257;
 const int secTypeTLSVnc = 258;
 const int secTypeTLSPlain = 259;
@@ -680,9 +681,8 @@ void ClientConnection::AuthVeNCrypt()
 			temp = Swap32IfLE(temp);
 			switch (temp)
 			{
-			case secTypeTLSNone:
-			case secTypeTLSVnc:
-			case secTypeTLSPlain:
+			case rfbVncAuth:
+			case secTypePlain:
 			case secTypeX509None:
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
@@ -695,106 +695,111 @@ void ClientConnection::AuthVeNCrypt()
 		return SetLastError("No valid sub-type");
 	temp = Swap32IfLE(subType);
 	WriteExact((char *)&temp, 4);
-	temp = 0;
-	ReadExact((char *)&temp, 1);
-	if (temp != 1)
-		return SetLastError("Server unsupported sub-type");
 
-	// start TLS on existing connection
-	TLSSession session;
-	session.Init(m_host);
-	DynBuffer inbuf, outbuf;
-	while (TRUE)
-	{
-		if (!session.Handshake(inbuf, outbuf))
-			return SetLastError(session.lastError);
-		size = outbuf.GetAvailable();
-		if (size > 0)
+	// if standard RFB type negotiated -> no further msgs and no TLS session
+	if (subType >= 256) {
+		temp = 0;
+		ReadExact((char *)&temp, 1);
+		if (temp != 1)
+			return SetLastError("Server unsupported sub-type");
+
+		// start TLS on existing connection
+		TLSSession session;
+		session.Init(m_host);
+		DynBuffer inbuf, outbuf;
+		while (TRUE)
 		{
-			WriteExact((char *)outbuf.GetHead(), size);
-			outbuf.size = 0;
-		}
-		if (session.IsReady())
-			break;
-		size = 1;
-		inbuf.EnsureFree(size);
-		ReadExact((char *)inbuf.GetTail(), size);
-		inbuf.size += size;
-	}
-	if (!session.ValidateRemoteCertificate())
-	{
-		TCHAR key[MAX_HOST_NAME_LEN];
-		sprintf_s(key, "%s:%d", m_host, m_port);
-		ThumbHost host(key, m_opts->getDefaultOptionsFileName());
-		char hex[64];
-		bool done = false;
-		if (GetCertificateThumbprint(session.pRemoteCert, hex, sizeof(hex)) && host.CompareThumbprint(hex))
-			done = true;
-		while (!done)
-		{
-			int nButtonPressed = 0;
-			WCHAR msg[1024];
-			swprintf_s(msg, L"%hs\n\nDo you want to continue?\n", session.lastError);
-			TASKDIALOGCONFIG tc = { 0 };
-			const TASKDIALOG_BUTTON buttons[] = { { IDNO, L"View Certificate" } };
-			BOOL bPersist = FALSE;
-			tc.cbSize = sizeof(tc);
-			tc.dwFlags = TDF_SIZE_TO_CONTENT;
-			tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
-			tc.pszWindowTitle = L"UltraVNC Viewer - Warning";
-			tc.hInstance = pApp->m_instance;
-			tc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
-			tc.pszMainInstruction = L"Invalid server certificate";
-			tc.pszContent = msg;
-			tc.pButtons = buttons;
-			tc.cButtons = _countof(buttons);
-			tc.nDefaultButton = 1;
-			if (secTypeTLSNone <= subType && subType <= secTypeTLSPlain)
-				tc.pszVerificationText = L"Don't ask anymore";
-			TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
-			switch (nButtonPressed)
+			if (!session.Handshake(inbuf, outbuf))
+				return SetLastError(session.lastError);
+			size = outbuf.GetAvailable();
+			if (size > 0)
 			{
-			case IDNO:
-			{
-				BOOL changed = FALSE;
-				CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
-				vc.dwSize = sizeof(vc);
-				vc.hwndParent = m_hwndStatus;
-				vc.pCertContext = session.pRemoteCert;
-				CryptUIDlgViewCertificate(&vc, &changed);
-				break;
+				WriteExact((char *)outbuf.GetHead(), size);
+				outbuf.size = 0;
 			}
-			case IDCANCEL:
-				if (!session.Shutdown(outbuf))
-					return SetLastError(session.lastError);
-				size = outbuf.GetAvailable();
-				if (size > 0)
-				{
-					WriteExact((char*)outbuf.GetHead(), size);
-					outbuf.size = 0;
-				}
-				throw QuietException("Authentication cancelled");
+			if (session.IsReady())
 				break;
-			default:
-				if (bPersist)
-					host.SaveThumbprint(hex);
+			size = 1;
+			inbuf.EnsureFree(size);
+			ReadExact((char *)inbuf.GetTail(), size);
+			inbuf.size += size;
+		}
+		if (!session.ValidateRemoteCertificate())
+		{
+			TCHAR key[MAX_HOST_NAME_LEN];
+			sprintf_s(key, "%s:%d", m_host, m_port);
+			ThumbHost host(key, m_opts->getDefaultOptionsFileName());
+			char hex[64];
+			bool done = false;
+			if (GetCertificateThumbprint(session.pRemoteCert, hex, sizeof(hex)) && host.CompareThumbprint(hex))
 				done = true;
-				break;
+			while (!done)
+			{
+				int nButtonPressed = 0;
+				WCHAR msg[1024];
+				swprintf_s(msg, L"%hs\n\nDo you want to continue?\n", session.lastError);
+				TASKDIALOGCONFIG tc = { 0 };
+				const TASKDIALOG_BUTTON buttons[] = { { IDNO, L"View Certificate" } };
+				BOOL bPersist = FALSE;
+				tc.cbSize = sizeof(tc);
+				tc.dwFlags = TDF_SIZE_TO_CONTENT;
+				tc.dwCommonButtons = TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON;
+				tc.pszWindowTitle = L"UltraVNC Viewer - Warning";
+				tc.hInstance = pApp->m_instance;
+				tc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
+				tc.pszMainInstruction = L"Invalid server certificate";
+				tc.pszContent = msg;
+				tc.pButtons = buttons;
+				tc.cButtons = _countof(buttons);
+				tc.nDefaultButton = 1;
+				tc.pszVerificationText = L"Don't ask anymore";
+				TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
+				switch (nButtonPressed)
+				{
+				case IDNO:
+				{
+					BOOL changed = FALSE;
+					CRYPTUI_VIEWCERTIFICATE_STRUCT vc = { 0 };
+					vc.dwSize = sizeof(vc);
+					vc.hwndParent = m_hwndStatus;
+					vc.pCertContext = session.pRemoteCert;
+					CryptUIDlgViewCertificate(&vc, &changed);
+					break;
+				}
+				case IDCANCEL:
+					if (!session.Shutdown(outbuf))
+						return SetLastError(session.lastError);
+					size = outbuf.GetAvailable();
+					if (size > 0)
+					{
+						WriteExact((char *)outbuf.GetHead(), size);
+						outbuf.size = 0;
+					}
+					throw QuietException("Authentication cancelled");
+					break;
+				default:
+					if (bPersist)
+						host.SaveThumbprint(hex);
+					done = true;
+					break;
+				}
 			}
 		}
+		m_fUsePlugin = true;
+		m_pPluginInterface = new TLSPlugin(session);
 	}
-	m_fUsePlugin = true;
-	m_pPluginInterface = new TLSPlugin(session);	
 	switch (subType)
 	{
 	case secTypeTLSNone:
 	case secTypeX509None:
 		// do nothing
 		break;
+	case rfbVncAuth:
 	case secTypeTLSVnc:
 	case secTypeX509Vnc:
 		AuthVnc();
 		break;
+	case secTypePlain:
 	case secTypeTLSPlain:
 	case secTypeX509Plain:
 		if (strlen(m_clearPasswd) == 0)
