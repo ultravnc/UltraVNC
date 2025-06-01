@@ -319,8 +319,8 @@ void SettingsManager::load()
 		m_pref_keepAliveInterval = m_pref_ftTimeout - KEEPALIVE_HEADROOM;
 	iniFile.ReadString("admin", "service_commandline", m_pref_service_commandline, 1024);
 	iniFile.ReadString("admin", "accept_reject_mesg", m_pref_accept_reject_mesg, 512);
-	vncPasswd::FromClear crypt(m_pref_Secure);
-	memcpy(m_pref_passwd, crypt, MAXPWLEN);
+	//vncPasswd::FromClear crypt(m_pref_Secure);
+	//memcpy(m_pref_passwd, crypt, MAXPWLEN);
 	m_pref_DebugMode = iniFile.ReadInt("admin", "DebugMode", m_pref_DebugMode);
 	iniFile.ReadString("admin", "path", m_pref_DebugPath, 512);
 	m_pref_DebugLevel = iniFile.ReadInt("admin", "DebugLevel", m_pref_DebugLevel);
@@ -354,6 +354,8 @@ void SettingsManager::load()
 	m_pref_OSD = iniFile.ReadInt("admin", "OSD", m_pref_OSD);
 	m_pref_NotificationSelection = iniFile.ReadInt("admin", "NotificationSelection", m_pref_NotificationSelection);
 	m_pref_QueryIfNoLogon = iniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
+	strcpy_s(m_pref_passwd, "");
+	strcpy_s(m_pref_passwdViewOnly, "");
 	iniFile.ReadPassword(m_pref_passwd, MAXPWLEN);
 	iniFile.ReadPasswordViewOnly(m_pref_passwdViewOnly, MAXPWLEN); //PGM
 	m_pref_EnableRemoteInputs = iniFile.ReadInt("admin", "InputsEnabled", m_pref_EnableRemoteInputs);

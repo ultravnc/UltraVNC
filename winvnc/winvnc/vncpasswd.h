@@ -56,7 +56,12 @@ public:
 	inline ToText(const char encrypted[MAXPWLEN], bool secure)
 	{
 	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
-	    plaintext = vncDecryptPasswd((char *)encrypted, secure);
+		char* emptyPasswd = (char*)malloc(1);
+		emptyPasswd[0] = 0;
+	    plaintext = (strlen(encrypted) == 0) 
+				? emptyPasswd 
+				: vncDecryptPasswd((char*)encrypted, secure);
+		
 	}
 	inline ~ToText()
 	{
