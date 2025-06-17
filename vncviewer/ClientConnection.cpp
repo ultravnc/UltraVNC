@@ -615,44 +615,39 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 
 	OSVERSIONINFO osvi = { sizeof(OSVERSIONINFO) };
 	GetVersionEx(&osvi);
-	if (osvi.dwMajorVersion >= 6 && osvi.dwMinorVersion >= 3)
-	{
-		typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
-		PFN_GetDpiForMonitor getDpiForMonitor;
-		HMODULE hShcore = NULL;
-		HMODULE hUser32 = NULL;
 
-		hShcore = LoadLibrary(_T("Shcore.dll"));
-		if (hShcore)
-			// GetDpiForMonitor, Windows 8.1 [desktop apps only]
-			getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
-		if (getDpiForMonitor)
-		{
-			HMONITOR monitor = MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
-			if (monitor) {
-				UINT xScale = 96, yScale = 96;
-				HRESULT hr = getDpiForMonitor(monitor, MDT_DEFAULT, &xScale, &yScale);
-				if (FAILED(hr)) // Ensure function call succeeded
-				{
-					m_Dpi = 96;
-				}
-				else
-				{
-					m_Dpi = xScale;
-				}
+	typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
+	PFN_GetDpiForMonitor getDpiForMonitor;
+	HMODULE hShcore = NULL;
+	HMODULE hUser32 = NULL;
+
+	hShcore = LoadLibrary(_T("Shcore.dll"));
+	if (hShcore)
+		// GetDpiForMonitor, Windows 8.1 [desktop apps only]
+		getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
+	if (getDpiForMonitor)
+	{
+		HMONITOR monitor = MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
+		if (monitor) {
+			UINT xScale = 96, yScale = 96;
+			HRESULT hr = getDpiForMonitor(monitor, MDT_DEFAULT, &xScale, &yScale);
+			if (FAILED(hr)) // Ensure function call succeeded
+			{
+				m_Dpi = 96;
 			}
 			else
-				m_Dpi = 96;
-
+			{
+				m_Dpi = xScale;
+			}
 		}
 		else
-		{
-			m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
-		}
-		FreeLibrary(hShcore);
+			m_Dpi = 96;
+
 	}
 	else
-		m_Dpi = 96;
+		m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
+	FreeLibrary(hShcore);
+
 
 	m_DpiOld = m_Dpi;
 	vnclog.Print(2, _T("DPI %d\n"), m_Dpi);
