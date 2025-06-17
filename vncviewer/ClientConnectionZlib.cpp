@@ -89,7 +89,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 {
 	unsigned char *newbuf;
 
-	if (m_zlibbufsize > bufsize + 256) return;
+	if (m_zlibbufsize >= bufsize + 256) return;
 
 	omni_mutex_lock l(m_zlibBufferMutex);
 
