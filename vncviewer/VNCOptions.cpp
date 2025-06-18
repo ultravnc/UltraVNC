@@ -1349,7 +1349,7 @@ void VNCOptions::LoadOptions(char* fname)
 }
 
 void VNCOptions::ShowUsage(LPTSTR info) {
-	TCHAR msg[1024];
+	TCHAR msg[2048];
 	TCHAR* tmpinf = _T("");
 	if (info != NULL)
 		tmpinf = info;

@@ -157,7 +157,7 @@ bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* bod
 bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon)
 {
     wchar_t w_header[128];
-    wchar_t w_body[1024];
+    wchar_t w_body[2048];
     size_t outSize;
 
     mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
