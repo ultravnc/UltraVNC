@@ -273,7 +273,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_SAVEASDEFAULT:
 			_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
 			return true;
-		case IDC_DELETE:
+		case IDC_RESET_DEFAULTS:
 			DeleteFile(_this->m_pOpt->getDefaultOptionsFileName());
 			_this->SetDefaults();
 			return TRUE;
@@ -468,10 +468,10 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	{
 		_ASSERT(!m_bExpanded);
 
-		// Position and Size from IDC_DELETE
-		HWND hDelete = GetDlgItem(hDlg, IDC_DELETE);
+		// Position bottom left button 
+		HWND hBottomLeftButton = GetDlgItem(hDlg, IDC_SAVE);
 		RECT rcDelete;
-		GetWindowRect(hDelete, &rcDelete);
+		GetWindowRect(hBottomLeftButton, &rcDelete);
 		POINT ptBottomRight = { rcDelete.right, rcDelete.bottom };
 		ScreenToClient(hDlg, &ptBottomRight);
 		int paddingX = MulDiv(16, m_Dpi, 96);

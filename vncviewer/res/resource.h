@@ -216,6 +216,7 @@
 #define IDC_4GREYCOLORS_RADIO           1145
 #define IDC_2GREYCOLORS_RADIO           1146
 #define IDC_DELETE                      1147
+#define IDC_RESET_DEFAULTS              1147
 #define IDC_SETDEFAULT_CHECK            1148
 #define IDC_LM_STATIC                   1149
 #define IDC_RM_STATIC                   1150
