@@ -848,14 +848,16 @@ private:
 	DWORD prevMousekeyflags;
 	UINT prevMousemsg;
 
-	UINT m_Dpi;
+	
 	UINT m_DpiOld;
 	bool m_DpiMove;
-	HMODULE hUser32;
-	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+	HMODULE hUser32;	
 	short nbrMonitors = 0;
 
 public:
+	UINT m_Dpi;
+	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+
 	// RFB settings
 #ifdef _CLOUD
 	CloudThread* cloudThread = NULL;

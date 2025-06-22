@@ -60,9 +60,7 @@ extern char sz_F11[64];
 SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin* pDSMPlugin)
 {
 	m_bExpanded = true;
-	cy = 0;
-	cx = 0;
-	dpichanged = false;
+	m_Dpi = pCC->m_Dpi;
 	m_pCC = pCC;
 	m_pOpt = pOpt;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME, 98);
@@ -389,18 +387,12 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	case WM_DPICHANGED:
-		_this->dpichanged = true;
+		_this->m_Dpi = HIWORD(wParam);
 		return FALSE;
-	case WM_MOVE:
-		if (_this->dpichanged)
-			if (_this->IsOnlyOneMonitor(hwnd))
-			{
-				_this->dpichanged = false;
-				_this->DpiChange(hwnd);
-			}
+	/*case WM_MOVE:
 		return FALSE;
 	case WM_CLOSE:
-		return FALSE;
+		return FALSE;*/
 	case WM_DESTROY:
 		EndDialog(hwnd, FALSE);
 		KillTimer(hwnd, 100);
@@ -416,38 +408,6 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-bool SessionDialog::IsOnlyOneMonitor(HWND hDlg)
-{
-	RECT windowRect;
-	GetWindowRect(hDlg, &windowRect);
-	HMONITOR hMonitor = ::MonitorFromWindow(hDlg, MONITOR_DEFAULTTONEAREST);
-	MONITORINFO mi;
-	mi.cbSize = sizeof(MONITORINFO);
-	GetMonitorInfo(hMonitor, &mi);
-	return ((windowRect.top >= mi.rcMonitor.top) && (windowRect.bottom <= mi.rcMonitor.bottom) && (windowRect.left >= mi.rcMonitor.left) && (windowRect.right <= mi.rcMonitor.right))
-		|| (windowRect.right - windowRect.left) >= (mi.rcMonitor.right - mi.rcMonitor.left) || (windowRect.bottom - windowRect.top) >= (mi.rcMonitor.bottom - mi.rcMonitor.top);  // or Bigger
-}
-
-void SessionDialog::DpiChange(HWND hDlg)
-{
-	if (m_bExpanded)
-	{
-		cx = 0;
-		cy = 0;
-	}
-	else
-	{
-		RECT rcWnd, rcDefaultBox;
-		HWND wndDefaultBox = NULL;
-		GetWindowRect(hDlg, &rcWnd);
-		wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
-		if (wndDefaultBox == NULL) return;
-		GetWindowRect(wndDefaultBox, &rcDefaultBox);
-		rcDefaultBox.left += 2;
-		cx = rcDefaultBox.right - rcWnd.left; // OK
-		// cy = rcWnd.bottom - rcWnd.top;  // not OK, toDo  size wrong after dpichange
-	}
-}
 
 void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 {
@@ -489,19 +449,8 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		_ASSERT(m_bExpanded);
 		GetWindowRect(hDlg, &rcWnd);
 
-		// this is the first time we are being called to shrink the dialog
-		// box. The dialog box is currently in its expanded size and we must
-		// save the expanded width and height so that it can be restored
-		// later when the dialog box is expanded.
-
-		if (cx == 0 && cy == 0)
-		{
-			cx = rcDefaultBox.right - rcWnd.left;
-			cy = rcWnd.bottom - rcWnd.top;
-
-			// we also hide the default box here so that it is not visible
-			ShowWindow(wndDefaultBox, SW_HIDE);
-		}
+		// we also hide the default box here so that it is not visible
+		ShowWindow(wndDefaultBox, SW_HIDE);
 
 		// shrink the dialog box so that it encompasses everything from the top,
 		// left up to and including the default box.
@@ -518,7 +467,33 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	else // we are expanding
 	{
 		_ASSERT(!m_bExpanded);
-		SetWindowPos(hDlg, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
+
+		// Position and Size from IDC_DELETE
+		HWND hDelete = GetDlgItem(hDlg, IDC_DELETE);
+		RECT rcDelete;
+		GetWindowRect(hDelete, &rcDelete);
+		POINT ptBottomRight = { rcDelete.right, rcDelete.bottom };
+		ScreenToClient(hDlg, &ptBottomRight);
+		int paddingX = MulDiv(16, m_Dpi, 96);
+		int paddingY = MulDiv(16, m_Dpi, 96);
+		int desiredWidth = ptBottomRight.x + paddingX;
+		int desiredHeight = ptBottomRight.y + paddingY;
+		DWORD dwStyle = GetWindowLong(hDlg, GWL_STYLE);
+		DWORD dwExStyle = GetWindowLong(hDlg, GWL_EXSTYLE);
+		RECT rcClient = { 0, 0, desiredWidth, desiredHeight };	
+		if (m_pCC->adjustWindowRectExForDpi)
+		{
+			m_pCC->adjustWindowRectExForDpi(&rcClient, dwStyle, FALSE, dwExStyle,m_Dpi);
+		}
+		else
+		{
+			AdjustWindowRectEx(&rcClient, dwStyle, FALSE, dwExStyle);
+		}
+
+		SetWindowPos(hDlg, NULL, 0, 0,
+			rcClient.right - rcClient.left,
+			rcClient.bottom - rcClient.top,
+			SWP_NOMOVE | SWP_NOZORDER);
 
 		// make sure that the entire dialog box is visible on the user's
 		// screen.

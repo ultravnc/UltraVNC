@@ -170,15 +170,10 @@ public:
 	VNCOptions *m_pOpt;
 	void StartListener();
 	void ModeSwitch(HWND hwnd, WPARAM wParam);
-	void DpiChange(HWND hDlg);
-	bool IsOnlyOneMonitor(HWND hDlg);
-	bool dpichanged;
 	UINT m_Dpi;
-	UINT m_DpiOld;
 	char InfoMsg[255]{0};
 	char customConfigFile[_MAX_PATH]{};
 private:
-	int cx, cy;
 	HWND hTabEncoders, hTabKeyboardMouse, hTabDisplay, hTabMisc, hTabSecurity,
 			hTabQuickOptions, hTabListen, hTabConfig;
 	HWND m_hTab;
