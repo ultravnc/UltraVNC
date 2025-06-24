@@ -3072,6 +3072,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		{
 			throw WarningException("You refused a untrusted server.");
 		}
+		if (bCheckboxChecked)
+			SaveAllowUntrustedServers();
+		
 
 		if (m_minorVersion < 8)
 			{

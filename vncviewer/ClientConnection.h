@@ -199,6 +199,7 @@ public:
 	void WriteExact(char *buf, int bytes); //adzm 2010-09
 	void WriteExactFT(char *buf, int bytes);
 	void ResizeToolbar(RECT& rect);
+	void SaveAllowUntrustedServers();
 
 private:
 	bool brfbClientInitExtraMsgSupportNew = false;

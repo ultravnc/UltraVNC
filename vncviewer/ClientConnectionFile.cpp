@@ -130,6 +130,42 @@ void ClientConnection::SaveConnection()
 	//m_opts->Register();
 }
 
+void ClientConnection::SaveAllowUntrustedServers()
+{
+	char buf[10];
+	sprintf_s(buf, "%d", 1);
+	if (m_opts->m_UseOnlyDefaultConfigFile)
+		WritePrivateProfileString("options", "AllowUntrustedServers", buf, m_opts->getDefaultOptionsFileName());
+	else {
+		char fname[_MAX_PATH];
+		char tname[_MAX_FNAME + _MAX_EXT];
+		ofnInit();
+		int disp = PORT_TO_DISPLAY(m_port);
+		sprintf_s(fname, "%.15s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
+		ofn.hwndOwner = m_hwndcn;
+		ofn.lpstrFile = fname;
+		ofn.lpstrFileTitle = tname;
+		ofn.Flags = OFN_HIDEREADONLY;
+		if (!GetSaveFileName(&ofn)) {
+			DWORD err = CommDlgExtendedError();
+			char msg[1024];
+			switch (err) {
+			case 0:	// user cancelled
+				break;
+			case FNERR_INVALIDFILENAME:
+				strcpy_s(msg, sz_K1);
+				yesUVNCMessageBox(m_hInstResDLL, m_hwndcn, msg, sz_K2, MB_ICONERROR);
+				break;
+			default:
+				vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
+				break;
+			}
+			return;
+		}
+		WritePrivateProfileString("options", "AllowUntrustedServers", buf, fname);
+	}
+}
+
 
 void ClientConnection::Save_Latest_Connection()
 {
