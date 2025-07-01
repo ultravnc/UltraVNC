@@ -18,6 +18,7 @@ env:
 jobs:
   ubuntu-vcpkg:
     runs-on: ubuntu-latest
+    if: false
     steps:
     - uses: actions/checkout@v4
       with:
@@ -32,7 +33,7 @@ jobs:
     - name: Update apt
       run: sudo apt update
     - name: Install dependencies
-      run: sudo apt-get install -y yasm nasm libglu1-mesa-dev freeglut3-dev mesa-common-dev libxcursor-dev libxft-dev libxinerama-dev mono-complete
+      run: sudo apt-get install -y yasm nasm autoconf libglu1-mesa-dev freeglut3-dev mesa-common-dev libxcursor-dev libxft-dev libxinerama-dev mono-complete
 
     - name: 'Setup vcpkg and NuGet artifacts backend'
       shell: bash
@@ -57,15 +58,10 @@ jobs:
       shell: pwsh
       run: ${{ github.workspace }}/cmake/CCM/build.ps1 -UseVCPKG -DoNotUpdateVCPKG -DisableInteractive -DoNotUpdateTOOL
 
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ github.event.repository.name }}-ubuntu
-        path: build_release/${{ github.event.repository.name }}-*.deb
-
 
   osx-vcpkg:
     runs-on: macos-latest
+    if: false
     steps:
     - uses: actions/checkout@v4
       with:
@@ -76,7 +72,7 @@ jobs:
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
 
     - name: Install dependencies
-      run: brew install libomp yasm nasm
+      run: brew install libomp yasm nasm autoconf
 
     - uses: lukka/get-cmake@latest
 
@@ -102,12 +98,6 @@ jobs:
     - name: 'Build'
       shell: pwsh
       run: ${{ github.workspace }}/cmake/CCM/build.ps1 -UseVCPKG -DoNotUpdateVCPKG -DisableInteractive -DoNotUpdateTOOL
-
-    - name: Publish artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ github.event.repository.name }}-macos
-        path: build_release/${{ github.event.repository.name }}-*.dmg
 
 
   win-vcpkg:
@@ -147,8 +137,13 @@ jobs:
       shell: pwsh
       run: ${{ github.workspace }}/cmake/CCM/build.ps1 -UseVCPKG -DoNotUpdateVCPKG -DisableInteractive -DoNotUpdateTOOL -ForceLocalVCPKG
 
+    - name: Create installer
+      if: false
+      shell: pwsh
+      run: iscc.exe ./UltraVNC_installer_x64.iss
+
     - name: Publish artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.event.repository.name }}-windows
-        path: build_release/${{ github.event.repository.name }}-*.msi
+        path: build_release/ultravnc/*.*
