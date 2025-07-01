@@ -146,4 +146,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.event.repository.name }}-windows
-        path: build_release/ultravnc/*.*
+        path: cmake/build_release/ultravnc/*.*
