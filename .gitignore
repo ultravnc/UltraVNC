@@ -22,6 +22,7 @@ bld/
 [Ll]og/
 [Ll]ogs/
 build/
+cmake/build*/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -134,7 +135,7 @@ $RECYCLE.BIN/
 # =========================
 
 
-# CMakeSpecific Ignore configuration file  
+# CMakeSpecific Ignore configuration file
 CMakeUserPresets.json
 
 
