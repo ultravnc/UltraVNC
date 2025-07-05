@@ -28,7 +28,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
-This UltraVNC Java Viewer supports UltraVNC File Transfer Protocol (>= RC19)
+This UltraVNC JavaViewer supports UltraVNC File Transfer Protocol (>= RC19)
 as well as UltraVNC MS-Logon.
 
 So even from a Unix or Mac machine you can use a simple Web browser and do
@@ -36,11 +36,11 @@ some File Transfer with the UltraVNC Win32 Server, as well as taking advantage
 of the more secure MS-Logon authentication method.
 
 When loaded in the WebBrowser (browsing http://YourUltraServerIP:5800), the
-user is prompted to accept or reject the UltraVNC Java Viewer applet signed
-certificate. It is necessary as this new UltraVNC Java Viewer does some File Transfer
+user is prompted to accept or reject the UltraVNC JavaViewer applet signed
+certificate. It is necessary as this new UltraVNC JavaViewer does some File Transfer
 and consequently needs to access the user's local drives.
 
-WARNING: This UltraVNC Java Viewer Applet can't be loaded using the default MS IE JVM
+WARNING: This UltraVNC JavaViewer Applet can't be loaded using the default MS IE JVM
 as it doesn't support Swing. You must install a Java JVM (v1.3 or >).
 
 What still needs to be implemented as soon as possible (that is already in
@@ -58,10 +58,10 @@ NEW: added support for more color modes, usefull on slow connections:
 64 Colors, 8 Colors, 2 B/W, 8 and 4 Grey Scale colors.
 
 
-Compiling and Running the UltraVNC Java Viewer
+Compiling and Running the UltraVNC JavaViewer
 ====================================
 
-** To compile the UltraVNC Java Viewer
+** To compile the UltraVNC JavaViewer
 
 1. Edit the "mk.bat" file and replace the path "c:\soft" with the
 path where your Java sdk stands.
@@ -73,17 +73,17 @@ UltraVNC Server winvnc.exe and injected into web browsers on connections to port
 use the keytool.exe and jarsigner.exe programs that can be found in the
 Java sdk.
 
-4. To replace the UltraVNC Java Viewer applet with your modifed
+4. To replace the UltraVNC JavaViewer applet with your modifed
 and signed applet, copy the generated .class files and the vncviewer.jar
 file into winvnc\res directory and recompile UltraVNC Server.
 
 
 
-** To run this UltraVNC Java Viewer as a Java application, you must have the Java
+** To run this UltraVNC JavaViewer as a Java application, you must have the Java
 Runtime installed.
 
 1. Edit the "run.bat" file and replace the path "C:\UltraVNC\JavaViewer"
-with the path where you've copied the UltraVNC Java Viewer, then replace "127.0.0.1"
+with the path where you've copied the UltraVNC JavaViewer, then replace "127.0.0.1"
 with the IP adress or network name of the machine where UltraVNC Server is
 running.
 
@@ -99,7 +99,7 @@ Under Linux and Mac, you can also make a batchfile that executes this command:
 java.exe -cp **YourUltraVNCJavaViewerFullPath** VncViewer HOST **YourServerIP** PORT 5900
 
 
-As soon as this new UltraVNC Java Viewer reaches the "beta" stage we'll put the source
+As soon as this new UltraVNC JavaViewer reaches the "beta" stage we'll put the source
 code in UltraVNC CVS repository. For now, the source code is available on demand
 only. If you know Java, have time and want to improve the UltraVNC project, your
 help would be greatly appreciated.
@@ -130,11 +130,11 @@ installation directory.
 Configuration
 =============
 
-UltraVNC Java Viewer supports a number of parameters allowing you to
+UltraVNC JavaViewer supports a number of parameters allowing you to
 customize its behaviour. Most parameter names copy settings available from
-the Options frame in the Java Viewer. Both parameter names and their values
+the Options frame in the JavaViewer. Both parameter names and their values
 are case-insensitive, with one exception for the "PASSWORD" parameter. Here
-is the full list of parameters supported in UltraVNC Java Viewer:
+is the full list of parameters supported in UltraVNC JavaViewer:
 
 --> "HOST" (no GUI equivalent)
 
@@ -185,7 +185,7 @@ is the full list of parameters supported in UltraVNC Java Viewer:
 
     The preferred encoding. "Hextile" is a good choice for fast networks,
     while "Tight" is better suited for low-bandwidth connections. From the
-    other side, the "Tight" decoder in UltraVNC Java Viewer seems to be more
+    other side, the "Tight" decoder in UltraVNC JavaViewer seems to be more
     efficient than "Hextile" decoder so it's possible that this default
     setting can be ok for fast networks too.
 
@@ -338,12 +338,12 @@ is the full list of parameters supported in UltraVNC Java Viewer:
 RECORDING VNC SESSIONS
 ======================
 
-Current version of the UltraVNC Java Viewer is able to record VNC (RFB)
+Current version of the UltraVNC JavaViewer is able to record VNC (RFB)
 sessions in files for later playback. The data format in saved session files
 is compatible with the rfbproxy program written by Tim Waugh. Most important
 thing about session recording is that it's supported only if Java security
 manager allows access to local filesystem. Typically, it would not work for
-unsigned applets. To use this feature, either use UltraVNC Java Viewer as a
+unsigned applets. To use this feature, either use UltraVNC JavaViewer as a
 standalone application (Java Runtime Environment or Java Development Kit
 should be installed), or as a signed applet. The code checks if it's possible
 to support session recording, and if everything's fine, the new "Record"

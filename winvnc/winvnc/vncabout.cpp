@@ -33,6 +33,7 @@
 #include "../common/Hyperlinks.h"
 #include "winvnc.h"
 #include "vncabout.h"
+extern char configFile[256];
 
 //	[v1.0.2-jp1 fix] Load resouce from dll
 extern HINSTANCE	hInstResDLL;
@@ -83,7 +84,7 @@ char* GetVersionFromResource(char* version)
             }
         }
     }
-    strcat(version, (char*)"-dev");
+    //strcat(version, (char*)"-dev");
     return version;
 }
 
@@ -160,6 +161,26 @@ BOOL
         return TRUE;
     }
 
+void convertToISO8601(const char* input, char* output, size_t size) {
+    // Expected format: "Mar 14 2025 12:34:56"
+
+    // Convert month abbreviation to a number
+    const char* months = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+    char monthStr[4];  // Buffer for the month abbreviation (e.g., "Mar")
+    int day, year, month;
+    int hour, minute, second;
+
+    // Extract components from the input string
+    sscanf(input, "%3s %d %d %d:%d:%d", monthStr, &day, &year, &hour, &minute, &second);
+
+    // Convert month abbreviation to number (1-12)
+    month = (std::strstr(months, monthStr) - months) / 3 + 1;
+
+    // Format into ISO 8601 format "YYYY-MM-DDTHH:MM:SS"
+    snprintf(output, size, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+}
+
 // Constructor/destructor
 vncAbout::vncAbout()
 {
@@ -228,7 +249,11 @@ vncAbout::DialogProc(HWND hwnd,
 
 			// Insert the build time information
 			extern char buildtime[];
-			SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
+            char isoTime[20];  // Buffer for ISO output
+
+            convertToISO8601(buildtime, isoTime, sizeof(isoTime));
+
+			SetDlgItemText(hwnd, IDC_BUILDTIME, isoTime);
             ConvertStaticToHyperlink(hwnd, IDC_WWW);
 			// Show the dialog
 			SetForegroundWindow(hwnd);
@@ -243,7 +268,18 @@ vncAbout::DialogProc(HWND hwnd,
             strcat_s(title, " 32-bit -");
 #endif
 			strcat_s(title, GetVersionFromResource(version));
+#ifndef _X64
+            strcat_s(title, " - x86");
+#else
+            strcat_s(title, " - x64");
+#endif
 			SetDlgItemText(hwnd, IDC_VERSION, title);
+
+            const long lszConfigFileSize = 256;
+            char szConfigFile[lszConfigFileSize];
+
+            _snprintf_s(szConfigFile, lszConfigFileSize - 1, "Config file: %s", configFile);
+            SetDlgItemText(hwnd, IDC_CONFIG_FILE, szConfigFile);
 			return TRUE;
 		}
 

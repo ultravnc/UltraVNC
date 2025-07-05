@@ -33,6 +33,8 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION INT_FILEVERSION
  PRODUCTVERSION INT_PRODUCTVERSION
+ FILEVERSION 1,6,0,0
+ PRODUCTVERSION 1,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -47,19 +49,16 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments", "Logging for UltraVNC MS-Logon\0"
-            VALUE "CompanyName", STR_COMPANYNAME
-            VALUE "FileDescription", "Logging for UltraVNC MS-Logon\0"
-            VALUE "FileVersion", STR_FILEVERSION
-            VALUE "InternalName", "logging\0"
-            VALUE "LegalCopyright", STR_COPYRIGHT
-            VALUE "OriginalFilename", "logging.dll\0"
-            VALUE "ProductName", "UltraVNC logging\0"
-            VALUE "ProductVersion", STR_PRODUCTVERSION
-#if isRC == 1
-			VALUE "SpecialBuild", STR_SPECIALBUILD
-#endif
-			END
+            VALUE "Comments", "Logging for UltraVNC MS-Logon"
+            VALUE "CompanyName", "UltraVNC"
+            VALUE "FileDescription", "Logging for UltraVNC MS-Logon"
+            VALUE "FileVersion", "1.6.0.0"
+            VALUE "InternalName", "logging"
+            VALUE "LegalCopyright", "Copyright � 2002-2025 UltraVNC Team Members. All Rights Reserved."
+            VALUE "OriginalFilename", "logging.dll"
+            VALUE "ProductName", "UltraVNC logging"
+            VALUE "ProductVersion", "1.6.0.0"
+        END
     END
     BLOCK "VarFileInfo"
     BEGIN

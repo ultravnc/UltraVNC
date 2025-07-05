@@ -57,7 +57,7 @@ ClipRect(int *x, int *y, int *w, int *h,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 void
 vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::UpdateTracker &tracker)
 {
@@ -150,7 +150,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 
 
 
-// Modif rdv@2002 - v1.1.x - videodriver
+// Modif rdv@2002 - v1.1.x - VideoDriver
 BOOL
 vncDesktopThread::handle_driver_changes(rfb::Region2D &rgncache,rfb::UpdateTracker &tracker)
 { 
@@ -362,7 +362,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			clipped_updates.clear();
 			// TESTTESTTEST
 			// Are all updates cleared....old updates could generate bounding errors
-			// any other queues to clear ? Yep cursor positions
+			// any other queues to clear? Yep cursor positions
 			m_desktop->m_cursorpos.tl.x=0;
 			m_desktop->m_cursorpos.tl.y=0;
 			m_desktop->m_cursorpos.br.x=0;
@@ -427,11 +427,11 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 
 						m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);
 
-						// sf@2003 - After a new Startup(), we check if the required video driver
+						// sf@2003 - After a new Startup(), we check if the required Video Driver
 						// is actually available. If not, we force hookdll
 						// No need for m_hookswitch again because the driver is NOT available anyway.
 						// All the following cases are now handled:
-						// 1. Desktop thread starts with "Video Driver" checked and no video driver available...
+						// 1. Desktop thread starts with "Video Driver" checked and no Video Driver available...
 						//    -> HookDll forced (handled by the first InitHookSettings() after initial Startup() call
 						// 2. Desktop Thread starts without "Video Driver" checked but available driver
 						//    then the user checks "Video Driver" -> Video Driver used
@@ -853,7 +853,7 @@ vncDesktopThread::run_undetached(void *arg)
 	
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver && !VNC_OSVersion::getInstance()->OS_WIN8 && !VNC_OSVersion::getInstance()->OS_WIN10)
 		{
-			// MIRROR DRIVER... still to check if this works			
+			// Mirror Driver... still to check if this works			
 			DWORD dw;
 			if (ThreadHandleCheckMirrorDriverUpdates == NULL)
 				ThreadHandleCheckMirrorDriverUpdates = CreateThread(NULL, 0, ThreadCheckMirrorDriverUpdates, this, 0, &dw);

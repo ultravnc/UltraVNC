@@ -30,7 +30,7 @@
  *
  */
 
-/* TODO: sinnvolle werte ? */
+/* TODO: sinnvolle werte? */
 #define rfbGIIMinVersion	1
 #define rfbGIIMaxVersion	1
 

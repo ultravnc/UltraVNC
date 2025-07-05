@@ -391,13 +391,15 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
     } else if (UnicodeChar < 255) {
         // Do not send non printable Latin-1 character
        vnclog.Print(8, _T("  0x%04x (Non printable Latin-1): "), UnicodeChar);
-    } else if (IsUCSLatinExtAB(UnicodeChar)) {
+    }
+    else if (useUnicodeKeysym) {
+        isUnicodeKeysym = true;
+    }    
+    else if (IsUCSLatinExtAB(UnicodeChar)) {
         // Latin Extended-A or B
        vnclog.Print(8, _T("  0x%04x (Latin Extended-A or B '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsLatinExtABMap.find(UnicodeChar) != ucsLatinExtABMap.end()) {
             XChar = ucsLatinExtABMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsLatinExtABMap\n"));
         }
@@ -406,9 +408,7 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Greek and Coptic '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsGreek_CopticMap.find(UnicodeChar) != ucsGreek_CopticMap.end()) {
             XChar = ucsGreek_CopticMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
-        } else {
+        }  else {
            vnclog.Print(8, _T("  The character is missing in ucsGreek_CopticMap\n"));
         }
     } else if (IsUCSCyrillic(UnicodeChar)) {
@@ -416,39 +416,34 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Cyrillic '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsCyrillicMap.find(UnicodeChar) != ucsCyrillicMap.end()) {
             XChar = ucsCyrillicMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
-        } else {
+        }  else {
            vnclog.Print(8, _T("  The character is missing in ucsCyrillicMap\n"));
         }
     } else if (IsUCSArmenian(UnicodeChar)) {
         // Armenian
        vnclog.Print(8, _T("  0x%04x (Armenian '%c'): "), UnicodeChar, UnicodeChar);
-        if (ucsArmenianMap.find(UnicodeChar) != ucsArmenianMap.end()) {
-            XChar = ucsArmenianMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
-        } else {
+       if (ucsArmenianMap.find(UnicodeChar) != ucsArmenianMap.end()) {
+           XChar = ucsArmenianMap[UnicodeChar];
+       }
+       else {
            vnclog.Print(8, _T("  The character is missing in ucsCyrillicMap\n"));
         }
     } else if (IsUCSHebrew(UnicodeChar)) {
         // Hebrew
        vnclog.Print(8, _T("  0x%04x (Hebrew '%c'): "), UnicodeChar, UnicodeChar);
-        if (ucsHebrewMap.find(UnicodeChar) != ucsHebrewMap.end()) {
-            XChar = ucsHebrewMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
-        } else {
+       if (ucsHebrewMap.find(UnicodeChar) != ucsHebrewMap.end()) {
+           XChar = ucsHebrewMap[UnicodeChar];
+       }
+        else {
            vnclog.Print(8, _T("  The character is missing in ucsHebrewMap\n"));
         }
     } else if (IsUCSArabic(UnicodeChar)) {
         // Arabic
        vnclog.Print(8, _T("  0x%04x (Arabic '%c'): "), UnicodeChar, UnicodeChar);
-        if (ucsArabicMap.find(UnicodeChar) != ucsArabicMap.end()) {
-            XChar = ucsArabicMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
-        } else {
+       if (ucsArabicMap.find(UnicodeChar) != ucsArabicMap.end()) {
+           XChar = ucsArabicMap[UnicodeChar];
+       }
+        else {
            vnclog.Print(8, _T("  The character is missing in ucsArabicMap\n"));
         }
     } else if (IsUCSThai(UnicodeChar)) {
@@ -456,8 +451,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Thai '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsThaiMap.find(UnicodeChar) != ucsThaiMap.end()) {
             XChar = ucsThaiMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsThaiMap\n"));
         }
@@ -466,8 +459,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Georgian '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsGeorgianMap.find(UnicodeChar) != ucsGeorgianMap.end()) {
             XChar = ucsGeorgianMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsGeorgianMap\n"));
         }
@@ -476,8 +467,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Hangul Jamo '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsHangulJamoMap.find(UnicodeChar) != ucsHangulJamoMap.end()) {
             XChar = ucsHangulJamoMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsHangulJamoMap\n"));
         }
@@ -486,8 +475,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Latin Extended Additional '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsLatinExtAddMap.find(UnicodeChar) != ucsLatinExtAddMap.end()) {
             XChar = ucsLatinExtAddMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsLatinExtAddMap\n"));
         }
@@ -496,8 +483,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (General Punctuation '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsGenPuncMap.find(UnicodeChar) != ucsGenPuncMap.end()) {
             XChar = ucsGenPuncMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsGenPuncMap\n"));
         }
@@ -506,8 +491,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Currency Symbols '%c'): "), UnicodeChar);
         if (ucsCurrSymMap.find(UnicodeChar) != ucsCurrSymMap.end()) {
             XChar = ucsCurrSymMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsCurrSymMap\n"));
         }
@@ -516,8 +499,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (CJK Symbols and Punctuation '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsCJKSym_PuncMap.find(UnicodeChar) != ucsCJKSym_PuncMap.end()) {
             XChar = ucsCJKSym_PuncMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsCJKSym_PuncMap\n"));
         }
@@ -526,8 +507,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
        vnclog.Print(8, _T("  0x%04x (Katakana '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsKatakanaMap.find(UnicodeChar) != ucsKatakanaMap.end()) {
             XChar = ucsKatakanaMap[UnicodeChar];
-        } else if (useUnicodeKeysym) {
-            isUnicodeKeysym = true;
         } else {
            vnclog.Print(8, _T("  The character is missing in ucsKatakanaMap\n"));
         }
@@ -535,8 +514,6 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
         // Other Unicode Characters
        vnclog.Print(8, _T("  0x%04x (Other Unicode Characters '%c'): "), UnicodeChar, UnicodeChar);
         XChar = ucsOthersMap[UnicodeChar];
-    } else if (useUnicodeKeysym) {
-        isUnicodeKeysym = true;
     } else {
        vnclog.Print(8, _T("  0x%04x (Not supported yet)\n"), UnicodeChar);
     }

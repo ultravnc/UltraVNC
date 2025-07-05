@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:UltraVnc_x64"
+"ProjectName" = "8:UltraVNC_x64"
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7D53666E957541908FC6F9E66C68D1C2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -123,6 +129,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_E6B35E58572C43E984C2417C3535F24F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -141,6 +153,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_FBFFFEE74791483F94CD9C162961C3D9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FE82FF2D562E4B80928D6FEB67F9F479"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -153,7 +171,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\UltraVnc.msi"
+        "OutputFilename" = "8:Debug\\UltraVNC_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -190,7 +208,7 @@
         "DisplayName" = "8:NOacceleration"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:NOacceleration\\UltraVnc_VS2015_X64.msi"
+        "OutputFilename" = "8:NOacceleration\\UltraVNC_VS2015_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -222,7 +240,7 @@
         "DisplayName" = "8:Rel_Vista"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Rel_Vista\\UltraVnc_VS2010_X64.msi"
+        "OutputFilename" = "8:Rel_Vista\\UltraVNC_VS2010_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -254,7 +272,7 @@
         "DisplayName" = "8:Rel_XP"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Rel_XP\\UltraVnc_VS2010_X64.msi"
+        "OutputFilename" = "8:Rel_XP\\UltraVNC_VS2010_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -286,7 +304,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release64\\UltraVnc_132_X64.msi"
+        "OutputFilename" = "8:Release64\\UltraVNC_132_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -318,7 +336,7 @@
         "DisplayName" = "8:Release_Vista"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Release_Vista\\UltraVnc_VS2010_X64.msi"
+        "OutputFilename" = "8:Release_Vista\\UltraVNC_VS2010_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -350,7 +368,7 @@
         "DisplayName" = "8:SC_20"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:SC_20\\UltraVnc_VS2015_X64.msi"
+        "OutputFilename" = "8:SC_20\\UltraVNC_VS2015_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -382,7 +400,7 @@
         "DisplayName" = "8:SC_20_DEBUG"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:SC_20_DEBUG\\UltraVnc_VS2015_X64.msi"
+        "OutputFilename" = "8:SC_20_DEBUG\\UltraVNC_VS2015_x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -538,6 +556,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7D53666E957541908FC6F9E66C68D1C2"
+            {
+            "SourcePath" = "8:..\\..\\uvnc_settings\\uvnc_settings\\settings.ico"
+            "TargetName" = "8:settings.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_81EC230B377349C08B1BC851300A9F19"
             {
             "SourcePath" = "8:..\\..\\Files\\banner.jpg"
@@ -618,6 +656,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E6B35E58572C43E984C2417C3535F24F"
+            {
+            "SourcePath" = "8:..\\..\\vncviewer\\res\\vncviewer.ico"
+            "TargetName" = "8:vncviewer.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EC5A6F0C434542EEB351F82ACC3EE4C1"
             {
             "SourcePath" = "8:..\\..\\Files\\vncviewer64.exe"
@@ -642,6 +700,26 @@
             {
             "SourcePath" = "8:..\\..\\Files\\Licence.rtf"
             "TargetName" = "8:Licence.rtf"
+            "Tag" = "8:"
+            "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FBFFFEE74791483F94CD9C162961C3D9"
+            {
+            "SourcePath" = "8:..\\winvnc\\res\\vncserver.ico"
+            "TargetName" = "8:vncserver.ico"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Condition" = "8:"
@@ -707,6 +785,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_1AEAF0D62BEA4E6A95A961CDEB67E9A7"
+                    {
+                    "Name" = "8:UltraVNC"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_FDCAE1B6D49F416987CA1B518FD74753"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
         }
@@ -725,24 +814,24 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:UltraVNC"
-        "ProductCode" = "8:{B6BC2651-3B85-421F-9F84-0FC7B3EF698D}"
-        "PackageCode" = "8:{88264E1A-0166-4D06-B4F5-30108F508590}"
+        "ProductCode" = "8:{E4807017-CC9E-4087-B302-78F3A9BF80D7}"
+        "PackageCode" = "8:{FA3F8D9D-4957-4234-A300-17B115C9372A}"
         "UpgradeCode" = "8:{25A3A242-EEA3-4731-A2D0-E990D2EA5A23}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.4.40"
-        "Manufacturer" = "8:uvnc bvba"
+        "ProductVersion" = "8:1.5.07"
+        "Manufacturer" = "8:uvnc bv"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:forum.uvnc.com"
+        "ARPHELPLINK" = "8:https://forum.uvnc.com"
         "Title" = "8:UltraVNC"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Rudi De Vos"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:http://uvnc.com"
+        "ARPCOMMENTS" = "8:UltraVNC server - remote access tool "
+        "ARPURLINFOABOUT" = "8:https://uvnc.com"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
@@ -846,88 +935,60 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_06263225605F4301A7168CF3EE747810"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_5C41857373444022A877D63C5B89FE8F"
+            {
+            "Name" = "8:UltraVNC Settings"
+            "Arguments" = "8:-settings"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+            "Folder" = "8:_1AEAF0D62BEA4E6A95A961CDEB67E9A7"
+            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
+            "Icon" = "8:_7D53666E957541908FC6F9E66C68D1C2"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_832B6FC44D1A4033B9233A50ABAD349B"
             {
             "Name" = "8:UltraVNC Server"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:102"
+            "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
-            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
-            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_19DD77A81068414E941AFD1342E6D1A0"
-            {
-            "Name" = "8:UltraVNC Settings"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:133"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_0F3E5B898783469D8773791F4330AA21"
             "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_0F3E5B898783469D8773791F4330AA21"
+            "Icon" = "8:_FBFFFEE74791483F94CD9C162961C3D9"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_4053ECB4920340759C34252F8750BE5D"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8AF9792A29FD41DEB5D28A8F458C9D50"
             {
-            "Name" = "8:UltraVNC Settings"
+            "Name" = "8:UltraVNC Server"
             "Arguments" = "8:"
-            "Description" = "8:"
+            "Description" = "8:UltraVNC server - Remote access tool"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:133"
+            "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_0F3E5B898783469D8773791F4330AA21"
-            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
-            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_0F3E5B898783469D8773791F4330AA21"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8BEC2661413E4EF3884A8B41F3E69E6F"
-            {
-            "Name" = "8:UltraVNC"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:184"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
+            "Target" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
+            "Folder" = "8:_1AEAF0D62BEA4E6A95A961CDEB67E9A7"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
             "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D6A42525FBAD48DC8428C8AD86945D7A"
-            {
-            "Name" = "8:UltraVNC Server"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:102"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
-            "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
-            "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:_E7889E76F1B34653A90C53D3F997EBAF"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_EE6C7EDB2811472D81E9825BE856766E"
             {
             "Name" = "8:UltraVNC Viewer"
             "Arguments" = "8:"
-            "Description" = "8:"
+            "Description" = "8:UltraVNC viewer - Remote access tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_EC5A6F0C434542EEB351F82ACC3EE4C1"
-            "Folder" = "8:_97AE57B765F34429BF8EAA1F4067FFD5"
+            "Folder" = "8:_1AEAF0D62BEA4E6A95A961CDEB67E9A7"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
+            "Icon" = "8:_E6B35E58572C43E984C2417C3535F24F"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_FC4108ADD83D4478B2822BBBEEBE610D"
@@ -941,7 +1002,7 @@
             "Target" = "8:_EC5A6F0C434542EEB351F82ACC3EE4C1"
             "Folder" = "8:_24665A4E9C2843369A076809668F5E3C"
             "WorkingFolder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
-            "Icon" = "8:"
+            "Icon" = "8:_E6B35E58572C43E984C2417C3535F24F"
             "Feature" = "8:"
             }
         }
@@ -1313,7 +1374,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.4.4.0-dev X64"
+                            "Value" = "8:UltraVnc 1.5.0.7-dev X64"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1465,7 +1526,7 @@
                             "ContextData" = "8:"
                             "Attributes" = "3:0"
                             "Setting" = "3:2"
-                            "Value" = "8:UltraVnc 1.4.4.0-dev X64"
+                            "Value" = "8:UltraVnc 1.5.0.7-dev X64"
                             "DefaultValue" = "8:#1215"
                             "UsePlugInResources" = "11:TRUE"
                             }
@@ -1764,7 +1825,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_057C03B3B6C348A59E8D997A9884CC96"
             {
-            "SourcePath" = "8:..\\Debug\\logging.dll"
+            "SourcePath" = "8:..\\Release\\logging.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1792,7 +1853,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0F3E5B898783469D8773791F4330AA21"
             {
-            "SourcePath" = "8:..\\Debug\\uvnc_settings.exe"
+            "SourcePath" = "8:..\\Release\\uvnc_settings.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1820,7 +1881,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1D605486DA064476BC03795B9D1F0A1D"
             {
-            "SourcePath" = "8:..\\Debug\\authSSP.dll"
+            "SourcePath" = "8:..\\Release\\authSSP.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1848,7 +1909,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2499FE2BC2EC43FC827586F2B36F2483"
             {
-            "SourcePath" = "8:..\\Debug\\testauth.exe"
+            "SourcePath" = "8:..\\..\\addon\\Release\\testauth.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1876,7 +1937,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26A88B0595B5471B8B4F81FFBB8B5087"
             {
-            "SourcePath" = "8:..\\Debug\\ldapauth.dll"
+            "SourcePath" = "8:..\\Release\\ldapauth.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1904,7 +1965,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2C1853F772494048B3B26B78A53486F4"
             {
-            "SourcePath" = "8:..\\Debug\\MSLogonACL.exe"
+            "SourcePath" = "8:..\\Release\\MSLogonACL.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1932,7 +1993,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_30A3C3ED62BD436097EAA36546BB4380"
             {
-            "SourcePath" = "8:..\\Debug\\authadmin.dll"
+            "SourcePath" = "8:..\\Release\\authadmin.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1960,7 +2021,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_496FDBFD8E724200972D9572D0438D7C"
             {
-            "SourcePath" = "8:..\\Debug\\setpasswd.exe"
+            "SourcePath" = "8:..\\Release\\setpasswd.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -1988,7 +2049,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7E9202FA9ECA4F4E821B4ABFAFEE00A5"
             {
-            "SourcePath" = "8:..\\Debug\\ldapauthnt4.dll"
+            "SourcePath" = "8:..\\Release\\ldapauthnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2016,7 +2077,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_87DB62653B71411E93DD76EF68D97A39"
             {
-            "SourcePath" = "8:..\\Debug\\workgrpdomnt4.dll"
+            "SourcePath" = "8:..\\Release\\workgrpdomnt4.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2044,7 +2105,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9FFC46783A7F4BCB9DDA60B790D35975"
             {
-            "SourcePath" = "8:..\\Debug\\ldapauth9x.dll"
+            "SourcePath" = "8:..\\Release\\ldapauth9x.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2072,7 +2133,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0AE7F7B374D4940BFC810B4E4ED9394"
             {
-            "SourcePath" = "8:..\\Debug\\setcad.exe"
+            "SourcePath" = "8:..\\Release\\setcad.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2100,7 +2161,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E7889E76F1B34653A90C53D3F997EBAF"
             {
-            "SourcePath" = "8:..\\Debug\\winvnc.exe"
+            "SourcePath" = "8:..\\Release\\winvnc.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"
@@ -2128,7 +2189,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FE82FF2D562E4B80928D6FEB67F9F479"
             {
-            "SourcePath" = "8:..\\Debug\\vnchooks.dll"
+            "SourcePath" = "8:..\\Release\\vnchooks.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8E29FEC8D8F44EA898A22D8310862267"

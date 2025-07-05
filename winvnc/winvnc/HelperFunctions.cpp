@@ -63,6 +63,11 @@ void Open_mastodon()
 	ShellExecute(0, "open", "https://mastodon.social/@ultravnc", 0, 0, 1);
 }
 
+void Open_bluesky()
+{
+	ShellExecute(0, "open", "https://bsky.app/profile/ultravnc.bsky.social", 0, 0, 1);
+}
+
 void Open_facebook()
 {
 	ShellExecute(0, "open", "https://www.facebook.com/ultravnc1", 0, 0, 1);
@@ -70,7 +75,7 @@ void Open_facebook()
 
 void Open_xtwitter()
 {
-	ShellExecute(0, "open", "https://twitter.com/ultravnc1", 0, 0, 1);
+	ShellExecute(0, "open", "https://x.com/ultravnc1", 0, 0, 1);
 }
 
 void Open_reddit()
@@ -242,7 +247,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 			else {
 				if (uType & MB_OK)
 					uType &= ~MB_OK;
-				helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+				retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 			}
 
 			SetThreadDesktop(old_desktop);
@@ -263,7 +268,7 @@ DWORD MessageBoxSecure(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 		else {
 			if (uType & MB_OK)
 				uType &= ~MB_OK;
-			helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
+			retunvalue = helper::yesUVNCMessageBox(hInstResDLL, hWnd, (char*)lpText, (char*)lpCaption, uType);
 		}
 	}
 	return retunvalue;
@@ -583,9 +588,8 @@ namespace processHelper {
 	DWORD GetExplorerLogonPid()
 	{
 		char alternate_shell[129];
-		IniFile myIniFile;
 		strcpy_s(alternate_shell, "");
-		myIniFile.ReadString("admin", "alternate_shell", alternate_shell, 256);
+		strcpy_s(alternate_shell, settings->getAlternateShell());
 		DWORD dwSessionId;
 		DWORD dwExplorerLogonPid = 0;
 		PROCESSENTRY32 procEntry{};
@@ -698,7 +702,7 @@ namespace processHelper {
 				}
 				else {
 					// Genuine error...
-					vnclog.Print(LL_INTERR, VNCLOG("getusername error %d\n"), GetLastError());
+					vnclog.Print(LL_INTERR, VNCLOG("GetUsername error %d\n"), GetLastError());
 					return FALSE;
 				}
 			}

@@ -118,6 +118,7 @@ protected:
 	bool balloonset = false;
 	wchar_t m_tooltip[128]{};
 	int authClientCount = -1;
+	static char exe_file_name[MAX_PATH];
 };
 
 

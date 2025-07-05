@@ -26,6 +26,7 @@
 #include "DeskdupEngine.h"
 #include <stdio.h>
 #include "stdhdrs.h"
+#include "winvnc.h"
 #ifdef SC_20
 	#include "../loadmemory/loadDllFromMemory.h"
 #endif // SC_20
@@ -56,13 +57,8 @@ DeskDupEngine::DeskDupEngine()
 	if (osVer == OSWIN10) {
 #ifdef _X64
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\ddengine64.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\ddengine64.dll");
 #endif // _X64
 #ifdef SC_20
 		loadDllFromMemory = std::make_unique<LoadDllFromMemory>();
@@ -72,13 +68,8 @@ DeskDupEngine::DeskDupEngine()
 #else
 #ifndef _X64
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\ddengine.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\ddengine.dll");
 		
 #endif // _X64
 		hModule = LoadLibrary(szCurrentDir);
@@ -141,13 +132,13 @@ void DeskDupEngine::videoDriver_start(int x, int y, int w, int h, bool onlyVirtu
 
 	if (StartW8V2) {
 		if (!StartW8V2(primonly, onlyVirtual, 1000/maxFPS)) {
-			vnclog.Print(LL_INTWARN, VNCLOG("DDengine V2 failed, not supported by video driver\n")); 
+			vnclog.Print(LL_INTWARN, VNCLOG("DDengine V2 failed, not supported by Video Driver\n")); 
 			return;
 		}
 	}
 	else if(StartW8) {
 		if (!StartW8(primonly)) {
-			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by video driver\n"));
+			vnclog.Print(LL_INTWARN, VNCLOG("DDengine failed, not supported by Video Driver\n"));
 			return;
 		}
 	}

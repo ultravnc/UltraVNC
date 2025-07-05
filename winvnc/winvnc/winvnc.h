@@ -48,12 +48,14 @@
 extern HINSTANCE	hAppInstance;
 extern const char	*szAppName;
 extern DWORD		mainthreadId;
+extern char winvncFolder[MAX_PATH];
 
-// Main VNC server routine
+// Main UltraVNC Server routine
 
 extern int WinVNCAppMain();
 
 // Standard command-line flag definitions
+const char winvncConfig[] = "-config";
 const char winvncRunService[]		= "-service_run";
 const char winvncRunServiceRdp[]		= "-service_rdp_run";
 const char winvncPreConnect[]		="-preconnect";
@@ -67,6 +69,7 @@ const char winvncSCexit[]	= "-sc_exit";
 const char winvncSCprompt[]	= "-sc_prompt";
 const char winvncmulti[]	= "-multi";
 const char winvnchttp[]	= "-httpproxy";
+const char winvncsettings[] = "-settings";
 
 //adzm 2009-06-20
 // for use with -sc
@@ -94,13 +97,11 @@ const char winvncopenhomepage[]				= "-openhomepage";
 const char winvncopenforum[]				= "-openforum";
 const char winvncopengithub[]				= "-opengithub";
 const char winvncopenmastodon[]				= "-openmastodon";
+const char winvncopenbluesky[]				= "-openbluesky";
 const char winvncopenfacebook[]				= "-openfacebook";
 const char winvncopenxtwitter[]				= "-openxtwitter";
 const char winvncopenreddit[]				= "-openreddit";
 const char winvncopenopenhub[]				= "-openopenhub";
-
-const char dsmpluginhelper[]				= "-dsmpluginhelper";
-const char dsmplugininstance[]				= "-dsmplugininstance";
 
 // Usage string
 const char winvncUsageText[]		= "winvnc [-sc_prompt] [-sc_exit] [-id:????] [-stopreconnect][-autoreconnect[ ID:????]] [-connect host[:display]] [-connect host[::port]] [-repeater host[:port]][-run]\n";

@@ -62,7 +62,7 @@
 
 #define STR_FILEVERSION XSTR(STR_VERSION) "\0"
 #define STR_PRODUCTVERSION XSTR(STR_VERSION) "\0"
-#define STR_COPYRIGHT "Copyright © 2002-2005 UltraVNC team members\0"
+#define STR_COPYRIGHT "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved.\0"
 #define STR_SPECIALBUILD "v" XSTR(STR_MAINVER) " ReleaseCandidate " XSTR(STR_RC_VERSION) "\0"
 #if isRC == 1
 #define STR_ABOUT_SERVER_VERSION XSTR(UltraVNC Win32 Server v STR_MAINVER RC STR_RC_VERSION)

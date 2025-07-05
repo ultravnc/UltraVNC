@@ -28,7 +28,7 @@ BEGIN
             VALUE "FileDescription", PLUGIN_NAME BUILD_NUMBER 
             VALUE "FileVersion", BUILD_NUMBER
             VALUE "InternalName", PLUGIN_NAME
-            VALUE "LegalCopyright", "Copyright (C) 2005-2009 Sean E. Covel\0"
+            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved.\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", DSM_NAME
             VALUE "PrivateBuild", "\0"

@@ -28,7 +28,7 @@
 
 // RFB V3.0
 
-// Datatypes used by the VGui system
+// Datatypes used by the VGUI system
 
 #if (!defined(_ATT_VTYPES_DEFINED))
 #define _ATT_VTYPES_DEFINED

@@ -38,7 +38,7 @@
 // * Add support for UltraVNC MS-Logon feature.
 //   You can now be connected to a UltraVNC box with MS-Logon required.
 //   Thanks to Wim Vandersmissen, who provide a TightVNC Viewer patch do to so.
-//   That give me the idea to provide it in the UltraVNC Java Viewer too.
+//   That give me the idea to provide it in the UltraVNC JavaViewer too.
 //
 // * Add ScrollPanel to applet mode
 //

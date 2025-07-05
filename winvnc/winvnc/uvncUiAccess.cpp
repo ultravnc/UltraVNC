@@ -24,6 +24,7 @@
 
 #include "uvncUiAccess.h"
 #include "vncOSVersion.h"
+#include "winvnc.h"
 
 comm_serv *keyEventFn=NULL;
 comm_serv *StopeventFn=NULL;
@@ -56,12 +57,7 @@ mini_lock::~mini_lock()
 bool Shellexecuteforuiaccess()
 {		
 		char WORKDIR[MAX_PATH];
-		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-				{
-				char* p = strrchr(WORKDIR, '\\');
-				if (p == NULL) return false;
-				*p = '\0';
-				}
+		strcpy_s(WORKDIR, winvncFolder);
 		strcat_s(WORKDIR,"\\uvnckeyboardhelper.exe");
 	
 		FILE *fp = fopen(WORKDIR,"rb");

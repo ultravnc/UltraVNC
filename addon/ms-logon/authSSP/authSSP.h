@@ -91,7 +91,8 @@ bool IsImpersonationAllowed();
 #define	vncGenericExecute (STANDARD_RIGHTS_EXECUTE)
 #define	vncGenericAll (STANDARD_RIGHTS_ALL | ViewOnly | Interact)
 
-void LOG(long EvenID, const TCHAR *format, ...);
+void LOG(long EvenID, const TCHAR* format, ...);
+void LOGV2(TCHAR* szMslogonLog, long EvenID, const TCHAR *format, ...);
 
 bool QualifyName(const TCHAR *user, LPTSTR DomName);
 bool isNT4();

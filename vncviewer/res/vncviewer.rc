@@ -263,16 +263,16 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - File Transfer"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "History",IDC_HS_STATIC,4,374,26,8
-    COMBOBOX        IDC_HISTORY_CB,45,372,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Progress",IDC_PR_STATIC,4,388,32,8
-    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,388,307,9
-    CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,10,WS_EX_STATICEDGE
-    CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,10,WS_EX_STATICEDGE
+    LTEXT           "History",IDC_HS_STATIC,4,378,26,8
+    COMBOBOX        IDC_HISTORY_CB,45,376,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Progress",IDC_PR_STATIC,4,390,32,8
+    CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,390,307,8
+    CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,14,WS_EX_STATICEDGE
+    CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,14,WS_EX_STATICEDGE
     COMBOBOX        IDC_LOCAL_DRIVECB,3,3,98,171,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CTEXT           "LOCAL MACHINE",IDC_LM_STATIC,105,3,94,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "\\",IDC_LOCAL_ROOTB,204,3,17,12
-    PUSHBUTTON      "..",IDC_LOCAL_UPB,224,3,17,12
+    CTEXT           "LOCAL MACHINE",IDC_LM_STATIC,105,3,94,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_LOCAL_ROOTB,204,3,17,14
+    PUSHBUTTON      "..",IDC_LOCAL_UPB,224,3,17,14
     CONTROL         "",IDC_CURR_LOCAL,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,3,17,238,12,WS_EX_STATICEDGE
     CONTROL         "List2",IDC_LOCAL_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,3,31,238,324
     PUSHBUTTON      "Local Drives List",IDC_LOCAL_ROOT_B,245,1,66,21,BS_FLAT | NOT WS_VISIBLE
@@ -284,43 +284,43 @@ BEGIN
     PUSHBUTTON      "Delete",IDC_DELETE_B,246,203,66,14,BS_FLAT
     PUSHBUTTON      "New Folder",IDC_NEWFOLDER_B,246,221,66,14,BS_FLAT
     PUSHBUTTON      "Rename",IDC_RENAME_B,246,239,66,14,BS_FLAT
-    PUSHBUTTON      "Minimize",IDC_HIDE_B,246,321,66,14
-    PUSHBUTTON      "Close",IDCANCEL,246,338,66,14
+    PUSHBUTTON      "Minimize",IDC_HIDE_B,246,306,66,14
+    PUSHBUTTON      "Close",IDCANCEL,246,323,66,14
     COMBOBOX        IDC_REMOTE_DRIVECB,314,3,98,172,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CTEXT           "REMOTE MACHINE",IDC_RM_STATIC,415,3,95,13,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "\\",IDC_REMOTE_ROOTB,514,3,17,12
-    PUSHBUTTON      "..",IDC_REMOTE_UPB,534,3,17,12
+    CTEXT           "REMOTE MACHINE",IDC_RM_STATIC,415,3,95,14,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "\\",IDC_REMOTE_ROOTB,514,3,17,14
+    PUSHBUTTON      "..",IDC_REMOTE_UPB,534,3,17,14
     CONTROL         "",IDC_CURR_REMOTE,"RICHEDIT",TCS_VERTICAL | TCS_RAGGEDRIGHT,314,17,238,12,WS_EX_STATICEDGE
     CONTROL         "List3",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
-    LTEXT           "",IDC_GLOBAL_STATUS,484,388,65,8,SS_SUNKEN
+    LTEXT           "",IDC_GLOBAL_STATUS,484,391,65,8,SS_SUNKEN
     LTEXT           "",IDC_PERCENT,356,388,120,8
     PUSHBUTTON      "Forced Stop",IDC_ABORT_B2,246,160,66,14,BS_FLAT | NOT WS_VISIBLE
-    PUSHBUTTON      "Forced Close",IDCANCEL2,246,355,66,14
+    PUSHBUTTON      "Forced Close",IDCANCEL2,246,340,66,14
 END
 
-IDD_SESSION_DLG DIALOGEX 0, 0, 260, 312
+IDD_SESSION_DLG DIALOGEX 0, 0, 260, 297
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer 1.4.4.0-dev - Connection"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,5,26,23
     CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,83,18,47,10
     CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,132,18,47,10
     COMBOBOX        IDC_HOSTNAME_EDIT,81,30,103,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_PROXY_EDIT,81,44,103,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Connect",IDCONNECT,200,29,47,14
-    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,11,65,50,13
-    PUSHBUTTON      "Save",IDC_SAVE,73,65,50,13
-    PUSHBUTTON      "Save as",IDC_SAVEAS,135,65,50,13
-    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,197,65,50,13
-    PUSHBUTTON      "Options",IDC_BUTTON_EXPAND,11,84,50,13,BS_ICON
-    PUSHBUTTON      "About",IDC_ABOUT,73,84,50,13
-    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,5,115,243,172
-    PUSHBUTTON      "Restore defaults",IDC_DELETE,188,291,60,14
+    DEFPUSHBUTTON   "Connect",IDCONNECT,204,29,47,14
+    PUSHBUTTON      "Options",IDC_BUTTON_EXPAND,9,62,50,13,BS_ICON
+    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,243,172
+    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,124,258,60,13
+    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,191,258,60,13
+    PUSHBUTTON      "About",IDC_ABOUT,9,277,60,13
+    PUSHBUTTON      "Save as",IDC_SAVEAS,124,277,60,13
+    PUSHBUTTON      "Restore defaults",IDC_RESET_DEFAULTS,9,258,60,13
+    PUSHBUTTON      "Save",IDC_SAVE,191,277,60,13
     LTEXT           "Computer",IDC_LINE1,33,32,46,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,5,26,23
     CTEXT           "UltraVNC Viewer",IDC_LOGO,46,7,156,8,SS_CENTERIMAGE
     LTEXT           "Computer",IDC_LINE2,33,46,47,8
-    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,4,0,255,104
+    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,4,0,255,84
     CONTROL         IDB_GREEN,IDC_GREEN,"Static",SS_BITMAP,192,52,6,6
     CONTROL         IDB_BITMAP1,IDC_YELLOW,"Static",SS_BITMAP,192,52,6,6
     CONTROL         IDB_RED,IDC_RED,"Static",SS_BITMAP,192,52,6,6
@@ -401,7 +401,7 @@ BEGIN
     LTEXT           "Server Name",IDC_VNCSERVER,101,12,101,9
     LTEXT           "Status",IDC_STATIC,12,54,46,9
     LTEXT           "Connection closed",IDC_STATUS,101,54,105,9
-    RTEXT           "",IDC_PLUGIN_STATUS,14,68,46,9
+    RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Cancel",IDQUIT,7,180,50,14
     LTEXT           "Speed",IDC_STATIC,12,85,31,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
@@ -450,22 +450,19 @@ BEGIN
     DEFPUSHBUTTON   "",IDOK,299,0,8,6,NOT WS_VISIBLE
 END
 
-IDD_APP_ABOUT DIALOGEX 0, 0, 327, 136
+IDD_APP_ABOUT DIALOGEX 0, 0, 264, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer - About"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,258,118,62,14
+    DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members\nCopyright © 2001-2002 Sam - eSVNC\nCopyright © 1999-2002 Rudi D. V. - VdaccVNC",IDC_STATIC,29,34,291,25
-    LTEXT           "Built",IDC_STATIC,45,18,15,10
-    LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,10
-    LTEXT           "Copyright © 2002 VNC QuickDesk\nCopyright © 1999-2002 Tridia Corporation - TridiaVNC\nCopyright © 1994-2001 AT&&T Laboratories Cambridge/Olivetti Research Ltd. - VNC",IDC_STATIC,29,74,291,25
-    LTEXT           "Copyright © 1990-2002 Info-ZIP\nCopyright © 1996-2002 Markus Franz Xaver Johannes Oberhumer - Mini LZO library",IDC_STATIC,29,98,291,20
-    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,124,55,8
-    LTEXT           "Copyright © 1999-2002 Const. Kaplinsky - TightVNC\nCopyright © 2002 RealVNC Ltd. - RealVNC\n",IDC_STATIC,29,58,291,16
-    LTEXT           "Website:",IDC_STATIC,7,124,29,8
+    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
+    LTEXT           "Built",IDC_STATIC,44,18,15,11
+    LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,55,8
+    LTEXT           "Website:",IDC_STATIC,7,54,29,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -642,10 +639,11 @@ BEGIN
     LTEXT           "1  /",IDC_STATIC,99,119,12,8
     EDITTEXT        IDC_SERVER_SCALE,115,117,14,12,ES_AUTOHSCROLL
     CONTROL         "Save position on exit",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
-    CONTROL         "Start in full screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,96,90,10
-    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,107,65,10
-    CONTROL         "GNOME R.D.",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,118,56,10
+    CONTROL         "Start in full screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,87,90,10
+    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,98,65,10
+    CONTROL         "",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,110,8,11
     CONTROL         "Save size on exit",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
+    LTEXT           "GNOME Remote Desttop \nQEMU",IDC_STATIC,148,111,82,17
 END
 
 IDD_MISC DIALOGEX 0, 0, 240, 145
@@ -662,7 +660,8 @@ BEGIN
     CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,164,10
     CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,128,10
-    CONTROL         "Hide End of Stream error", IDC_HIDEENDOFSTREAMERROR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
+    CONTROL         "Hide End of Stream error",IDC_HIDEENDOFSTREAMERROR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
     LTEXT           "Folder",IDC_STATIC,4,18,36,9
     LTEXT           "Prefix",IDC_STATIC,4,36,36,8
     LTEXT           "Snapshot folder and prefix",IDC_STATIC,4,4,232,8
@@ -739,6 +738,17 @@ BEGIN
     LTEXT           "Port",IDC_STATIC,4,27,17,8
 END
 
+IDD_CONFIG DIALOGEX 0, 0, 240, 145
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "1",IDC_DEFAULTCONFIG,4,49,232,13
+    CONTROL         "Use only options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,82,10
+    LTEXT           "Default config file",IDC_SLIDERRES,4,35,124,8
+    LTEXT           "Custom config file",IDC_STATIC,4,66,110,8
+    LTEXT           "2",IDC_CUSTOMCONFIG,4,79,232,18
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -758,29 +768,30 @@ BEGIN
 
     IDD_FILETRANSFER_DLG, DIALOG
     BEGIN
-        RIGHTMARGIN, 505
         VERTGUIDE, 215
         VERTGUIDE, 274
         VERTGUIDE, 279
         VERTGUIDE, 486
-        BOTTOMMARGIN, 397
     END
 
     IDD_SESSION_DLG, DIALOG
     BEGIN
         RIGHTMARGIN, 259
         VERTGUIDE, 4
-        VERTGUIDE, 11
+        VERTGUIDE, 9
         VERTGUIDE, 46
         VERTGUIDE, 130
+        VERTGUIDE, 184
         VERTGUIDE, 202
         VERTGUIDE, 213
         VERTGUIDE, 247
-        VERTGUIDE, 248
-        BOTTOMMARGIN, 308
+        VERTGUIDE, 251
+        BOTTOMMARGIN, 293
         HORZGUIDE, 70
         HORZGUIDE, 77
         HORZGUIDE, 145
+        HORZGUIDE, 271
+        HORZGUIDE, 290
     END
 
     IDD_SERVINFO_DLG, DIALOG
@@ -871,16 +882,14 @@ BEGIN
     IDD_APP_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
+        RIGHTMARGIN, 227
         VERTGUIDE, 12
         VERTGUIDE, 94
         VERTGUIDE, 108
         VERTGUIDE, 120
         VERTGUIDE, 247
-        VERTGUIDE, 285
-        VERTGUIDE, 306
-        VERTGUIDE, 320
         TOPMARGIN, 7
-        BOTTOMMARGIN, 132
+        BOTTOMMARGIN, 62
     END
 
     IDD_FTCONFIRM_DLG, DIALOG
@@ -1034,6 +1043,13 @@ BEGIN
     END
 
     IDD_LISTEN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 236
+        VERTGUIDE, 4
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_CONFIG, DIALOG
     BEGIN
         RIGHTMARGIN, 236
         VERTGUIDE, 4
@@ -1376,12 +1392,12 @@ BEGIN
     IDS_H35                 "File Transfer with"
     IDS_H36                 "Connected"
     IDS_H37                 "Connecting. Please Wait..."
-    IDS_H38                 "already exists on REMOTE machine.\n\n Do you want to overwrite it or resume the transfer ?\n"
+    IDS_H38                 "already exists on REMOTE machine.\n\n Do you want to overwrite it or resume the transfer?\n"
     IDS_H39                 "File Transfer Warning"
     IDS_H40                 "File(s)/Folder(s) selected for transfer"
     IDS_H41                 "Starting Transfer. Sending"
     IDS_H42                 "File(s)/Folder(s) to Remote Machine"
-    IDS_H43                 "already exists on LOCAL machine.\n\n Do you want to overwrite it or resume the transfer ?\n"
+    IDS_H43                 "already exists on LOCAL machine.\n\n Do you want to overwrite it or resume the transfer?\n"
     IDS_H44                 "Starting Transfer. Receiving"
     IDS_H45                 "File(s)/Folder(s) from Remote Machine "
     IDS_H46                 "Please select a file to delete. \nOnly one file can be deleted at a time."
@@ -1426,7 +1442,7 @@ BEGIN
     IDS_H69                 "Transfer Aborted."
     IDS_H70                 "successfully SENT."
     IDS_H71                 "The REMOTE Folder"
-    IDS_H72                 "already exists.\n\n Are you sure you want to OVERWRITE it as well as ALL its Files and SubFolders ?"
+    IDS_H72                 "already exists.\n\n Are you sure you want to OVERWRITE it as well as ALL its Files and SubFolders?"
     IDS_H73                 "The LOCAL Folder"
 END
 

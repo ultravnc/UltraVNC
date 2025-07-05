@@ -613,6 +613,14 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	ExtDesktop = false;
 	tbWM_Set = false;
 
+	OSVERSIONINFO osvi = { sizeof(OSVERSIONINFO) };
+	GetVersionEx(&osvi);
+
+	typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
+	PFN_GetDpiForMonitor getDpiForMonitor;
+	HMODULE hShcore = NULL;
+	HMODULE hUser32 = NULL;
+
 	hShcore = LoadLibrary(_T("Shcore.dll"));
 	if (hShcore)
 		// GetDpiForMonitor, Windows 8.1 [desktop apps only]
@@ -620,14 +628,27 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	if (getDpiForMonitor)
 	{
 		HMONITOR monitor = MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
-		UINT xScale, yScale;
-		getDpiForMonitor(monitor, MDT_DEFAULT, &xScale, &yScale);
-		m_Dpi = xScale;
+		if (monitor) {
+			UINT xScale = 96, yScale = 96;
+			HRESULT hr = getDpiForMonitor(monitor, MDT_DEFAULT, &xScale, &yScale);
+			if (FAILED(hr)) // Ensure function call succeeded
+			{
+				m_Dpi = 96;
+			}
+			else
+			{
+				m_Dpi = xScale;
+			}
+		}
+		else
+			m_Dpi = 96;
+
 	}
 	else
-	{
 		m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
-	}
+	FreeLibrary(hShcore);
+
+
 	m_DpiOld = m_Dpi;
 	vnclog.Print(2, _T("DPI %d\n"), m_Dpi);
 	m_FullScreenNotDone = false;
@@ -1711,7 +1732,7 @@ void ClientConnection::SetDSMPluginStuff()
 		vnclog.Print(0, _T("DSMPlugin enabled\n"));
 		char szParams[256+16];
 		//strcpy_s(szParams,m_pDSMPlugin->GetPluginParams());
-		// Does the plugin need the VNC password to do its job ?
+		// Does the plugin need the VNC password to do its job?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
 		{
 			// Yes. The user must enter the VNC password
@@ -2642,7 +2663,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		m_ms_logon_I_legacy = true;
 		m_fServerKnowsFileTransfer = true;
 	}
-	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC viewer for some reason
+	else if (m_minorVersion == 6) // 6 because 5 already used in TightVNC Viewer for some reason
 	{
 		m_fServerKnowsFileTransfer = true;
 	}
@@ -3051,6 +3072,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		{
 			throw WarningException("You refused a untrusted server.");
 		}
+		if (bCheckboxChecked)
+			SaveAllowUntrustedServers();
+		
 
 		if (m_minorVersion < 8)
 			{
@@ -3498,7 +3522,7 @@ void ClientConnection::AuthMsLogonI()
 			memset(m_clearPasswd, 0, sizeof(m_clearPasswd));
 	}
 
-	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Was the password already specified in a config file or entered for DSMPlugin?
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
@@ -3555,7 +3579,7 @@ void ClientConnection::AuthMsLogonI()
 	if (m_ms_logon_I_legacy) ReadExact((char *)challengems, CHALLENGESIZEMS);
 	ReadExact((char *)challenge, CHALLENGESIZE);
 
-	// MS logon
+	// MS-Logon
 	if (m_ms_logon_I_legacy)
 	{
 		int i=0;
@@ -3592,7 +3616,7 @@ void ClientConnection::AuthVnc()
 	// rdv@2002 - v1.1.x
 	char passwd[256];
 	memset(passwd, 0, sizeof(char)*256);
-	// Was the password already specified in a config file or entered for DSMPlugin ?
+	// Was the password already specified in a config file or entered for DSMPlugin?
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
@@ -3994,9 +4018,9 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	m_winwidth  = min(m_fullwinwidth,  workwidth);
 	//m_winheight = min(m_fullwinheight+m_TBr.bottom + m_TBr.top+16 , workheight);
 	if (m_opts->m_ShowToolbar)
-		m_winheight = min(m_fullwinheight + m_TBr.bottom + m_TBr.top , workheight);
+		m_winheight = minimum(m_fullwinheight + m_TBr.bottom + m_TBr.top , workheight);
 	else
-		m_winheight = min(m_fullwinheight, workheight);
+		m_winheight = minimum(m_fullwinheight, workheight);
 	int temp_x = 0;
 	int temp_y = 0;
 	int temp_w = 0;
@@ -4480,8 +4504,8 @@ void ClientConnection::SuspendThread()
 	// Reinit DSM stuff
 	m_nTO = 1;
 	LoadDSMPlugin(true);
-	// WHat is this doing here ???
-	// m_fUseProxy = false;  << repeater block after reconnect+
+	// What is this doing here???
+	// m_fUseProxy = false; << repeater block after reconnect+
 
 	delete[] m_pNetRectBuf;
 	m_pNetRectBuf = NULL;
@@ -4671,9 +4695,9 @@ bool ClientConnection::ScrollScreen(int dx, int dy, bool absolute)
 		dy = dy - m_vScrollPos;
 	}
 	else{
-		dx = max(dx, -m_hScrollPos);
+		dx = maximum(dx, -m_hScrollPos);
 		dx = min(dx, m_hScrollMax - (m_cliwidth)-m_hScrollPos);
-		dy = max(dy, -m_vScrollPos);
+		dy = maximum(dy, -m_vScrollPos);
 		dy = min(dy, m_vScrollMax - (m_cliheight)-m_vScrollPos);
 	}
 	if (dx || dy) {
@@ -7622,7 +7646,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 	}
 
 	// Das eigendliche HauptFenster erstellen,
-	// welches das VNC-Fenster und die Toolbar enthält
+	// welches das VNC-Fenster und die Toolbar enthï¿½lt
 	WNDCLASS wndclass;
 
 	wndclass.style			= 0;
@@ -8811,14 +8835,14 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 
 							int newhpos, newvpos;
-							newhpos = max(0,
+							newhpos = maximum(0,
 										  min(_this->m_hScrollPos,
-											  _this->m_hScrollMax - max(_this->m_cliwidth, 0)
+											  _this->m_hScrollMax - maximum(_this->m_cliwidth, 0)
 											 )
 										 );
-							newvpos = max(0,
+							newvpos = maximum(0,
 										  min(_this->m_vScrollPos,
-											  _this->m_vScrollMax - max(_this->m_cliheight, 0)
+											  _this->m_vScrollMax - maximum(_this->m_cliheight, 0)
 											 )
 										 );
 
@@ -10248,7 +10272,7 @@ void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
 	case WMSZ_LEFT:
 	case WMSZ_TOPLEFT:
 	case WMSZ_BOTTOMLEFT:
-		lprc->left = max(lprc->left, lprc->right - (m_fullwinwidth + vSchrollSize));
+		lprc->left = maximum(lprc->left, lprc->right - (m_fullwinwidth + vSchrollSize));
 		break;
 	}
 
@@ -10257,9 +10281,9 @@ void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)
 	case WMSZ_TOPLEFT:
 	case WMSZ_TOPRIGHT:
 		if (m_opts->m_ShowToolbar)
-			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
+			lprc->top = maximum(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
 		else
-			lprc->top = max(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize));
+			lprc->top = maximum(lprc->top, lprc->bottom - (m_fullwinheight + hScrollSize));
 		break;
 	case WMSZ_BOTTOM:
 	case WMSZ_BOTTOMLEFT:
@@ -10280,12 +10304,12 @@ void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
 		int hScrollSize = SB_HORZ_BOOL ? GetSystemMetrics(SM_CYHSCROLL) : 0;
 		int vSchrollSize = SB_VERT_BOOL ? GetSystemMetrics(SM_CXVSCROLL) : 0;
 		rect.right = min(rect.right, rect.left + (m_fullwinwidth + vSchrollSize) + 1);
-		rect.left = max(rect.left, rect.right - (m_fullwinwidth + vSchrollSize));
+		rect.left = maximum(rect.left, rect.right - (m_fullwinwidth + vSchrollSize));
 
 		if (m_opts->m_ShowToolbar)
-			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
+			rect.top = maximum(rect.top, rect.bottom - (m_fullwinheight + hScrollSize) - m_TBr.bottom);
 		else
-			rect.top = max(rect.top, rect.bottom - (m_fullwinheight + hScrollSize));
+			rect.top = maximum(rect.top, rect.bottom - (m_fullwinheight + hScrollSize));
 
 		if (m_opts->m_ShowToolbar)
 			rect.bottom = min(rect.bottom, rect.top + (m_fullwinheight + hScrollSize) + m_TBr.bottom);

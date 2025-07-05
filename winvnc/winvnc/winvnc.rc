@@ -71,19 +71,20 @@ BEGIN
     LISTBOX         IDC_PENDING_LISTBOX,187,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
 END
 
-IDD_ABOUT DIALOGEX 0, 0, 274, 60
+IDD_ABOUT DIALOGEX 0, 0, 274, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Server - About"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,215,39,54,16
+    DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
-    LTEXT           "Website:",IDC_WWW2,17,46,31,9
+    LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "https://uvnc.com/",IDC_WWW,49,46,61,8
+    LTEXT           "https://uvnc.com/",IDC_WWW,47,65,61,8
+    LTEXT           "Config file: ",IDC_CONFIG_FILE,17,44,250,8
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
@@ -156,7 +157,7 @@ END
 
 IDD_MSLOGON DIALOGEX 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - MS-Logon setup"
+CAPTION "UltraVNC Server - MS-Logon Setup"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
@@ -216,6 +217,7 @@ BEGIN
         VERTGUIDE, 100
         VERTGUIDE, 120
         TOPMARGIN, 5
+        BOTTOMMARGIN, 74
         HORZGUIDE, 9
         HORZGUIDE, 20
         HORZGUIDE, 30
@@ -323,6 +325,7 @@ BEGIN
             MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
             MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
             MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
+            MENUITEM "Bluesky",                     ID_VISITUSONLINE_BLUESKY
             MENUITEM "Facebook",                    ID_VISITUSONLINE_FACEBOOK
             MENUITEM "X/Twitter",                   ID_VISITUSONLINE_XTWITTER
             MENUITEM "Reddit",                      ID_VISITUSONLINE_REDDIT
@@ -482,7 +485,7 @@ BEGIN
     ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
     ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphics device driver"
     ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC viewer"
+    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC Viewer"
     ID_FAILED_INIT          "Failed to initialize the socket system"
     ID_MB1                  "MB1"
     ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
@@ -577,7 +580,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDD_PROPERTIESDIALOG DIALOGEX 0, 0, 380, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - settings"
+CAPTION "UltraVNC Server - Settings"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,204,232,50,14
@@ -648,7 +651,7 @@ BEGIN
     LTEXT           "Administration password",IDC_STATIC,12,44,78,8
     CONTROL         "Allow users to view and make property changes using this password",IDC_ALLOWUSERSSETTINGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
-    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,199,20
+    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,312,15
     PUSHBUTTON      "SET/CHANGE...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
     PUSHBUTTON      "CLEAR",IDC_ADMINCLEAR,171,41,50,14
 END
@@ -668,7 +671,7 @@ BEGIN
     EDITTEXT        IDC_PORTRFB,219,16,29,12,ES_AUTOHSCROLL
     LTEXT           "HTTP port",IDC_STATIC,160,31,38,8
     EDITTEXT        IDC_PORTHTTP,219,30,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable UltraVNC Java Viewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
+    CONTROL         "Enable UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
     CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
@@ -694,10 +697,10 @@ END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "Edit IP Access Rule"
+CAPTION "UltraVNC Server - Edit IPv4 Access Rule"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "IP Addresses",IDC_STATIC,0,5,223,58,WS_GROUP
+    GROUPBOX        "IPv4 Addresses",IDC_STATIC,0,5,223,58,WS_GROUP
     LTEXT           "Matching template",IDC_STATIC,15,17,59,8
     EDITTEXT        IDC_FIRST_IP,80,16,64,12,ES_AUTOHSCROLL | WS_GROUP
     GROUPBOX        "Action",IDC_STATIC,0,65,223,56
@@ -706,7 +709,7 @@ BEGIN
     CONTROL         "Allow",IDC_ALLOW,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,12,78,33,10
     CONTROL         "Refuse",IDC_DENY,"Button",BS_AUTORADIOBUTTON,12,91,37,10
     CONTROL         "Ask local user",IDC_QUERY,"Button",BS_AUTORADIOBUTTON,12,104,59,10
-    LTEXT           "Format template ip address : a.b.c.d or a.b.c. or a.b or a or empty\na.b.c = range from a.b.c.1 to a.b.c.254",IDC_STATIC,8,39,209,28
+    LTEXT           "IPv4 address format template:\na.b.c.d or a.b.c. or a.b or a or empty\na.b.c = range from a.b.c.1 to a.b.c.254",IDC_STATIC,8,39,209,28
     LTEXT           "",IDC_ERROR_TEXT,7,130,97,8
 END
 
@@ -802,25 +805,25 @@ END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Enter UltraVNC Server Administration password"
+CAPTION "UltraVNC Server - Enter UltraVNC Server Administration Password"
 FONT 11, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
+    EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,31,50,14
     PUSHBUTTON      "CANCEL",IDCANCEL,199,31,50,14
-    EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
     LTEXT           "Admin password",IDC_STATIC,7,10,55,8
 END
 
 IDD_CHANGE_PASSWORD DIALOGEX 0, 0, 182, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Change password"
+CAPTION "UltraVNC Server - Change Password"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "SAVE",IDOK,68,84,50,14
     PUSHBUTTON      "CANCEL",IDCANCEL,125,84,50,14
-    LTEXT           "Enter new passwword:",IDC_STATIC,7,11,168,8
+    LTEXT           "Enter a new password",IDC_STATIC,7,11,168,8
     EDITTEXT        IDC_PASSWORD_1,7,23,168,14,ES_PASSWORD | ES_AUTOHSCROLL
-    LTEXT           "Enter a new time the password for verification",IDC_STATIC,7,43,168,8
+    LTEXT           "Confirm the new password",IDC_STATIC,7,43,168,8
     EDITTEXT        IDC_PASSWORD_2,7,55,168,14,ES_PASSWORD | ES_AUTOHSCROLL
 END
 
@@ -847,6 +850,17 @@ BEGIN
     LTEXT           "Default screen",IDC_STATIC,14,129,47,8
     CONTROL         "Primary",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
     CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
+END
+
+IDD_FORM_Service DIALOGEX 0, 0, 362, 209
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 11, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    PUSHBUTTON      "Install service",IDC_INSTALL_SERVICE,17,7,84,14
+    PUSHBUTTON      "Uninstall service",IDC_UNINSTALL_SERVICE,17,28,84,14
+    PUSHBUTTON      "Start service",IDC_START_SERVICE,17,49,84,14
+    PUSHBUTTON      "Stop service",IDC_STOP_SERVICE,17,70,84,14
+    LTEXT           "Static",IDC_SERVICE_STATUS,17,100,217,31
 END
 
 
@@ -938,6 +952,8 @@ BEGIN
         RIGHTMARGIN, 351
         VERTGUIDE, 12
         VERTGUIDE, 296
+        VERTGUIDE, 355
+        VERTGUIDE, 360
         TOPMARGIN, 7
         BOTTOMMARGIN, 202
     END
@@ -983,6 +999,14 @@ BEGIN
         VERTGUIDE, 12
         TOPMARGIN, 7
         BOTTOMMARGIN, 204
+    END
+
+    IDD_FORM_Service, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 355
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1059,6 +1083,11 @@ BEGIN
 END
 
 IDD_FORM_Misc AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FORM_Service AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

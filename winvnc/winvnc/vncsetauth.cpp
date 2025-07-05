@@ -49,9 +49,8 @@ vncSetAuth::vncSetAuth()
 
 // Initialisation
 BOOL
-vncSetAuth::Init(vncServer *server)
+vncSetAuth::Init()
 {
-	m_server = server;
 	m_dlgvisible = FALSE;
 	return TRUE;
 }

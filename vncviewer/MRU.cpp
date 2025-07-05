@@ -88,6 +88,8 @@ void MRU::AddItem(LPTSTR txt)
     // If we've run out of unused ids, use the last one in the index and then remove it from the end.
     if (_tcscmp(&firstUnusedId, &LAST_USEABLE_ID) > 0) {
         firstUnusedId = id;
+        if (_tcslen(m_index) < 1)
+            return;
         m_index[_tcslen(m_index) - 1] = _T('\0');    
     }
     

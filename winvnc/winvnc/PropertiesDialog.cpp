@@ -17,6 +17,11 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <windowsx.h>
+#include "winvnc.h"
+#include "UltraVNCService.h"
+#include "HelperFunctions.h"
+
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
@@ -64,6 +69,8 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	}
 	return 0;
 }
+
+extern char configFile[256];
 bool PropertiesDialog::InitDialog(HWND hwnd)
 {
 	PropertiesDialogHwnd = hwnd;
@@ -72,6 +79,12 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_WINVNC));
 	SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
+	const long lTitleBufSize = 256;
+	char szTitle[lTitleBufSize];
+
+	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - Settings - Config file: %s", configFile);
+	SetWindowText(hwnd, szTitle);
 
 	showAdminPanel = false;
 	vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel = false\n"));
@@ -84,7 +97,8 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		}
 		else {
 			vnclog.Print(LL_INTWARN, VNCLOG("IsDesktopUserAdmin false\n"));
-			if (settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) {
+			if (!settings->getAllowUserSettingsWithPassword() ||
+				(settings->getAllowUserSettingsWithPassword() && !settings->checkAdminPassword()) ) {
 				EndDialog(hwnd, IDCANCEL);
 				return true;
 			}
@@ -124,8 +138,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		item.pszText = "Administration";
 		TabCtrl_InsertItem(hTabControl, 9, &item);
 	}
-	else
-		vnclog.Print(LL_INTWARN, VNCLOG("Don't show showAdminPanel\n"));
+	else if (standalone) 
+	{
+		item.pszText = "Service";
+		TabCtrl_InsertItem(hTabControl, 9, &item);
+	}
 
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_AUTHENTICATION),
@@ -177,6 +194,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
+	hTabService = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_Service),
+		hwnd,
+		(DLGPROC)DlgProc,
+		(LONG_PTR)this);
 	RECT rc;
 	GetWindowRect(hTabControl, &rc);
 	MapWindowPoints(NULL, hwnd, (POINT*)&rc, 2);
@@ -211,6 +233,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	SetWindowPos(hTabAdministration, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
+	SetWindowPos(hTabService, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);	
 	return TRUE;
 };
 int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
@@ -264,8 +289,14 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabLog);
 				return 0;
 			case 9:
-				ShowWindow(hTabAdministration, SW_SHOW);
-				SetFocus(hTabAdministration);
+				if (showAdminPanel) {
+					ShowWindow(hTabAdministration, SW_SHOW);
+					SetFocus(hTabAdministration);
+				}
+				else if (standalone) {
+					ShowWindow(hTabService, SW_SHOW);
+					SetFocus(hTabService);
+				}
 				return 0;				
 			}
 			return 0;
@@ -309,7 +340,12 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabLog, SW_HIDE);
 				break;
 			case 9:
-				ShowWindow(hTabAdministration, SW_HIDE);
+				if (showAdminPanel) {
+					ShowWindow(hTabAdministration, SW_HIDE);
+				}
+				else if (standalone) {
+					ShowWindow(hTabService, SW_HIDE);
+				}
 				break;
 			}
 			return 0;
@@ -345,6 +381,20 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LONG)(INT_PTR)GetStockObject(WHITE_BRUSH);
 	}
+	case WM_NOTIFY:
+		{
+		int a = 0;
+		LPNMHDR nmhdr = (LPNMHDR)lParam;
+		if (nmhdr->idFrom == IDC_SLIDERFPS) {
+			int fps = SendMessage(GetDlgItem(hwnd, IDC_SLIDERFPS), TBM_GETPOS, 0, 0L);
+			if (fps != settings->getMaxFPS())
+				EnableWindow(GetDlgItem(_this->PropertiesDialogHwnd, IDC_APPLY), true);
+				CHAR temp[250];
+				sprintf_s(temp, "%d", fps);
+				SetDlgItemText(hwnd, IDC_STATICFPS, temp);
+			}
+		}
+		return true;
 	case WM_COMMAND:
 		_this->onCommand(LOWORD(wParam), hwnd, HIWORD(wParam));
 	}
@@ -366,7 +416,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	else
 
-	m_dlgvisible = TRUE;
+		m_dlgvisible = TRUE;
 	bConnectSock = settings->getEnableConnections();
 
 	if (GetDlgItem(hwnd, IDC_CONNECT_SOCK)) {
@@ -384,7 +434,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	BOOL bValidDisplay = (d1 == d2 && d1 >= 0 && d1 <= 99);
 
 	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN)) {
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), settings->isAdminPasswordSet() ? "CHANGE": "SET");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), settings->isAdminPasswordSet() ? "CHANGE" : "SET");
 	}
 
 	if (GetDlgItem(hwnd, IDC_SPECPORT)) {
@@ -553,7 +603,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 				IDC_RADIONOTIFICATIONON);
 			break;
 		};
-		SendMessage(hNotificationSelection,BM_SETCHECK,TRUE,0);
+		SendMessage(hNotificationSelection, BM_SETCHECK, TRUE, 0);
 	}
 
 	if (GetDlgItem(hwnd, IDC_MV1)) {
@@ -630,8 +680,18 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 #endif // SC_20
 	}
 
-	if (GetDlgItem(hwnd, IDC_PLUGIN_CHECK))
+	if (GetDlgItem(hwnd, IDC_PLUGIN_CHECK)) {
+
+		TCHAR szPlugin[MAX_PATH];
+		TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+		bool pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
 		SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_SETCHECK, settings->getUseDSMPlugin(), 0);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), (m_server == NULL || m_server->AuthClientCount() == 0)
+			? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
+			: BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	}	
 
 	// Query window option - Taken from TightVNC advanced properties
 	if (GetDlgItem(hwnd, IDC_DREFUSE)) {
@@ -806,7 +866,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		hEditLog = GetDlgItem(hwnd, IDC_EDIT_LOG);
 		LogToEdit("");
 	}
-
+	setServiceStatusText(hwnd);
 	return FALSE; // Because we've set the focus
 }
 
@@ -893,14 +953,14 @@ void PropertiesDialog::ShowImpersonateDialog()
 			if ((strlen(plain) != 0) || !settings->getAuthRequired())
 				return;
 		}
-		vnclog.Print(LL_INTERR, VNCLOG("warning - empty password\n"));
+		vnclog.Print(LL_INTERR, VNCLOG("Warning - Empty password\n"));
 		// If we reached here then OK was used & there is no password!
 		MessageBoxSecure(NULL, sz_ID_NO_PASSWORD_WARN, sz_ID_WINVNC_WARNIN, MB_OK | MB_ICONEXCLAMATION);
 
 		// The password is empty, so if OK was used then redisplay the box,
 		// otherwise, if CANCEL was used, close down UltraVNC Server
 		if (result == IDCANCEL) {
-			vnclog.Print(LL_INTERR, VNCLOG("no password - QUITTING\n"));
+			vnclog.Print(LL_INTERR, VNCLOG("No password - QUITTING\n"));
 			PostQuitMessage(0);
 			if (iImpersonateResult == ERROR_SUCCESS)
 				RevertToSelf();
@@ -921,8 +981,9 @@ void PropertiesDialog::ShowImpersonateDialog()
 		RevertToSelf();
 }
 
-int PropertiesDialog::ShowDialog()
+int PropertiesDialog::ShowDialog(bool standalone)
 {
+	this->standalone = standalone;
 	return DialogBoxParam(hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_PROPERTIESDIALOG),
 		NULL, (DLGPROC)PropertiesDlgProc, (LONG_PTR)this);
 };
@@ -998,17 +1059,7 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 	int fRet = 1;
 	int nFiles = 0;
 	char szCurrentDir[MAX_PATH];
-
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		if (p == NULL)
-			return 0;
-		*p = '\0';
-	}
-	else
-		return 0;
-
+	strcpy_s(szCurrentDir, winvncFolder);
 	if (szCurrentDir[strlen(szCurrentDir) - 1] != '\\') strcat_s(szCurrentDir, "\\");
 	strcat_s(szCurrentDir, "*.dsm"); // The DSMplugin dlls must have this extension
 
@@ -1030,28 +1081,77 @@ int PropertiesDialog::ListPlugins(HWND hComboBox)
 
 	return nFiles;
 }
+static bool isRunning = false;
 
 bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 {
-	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT &&
+	if ((command != IDC_SERVICE_COMMANDLINE && command != IDC_IDLETIMEINPUT && command != IDC_STARTLOG &&
 		command != IDC_KINTERVAL && command != IDC_PORTRFB && command != IDC_PORTHTTP &&
-		command != IDC_SCALE)|| subcommand == 1024)
+		command != IDC_SCALE && command != IDC_CHECKIP && command != IDC_STARTREP && 
+		command != IDC_INSTALL_SERVICE && command != IDC_UNINSTALL_SERVICE  && command != IDC_START_SERVICE 
+		&& command != IDC_STOP_SERVICE )|| subcommand == 1024)
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), true);
 	switch (command) {
+	case IDC_PLUGINS_COMBO: {
+			HWND hCombo = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
+			bool pluginset = false;
+			TCHAR szPlugin[MAX_PATH]{};
+			TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+
+			if (subcommand == CBN_SELCHANGE) {
+				int selIndex = ComboBox_GetCurSel(hCombo); // Get selected index				
+				if (selIndex != CB_ERR) {
+					ComboBox_GetLBText(hCombo, selIndex, szPlugin); // Get text of selected item								
+					pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
+				}
+				if (m_server)
+					EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+						? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
+						: BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			}
+			if (subcommand == CBN_EDITCHANGE) {
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
+					? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
+					: BST_UNCHECKED);
+				EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			}
+		}
+		return TRUE;
 	case IDC_REMOVE_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->removeSelectedItem();
+		isRunning = false;
 		break;
 	case IDC_MOVE_DOWN_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->moveDown();
+		isRunning = false;
 		break;
 	case IDC_MOVE_UP_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->moveUp();
+		isRunning = false;
 		break;
 	case IDC_ADD_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->add();
+		isRunning = false;
 		break;
 	case IDC_EDIT_BUTTON:
+		if (isRunning)
+			break;
+		isRunning = true;
 		rulesListView->edit();
+		isRunning = false;
 		break;
 	case IDC_DRIVER:
 		if (m_server)
@@ -1086,6 +1186,37 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_CHECKDRIVER:
 		CheckVideoDriver(1);
 		return TRUE;
+#ifndef SC_20
+	case IDC_INSTALL_SERVICE:
+		UltraVNCService::install_service();
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+		break;
+	case IDC_UNINSTALL_SERVICE:
+		UltraVNCService::uninstall_service();
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+		break;
+
+	case IDC_START_SERVICE:
+	{
+		char command[MAX_PATH + 32]; // 29 January 2008 jdp
+		_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
+		WinExec(command, SW_HIDE);
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+	}
+		break;
+	case IDC_STOP_SERVICE:
+	{
+		char command[MAX_PATH + 32]; // 29 January 2008 jdp
+		_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
+		WinExec(command, SW_HIDE);
+		Sleep(3000);
+		setServiceStatusText(hwnd);
+	}
+		break;
+#endif
 	case IDC_BLANK:
 	{
 		// only enable alpha blanking if blanking is enabled
@@ -1197,12 +1328,17 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		}
 		return TRUE;
 
-	// sf@2002 - DSM Plugin
-	case IDC_PLUGIN_CHECK:
+	case IDC_PLUGIN_CHECK: {
+		TCHAR szPlugin[MAX_PATH];
+		TCHAR szPluginDefault[MAX_PATH] = "No Plugin detected...";
+		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+		bool pluginset = (strcmp(szPlugin, szPluginDefault) != 0) && strlen(szPlugin) > 0;
 		if (m_server)
 			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), m_server->AuthClientCount() == 0
-				? SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED
+				? (SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED) && pluginset
 				: BST_UNCHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), SendMessage(GetDlgItem(hwnd, IDC_PLUGIN_CHECK), BM_GETCHECK, 0, 0) == BST_CHECKED);
+		}
 		return TRUE;
 
 	case IDC_MSLOGON_CHECKD:
@@ -1262,21 +1398,22 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			serviceHelpers::winvncSecurityEditorHelper_as_admin();
 		}
 		else {
-			// Marscha@2004 - authSSP: end of change
-			if (m_server) {
-				m_vncauth.Init(m_server);
-				m_vncauth.Show(TRUE);
-			}
+			m_vncauth.Init();
+			m_vncauth.Show(TRUE);
 		}
 	}
 	return TRUE;
 #endif // SC_20
 	case IDC_CHANGEPASSWORD:
 	{
+		static bool isRunningPw = false;
+		if (isRunningPw)
+			return true;
+		isRunningPw = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
-			? "Set password"
-			: "Change password", 8)) {
+			? "UltraVNC Server - Set Password"
+			: "UltraVNC Server - Change Password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1289,15 +1426,21 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->savePassword();
 			}
 		}
+		delete dlgChangePassword;
+		isRunningPw = false;
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CHANGEPASSWORDVO:
 	{
+		static bool isRunningPwVo = false;
+		if (isRunningPwVo)
+			return true;
+		isRunningPwVo = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
-					? "Set View-only password"
-					: "Change View-only password", 8)) {
+					? "UltraVNC Server - Set View-only Password"
+					: "UltraVNC Server - Change View-only Password", 8)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			if (strlen(password) == 0) {
@@ -1310,25 +1453,34 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				settings->saveViewOnlyPassword();
 			}
 		}
+		delete dlgChangePassword;
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+		isRunningPwVo = false;
 		return true;
 	}
 	case IDC_CHANGEPASSWORDADMIN: {
+		static bool isRunningPwaAdm = false;
+		if (isRunningPwaAdm)
+			return true;
+		isRunningPwaAdm = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
 		if (dlgChangePassword->ShowDlg(NULL, settings->isAdminPasswordSet() 
-					? "Change Admin password" 
-					: "Set Admin password", 128)) {
+					? "UltraVNC Server - Change Admin Password" 
+					: "UltraVNC Server - Set Admin Password", 128)) {
 			char password[1024];
 			strcpy_s(password, dlgChangePassword->getPassword());
 			settings->setAdminPasswordHash(password);
 			SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "CHANGE");
 		}
+		isRunningPwaAdm = false;
+		delete dlgChangePassword;
 	}
 		return true;
 
 	case IDC_ADMINCLEAR: {
 		settings->setAdminPasswordHash("");
 		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDADMIN), "SET");
+		return true;
 	}
 
 	case IDC_CLEARPASSWORD:
@@ -1347,13 +1499,12 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	}
 	case IDC_PLUGIN_BUTTON:
 	{
-		if (m_server) {
-			HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
-			if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED) {
-				TCHAR szPlugin[MAX_PATH];
-				GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
-				PathStripPathA(szPlugin);
-
+		HWND hPlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
+		if (SendMessage(hPlugin, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+			TCHAR szPlugin[MAX_PATH];
+			GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
+			PathStripPathA(szPlugin);
+			if (m_server) {
 				if (!m_server->GetDSMPluginPointer()->IsLoaded())
 					m_server->GetDSMPluginPointer()->LoadPlugin(szPlugin, false);
 				else {
@@ -1367,10 +1518,12 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				}
 
 				if (m_server->GetDSMPluginPointer()->IsLoaded())
-					Secure_Save_Plugin_Config(szPlugin);
+					PropertiesDialog::Secure_Plugin(szPlugin);
 				else
 					MessageBoxSecure(NULL, sz_ID_PLUGIN_NOT_LOAD, sz_ID_PLUGIN_LOADIN, MB_OK | MB_ICONEXCLAMATION);
 			}
+			else
+				PropertiesDialog::Secure_Plugin(szPlugin);
 		}
 		return TRUE;
 	}
@@ -1442,14 +1595,13 @@ void PropertiesDialog::Secure_Plugin(char* szPlugin)
 		char* szNewConfig = NULL;
 		char DSMPluginConfig[512];
 		DSMPluginConfig[0] = '\0';
-		IniFile myIniFile;
-		myIniFile.ReadString("admin", "DSMPluginConfig", DSMPluginConfig, 512);
+		strcpy_s(DSMPluginConfig, settings->getDSMPluginConfig());
 		m_pDSMPlugin->SetPluginParams(hwnd2, szParams, DSMPluginConfig, &szNewConfig);
 
 		if (szNewConfig != NULL && strlen(szNewConfig) > 0) {
 			strcpy_s(DSMPluginConfig, 511, szNewConfig);
 		}
-		myIniFile.WriteString("admin", "DSMPluginConfig", DSMPluginConfig);
+		settings->setDSMPluginConfig(DSMPluginConfig);
 
 		CoUninitialize();
 		SetThreadDesktop(old_desktop);
@@ -1572,8 +1724,8 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		settings->setSecure(SendMessage(hSecure, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		bool bSecure = settings->getSecure();
 		if (Secure_old != bSecure) {
-			//We changed the method to save the password
-			//load passwords and encrypt the other method
+			// We changed the method to save the password
+			// load passwords and encrypt the other method
 			vncPasswd::ToText plain(settings->getPasswd(), Secure_old);
 			vncPasswd::ToText plainViewOnly(settings->getPasswdViewOnly(), Secure_old);
 			char passwd[MAXPWLEN + 1];
@@ -1912,12 +2064,15 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			settings->setQueryDisableTime(atoi(disabletime));
 	}
 
-	if (GetDlgItem(hwnd, IDC_SERVICE_COMMANDLINE) && GetDlgItem(hwnd, IDC_EDITQUERYTEXT)) {
+	if (GetDlgItem(hwnd, IDC_SERVICE_COMMANDLINE)) {
 		char temp[1024]{};
-		char temp2[512]{};
 		GetDlgItemText(hwnd, IDC_SERVICE_COMMANDLINE, temp, 1024);
-		GetDlgItemText(hwnd, IDC_EDITQUERYTEXT, temp2, 512);
 		settings->setService_commandline(temp);
+	}
+
+	if (GetDlgItem(hwnd, IDC_EDITQUERYTEXT)) {
+		char temp2[512]{};
+		GetDlgItemText(hwnd, IDC_EDITQUERYTEXT, temp2, 512);
 		settings->setAccept_reject_mesg(temp2);
 	}
 
@@ -1981,12 +2136,13 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDC_APPLY, 0);
-}
-void PropertiesDialog::onOK(HWND hwnd)
-	{
+	SendMessage(hTabService, WM_COMMAND, IDC_APPLY, 0);
 #ifndef SC_20
 	settings->save();
 #endif // SC_20	
+}
+void PropertiesDialog::onOK(HWND hwnd)
+	{
 	SendMessage(hTabAuthentication, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabIncoming, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabInput, WM_COMMAND, IDOK, 0);
@@ -1997,6 +2153,11 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabService, WM_COMMAND, IDOK, 0);
+
+#ifndef SC_20
+	settings->save();
+#endif // SC_20	
 
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
@@ -2008,6 +2169,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
+	DestroyWindow(hTabService);
 	EndDialog(hwnd, TRUE);
 }
 void PropertiesDialog::onCancel(HWND hwnd)
@@ -2022,6 +2184,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabService, WM_COMMAND, IDCANCEL, 0);
 	DestroyWindow(hTabAuthentication);
 	DestroyWindow(hTabIncoming);
 	DestroyWindow(hTabInput);
@@ -2032,67 +2195,46 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
 	DestroyWindow(hTabAdministration);
+	DestroyWindow(hTabService);
 	EndDialog(hwnd, FALSE);
-}
-
-void PropertiesDialog::Secure_Save_Plugin_Config(char* szPlugin)
-{
-	HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
-	if (!hPToken)
-		return;
-
-	char dir[MAX_PATH];
-	char exe_file_name[MAX_PATH];
-	GetModuleFileName(0, exe_file_name, MAX_PATH);
-	strcpy_s(dir, exe_file_name);
-	strcat_s(dir, " -dsmpluginhelper ");
-	strcat_s(dir, szPlugin);
-
-	STARTUPINFO          StartUPInfo{};
-	PROCESS_INFORMATION  ProcessInfo{};
-	ZeroMemory(&StartUPInfo, sizeof(STARTUPINFO));
-	ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
-	StartUPInfo.wShowWindow = SW_SHOW;
-	StartUPInfo.lpDesktop = "Winsta0\\Default";
-	StartUPInfo.cb = sizeof(STARTUPINFO);
-
-	CreateProcessAsUser(hPToken, NULL, dir, NULL, NULL, FALSE, DETACHED_PROCESS, NULL, NULL, &StartUPInfo, &ProcessInfo);
-	DWORD errorcode = GetLastError();
-	if (ProcessInfo.hProcess)
-		CloseHandle(ProcessInfo.hProcess);
-	if (ProcessInfo.hThread)
-		CloseHandle(ProcessInfo.hThread);
-	if (errorcode == 1314)
-		Secure_Plugin(szPlugin);
-	return;
-}
-
-void PropertiesDialog::Secure_Plugin_elevated(char* szPlugin)
-{
-	char dir[MAX_PATH];
-	char exe_file_name[MAX_PATH];
-	strcpy_s(dir, " -dsmplugininstance ");
-	strcat_s(dir, szPlugin);
-
-	GetModuleFileName(0, exe_file_name, MAX_PATH);
-	SHELLEXECUTEINFO shExecInfo;
-	shExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-	shExecInfo.fMask = NULL;
-	shExecInfo.hwnd = GetForegroundWindow();
-	shExecInfo.lpVerb = "runas";
-	shExecInfo.lpFile = exe_file_name;
-	shExecInfo.lpParameters = dir;
-	shExecInfo.lpDirectory = NULL;
-	shExecInfo.nShow = SW_HIDE;
-	shExecInfo.hInstApp = NULL;
-	ShellExecuteEx(&shExecInfo);
 }
 
 const int MAX_LINES = 100;
 void PropertiesDialog::LogToEdit(const std::string & message) 
 {
 	if (hEditLog == NULL || !IsWindow(hEditLog))
+	{
+		// Convert buffer to a string
+		std::string content(buffer);
+
+		// Split the content into lines
+		std::vector<std::string> lines;
+		std::istringstream iss(content);
+		std::string line;
+		while (std::getline(iss, line)) {
+			lines.push_back(line);
+		}
+
+		// Add the new message
+		lines.insert(lines.begin(), message);
+
+		// Remove excess lines if necessary
+		while (lines.size() > MAX_LINES) {
+			lines.pop_back();
+		}
+
+		std::ostringstream oss;
+		for (const auto& ln : lines) {
+			oss << ln << '\n'; // Add newline between lines
+		}
+		std::string updatedContent = oss.str();
+
+		// Copy the updated content back to the buffer
+		if (updatedContent.size() < 65536) {
+			std::strcpy(buffer, updatedContent.c_str());
+		}
 		return;
+	}
 	// Get the current content of the edit control		
 	std::string content(buffer);
 
@@ -2124,4 +2266,40 @@ void PropertiesDialog::LogToEdit(const std::string & message)
 	SendMessage(hEditLog, EM_SCROLLCARET, 0, 0);  // Ensure the last line is visible
 	GetWindowText(hEditLog, buffer, sizeof(buffer));
 }
+
+void PropertiesDialog::setServiceStatusText(HWND hwnd)
+{
+#ifndef SC_20
+	if (GetDlgItem(hwnd, IDC_SERVICE_STATUS)) {
+		bool installed = processHelper::IsServiceInstalled();
+		bool running = processHelper::IsServiceRunning();
+		if (!installed) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service is not installed");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 0);
+		}
+		if (installed && running) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service installed and running");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 1);
+		}
+
+		if (installed && !running) {
+			SetWindowText(GetDlgItem(hwnd, IDC_SERVICE_STATUS), "Service installed and not running");
+			EnableWindow(GetDlgItem(hwnd, IDC_INSTALL_SERVICE), 0);
+			EnableWindow(GetDlgItem(hwnd, IDC_UNINSTALL_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_START_SERVICE), 1);
+			EnableWindow(GetDlgItem(hwnd, IDC_STOP_SERVICE), 0);
+		}
+
+
+		
+	}
+#endif	
+}
+
 

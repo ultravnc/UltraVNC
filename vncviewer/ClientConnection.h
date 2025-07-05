@@ -80,12 +80,12 @@ class vnctouch;
 #endif
 extern const UINT FileTransferSendPacketMessage;
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#ifndef maximum
+#define maximum(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
 
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#ifndef minimum
+#define minimum(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
 
 //adzm 2010-09
@@ -137,7 +137,6 @@ struct BitmapInfo {
 };
 
 namespace rdr { class InStream; class FdInStream; class ZlibInStream; class xzInStream; class ZstdInStream; }
-typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*,UINT*);
 typedef BOOL(WINAPI* PFN_AdjustWindowRectExForDpi) (LPRECT, DWORD, BOOL, DWORD, UINT);
 
 class ClientConnection  : public omni_thread
@@ -200,6 +199,7 @@ public:
 	void WriteExact(char *buf, int bytes); //adzm 2010-09
 	void WriteExactFT(char *buf, int bytes);
 	void ResizeToolbar(RECT& rect);
+	void SaveAllowUntrustedServers();
 
 private:
 	bool brfbClientInitExtraMsgSupportNew = false;
@@ -849,16 +849,16 @@ private:
 	DWORD prevMousekeyflags;
 	UINT prevMousemsg;
 
-	UINT m_Dpi;
+	
 	UINT m_DpiOld;
 	bool m_DpiMove;
-	HMODULE hShcore;
-	HMODULE hUser32;
-	PFN_GetDpiForMonitor getDpiForMonitor;
-	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+	HMODULE hUser32;	
 	short nbrMonitors = 0;
 
 public:
+	UINT m_Dpi;
+	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
+
 	// RFB settings
 #ifdef _CLOUD
 	CloudThread* cloudThread = NULL;

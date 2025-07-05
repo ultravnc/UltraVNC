@@ -234,7 +234,7 @@ Source: "64\xp\vnchooks.dll"; DestDir: "{app}"; Flags: ignoreversion replacesame
 Source: "64\xp\ddengine64.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\UVncVirtualDisplay64\*"; DestDir: "{app}\UVncVirtualDisplay64"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\repeater.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Repeater
-Source: "64\xp\SecureVNCPlugin.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
+Source: "64\xp\SecureVNCPlugin64.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
 //Source: "64\xp\MSRC4Plugin_for_sc.dsm"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
 Source: "64\xp\uvnckeyboardhelper.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ; MS-Logon I files
@@ -433,6 +433,55 @@ begin
   DonateImage.Cursor := crHand;
   DonateImage.OnClick := @DonateImageOnClick;
   DonateImage.Parent := WizardForm;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  SourceFile, TargetDir, TargetFile: String;
+begin
+  // Check if we're at the "PostInstall" step
+  if CurStep = ssPostInstall then
+  begin
+    SourceFile := ExpandConstant('{app}\ultravnc.ini');
+    TargetDir := ExpandConstant('{commonappdata}\UltraVNC');
+    TargetFile := TargetDir + '\ultravnc.ini';
+
+    // Check if the source file exists
+    if FileExists(SourceFile) then
+    begin
+      // Check if the target file already exists
+      if not FileExists(TargetFile) then
+      begin
+        // Ensure the target directory exists
+        if not DirExists(TargetDir) then
+        begin
+          if not CreateDir(TargetDir) then
+          begin
+            MsgBox('Failed to create target directory: ' + TargetDir, mbError, MB_OK);
+            Exit;
+          end;
+        end;
+
+        // Copy the file to the destination
+        if not FileCopy(SourceFile, TargetFile, False) then
+        begin
+          MsgBox('Failed to copy "' + SourceFile + '" to "' + TargetFile + '".', mbError, MB_OK);
+        end
+        else
+        begin
+          MsgBox('File "' + SourceFile + '" successfully copied to "' + TargetFile + '".', mbInformation, MB_OK);
+        end;
+      end
+      else
+      begin
+        MsgBox('Target file "' + TargetFile + '" already exists. Skipping copy.', mbInformation, MB_OK);
+      end;
+    end
+    else
+    begin
+      MsgBox('Source file "' + SourceFile + '" does not exist.', mbInformation, MB_OK);
+    end;
+  end;
 end;
 
 [Dirs]

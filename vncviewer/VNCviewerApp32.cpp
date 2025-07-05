@@ -82,12 +82,10 @@ VNCviewerApp32::VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine) :
 void VNCviewerApp32::NewConnection(bool Is_Listening) {
 	ClientConnection *pcc = new ClientConnection(this);
 	try {
-		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
 		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
-//		DestroyWindow(pcc->m_hwndMain);
 		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
@@ -97,12 +95,10 @@ void VNCviewerApp32::NewConnection(bool Is_Listening) {
 void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 	ClientConnection *pcc = new ClientConnection(this, host,port);
 	try {
-		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
 		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
 	} catch (Exception &e) {
-//		DestroyWindow(pcc->m_hwndMain); 
 		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
@@ -112,12 +108,10 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 void VNCviewerApp32::NewConnection(bool Is_Listening,SOCKET sock) {
 	ClientConnection *pcc = new ClientConnection(this, sock);
 	try {
-		//memcpy((char*)&pcc->m_opts,(char*)&m_options,sizeof(m_options));
 		pcc->m_opts = &m_options;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
-	} catch (Exception &e) {
-//		DestroyWindow(pcc->m_hwndMain); 
+	} catch (Exception &e) { 
 		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;

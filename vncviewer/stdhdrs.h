@@ -45,7 +45,7 @@
 #define WINVER 0x0500
 #endif
 #define VC_EXTRALEAN
-
+#define NOMINMAX
 #include <winsock2.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>

@@ -43,11 +43,17 @@ void UdpEchoServer(int port)
         if (bytesReceived == SOCKET_ERROR) {
             continue; // Continue to next iteration
         }
-
+        
+        char realvnc[5];
+        realvnc[0] = 38;
+        realvnc[1] = -85;
+        realvnc[2] = 38;
+        realvnc[3] = -85;
+        realvnc[4] = 0;
         // Print received message
         buffer[bytesReceived] = '\0'; // Null-terminate the received data
         // Echo the message back to the client
-        if (strcmp(buffer, "&«&«") != 0) {
+        if (strcmp(buffer, realvnc) != 0) {
             if (sendto(serverSocket, buffer, bytesReceived, 0, reinterpret_cast<sockaddr*>(&clientAddr), clientAddrSize) == SOCKET_ERROR) {
                 continue; // Continue to next iteration
             }

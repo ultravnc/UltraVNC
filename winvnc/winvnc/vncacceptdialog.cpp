@@ -32,7 +32,7 @@
 #include "winvnc.h"
 #include "resource.h"
 #include "common/win32_helpers.h"
-#include "common/inifile.h"
+#include "SettingsManager.h"
 
 #include "Localization.h" // Act : add localization on messages
 
@@ -129,8 +129,7 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 
 			// Set the IP-address string
 			char accept_reject_mesg[512];
-			IniFile myIniFile;
-			myIniFile.ReadString("admin", "accept_reject_mesg", accept_reject_mesg,512);
+			strcpy_s(accept_reject_mesg, settings->getAccept_reject_mesg());
 
 			if (strlen(accept_reject_mesg) == 0) 
 				strcpy_s(accept_reject_mesg,"UltraVNC Server has received an incoming connection from");
@@ -143,15 +142,8 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
 			SetDlgItemText(hwnd, IDC_ACCEPT_IP, _this->m_ipAddress);
 
 			{
-			char WORKDIR[MAX_PATH];
-			char mycommand[MAX_PATH];
-			if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-				{
-				char* p = strrchr(WORKDIR, '\\');
-				if (p == NULL) return 0;
-				*p = '\0';
-			}
-			strcpy_s(mycommand,WORKDIR);
+			char mycommand[MAX_PATH];	
+			strcpy_s(mycommand, winvncFolder);
 			strcat_s(mycommand,"\\mylogo.bmp");
 			hbmBkGnd = (HBITMAP)LoadImage(NULL, mycommand, IMAGE_BITMAP, 0, 0,LR_LOADFROMFILE);
 			}

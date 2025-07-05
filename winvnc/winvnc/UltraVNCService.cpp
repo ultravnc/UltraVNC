@@ -246,7 +246,6 @@ void UltraVNCService::Reboot_with_force_reboot()
 
 void UltraVNCService::Reboot_with_force_reboot_elevated()
 {
-
 	char exe_file_name[MAX_PATH];
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	SHELLEXECUTEINFO shExecInfo;
@@ -274,7 +273,6 @@ void UltraVNCService::Reboot_in_safemode()
 
 void UltraVNCService::Reboot_in_safemode_elevated()
 {
-
 	char exe_file_name[MAX_PATH];
 	GetModuleFileName(0, exe_file_name, MAX_PATH);
 	SHELLEXECUTEINFO shExecInfo;

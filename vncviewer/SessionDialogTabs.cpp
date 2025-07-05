@@ -38,6 +38,7 @@ BOOL CALLBACK DlgProcMisc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcQuickOptions(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcListen(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DlgProcConfig(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 extern bool g_disable_sponsor;
 extern char sz_F1[64];
 extern char sz_F3[64];
@@ -68,10 +69,12 @@ void SessionDialog::InitTab(HWND hwnd)
 	TabCtrl_InsertItem(m_hTab, 3, &item);
 	item.pszText = "Security";
 	TabCtrl_InsertItem(m_hTab, 4, &item);
-	item.pszText = "Quick encoder";
+	item.pszText = "Quick enc";
 	TabCtrl_InsertItem(m_hTab, 5, &item);
 	item.pszText = "Listen";
 	TabCtrl_InsertItem(m_hTab, 6, &item);
+	item.pszText = "Conf";
+	TabCtrl_InsertItem(m_hTab, 7, &item);
 	hTabEncoders = CreateDialogParam(pApp->m_instance,
 		MAKEINTRESOURCE(IDD_ENCODERS),
 		hwnd,
@@ -107,6 +110,11 @@ void SessionDialog::InitTab(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProcListen,
 		(LONG_PTR)this);
+	hTabConfig = CreateDialogParam(pApp->m_instance,
+		MAKEINTRESOURCE(IDD_CONFIG),
+		hwnd,
+		(DLGPROC)DlgProcConfig,
+		(LONG_PTR)this);
 	RECT rc;
 	GetWindowRect(m_hTab, &rc);
 	MapWindowPoints(NULL, hwnd, (POINT*)&rc, 2);
@@ -130,6 +138,9 @@ void SessionDialog::InitTab(HWND hwnd)
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabListen, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);
+	SetWindowPos(hTabConfig, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 }
@@ -172,6 +183,10 @@ int SessionDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabListen, SW_SHOW);
 				SetFocus(hTabListen);
 				return 0;
+			case 7:
+				ShowWindow(hTabConfig, SW_SHOW);
+				SetFocus(hTabConfig);
+				return 0;
 			}
 			return 0;
 		}
@@ -202,6 +217,9 @@ int SessionDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				break;
 			case 6:
 				ShowWindow(hTabListen, SW_HIDE);
+				break;
+			case 7:
+				ShowWindow(hTabConfig, SW_HIDE);
 				break;
 			}
 			return 0;
@@ -637,6 +655,58 @@ BOOL CALLBACK DlgProcQuickOptions(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return (INT_PTR)FALSE;
 }
 ////////////////////////////////////////////////////////////////////////////////
+BOOL CALLBACK DlgProcConfig(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	SessionDialog* _this = helper::SafeGetWindowUserData<SessionDialog>(hwnd);
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		helper::SafeSetWindowUserData(hwnd, lParam);
+		SessionDialog* _this = (SessionDialog*)lParam;
+		_this->ConfigHwnd = hwnd;
+		_this->InitDlgProcConfig();
+	
+		
+		return TRUE;
+	}
+
+	case WM_CTLCOLORDLG:
+		return (INT_PTR)GetStockObject(WHITE_BRUSH);
+
+	case WM_CTLCOLORSTATIC:
+	{
+		HDC hdcStatic = (HDC)wParam;
+		SetTextColor(hdcStatic, RGB(0, 0, 0));
+		SetBkMode(hdcStatic, TRANSPARENT);
+		return (LONG)(INT_PTR)GetStockObject(WHITE_BRUSH);
+	}	
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			return TRUE;
+		case IDOK:
+			return TRUE;
+		case IDC_CHECKCONFIG:
+			_this->ReadDlgProcConfig();
+			if (_this->fUseOnlyDefaultConfigFile) {
+				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), "");
+				_this->LoadFromFile(_this->m_pOpt->getDefaultOptionsFileName());
+			}
+			else {
+				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), _this->customConfigFile);
+				_this->LoadFromFile(_this->customConfigFile);
+			}
+			return TRUE;
+		default:
+
+			break;
+		}
+	}
+	return (INT_PTR)FALSE;
+}
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcEncoders()
 {
@@ -961,6 +1031,19 @@ void SessionDialog::InitDlgProcMisc()
 		SendMessage(hcomboscreen, CB_SETCURSEL, 3, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
+void SessionDialog::InitDlgProcConfig()
+{
+	HWND hwnd = ConfigHwnd;
+	SetWindowText(GetDlgItem(hwnd, IDC_DEFAULTCONFIG),
+			m_pOpt->getDefaultOptionsFileName());
+	if (fUseOnlyDefaultConfigFile)
+		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), "");
+	else
+		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), customConfigFile);
+	HWND hfUseOnlyDefaultConfigFile = GetDlgItem(hwnd, IDC_CHECKCONFIG);
+	SendMessage(hfUseOnlyDefaultConfigFile, BM_SETCHECK, fUseOnlyDefaultConfigFile, 0);
+}
+////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::InitDlgProcSecurity()
 {
 	HWND hwnd = SecurityHwnd;
@@ -1239,6 +1322,12 @@ void SessionDialog::ReadDlgProcSecurity()
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	ipv6 = (SendMessage(GetDlgItem(hwnd, IDC_IPV6), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg, 255);
+}
+////////////////////////////////////////////////////////////////////////////////
+void SessionDialog::ReadDlgProcConfig()
+{
+	HWND hwnd = ConfigHwnd;
+	fUseOnlyDefaultConfigFile = (SendMessage(GetDlgItem(hwnd, IDC_CHECKCONFIG), BM_GETCHECK, 0, 0) == BST_CHECKED);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProc()
@@ -1571,6 +1660,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
+	m_pOpt->m_UseOnlyDefaultConfigFile = fUseOnlyDefaultConfigFile;
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_ipv6 = ipv6;
 	m_pOpt->m_AllowUntrustedServers = AllowUntrustedServers;

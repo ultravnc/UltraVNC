@@ -62,8 +62,9 @@ ViewerDirectxClass::DestroyD3D(void)
 	directxlocked = true;
 	if (surface)
 		{
-			surface->Release();
+			LPDIRECT3DSURFACE9 pSurface = surface;
 			surface = 0;
+			pSurface->Release();
 		}
 	if (pD3DDevice9)
 	{

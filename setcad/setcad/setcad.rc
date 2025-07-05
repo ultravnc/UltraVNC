@@ -45,7 +45,7 @@ BEGIN
             VALUE "FileDescription", "ctrl-alt-del helper"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "setcad.exe"
-            VALUE "LegalCopyright", "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+            VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "setcad.exe"
             VALUE "ProductName", "setcad"
             VALUE "ProductVersion", "1.0.0.1"

@@ -243,6 +243,7 @@ VNCOptions::VNCOptions()
 	m_fAutoAcceptIncoming = false;
 	m_fAutoAcceptNoDSM = false;
 	m_fRequireEncryption = false;
+	m_UseOnlyDefaultConfigFile = true;
 	m_preemptiveUpdates = false;
 	m_saved_scale_num = 100;
 	m_saved_scale_den = 100;
@@ -453,6 +454,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = s.m_fRequireEncryption;
+	m_UseOnlyDefaultConfigFile = s.m_UseOnlyDefaultConfigFile;
 
 	//adzm 2010-07-04
 	m_preemptiveUpdates = s.m_preemptiveUpdates;
@@ -462,11 +464,6 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 VNCOptions::~VNCOptions()
 {
-}
-
-inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
-	return (arg[0] == '-' || arg[0] == '/') &&
-		(_tcsicmp(&arg[1], swtch) == 0);
 }
 
 static void ArgError(LPTSTR msg) {
@@ -500,6 +497,7 @@ void VNCOptions::FixScaling()
 void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	// We assume no quoting here.
 	// Copy the command line - we don't know what might happen to the original
+	strcpy_s(this->szCmdLine, szCmdLine);
 	config_specified = false;
 	int cmdlinelen = _tcslen(szCmdLine);
 	if (cmdlinelen == 0) return;
@@ -1230,6 +1228,8 @@ void VNCOptions::SaveOptions(char* fname)
 
 	//adzm 2010-05-12
 	saveInt("RequireEncryption", m_fRequireEncryption, fname);
+	saveInt("UseOnlyDefaultConfigFile", m_UseOnlyDefaultConfigFile, fname);
+	
 
 	//adzm 2010-07-04
 	saveInt("PreemptiveUpdates", m_preemptiveUpdates, fname);
@@ -1341,13 +1341,15 @@ void VNCOptions::LoadOptions(char* fname)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = readInt("RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
+	m_UseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)m_UseOnlyDefaultConfigFile, fname) ? true : false;
+	
 
 	//adzm 2010-07-04
 	m_preemptiveUpdates = readInt("PreemptiveUpdates", (int)m_preemptiveUpdates, fname) ? true : false;
 }
 
 void VNCOptions::ShowUsage(LPTSTR info) {
-	TCHAR msg[1024];
+	TCHAR msg[2048];
 	TCHAR* tmpinf = _T("");
 	if (info != NULL)
 		tmpinf = info;

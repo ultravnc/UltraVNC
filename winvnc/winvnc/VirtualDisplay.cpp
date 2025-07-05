@@ -27,6 +27,7 @@
 #include "VirtualDisplay.h"
 #include "versionhelpers.h"
 #include <newdev.h>
+#include "winvnc.h"
 #pragma comment(lib, "Newdev.lib")
 #pragma comment(lib, "swdevice.lib")
 
@@ -465,17 +466,14 @@ bool VirtualDisplay::InstallDriver(bool fromCommandline)
 		if (!fromCommandline)
 			return 1;
 		CHAR szdriverPath[MAX_PATH];
-		if (GetModuleFileName(NULL, szdriverPath, MAX_PATH)) {
-			char* p = strrchr(szdriverPath, '\\');
-			if (p == NULL)
-				return 0;
-			*p = '\0';
+		strcpy_s(szdriverPath, winvncFolder);
+		
 #ifdef _X64
 			strcat_s(szdriverPath, "\\UVncVirtualDisplay64\\UVncVirtualDisplay.inf");
 #else
 			strcat_s(szdriverPath, "\\UVncVirtualDisplay\\UVncVirtualDisplay.inf");
 #endif
-		}
+
 		std::unique_ptr<BOOL> restart(new BOOL());
 
 		HMODULE hModule = LoadLibrary("Newdev.dll");

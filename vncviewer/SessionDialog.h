@@ -122,6 +122,7 @@ public:
 	bool fAutoAcceptIncoming;
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
+	bool fUseOnlyDefaultConfigFile;
 	bool restricted;
 	bool ipv6;
 	bool AllowUntrustedServers;
@@ -139,6 +140,7 @@ public:
 	void setDisplays();
 	void InitDlgProcMisc();
 	void InitDlgProcSecurity();	
+	void InitDlgProcConfig();
 	void InitDlgProc(bool loadhost = false, bool initMruNeeded = true);
 	void InitDlgProcListen();
 
@@ -147,10 +149,12 @@ public:
 	void ReadDlgProcDisplay();
 	void ReadDlgProcMisc();
 	void ReadDlgProcSecurity();	
+	void ReadDlgProcConfig();
 	void ReadDlgProc();
 	void ReadDlgProcListen();
 
-	HWND EncodersHwnd, KeyboardMouseHwnd, DisplayHwnd, MiscHwnd, SecurityHwnd, SessHwnd, QuickOptionsHwnd, ListenHwnd;
+	HWND EncodersHwnd, KeyboardMouseHwnd, DisplayHwnd, MiscHwnd, SecurityHwnd, ConfigHwnd,
+			SessHwnd, QuickOptionsHwnd, ListenHwnd;
 	void FixScaling();
 	void SaveConnection(HWND hwnd, bool saveAs);
 	void SettingsFromUI();
@@ -158,6 +162,7 @@ public:
 	void SaveToFile(char *fname, bool SaveToFile = false);
 	void saveInt(char *name, int value, char *fname); 
 	void LoadFromFile(char *fname);
+	void overwriteCommandLine();
 	int readInt(char *name, int defval, char *fname);
 	void getAppData(char * buffer);
 	void IfHostExistLoadSettings(char *filename);
@@ -165,15 +170,12 @@ public:
 	VNCOptions *m_pOpt;
 	void StartListener();
 	void ModeSwitch(HWND hwnd, WPARAM wParam);
-	void DpiChange(HWND hDlg);
-	bool IsOnlyOneMonitor(HWND hDlg);
-	bool dpichanged;
 	UINT m_Dpi;
-	UINT m_DpiOld;
 	char InfoMsg[255]{0};
+	char customConfigFile[_MAX_PATH]{};
 private:
-	int cx, cy;
-	HWND hTabEncoders, hTabKeyboardMouse, hTabDisplay, hTabMisc, hTabSecurity, hTabQuickOptions, hTabListen;
+	HWND hTabEncoders, hTabKeyboardMouse, hTabDisplay, hTabMisc, hTabSecurity,
+			hTabQuickOptions, hTabListen, hTabConfig;
 	HWND m_hTab;
 	HWND browser_hwnd;
 	

@@ -62,6 +62,7 @@
 #include "common/win32_helpers.h"
 #include "shlwapi.h"
 #include "UltraVNCHelperFunctions.h"
+#include <limits>
 
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
@@ -762,7 +763,7 @@ bool FileTransfer::RequestNextFile()
 		ListView_GetItem(hWndRemoteList, &Item);
 
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFile, sizeof(szDstFile));
-		if (!strlen(szDstFile)) return false; // no destination dir selected - msgbox ?
+		if (!strlen(szDstFile)) return false; // no destination dir selected - msgbox?
 		strcat_s(szDstFile, szSelectedFile);
 
 		RequestRemoteFile(szDstFile);
@@ -839,7 +840,7 @@ bool FileTransfer::OfferNextFile()
 		ListView_GetItem(hWndLocalList, &Item);
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, szSrcFile, sizeof(szSrcFile));
-		if (!strlen(szSrcFile)) return false; // no destination dir selected - msgbox ?
+		if (!strlen(szSrcFile)) return false; // no destination dir selected - msgbox?
 		strcat_s(szSrcFile, szSelectedFile);
 
 		if (!OfferLocalFile(szSrcFile))
@@ -1275,6 +1276,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
+			if (strlen(ofDirT) < 1)
+				return;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
 			p = strrchr(ofDirT, '\\');
 			if (p == NULL) return;
@@ -1426,6 +1429,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
+			if (strlen(ofDirT) < 1)
+				return;
 			ofDirT[strlen(ofDirT) - 1] = '\0';
 			p = strrchr(ofDirT, '\\');
 			if (p == NULL)
@@ -1906,7 +1911,7 @@ void FileTransfer::SetStatus(LPSTR szStatus)
         DrawText(hdc, szHist, -1, &rc, DT_CALCRECT|DT_SINGLELINE);
         ReleaseDC(cbi.hwndList, hdc);
         int dx = rc.right - rc.left;
-        m_maxHistExtent = max(m_maxHistExtent, dx);
+        m_maxHistExtent = maximum(m_maxHistExtent, dx);
         SendDlgItemMessage(hWnd, IDC_HISTORY_CB, CB_SETHORIZONTALEXTENT, m_maxHistExtent, 0L);
     }
 	LRESULT Index = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_ADDSTRING, 0, (LPARAM)szHist); 
@@ -2165,14 +2170,15 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 		// if (dwFileSize != 0xFFFFFFFF)
 		if (bSizeOk)
 		{
-			unsigned long nCSBufferSize = (4 * (unsigned long)(n2FileSize.QuadPart / m_nBlockSize)) + 1024;
-			char* lpCSBuff = new char [nCSBufferSize];
-			if (lpCSBuff != NULL)
+			unsigned long long nCSBufferSize = (4 * (unsigned long long)(n2FileSize.QuadPart / m_nBlockSize)) + 1024;
+			if (nCSBufferSize > std::numeric_limits<size_t>::max())			
+				return false;
+			
+			std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(nCSBufferSize);
+			if (lpCSBuff)
 			{
-				int nCSBufferLen = GenerateFileChecksums(	m_hDestFile,
-															lpCSBuff,
-															nCSBufferSize
-														);
+				int nCSBufferLen = GenerateFileChecksums(m_hDestFile, lpCSBuff.get(), nCSBufferSize
+				);
 				if (nCSBufferLen != -1)
 				{
 					//sprintf_s(szStatus, " Sending %d bytes of file checksums to remote machine. Please Wait...", nCSBufferSize); 
@@ -2184,10 +2190,11 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 					ftm.size = Swap32IfLE(nCSBufferSize);
 					ftm.length = Swap32IfLE(nCSBufferLen);
 					//adzm 2010-09
-					m_pCC->WriteExactQueue((char *)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
-					m_pCC->WriteExactQueue((char *)lpCSBuff, nCSBufferLen);
+					m_pCC->WriteExactQueue((char*)&ftm, sz_rfbFileTransferMsg, rfbFileTransfer);
+					m_pCC->WriteExactQueue((char*)lpCSBuff.get(), nCSBufferLen);
 				}
 			}
+			
 		}
 	}
 
@@ -2581,7 +2588,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	memset(szDstFileName, 0, MAX_PATH + 32);
 
 	GetDlgItemText(hWnd, IDC_CURR_REMOTE, szDstFileName, sizeof(szDstFileName));
-	if (!strlen(szDstFileName)) return false; // no destination dir selected - msgbox ?
+	if (!strlen(szDstFileName)) return false; // no destination dir selected - msgbox?
 	strcat_s(szDstFileName, strrchr(m_szSrcFileName, '\\') + 1);
 
 	char szSrcFileTime[18];
@@ -3221,35 +3228,45 @@ int FileTransfer::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSB
 	DWORD dwNbBytesRead = 0;
 	int nCSBufferOffset = 0;
 
-	char* lpBuffer = new char [m_nBlockSize];
-	if (lpBuffer == NULL)
+	char* lpBuffer = new char[m_nBlockSize];
+	if (!lpBuffer)
 		return -1;
 
-	while ( !fEof )
+	while (!fEof)
 	{
-		int nRes = ReadFile(hFile, lpBuffer, m_nBlockSize, &dwNbBytesRead, NULL);
-		if (!nRes && dwNbBytesRead != 0)
+		if (!ReadFile(hFile, lpBuffer, m_nBlockSize, &dwNbBytesRead, NULL))
+		{
 			fError = true;
+			break;
+		}
 
-		if (nRes && dwNbBytesRead == 0)
+		if (dwNbBytesRead == 0)
+		{
 			fEof = true;
+		}
 		else
 		{
+			if (nCSBufferOffset + 4 > nCSBufferSize)
+			{
+				fError = true;
+				break;
+			}
+
 			unsigned long cs = adler32(0L, Z_NULL, 0);
 			cs = adler32(cs, (unsigned char*)lpBuffer, (int)dwNbBytesRead);
 			memcpy(lpCSBuffer + nCSBufferOffset, &cs, 4);
-			nCSBufferOffset += 4; 
+			nCSBufferOffset += 4;
 		}
 	}
 
-	SetFilePointer(hFile, 0L, NULL, FILE_BEGIN); 
-	delete [] lpBuffer;
+	if (SetFilePointer(hFile, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+	{
+		fError = true;
+	}
 
-	if (fError) 
-		return -1;
+	delete[] lpBuffer;
 
-	return nCSBufferOffset;
-
+	return fError ? -1 : nCSBufferOffset;
 }
 
 
@@ -4226,65 +4243,123 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		int cy;
 		int icx;
 		int icy;
+		int icyb;
 		int lf_an;
+		int rg_an;
 		int iProgressRight;
 		RECT rc;
+		RECT rcLMStatic;
+		RECT rcUpload;
+		RECT rcStatus;
+		RECT rcHistory;
+		RECT rcProgress;
+		RECT rcRoot;
+		int buttonUploadWidth;
+		int buttonUploadHeight;
+		int buttonStatusWidth;
+		int buttonStatusHeight;
+		int buttonHistoryWidth;
+		int buttonHistoryHeight;
+		int buttonProgressWidth;
+		int buttonProgressHeight;
+		int buttonRootWidth;
+		int buttonRootHeight;
+		int foced_closed;
+		int topbuttonsHeight;
+		int buttonLMStaticWidth;
 
 		if(wParam == SIZE_MINIMIZED)
 		{
 			break;
 		}
 
+		GetWindowRect(GetDlgItem(hWnd, IDC_UPLOAD_B), &rcUpload);
+		GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_STATUS), &rcStatus);
+		GetWindowRect(GetDlgItem(hWnd, IDC_HISTORY_CB), &rcHistory);
+		GetWindowRect(GetDlgItem(hWnd, IDC_PROGRESS), &rcProgress);
+		GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_ROOTB), &rcRoot);
+		GetWindowRect(GetDlgItem(hWnd, IDC_LM_STATIC), &rcLMStatic);
+
+		buttonUploadWidth = rcUpload.right - rcUpload.left;
+		buttonUploadHeight = rcUpload.bottom - rcUpload.top;
+
+		buttonStatusWidth = rcStatus.right - rcStatus.left;
+		buttonStatusHeight = rcStatus.bottom - rcStatus.top;
+
+		buttonHistoryWidth = rcHistory.right - rcHistory.left;
+		buttonHistoryHeight = rcHistory.bottom - rcHistory.top;
+
+		buttonProgressWidth = rcProgress.right - rcProgress.left;
+		buttonProgressHeight = rcProgress.bottom - rcProgress.top;
+
+		buttonRootWidth = rcRoot.right - rcRoot.left;
+		buttonRootHeight = rcRoot.bottom - rcRoot.top;
+
+		buttonLMStaticWidth = rcLMStatic.right - rcLMStatic.left;
+
+		foced_closed = buttonStatusHeight + buttonHistoryHeight + buttonProgressHeight + 12;
+		topbuttonsHeight = buttonUploadHeight * 2 + 12;
+
 		cx = LOWORD(lParam);	//Client Width
 		cy = HIWORD(lParam);	//Client Height
-		icy = cy-85-50;
-		icx = cx/2 - (21+4) * 2 - 94 - 95 - 7 * 4;
-		lf_an=(cx - 112)/2;
+		icy = cy- topbuttonsHeight - (buttonUploadHeight * 4); 
+		lf_an=(cx - buttonUploadWidth)/2 -12;
+
+		GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), &rc);
+		icx = lf_an - (buttonRootWidth + 4) * 2 - buttonLMStaticWidth - 4;
+		rg_an = buttonUploadWidth + 20;
+		
 
 		//Left
-		GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), &rc);
-		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB),              4,       4,   icx,  rc.bottom - rc.top, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_LM_STATIC),            4+icx+7,       4,   141,                  19, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB),    4+icx+7+141+7,       4,    25,                  18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), 4+icx+7+141+7+25+4,       4,    25,                  18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_CURR_LOCAL),                 4,      25, lf_an,                  18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST),             4,      46, lf_an,                 icy, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_STATUS),               4, cy-85+4, lf_an,                  15, TRUE);
+		
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB),              4,       4, icx,  rc.bottom - rc.top, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LM_STATIC),            4+icx+7,       4, buttonLMStaticWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB),    4+icx+7+ buttonLMStaticWidth +7,       4, buttonRootWidth, buttonRootHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), 4+icx+7+ buttonLMStaticWidth +7+ buttonRootWidth +4,       4, buttonRootWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_CURR_LOCAL),                 4, buttonUploadHeight + 4, lf_an, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_FILELIST),             4, (buttonUploadHeight + 4)*2, lf_an, icy, TRUE);
 
 		//Right
 		GetWindowRect(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), &rc);
-		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB),               lf_an+109,       4,   icx,   rc.bottom - rc.top, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_RM_STATIC),              lf_an+109+icx+7,       4,   141,                   19, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB),     lf_an+109+icx+7+141+7,       4,    25,                   18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB),  lf_an+109+icx+7+141+7+25+4,       4,    25,                   18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_CURR_REMOTE),                  lf_an+109,      25, lf_an,                   18, TRUE); 
-		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST),              lf_an+109,      46, lf_an,                  icy, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_STATUS),                lf_an+109, cy-85+4, lf_an,                   15, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB),               lf_an+ rg_an,       4, icx,   rc.bottom - rc.top, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_RM_STATIC),              lf_an+ rg_an +icx+7,       4, buttonLMStaticWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB),     lf_an+ rg_an +icx+7+ buttonLMStaticWidth +7,       4, buttonRootWidth, buttonRootHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB),  lf_an+ rg_an +icx+7+ buttonLMStaticWidth +7+ buttonRootWidth +4,       4, buttonRootWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_CURR_REMOTE),                  lf_an+ rg_an, buttonUploadHeight + 4, lf_an, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST),              lf_an+ rg_an, (buttonUploadHeight + 4) * 2, lf_an, icy, TRUE);
+		
 
 		//Bottom
-		iProgressRight = cx-6-97-6-180-6;
-		MoveWindow(GetDlgItem(hWnd, IDC_HS_STATIC),                  8,          cy-85+4+18+4,     39,                15, TRUE);
+		icyb = icy + 7 + (buttonUploadHeight + 4) * 2;
+		MoveWindow(GetDlgItem(hWnd, IDC_LOCAL_STATUS), 4, icyb, lf_an, buttonStatusHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REMOTE_STATUS), lf_an + rg_an, icyb, lf_an, buttonStatusHeight, TRUE);
+
+		MoveWindow(GetDlgItem(hWnd, IDC_HS_STATIC), 8, icyb + 7 + buttonStatusHeight, buttonUploadWidth, buttonStatusHeight, TRUE);
 		GetWindowRect(GetDlgItem(hWnd, IDC_HISTORY_CB), &rc);
-		MoveWindow(GetDlgItem(hWnd, IDC_HISTORY_CB),                65,            cy-85+4+18,  cx-69,  rc.bottom-rc.top, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_PR_STATIC),                  8,   cy-85+4+15+4+4+18+3,     56,                15, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_PROGRESS),                  65,   cy-85+4+15+4+4+18+2,    iProgressRight-65,  15, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_PERCENT),             cx-6-97-6-180, cy-85+4+10+4+4+18+4+2,     180,          12, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_GLOBAL_STATUS),  cx-6-97, cy-85+4+10+4+4+18+4+2,     97,					  12, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_HISTORY_CB), buttonUploadWidth + 4, icyb + 7 + buttonStatusHeight, cx - buttonUploadWidth * 4,  rc.bottom-rc.top, TRUE);
+
+		MoveWindow(GetDlgItem(hWnd, IDC_PR_STATIC), 8, icyb + 7 + buttonStatusHeight * 2, buttonUploadWidth, buttonProgressHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PROGRESS), buttonUploadWidth + 4, icyb + 7 + buttonStatusHeight * 2, cx - buttonUploadWidth *4, buttonProgressHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_PERCENT), cx - buttonUploadWidth * 2 - 12 , icyb + 7 + buttonStatusHeight * 2, buttonUploadWidth, buttonProgressHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_GLOBAL_STATUS), cx - buttonUploadWidth * 1 - 18, icyb + 7 + buttonStatusHeight * 2, buttonUploadWidth, buttonProgressHeight, TRUE);
+		
+		
+
 		GetWindowRect(GetDlgItem(hWnd, IDC_STATUS), &rc);
 		MoveWindow(GetDlgItem(hWnd, IDC_STATUS),                     0, cy-(rc.bottom-rc.top),     cx,  rc.bottom-rc.top, TRUE);
 
 		//Center
-		icy = 46+icy/2;
-		MoveWindow(GetDlgItem(hWnd, IDC_UPLOAD_B),     lf_an+10+2,  icy-15-20-6-20-5-20, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B),   lf_an+10+2,       icy-15-20-6-20, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B),      lf_an+10+2,            icy-15-20, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B2),	   lf_an+10+2,			   icy - 10, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_DELETE_B),     lf_an+10+2,               icy+15, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B),  lf_an+10+2,          icy+15+20+6, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_RENAME_B),     lf_an+10+2,     icy+15+20+6+20+6, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B),       lf_an+10+2,        cy-103-20-4-6, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2,             cy-103-4-3, 90, 20, TRUE);
-		MoveWindow(GetDlgItem(hWnd, IDCANCEL2),        lf_an+10+2,             cy-83-4, 90, 20, TRUE);
+		
+		MoveWindow(GetDlgItem(hWnd, IDC_UPLOAD_B),     lf_an+10+2, icy - (buttonUploadHeight + 4) * 12, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_DOWNLOAD_B),   lf_an+10+2, icy - (buttonUploadHeight + 4) * 11, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B),      lf_an+10+2, icy - (buttonUploadHeight + 4) * 10, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_ABORT_B2),	   lf_an+10+2, icy - (buttonUploadHeight + 4) * 9, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_DELETE_B),     lf_an+10+2, icy - (buttonUploadHeight + 4) * 7, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B),  lf_an+10+2, icy - (buttonUploadHeight + 4) * 6, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_RENAME_B),     lf_an+10+2, icy - (buttonUploadHeight + 4) * 5, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B),       lf_an+10+2, icy - (buttonUploadHeight + 4) * 2, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2, icy - (buttonUploadHeight + 4), buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDCANCEL2),        lf_an+10+2, icy, buttonUploadWidth, buttonUploadHeight, TRUE);
 		InvalidateRect(hWnd, NULL, FALSE);
 
 		FTAdjustFileNameColumns(hWnd); // sf@2006

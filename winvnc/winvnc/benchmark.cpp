@@ -152,7 +152,7 @@ void testBench()
 	if (time2<time1) G_USE_PIXEL=true;
 	else G_USE_PIXEL=false;
 
-	vnclog.Print(9, VNCLOG("Blit time %i  Getpixeltime %i  Use getpixel= %i\n"), time1,time2,G_USE_PIXEL);
+	vnclog.Print(9, VNCLOG("Blit time %i  GetPixelTime %i  Use GetPixel= %i\n"), time1,time2,G_USE_PIXEL);
 
 	if (m_hrootdc != NULL)
 	{

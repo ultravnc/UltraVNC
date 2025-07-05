@@ -37,6 +37,7 @@ extern char sz_K2[64];
 extern bool g_disable_sponsor;
 static OPENFILENAME ofn;
 
+extern int EncodingFromString(const char* szEncoding);
 void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 {
 	SettingsFromUI();
@@ -91,7 +92,7 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);
 	m_pMRU->AddItem(hostname);
-	InitMRU(hwnd);
+	//InitMRU(hwnd);
 }
 
 void SessionDialog::SettingsFromUI()
@@ -103,6 +104,7 @@ void SessionDialog::SettingsFromUI()
 	ReadDlgProcSecurity();
 	ReadDlgProcListen();
 	ReadDlgProc();
+	ReadDlgProcConfig();
 }
 
 void SessionDialog::SettingsToUI(bool initMruNeeded)
@@ -113,6 +115,7 @@ void SessionDialog::SettingsToUI(bool initMruNeeded)
 	InitDlgProcMisc();
 	InitDlgProcSecurity();	
 	InitDlgProcListen();
+	InitDlgProcConfig();
 	InitDlgProc(true, initMruNeeded);		
 }
 
@@ -204,6 +207,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	WritePrivateProfileString("options", "InfoMsg", InfoMsg, fname);
 	saveInt("AutoReconnect",		autoReconnect,	fname);
 	saveInt("FileTransferTimeout",  FTTimeout,    fname);
+	saveInt("ListenPort", listenport, fname);
 	saveInt("ThrottleMouse",		throttleMouse,    fname); 
 	saveInt("KeepAliveInterval",    keepAliveInterval,    fname);	
 	saveInt("AutoAcceptIncoming",	fAutoAcceptIncoming, fname);  
@@ -212,6 +216,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("GiiEnable", giiEnable, fname);
 #endif
 	saveInt("RequireEncryption",	fRequireEncryption, fname);
+	saveInt("UseOnlyDefaultConfigFile", fUseOnlyDefaultConfigFile, fname);
 	saveInt("restricted",			restricted,		fname);  //hide menu
 	saveInt("ipv6",					ipv6, fname);  //hide menu
 	saveInt("AllowUntrustedServers", AllowUntrustedServers, fname);
@@ -299,6 +304,7 @@ void SessionDialog::LoadFromFile(char *fname)
   FTTimeout  =			readInt("FileTransferTimeout", FTTimeout, fname);
   if (FTTimeout > 600)
       FTTimeout = 600; // cap at 1 minute
+  listenport = readInt("ListenPort", listenport, fname);
   keepAliveInterval  =	readInt("KeepAliveInterval", keepAliveInterval, fname);
   if (keepAliveInterval >= (FTTimeout - KEEPALIVE_HEADROOM))
       keepAliveInterval = (FTTimeout  - KEEPALIVE_HEADROOM); 
@@ -309,12 +315,392 @@ void SessionDialog::LoadFromFile(char *fname)
   fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
+  fUseOnlyDefaultConfigFile = readInt("UseCustomConfigFile", (int)fUseOnlyDefaultConfigFile, fname) ? true : false;
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
   m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
+  overwriteCommandLine();
 
+}
 
+void SessionDialog::overwriteCommandLine() 
+{
+	char* szCmdLine = m_pOpt->szCmdLine;
+	int cmdlinelen = _tcslen(szCmdLine);
+	if (cmdlinelen == 0) return;
+
+	TCHAR* cmd = new TCHAR[cmdlinelen + 1];
+	_tcscpy_s(cmd, cmdlinelen + 1, szCmdLine);
+
+	// Count the number of spaces
+	// This may be more than the number of arguments, but that doesn't matter.
+	int nspaces = 0;
+	TCHAR* p = cmd;
+	TCHAR* pos = cmd;
+	while ((pos = _tcschr(p, ' ')) != NULL) {
+		nspaces++;
+		p = pos + 1;
+	}
+
+	// Create the array to hold pointers to each bit of string
+	TCHAR** args = new LPTSTR[nspaces + 1];
+
+	// replace spaces with nulls and
+	// create an array of TCHAR*'s which points to start of each bit.
+	pos = cmd;
+	int i = 0;
+	args[i] = cmd;
+	bool inquote = false;
+	for (pos = cmd; *pos != 0; pos++) {
+		// Arguments are normally separated by spaces, unless there's quoting
+		if ((*pos == ' ') && !inquote) {
+			*pos = '\0';
+			p = pos + 1;
+			args[++i] = p;
+		}
+		if (*pos == '"') {
+			if (!inquote) {      // Are we starting a quoted argument?
+				args[i] = ++pos; // It starts just after the quote
+			}
+			else {
+				*pos = '\0';     // Finish a quoted argument?
+			}
+			inquote = !inquote;
+		}
+	}
+	i++;
+
+	bool hostGiven = false, portGiven = false;
+	// take in order.
+	for (int j = 0; j < i; j++) {
+		if (SwitchMatch(args[j], _T("listen")))
+		{
+			listening = true;
+			if (j + 1 < i && args[j + 1][0] >= '0' && args[j + 1][0] <= '9') {
+				if (_stscanf_s(args[j + 1], _T("%d"), &listenport) != 1) {
+					continue;
+				}
+				j++;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("fttimeout"))) { //PGM @ Advantig
+			if (j + 1 < i && args[j + 1][0] >= '0' && args[j + 1][0] <= '9') {
+				if (_stscanf_s(args[j + 1], _T("%d"), &FTTimeout) != 1) {
+					continue;
+				}
+				if (FTTimeout > 600)
+					FTTimeout = 600;
+				j++;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("keepalive"))) { //PGM @ Advantig
+			if (j + 1 < i && args[j + 1][0] >= '0' && args[j + 1][0] <= '9') {
+				if (_stscanf_s(args[j + 1], _T("%d"), &keepAliveInterval) != 1) {
+					continue;
+				}
+				if (keepAliveInterval >= (FTTimeout - KEEPALIVE_HEADROOM))
+					keepAliveInterval = (FTTimeout - KEEPALIVE_HEADROOM);
+				j++;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("socketkeepalivetimeout"))) { // adzm 2010-08
+			if (j + 1 < i && args[j + 1][0] >= '0' && args[j + 1][0] <= '9') {
+				int m_socketKeepAliveTimeout;
+				if (_stscanf_s(args[j + 1], _T("%d"), &m_socketKeepAliveTimeout) != 1) {
+					continue;
+				}
+				j++;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("askexit"))) { //PGM @ Advantig
+			fExitCheck = true; //PGM @ Advantig
+		}
+		else if (SwitchMatch(args[j], _T("restricted"))) {
+			restricted = true;
+		}
+		else if (SwitchMatch(args[j], _T("ipv6"))) {
+			ipv6 = true;
+		}
+		else if (SwitchMatch(args[j], _T("AllowUntrustedServers"))) {
+			AllowUntrustedServers = true;
+		}
+		else if (SwitchMatch(args[j], _T("viewonly"))) {
+			ViewOnly = true;
+		}
+		else if (SwitchMatch(args[j], _T("nostatus"))) {
+			NoStatus = true;
+		}
+		else if (SwitchMatch(args[j], _T("hideendofstreamerror"))) {
+			HideEndOfStreamError = true;
+		}
+		else if (SwitchMatch(args[j], _T("nohotkeys"))) {
+			NoHotKeys = true;
+		}
+		else if (SwitchMatch(args[j], _T("notoolbar"))) {
+			ShowToolbar = false;
+		}
+		else if (SwitchMatch(args[j], _T("autoscaling"))) {
+			fAutoScaling = true;
+		}
+		else if (SwitchMatch(args[j], _T("fullscreen"))) {
+			FullScreen = true;
+		}
+		else if (SwitchMatch(args[j], _T("savepos"))) {
+			SavePos = true;
+		}
+		else if (SwitchMatch(args[j], _T("savesize"))) {
+			SaveSize = true;
+		}
+		else if (SwitchMatch(args[j], _T("gnome"))) {
+			GNOME = true;
+		}
+		else if (SwitchMatch(args[j], _T("directx"))) {
+			Directx = true;
+		}
+		else if (SwitchMatch(args[j], _T("noauto"))) {
+			autoDetect = false;
+			quickoption = 0;
+		}
+		else if (SwitchMatch(args[j], _T("8bit"))) {
+			Use8Bit = rfbPF256Colors; //true;
+		}
+		else if (SwitchMatch(args[j], _T("256colors"))) {
+			Use8Bit = rfbPF256Colors; //true;
+		}
+		else if (SwitchMatch(args[j], _T("fullcolors"))) {
+			Use8Bit = rfbPFFullColors;
+		}
+		else if (SwitchMatch(args[j], _T("64colors"))) {
+			Use8Bit = rfbPF64Colors;
+		}
+		else if (SwitchMatch(args[j], _T("8colors"))) {
+			Use8Bit = rfbPF8Colors;
+		}
+		else if (SwitchMatch(args[j], _T("8greycolors"))) {
+			Use8Bit = rfbPF8GreyColors;
+		}
+		else if (SwitchMatch(args[j], _T("4greycolors"))) {
+			Use8Bit = rfbPF4GreyColors;
+		}
+		else if (SwitchMatch(args[j], _T("2greycolors"))) {
+			Use8Bit = rfbPF2GreyColors;
+		}
+		else if (SwitchMatch(args[j], _T("shared"))) {
+			Shared = true;
+		}
+		else if (SwitchMatch(args[j], _T("swapmouse"))) {
+			SwapMouse = true;
+		}
+		else if (SwitchMatch(args[j], _T("emulate3"))) {
+			Emul3Buttons = true;
+		}
+		else if (SwitchMatch(args[j], _T("JapKeyboard"))) {
+			JapKeyboard = true;
+		}
+		else if (SwitchMatch(args[j], _T("noemulate3"))) {
+			Emul3Buttons = false;
+		}
+		else if (SwitchMatch(args[j], _T("nocursorshape"))) {
+			requestShapeUpdates = false;
+		}
+		else if (SwitchMatch(args[j], _T("noremotecursor"))) {
+			requestShapeUpdates = true;
+			ignoreShapeUpdates = true;
+		}
+		else if (SwitchMatch(args[j], _T("scale"))) {
+			if (++j == i) {
+				continue;
+			}
+			int numscales = _stscanf_s(args[j], _T("%d/%d"), &scale_num, &scale_den);
+			if (numscales < 1) {
+				continue;
+			}
+			if (numscales == 1)
+				scale_den = 1; // needed if you're overriding a previous setting
+		}
+		else if (SwitchMatch(args[j], _T("disableclipboard"))) {
+			DisableClipboard = true;
+		}
+		else if (SwitchMatch(args[j], _T("InfoMsg"))) {
+			if (++j == i) {
+				continue;
+			}
+			strcpy_s(InfoMsg, args[j]);
+		}
+
+		else if (SwitchMatch(args[j], _T("register"))) {
+			//      Register();
+			PostQuitMessage(0);
+		}
+		else if (SwitchMatch(args[j], _T("encoding"))) {
+			if (++j == i) {
+				continue;
+			}
+			int enc = EncodingFromString(args[j]);
+			if (enc == -1) {
+				continue;
+			}
+			else {
+				PreferredEncodings.clear();
+				PreferredEncodings.push_back(enc);
+				UseEnc[enc] = true;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("encodings"))) {
+			if (++j == i) {
+				continue;
+			}
+			int encodings_found = 0;
+			while (encodings_found >= 0) {
+				int enc = EncodingFromString(args[j]);
+				if (enc == -1) {
+					if (encodings_found == 0) {
+					}
+					else {
+						j--;
+					}
+					encodings_found = -1;
+				}
+				else {
+					if (encodings_found == 0) {
+						PreferredEncodings.clear();
+					}
+					UseEnc[enc] = true;
+					if (PreferredEncodings.end() == std::find(PreferredEncodings.begin(), PreferredEncodings.end(), enc)) {
+						PreferredEncodings.push_back(enc);
+					}
+					encodings_found++;
+
+					j++;
+
+					if (j == i) {
+						encodings_found = -1;
+					}
+				}
+			}
+		}
+		// Tight options
+		else if (SwitchMatch(args[j], _T("compresslevel"))) {
+			if (++j == i) {
+				continue;
+			}
+			useCompressLevel = true;
+			if (_stscanf_s(args[j], _T("%d"), &compressLevel) != 1) {
+				continue;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("quality"))) {
+			if (++j == i) {
+				continue;
+			}
+			enableJpegCompression = true;
+			if (_stscanf_s(args[j], _T("%d"), &jpegQualityLevel) != 1) {
+				continue;
+			}
+		}
+		else if (SwitchMatch(args[j], _T("serverscale")))
+		{
+			if (++j == i)
+			{
+				continue;
+			}
+			_stscanf_s(args[j], _T("%d"), &nServerScale);
+			if (nServerScale < 1 || nServerScale > 9) nServerScale = 1;
+		}
+		// Modif sf@2002
+		else if (SwitchMatch(args[j], _T("quickoption")))
+		{
+			if (++j == i)
+			{
+				continue;
+			}
+			_stscanf_s(args[j], _T("%d"), &quickoption);
+		}
+		// Modif sf@2002 - DSM Plugin
+		else if (SwitchMatch(args[j], _T("dsmplugin")))
+		{
+			if (++j == i)
+			{
+				continue;
+			}
+			fUseDSMPlugin = true;
+			strcpy_s(szDSMPluginFilename, args[j]);
+		}
+		else if (SwitchMatch(args[j], _T("reconnectcounter")))
+		{
+			if (++j == i) {
+				PostQuitMessage(1);
+				continue;
+			}
+			_stscanf_s(args[j], _T("%d"), &reconnectcounter);
+		}
+		else if (SwitchMatch(args[j], _T("autoreconnect")))
+		{
+			if (++j == i) {
+				PostQuitMessage(1);
+				continue;
+			}
+			_stscanf_s(args[j], _T("%d"), &autoReconnect);
+		}
+		else if (SwitchMatch(args[j], _T("disablesponsor")))
+		{
+			//adzm - 2009-06-21
+			g_disable_sponsor = true;
+		}
+		else if (SwitchMatch(args[j], _T("autoacceptincoming")))
+		{
+			//adzm - 2009-06-21
+			fAutoAcceptIncoming = true;
+		}
+#ifdef _Gii
+		else if (SwitchMatch(args[j], _T("giienable")))
+		{
+			giiEnable = true;
+		}
+#endif
+		else if (SwitchMatch(args[j], _T("autoacceptnodsm")))
+		{
+			//adzm 2009-07-19
+			fAutoAcceptNoDSM = true;
+		}
+		else if (SwitchMatch(args[j], _T("requireencryption")))
+		{
+			//adzm 2010-05-12
+			fRequireEncryption = true;
+		}
+		else if (SwitchMatch(args[j], _T("preemptiveupdates")))
+		{
+			//adzm 2010-07-04
+			preemptiveUpdates = true;
+		}
+		else if (SwitchMatch(args[j], _T("enablecache")))
+		{
+			//adzm 2010-08
+			fEnableCache = true;
+		}
+		else if (SwitchMatch(args[j], _T("throttlemouse")))
+		{
+			//adzm 2010-10
+			if (++j == i) {
+				continue;
+			}
+			if (_stscanf_s(args[j], _T("%d"), &throttleMouse) != 1) {
+				continue;
+			}
+		}
+	}
+
+	if (scale_num != 1 || scale_den != 1)
+		scaling = true;
+
+	// reduce scaling factors by greatest common denominator
+	if (scaling) {
+		FixScaling();
+	}
+	// tidy up
+	delete[] cmd;
+	delete[] args;
 }
 
 void SessionDialog::getAppData(char * buffer)
@@ -324,7 +710,7 @@ void SessionDialog::getAppData(char * buffer)
 
 void SessionDialog::IfHostExistLoadSettings(char *hostname)
 {
-	
+	//SetDefaults();
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	int port;
 	ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &port);
@@ -336,12 +722,19 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	strcat_s(buffer,"\\UltraVNC\\");
 	strcat_s(buffer,fname);
 	FILE *file = fopen(buffer, "r");
-	if (strlen(hostname) != 0 && file ) {
+	strcpy_s(customConfigFile, buffer);
+	if (strlen(hostname) != 0 && file && !m_pOpt->m_UseOnlyDefaultConfigFile) {
 		fclose(file);
-		LoadFromFile(buffer);		
+		SetDefaults();
+		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
+		LoadFromFile(buffer);
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG),customConfigFile);
 	}
-	else
+	else {
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), "");
+	}
+	InitDlgProcListen();
 }
 
 void SessionDialog::SetDefaults()
@@ -404,6 +797,7 @@ void SessionDialog::SetDefaults()
 	fAutoAcceptIncoming = false;
 	fAutoAcceptNoDSM = false;
 	fRequireEncryption = false;
+	fUseOnlyDefaultConfigFile = true;
 	preemptiveUpdates = false;
 	scale_num = 100;
 	scale_den = 100;

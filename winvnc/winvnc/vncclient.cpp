@@ -85,6 +85,7 @@
 #include<map>
 #include "SettingsManager.h"
 #include "credentials.h"
+#include "winvnc.h"
 using namespace std;
 
 #pragma comment(lib, "mpr.lib") //for getting full mapped drive
@@ -1021,43 +1022,35 @@ void vncClientThread::LogAuthResult(bool success, bool isconnected)
 	if (!success)
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("authentication failed\n"));
-		typedef BOOL(*LogeventFn)(char* machine);
+		typedef BOOL(*LogeventFn)(char* machine, char* szMslogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILED");
-			Logevent((char*)m_client->GetClientNameName());
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGFAILEDV2");
+			Logevent((char*)m_client->GetClientNameName(), settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 	}
 	else
 	{
-		typedef BOOL(*LogeventFn)(char* machine, int clientId, bool isinteractive);
+		typedef BOOL(*LogeventFn)(char* machine, int clientId, bool isinteractive, char* szMsLogonLog);
 		LogeventFn Logevent = 0;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
 			if (!isconnected) {
-				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGCONN");
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGCONNV2");
 			} else {
-				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGON");
+				Logevent = (LogeventFn)GetProcAddress(hModule, "LOGLOGONV2");
 			}
-			Logevent((char*)m_client->GetClientNameName(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled);
+			Logevent((char*)m_client->GetClientNameName(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 	}
@@ -1138,22 +1131,18 @@ vncClientThread::InitAuthenticate()
 	// Check the FilterClients thing after final auth
 	if (strlen(m_client->infoMsg) > 0)
 	{
-		typedef BOOL(*LogeventFn)(char* info);
+		typedef BOOL(*LogeventFn)(char* info, char* szMslogonLog);
 		LogeventFn Logevent = NULL;
 		char szCurrentDir[MAX_PATH];
-		if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-		{
-			char* p = strrchr(szCurrentDir, '\\');
-			*p = '\0';
-			strcat_s(szCurrentDir, "\\logging.dll");
-		}
+		strcpy_s(szCurrentDir, winvncFolder);
+		strcat_s(szCurrentDir, "\\logging.dll");
 		HMODULE hModule = LoadLibrary(szCurrentDir);
 		if (hModule)
 		{
-			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFO");
+			Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXTRAINFOV2");
 			
 			if (Logevent)
-				Logevent((char*)m_client->infoMsg);
+				Logevent((char*)m_client->infoMsg, settings->getLogFile());
 			FreeLibrary(hModule);
 		}
 	}
@@ -1539,6 +1528,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 {
 	bool bPassphrase = false;
 	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+	vncPasswd::ToText plainViewOnly(settings->getPasswdViewOnly(), settings->getSecure());
 	ConfigHelper ConfigHelpervar(settings->getDSMPluginConfig());
 	if (strlen(ConfigHelpervar.m_szPassphrase) > 0)
 	{
@@ -1554,6 +1544,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 	BOOL auth_ok = FALSE;
 
 	const char* plainPassword = plain;
+	const char* plainPasswordViewOnly = plainViewOnly;
 	/*if (!m_ms_logon && plainPassword && strlen(plainPassword) > 0) {
 		m_socket->GetIntegratedPlugin()->SetPasswordData((const BYTE*)plainPassword, strlen(plainPassword));
 	}*/
@@ -1615,7 +1606,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 
 		m_socket->GetIntegratedPlugin()->SetHandshakeComplete();
 
-		if (!m_ms_logon && strlen(plainPassword) != 0)
+		if (!m_ms_logon && (strlen(plainPassword) != 0 || strlen(plainPasswordViewOnly) != 0))
 		{
 			if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
 				return FALSE;
@@ -1629,7 +1620,14 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			}
 			if (bPassphrase == false)
 			{
-				if (memcmp(plain, pResponseData, strlen(plain))) auth_ok = false;
+				if (memcmp(plain, pResponseData, strlen(plain))) 
+						auth_ok = false;
+				if (auth_ok == false && !memcmp(plainViewOnly, pResponseData, strlen(plainViewOnly))) {
+					m_client->EnableKeyboard(false); //PGM
+					m_client->EnablePointer(false); //PGM
+					m_client->EnableGii(false);
+					auth_ok = true;
+				}
 			}
 			else if (memcmp(ConfigHelpervar.m_szPassphrase, pResponseData, strlen(ConfigHelpervar.m_szPassphrase))) auth_ok = false;
 			delete[] pResponseData;
@@ -3855,13 +3853,13 @@ vncClientThread::run(void* arg)
 						//if (dwFileSize != 0xFFFFFFFF)
 						if (bSize)
 						{
-							int nCSBufferSize = (4 * (int)(n2SrcSize.QuadPart / sz_rfbBlockSize)) + 1024;
-							char* lpCSBuff = new char[nCSBufferSize];
-							if (lpCSBuff != NULL)
+							unsigned long nCSBufferSize = (4 * (unsigned long)(n2SrcSize.QuadPart / sz_rfbBlockSize)) + 1024;
+							if (nCSBufferSize > std::numeric_limits<size_t>::max())
+								break;
+							std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(nCSBufferSize);
+							if (lpCSBuff)
 							{
-								int nCSBufferLen = m_client->GenerateFileChecksums(m_client->m_hDestFile,
-									lpCSBuff,
-									nCSBufferSize);
+								int nCSBufferLen = m_client->GenerateFileChecksums(m_client->m_hDestFile, lpCSBuff.get(), nCSBufferSize);
 								if (nCSBufferLen != -1)
 								{
 									ft.contentType = rfbFileChecksums;
@@ -3869,8 +3867,7 @@ vncClientThread::run(void* arg)
 									ft.length = Swap32IfLE(nCSBufferLen);
 									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-									m_socket->SendExactQueue((char*)lpCSBuff, nCSBufferLen);
-									delete[] lpCSBuff;
+									m_socket->SendExactQueue((char*)lpCSBuff.get(), nCSBufferLen);
 								}
 							}
 						}
@@ -4085,7 +4082,7 @@ vncClientThread::run(void* arg)
 							// We replace the "\" char following the drive letter and ":"
 							// with a char corresponding to the type of drive
 							// We obtain something like "C:l<NULL>D:c<NULL>....Z:n\<NULL><NULL>"
-							// Isn't it ugly ?
+							// Isn't it ugly?
 							nType = GetDriveType(szDrive);
 							switch (nType)
 							{
@@ -4132,7 +4129,7 @@ vncClientThread::run(void* arg)
 						// moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
 						if (!settings->getEnableFileTransfer() || !fUserOk) break;
 						// sf@2004 - Shortcuts Case
-						// Todo: Cultures translation ?
+						// Todo: Cultures translation?
 						int nFolder = -1;
 						char szP[MAX_PATH + 2];
 						bool fShortError = false;
@@ -4463,20 +4460,16 @@ vncClientThread::run(void* arg)
 	// LOG it also in the event
 	//////////////////
 #ifndef SC_20
-	typedef BOOL(*LogeventFn)(char* machine, char* user, int clientId, bool isinteractive);
+	typedef BOOL(*LogeventFn)(char* machine, char* user, int clientId, bool isinteractive, char* szMslogonLog);
 	LogeventFn Logevent = 0;
 	char szCurrentDir[MAX_PATH];
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
-	{
-		char* p = strrchr(szCurrentDir, '\\');
-		*p = '\0';
-		strcat_s(szCurrentDir, "\\logging.dll");
-	}
+	strcpy_s(szCurrentDir, winvncFolder);
+	strcat_s(szCurrentDir, "\\logging.dll");
 	HMODULE hModule = LoadLibrary(szCurrentDir);
 	if (hModule)
 	{
-		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXIT");
-		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled);
+		Logevent = (LogeventFn)GetProcAddress(hModule, "LOGEXITV2");
+		Logevent((char*)m_client->GetClientNameName(), (char*)m_client->GetClientDomainUsername(), m_client->GetClientId(), m_client->m_keyboardenabled && m_client->m_pointerenabled, settings->getLogFile());
 		FreeLibrary(hModule);
 	}
 #endif // SC_20
@@ -5901,19 +5894,29 @@ int vncClient::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBuff
 	int nCSBufferOffset = 0;
 
 	char* lpBuffer = new char[sz_rfbBlockSize];
-	if (lpBuffer == NULL)
+	if (!lpBuffer)
 		return -1;
 
 	while (!fEof)
 	{
-		int nRes = ReadFile(hFile, lpBuffer, sz_rfbBlockSize, &dwNbBytesRead, NULL);
-		if (!nRes && dwNbBytesRead != 0)
+		if (!ReadFile(hFile, lpBuffer, sz_rfbBlockSize, &dwNbBytesRead, NULL))
+		{
 			fError = true;
+			break;
+		}
 
-		if (nRes && dwNbBytesRead == 0)
+		if (dwNbBytesRead == 0)
+		{
 			fEof = true;
+		}
 		else
 		{
+			if (nCSBufferOffset + 4 > nCSBufferSize)
+			{
+				fError = true;
+				break;
+			}
+
 			unsigned long cs = adler32(0L, Z_NULL, 0);
 			cs = adler32(cs, (unsigned char*)lpBuffer, (int)dwNbBytesRead);
 
@@ -5922,15 +5925,14 @@ int vncClient::GenerateFileChecksums(HANDLE hFile, char* lpCSBuffer, int nCSBuff
 		}
 	}
 
-	SetFilePointer(hFile, 0L, NULL, FILE_BEGIN);
-	delete[] lpBuffer;
-
-	if (fError)
+	if (SetFilePointer(hFile, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 	{
-		return -1;
+		fError = true;
 	}
 
-	return nCSBufferOffset;
+	delete[] lpBuffer;
+
+	return fError ? -1 : nCSBufferOffset;
 }
 
 //
@@ -6052,7 +6054,7 @@ void vncClient::FinishFileReception()
 	// sf@2004 - Delta transfer
 	SetEndOfFile(m_hDestFile);
 
-	// if error ?
+	// if error?
 	FlushFileBuffers(m_hDestFile);
 
 	// Set the DestFile Time Stamp
@@ -6556,7 +6558,7 @@ bool vncClient::DoFTUserImpersonation()
 void vncClient::UndoFTUserImpersonation()
 {
 	//vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Call\n"));
-	//moved to after returns, Is this lock realy needed if no revert is done ?
+	//moved to after returns, Is this lock realy needed if no revert is done?
 	//
 	//omni_mutex_lock l(GetUpdateLock());
 

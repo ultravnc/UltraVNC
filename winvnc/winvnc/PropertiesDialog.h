@@ -10,7 +10,7 @@ class PropertiesDialog
 {
 private:
 	HWND hTabControl, hTabAuthentication, hTabIncoming, hTabInput, hTabMisc, hTabNotifications,
-		hTabReverse, hTabRules, hTabCapture, hTabLog, hTabAdministration;
+		hTabReverse, hTabRules, hTabCapture, hTabLog, hTabAdministration, hTabService;
 	BOOL		m_dlgvisible;
 	BOOL bConnectSock = true;
 	int ListPlugins(HWND hComboBox);
@@ -22,16 +22,18 @@ private:
 	void InitPortSettings(HWND hwnd);
 
 	
-	void ShowImpersonateDialog();
-	HWND PropertiesDialogHwnd = NULL;
-	bool showAdminPanel = false;	
+	void ShowImpersonateDialog();	
+	bool showAdminPanel = false;
+	bool standalone = false;
+	void setServiceStatusText(HWND hwnd);
 
 public:
 	PropertiesDialog();
 	~PropertiesDialog();
 
+	HWND PropertiesDialogHwnd = NULL;
 	BOOL Init(vncServer* server);
-	int ShowDialog();
+	int ShowDialog(bool standalone = false);
 	void UpdateServer();
 	int HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam);
 	bool InitDialog(HWND hwnd);
@@ -41,8 +43,6 @@ public:
 	bool DlgInitDialog(HWND hwnd);
 	bool onCommand(int command, HWND hwnd, int subcommand);
 
-	static void Secure_Plugin_elevated(char* szPlugin);
-	static void Secure_Save_Plugin_Config(char* szPlugin);
 	static void Secure_Plugin(char* szPlugin);
 	static void LogToEdit(const std::string& message);
 	static char buffer[65536];

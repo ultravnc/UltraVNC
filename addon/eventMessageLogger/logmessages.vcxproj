@@ -205,7 +205,7 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll mess
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll /MACHINE:X64 messages.res
 </Command>
       <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>

@@ -101,6 +101,26 @@ BOOL
         return TRUE;
     }
 
+void convertToISO8601(const char* input, char* output, size_t size) {
+    // Expected format: "Mar 14 2025 12:34:56"
+
+    // Convert month abbreviation to a number
+    const char* months = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+    char monthStr[4];  // Buffer for the month abbreviation (e.g., "Mar")
+    int day, year, month;
+    int hour, minute, second;
+
+    // Extract components from the input string
+    sscanf(input, "%3s %d %d %d:%d:%d", monthStr, &day, &year, &hour, &minute, &second);
+
+    // Convert month abbreviation to number (1-12)
+    month = (std::strstr(months, monthStr) - months) / 3 + 1;
+
+    // Format into ISO 8601 format "YYYY-MM-DDTHH:MM:SS"
+    snprintf(output, size, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+}
+
 // Process the About dialog.
 static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg, 
 										   WPARAM wParam, LPARAM lParam) {
@@ -110,7 +130,10 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 			//CentreWindow(hwnd);
 			SetForegroundWindow(hwnd);
             extern char buildtime[];
-            SetDlgItemText(hwnd, IDC_BUILDTIME, buildtime);
+            char isoTime[20];  // Buffer for ISO output
+            convertToISO8601(buildtime, isoTime, sizeof(isoTime));
+            SetDlgItemText(hwnd, IDC_BUILDTIME, isoTime);
+
             ConvertStaticToHyperlink(hwnd, IDC_UVNCCOM);
             char version[50]{};
             char title[256]{};

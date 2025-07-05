@@ -37,6 +37,7 @@ class SettingsManager
 public:
 	static SettingsManager* getInstance();
 
+	void Initialize(char* configFile);
 	void load();
 	void save();
 	void savePassword();
@@ -234,10 +235,10 @@ public:
 	void setddEngine(BOOL value) { m_pref_ddEngine = value; };
 	BOOL getddEngine() { return m_pref_ddEngine; };
 
-	void setMaxCpu(BOOL value) { m_pref_MaxCpu = value; };
-	BOOL getMaxCpu() { return m_pref_MaxCpu; };
-	void setMaxFPS(BOOL value) { m_pref_MaxFPS = value; };
-	BOOL getMaxFPS() { return m_pref_MaxFPS; };
+	void setMaxCpu(int value) { m_pref_MaxCpu = value; };
+	int getMaxCpu() { return m_pref_MaxCpu; };
+	void setMaxFPS(int value) { m_pref_MaxFPS = value; };
+	int getMaxFPS() { return m_pref_MaxFPS; };
 	void setAutocapt(BOOL value) { m_pref_autocapt = value; };
 	BOOL getAutocapt() { return m_pref_autocapt; };
 
@@ -276,12 +277,18 @@ public:
 	void setShowAllLogs(bool value) { showAllLogs = value; }
 	bool getShowAllLogs() { return showAllLogs; }
 
+	char* getAlternateShell() { return m_pref_alternateShell; };
+
+	bool getShowSettings();
+	void setShowSettings(bool value) { showSettings = value; };
+	char *getLogFile() { return logfile; };
+	void setLogFile(char* value) { strcpy_s(logfile, value); };
 private:
 	SettingsManager();
 	static SettingsManager* s_instance;
 	void setDefaults();
 	void initTemp();
-	IniFile myIniFile;
+	IniFile iniFile;
 
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
@@ -353,7 +360,7 @@ private:
 	BOOL m_pref_Avilog;
 	BOOL m_pref_UseIpv6;
 	unsigned int G_SENDBUFFER_EX;
-	char m_Inifile[MAX_PATH];
+	char logfile[MAX_PATH];
 	bool m_pref_fEnableStateUpdates;
 	bool m_pref_fEnableKeepAlive;
 	BOOL m_pref_fRunningFromExternalService;
@@ -388,9 +395,11 @@ private:
 	BOOL m_pref_locdom3;
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
+	char m_pref_alternateShell[1024];
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
+	bool showSettings = false;
 };
 
 extern SettingsManager* settings;

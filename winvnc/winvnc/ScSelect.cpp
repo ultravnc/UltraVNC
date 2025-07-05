@@ -27,6 +27,7 @@
 	#include "ScSelect.h"
 	#include "resource.h"
 	#include "common/win32_helpers.h"
+	#include "winvnc.h"
 	#pragma comment (lib, "comctl32")
 extern HINSTANCE	hInstResDLL;
 
@@ -367,14 +368,10 @@ namespace ScSelect {
 			LvItem.pszText = item0; // Text to display (can be from a char variable) (Items)
 			FILE* fid;
 			bool done = false;
-			char configfile[1024];
-			int iItem;
-			if (GetModuleFileName(NULL, configfile, 1024)) {
-				char* p = strrchr(configfile, '\\');
-				if (p == NULL) return 0;
-				*p = '\0';
-				strcat_s(configfile, "\\helpdesk.txt");
-			}
+			char configfile[MAX_PATH];
+			strcpy_s(configfile, winvncFolder);
+			strcat_s(configfile, "\\helpdesk.txt");
+			int iItem;			
 
 			int i = 0;
 			bool direct = false;
