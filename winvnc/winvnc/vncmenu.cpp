@@ -599,7 +599,8 @@ void vncMenu::setToolTip()
 		char ipstring[100];
 		wchar_t wipstring[100];
 		GetIPAddrString(ipstring, 100);
-		mbstowcs(wipstring, ipstring, 100);
+		size_t convertedChars = 0;
+		mbstowcs_s(&convertedChars, wipstring, 100, ipstring, _TRUNCATE);
 		wcsncat_s(m_tooltip, wipstring, _TRUNCATE);
 	}
 	else
@@ -608,7 +609,8 @@ void vncMenu::setToolTip()
 	char namebuf[256]{};
 
 	if (gethostname(namebuf, 256) == 0) {
-		mbstowcs(namebufw, namebuf, strlen(namebuf));
+		size_t convertedChars = 0;
+		mbstowcs_s(&convertedChars, namebufw, sizeof(namebufw) / sizeof(wchar_t), namebuf, _TRUNCATE);
 		wcsncat_s(m_tooltip, L" - ", _TRUNCATE);
 		wcsncat_s(m_tooltip, namebufw, _TRUNCATE);
 	}

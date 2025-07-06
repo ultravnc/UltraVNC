@@ -75,7 +75,7 @@ char* GetVersionFromResource(char* version)
                             DWORD dwSecondRight = HIWORD(dwFileVersionLS);
                             DWORD dwRightMost = LOWORD(dwFileVersionLS);
 
-                            sprintf(version, " %d.%d.%d.%d", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
+                            sprintf_s(version, 50, " %d.%d.%d.%d", dwLeftMost, dwSecondLeft, dwSecondRight, dwRightMost);
                         }
                     }
 
@@ -172,8 +172,7 @@ void convertToISO8601(const char* input, char* output, size_t size) {
     int hour, minute, second;
 
     // Extract components from the input string
-    sscanf(input, "%3s %d %d %d:%d:%d", monthStr, &day, &year, &hour, &minute, &second);
-
+    sscanf_s(input, "%3s %d %d %d:%d:%d", monthStr, (unsigned)_countof(monthStr), &day, &year, &hour, &minute, &second);
     // Convert month abbreviation to number (1-12)
     month = (std::strstr(months, monthStr) - months) / 3 + 1;
 

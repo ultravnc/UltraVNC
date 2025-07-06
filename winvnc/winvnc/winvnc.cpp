@@ -135,7 +135,7 @@ u16 getCpuHash()
 bool
 Myinit(HINSTANCE hInstance)
 {
-	setbuf(stderr, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
 
 	// [v1.0.2-jp1 fix] Load resouce from dll
 
@@ -212,11 +212,11 @@ void replaceFilename(char* path, const char* newFilename) {
 	char* lastSlash = strrchr(path, '\\'); // Find the last '/'
 	if (lastSlash) {
 		*(lastSlash + 1) = '\0'; // Truncate after the last '/'
-		strcat(path, newFilename); // Append the new filename
+		strcat_s(path, 260, newFilename); // Append the new filename
 	}
 	else {
 		// No '/' found, replace the whole string
-		strcpy(path, newFilename);
+		strcpy_s(path, 260, newFilename);
 	}
 }
 
@@ -242,7 +242,7 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, '"'); // Find the closing quote
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength + 1; // Move i past the closing quote
 					configfileskip += pathLength + 1;
@@ -254,14 +254,14 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, ' '); // Find the next space
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;
 				}
 				else {
 					// Path is the rest of the string
-					strcpy(configFile, &szCmdLine[i]); // Copy the rest of the string into the path
+					strcpy_s(configFile, &szCmdLine[i]); // Copy the rest of the string into the path
 					pathLength = strlen(&szCmdLine[i]);
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;
@@ -335,7 +335,7 @@ void extractConfig(char* szCmdLine)
 		showSettings = true; // service
 	}
 	char logFile[MAX_PATH];
-	strcpy(logFile, configFile);
+	strcpy_s(logFile, configFile);
 	replaceFilename(logFile, "mslogon.log");
 	settings->setLogFile(logFile);
 	settings->setShowSettings(showSettings);
@@ -394,7 +394,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		settings->setScExit(false);
 		settings->setScPrompt(false);
 	#endif // SC_20
-		setbuf(stderr, 0);
+		setvbuf(stderr, NULL, _IONBF, 0);
 
 		// [v1.0.2-jp1 fix] Load resouce from dll
 		hInstResDLL = NULL;
@@ -728,7 +728,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 
 						strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
 						pszId[end - start] = 0;
-						pszId = _strupr(pszId);
+						_strupr_s(pszId, strlen(pszId) + 1);
 					}
 					//multiple spaces between autoreconnect and id
 					i = end;
@@ -772,7 +772,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					{
 						strncpy_s(pszId, end - start + 1, &(szCmdLine[start]), end - start);
 						pszId[end - start] = 0;
-						pszId = _strupr(pszId);
+						_strupr_s(pszId, strlen(pszId) + 1);
 					}
 				}
 				i = end;
@@ -1239,7 +1239,7 @@ int WinVNCAppMain()
 	fShutdownOrdered = true;
 
 	if (hShutdownEvent)CloseHandle(hShutdownEvent);
-	getvnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
+		vnclog.Print(LL_STATE, VNCLOG("################## SHUTING DOWN SERVER ####################\n"));
 
 	//adzm 2009-06-20
 	if (g_szRepeaterHost) {

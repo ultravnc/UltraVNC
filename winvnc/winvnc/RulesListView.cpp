@@ -35,7 +35,8 @@ void RulesListView::init(HWND hListView)
 		index = 0;
 		char * authHost = _strdup(settings->getAuthhosts());
 		if (authHost != 0) {
-			char* token = strtok(authHost, delimiter);
+			char* context = nullptr;
+			char* token = strtok_s(authHost, delimiter, &context);
 			while (token != nullptr) {
 
 				{
@@ -68,7 +69,7 @@ void RulesListView::init(HWND hListView)
 				ListView_SetItemText(hListView, index, 2, const_cast<char*>(token));
 
 				index++;
-				token = strtok(nullptr, delimiter);
+				token = strtok_s(nullptr, delimiter, &context);
 			}
 		}
 	}
@@ -392,7 +393,8 @@ bool RulesListView::isValidIPAddress(const char* ip) {
 	strncpy_s(ipCopy, ip, 19);
 	ipCopy[19] = '\0';
 
-	char* token = std::strtok(ipCopy, ".");
+	char* context = nullptr;
+	char* token = strtok_s(ipCopy, ".", &context);
 	int count = 0;
 
 	while (token != nullptr) {
@@ -401,7 +403,7 @@ bool RulesListView::isValidIPAddress(const char* ip) {
 			return false;
 		}
 
-		token = std::strtok(nullptr, ".");
+		token = strtok_s(nullptr, ".", &context);
 		count++;
 	}
 

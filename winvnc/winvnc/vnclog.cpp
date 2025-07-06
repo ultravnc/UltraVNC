@@ -54,7 +54,7 @@ char* removeNewlineAndCopy(const char* str) {
 
     // Allocate a new char array for the result
     char* result = new char[newLen + 1]; // +1 for null terminator
-    strncpy(result, str, newLen); // Copy up to newLen characters
+    strncpy_s(result, newLen + 1, str, newLen); // Copy up to newLen characters
     result[newLen] = '\0'; // Add null terminator
 
     return result; // Return the new char array
@@ -240,7 +240,9 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	if (current != m_lastLogTime) {
 		m_lastLogTime = current;
         char isoTime[20]; // Buffer for ISO 8601 format: "YYYY-MM-DDTHH:MM:SS"
-        std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", std::localtime(&m_lastLogTime));
+        std::tm timeinfo;
+        localtime_s(&timeinfo, &m_lastLogTime);
+        std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", &timeinfo);
 		ReallyPrintLine(isoTime);
         ReallyPrintLine("\n");
 	}
@@ -249,7 +251,7 @@ void VNCLog::ReallyPrint(const char* format, va_list ap)
 	TCHAR line[(LINE_BUFFER_SIZE * 2) + 1]; // sf@2006 - Prevents buffer overflow
 	TCHAR szErrorMsg[LINE_BUFFER_SIZE];
 	DWORD  dwErrorCode = GetLastError();
-    _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
+    _vsnprintf_s(line, LINE_BUFFER_SIZE, format, ap);
 	SetLastError(0);
     if (dwErrorCode != 0) {
 	    if (FormatMessage( 
@@ -269,10 +271,12 @@ void VNCLog::ReallyPrintScreen(const char* format, va_list ap)
 {
     time_t current = time(0);
     char isoTime[20]; // Buffer for ISO 8601 format: "YYYY-MM-DDTHH:MM:SS"
-    std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", std::localtime(&current));
+    std::tm timeinfo;
+    localtime_s(&timeinfo, &m_lastLogTime);
+    std::strftime(isoTime, sizeof(isoTime), "%Y-%m-%d %H:%M:%S", &timeinfo);
     TCHAR line[(LINE_BUFFER_SIZE * 2) + 1];
     TCHAR line2[(LINE_BUFFER_SIZE * 2) + 1];
-    _vsnprintf(line, LINE_BUFFER_SIZE, format, ap);
+    _vsnprintf_s(line, LINE_BUFFER_SIZE, format, ap);
     strcpy_s(line2, isoTime);
     strcat_s(line2, " ");
     strcat_s(line2, line);
