@@ -113,6 +113,7 @@ class CloudThread;
 #endif
 typedef void (ClientConnection:: *tightFilterFunc)(int);
 
+void JpegErrorHeader(j_common_ptr cinfo);
 struct mybool {
  bool b0 : 1;
  bool b1 : 1;

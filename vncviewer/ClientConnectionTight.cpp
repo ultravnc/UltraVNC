@@ -26,6 +26,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#include "Exception.h"
 
 #define TIGHT_MIN_TO_COMPRESS 12
 #define TIGHT_BUFFER_SIZE (2048 * 200)
@@ -544,7 +545,11 @@ cinfo->src = &jpegSrcManager;
 
 /*static void JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData,
 							  int compressedLen);*/
-
+void JpegErrorHeader(j_common_ptr cinfo) {
+    char msg[JMSG_LENGTH_MAX];
+    (*cinfo->err->format_message)(cinfo, msg);
+    throw QuietException(msg); 
+}
 void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
 {
   struct jpeg_decompress_struct cinfo;
@@ -560,24 +565,34 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   ReadExact(m_netbuf, compressedLen);
 
   cinfo.err = jpeg_std_error(&jerr);
-  jpeg_create_decompress(&cinfo);
+  jerr.error_exit = JpegErrorHeader;
+  try
+  {
+      jpeg_create_decompress(&cinfo);
 
-  //JpegSetSrcManager(&cinfo, m_netbuf, compressedLen);
+      //JpegSetSrcManager(&cinfo, m_netbuf, compressedLen);
 
-  jpegBufferPtr = (JOCTET *)m_netbuf;
-  jpegBufferLen = (size_t)compressedLen;
+      jpegBufferPtr = (JOCTET*)m_netbuf;
+      jpegBufferLen = (size_t)compressedLen;
 
-  m_jpegSrcManager.init_source = JpegInitSource;
-  m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
-  m_jpegSrcManager.skip_input_data = JpegSkipInputData;
-  m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
-  m_jpegSrcManager.term_source = JpegTermSource;
-  m_jpegSrcManager.next_input_byte = jpegBufferPtr;
-  m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+      m_jpegSrcManager.init_source = JpegInitSource;
+      m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
+      m_jpegSrcManager.skip_input_data = JpegSkipInputData;
+      m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
+      m_jpegSrcManager.term_source = JpegTermSource;
+      m_jpegSrcManager.next_input_byte = jpegBufferPtr;
+      m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
 
-  cinfo.src = &m_jpegSrcManager;
+      cinfo.src = &m_jpegSrcManager;
 
-  jpeg_read_header(&cinfo, TRUE);
+      jpeg_read_header(&cinfo, TRUE);
+  }
+  catch (QuietException& e) {
+      e.Report();
+      jpeg_destroy_decompress(&cinfo);
+      return;
+  }
+
   cinfo.out_color_space = JCS_RGB;
 
   jpeg_start_decompress(&cinfo);
