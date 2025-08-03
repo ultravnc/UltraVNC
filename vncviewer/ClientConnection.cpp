@@ -357,6 +357,18 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	m_fUseProxy = m_opts->m_fUseProxy;
 }
 
+typedef LONG(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+bool GetRealOSVersion(OSVERSIONINFOW& osInfo) {
+	HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
+	if (!hMod) return false;
+
+	RtlGetVersionPtr fxPtr = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
+	if (!fxPtr) return false;
+
+	osInfo.dwOSVersionInfoSize = sizeof(osInfo);
+	return fxPtr(&osInfo) == 0;
+}
+
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
 #ifdef _CLOUD
@@ -617,14 +629,20 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	GetVersionEx(&osvi);
 
 	typedef BOOL(WINAPI* PFN_GetDpiForMonitor) (HMONITOR, MONITOR_DPI_TYPE, UINT*, UINT*);
-	PFN_GetDpiForMonitor getDpiForMonitor;
+	PFN_GetDpiForMonitor getDpiForMonitor = NULL;
 	HMODULE hShcore = NULL;
 	HMODULE hUser32 = NULL;
 
-	hShcore = LoadLibrary(_T("Shcore.dll"));
-	if (hShcore)
-		// GetDpiForMonitor, Windows 8.1 [desktop apps only]
-		getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
+	OSVERSIONINFOW osInfo = {};
+	GetRealOSVersion(osInfo);
+
+	if (osInfo.dwMajorVersion == 6 && osInfo.dwMinorVersion == 3 || osInfo.dwMajorVersion > 6) {
+		hShcore = LoadLibrary(_T("Shcore.dll"));
+		if (hShcore)
+			// GetDpiForMonitor, Windows 8.1 [desktop apps only]
+			getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
+	}
+
 	if (getDpiForMonitor)
 	{
 		HMONITOR monitor = MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
