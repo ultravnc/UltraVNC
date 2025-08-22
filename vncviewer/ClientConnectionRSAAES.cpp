@@ -33,7 +33,7 @@ extern "C" {
 #include "../common/mnemonic.h"
 }
 
-
+const int secTypeRA2None = 0;
 const int secTypeRA2UserPass = 1;
 const int secTypeRA2Pass = 2;
 
@@ -750,7 +750,7 @@ struct RSAKEX
 	{
 		subtype = 0;
 		conn.ReadExact((char *)&subtype, 1);
-		if (subtype != secTypeRA2UserPass && subtype != secTypeRA2Pass)
+		if (subtype != secTypeRA2UserPass && subtype != secTypeRA2Pass && subtype != secTypeRA2None)
 		{
 			sprintf_s(lastError, "Invalid subtype (%d)", subtype);
 			return false;
@@ -761,6 +761,9 @@ struct RSAKEX
 	bool WriteCredentials(TCHAR *host, int port, char *cmdlnUser, char *clearPasswd)
 	{
 		DWORD size;
+
+		if (subtype == secTypeRA2None)
+			return true;
 
 		if (strlen(clearPasswd) == 0)
 		{
