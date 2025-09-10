@@ -3034,7 +3034,7 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbUltraVNC:
 		new_ultra_server=true;
 		m_fServerKnowsFileTransfer = true;
-		//HandleQuickOption();
+		HandleQuickOption();
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		if (bSecureVNCPluginActive) {
