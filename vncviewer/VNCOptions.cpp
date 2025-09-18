@@ -1050,20 +1050,35 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else
 		{
-			TCHAR phost[MAX_HOST_NAME_LEN];
-			if (!ParseDisplay(args[j], phost, MAX_HOST_NAME_LEN, &m_port)) {
-				ShowUsage(sz_D28);
-				PostQuitMessage(1);
+			if (j == 0 && (GetFileAttributesA(args[j]) != INVALID_FILE_ATTRIBUTES)
+				&& !(GetFileAttributesA(args[j]) & FILE_ATTRIBUTE_DIRECTORY)) {
+				// The GetPrivateProfile* stuff seems not to like some relative paths
+				_fullpath(m_configFilename, args[j], _MAX_PATH);
+				if (_access(m_configFilename, 04)) {
+					ArgError(sz_D17);
+					PostQuitMessage(1);
+					continue;
+				}
+				else {
+					LoadOptions(m_configFilename);
+					m_configSpecified = true;
+				}
 			}
 			else {
-				for (size_t l_i = 0, len = strlen(phost); l_i < len; l_i++)
-				{
-					phost[l_i] = toupper(phost[l_i]);
+				TCHAR phost[MAX_HOST_NAME_LEN];
+				if (!ParseDisplay(args[j], phost, MAX_HOST_NAME_LEN, &m_port)) {
+					ShowUsage(sz_D28);
+					PostQuitMessage(1);
 				}
-				_tcscpy_s(m_host_options, phost);
-				//adzm 2010-02-15
-				CheckProxyAndHost();
-				m_connectionSpecified = true;
+				else {
+					for (size_t l_i = 0, len = strlen(phost); l_i < len; l_i++) {
+						phost[l_i] = toupper(phost[l_i]);
+					}
+					_tcscpy_s(m_host_options, phost);
+					//adzm 2010-02-15
+					CheckProxyAndHost();
+					m_connectionSpecified = true;
+				}
 			}
 		}
 	}
