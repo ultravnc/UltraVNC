@@ -664,7 +664,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	}
 	else
 		m_Dpi = GetDeviceCaps(GetDC(m_hwndMain), LOGPIXELSX);
-	FreeLibrary(hShcore);
+	if (hShcore) {
+		FreeLibrary(hShcore);
+	}
 
 
 	m_DpiOld = m_Dpi;
