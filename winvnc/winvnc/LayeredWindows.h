@@ -47,6 +47,6 @@ private:
 public:
 	LayeredWindows();
 	~LayeredWindows();
-	bool SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_activ);
+	bool SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_activ, bool &screen_in_powersave, HWND hwnd);
 	void SetBorderWindow(bool enabled, RECT rect, char* infoMsg, bool set_OSD);
 };

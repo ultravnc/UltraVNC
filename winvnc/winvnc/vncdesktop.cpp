@@ -2512,12 +2512,12 @@ void vncDesktop::SetBlockInputState(bool newstate)
 		{
 			if ((blankmonitorstate == newstate) && (newstate == 1))
 			{
-				m_Black_window_active = layeredWindows->SetBlankMonitor(0, settings->getBlankInputsOnly(), m_Black_window_active);
+				m_Black_window_active = layeredWindows->SetBlankMonitor(0, settings->getBlankInputsOnly(), m_Black_window_active, m_screen_in_powersave, m_hwnd);
 				blankmonitorstate = 0;
 			}
 			else
 			{
-				m_Black_window_active = layeredWindows->SetBlankMonitor(newstate, settings->getEnableBlankMonitor(), m_Black_window_active);
+				m_Black_window_active = layeredWindows->SetBlankMonitor(newstate, settings->getEnableBlankMonitor(), m_Black_window_active, m_screen_in_powersave, m_hwnd);
 				blankmonitorstate = newstate;
 			}
 		}

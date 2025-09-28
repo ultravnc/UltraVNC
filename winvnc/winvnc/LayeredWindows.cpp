@@ -395,32 +395,55 @@ bool LayeredWindows::create_border_window(RECT rect)
     return true;
 }
 
-bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_active)
+bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, bool black_window_active, bool &screen_in_powersave, HWND hwnd)
 {
-    if ((!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
-        || VNC_OSVersion::getInstance()->OS_WIN8)
-        return false;
-
     // Also Turn Off the Monitor if allowed ("Blank Screen", "Blank Monitor")
     if (blankMonitorEnabled)
     {
-        if (enabled) {
-            if (VNC_OSVersion::getInstance()->OS_AERO_ON)
-                VNC_OSVersion::getInstance()->DisableAero();
 
-            HANDLE ThreadHandle2 = NULL;
-            DWORD dwTId;
-            ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
-            if (ThreadHandle2)
-                CloseHandle(ThreadHandle2);
-            black_window_active = true;
+        if ((!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
+            || VNC_OSVersion::getInstance()->OS_WIN8)
+        {
+            if (enabled) {
+                SendMessage(hwnd, WM_SYSCOMMAND, SC_MONITORPOWER, (LPARAM)2);
+                screen_in_powersave = true;
+            }
+            else {
+                SendMessage(hwnd, WM_SYSCOMMAND, SC_MONITORPOWER, (LPARAM)-1);
+                screen_in_powersave = false;
+                //win8 require mouse move
+                mouse_event(MOUSEEVENTF_MOVE, 0, 1, 0, NULL);
+                Sleep(40);
+                mouse_event(MOUSEEVENTF_MOVE, 0, -1, 0, NULL);
+                //Just in case video driver state was changed
+                HWND Blackhnd = FindWindow(("blackscreen"), 0);
+                if (Blackhnd)
+                    PostMessage(Blackhnd, WM_CLOSE, 0, 0);
+                black_window_active = false;
+                VNC_OSVersion::getInstance()->ResetAero();
+            }
+
         }
         else {
-            HWND Blackhnd = FindWindow(("blackscreen"), 0);
-            if (Blackhnd)
-                PostMessage(Blackhnd, WM_CLOSE, 0, 0);
-            black_window_active = false;
-            VNC_OSVersion::getInstance()->ResetAero();
+            if (enabled) {
+                if (VNC_OSVersion::getInstance()->OS_AERO_ON)
+                    VNC_OSVersion::getInstance()->DisableAero();
+
+                HANDLE ThreadHandle2 = NULL;
+                DWORD dwTId;
+                ThreadHandle2 = CreateThread(NULL, 0, BlackWindow, NULL, 0, &dwTId);
+                if (ThreadHandle2)
+                    CloseHandle(ThreadHandle2);
+                black_window_active = true;
+            }
+            else {
+                HWND Blackhnd = FindWindow(("blackscreen"), 0);
+                if (Blackhnd)
+                    PostMessage(Blackhnd, WM_CLOSE, 0, 0);
+                black_window_active = false;
+                VNC_OSVersion::getInstance()->ResetAero();
+            }
+
         }
     }
     return black_window_active;
