@@ -1018,6 +1018,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					return 0;
 			}
 #endif
+		case ID_CLOSE_SILENT:
 			// User selected Close from the tray menu
 			fShutdownOrdered = TRUE;
 			//Sleep(1000);

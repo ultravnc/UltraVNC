@@ -485,7 +485,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				hservwnd = postHelper::FindWinVNCWindow(false);
 				if (hservwnd != NULL)
 				{
-					PostMessage(hservwnd, WM_COMMAND, 40002, 0);
+					PostMessage(hservwnd, WM_COMMAND, ID_CLOSE_SILENT, 0);
 					PostMessage(hservwnd, WM_CLOSE, 0, 0);
 				}
 				return return2(0);

@@ -418,6 +418,7 @@
 #define ID_WINVNC_USAGE                 32856
 #define ID_WINVNC_WARNIN                32857
 #define ID_WVNC                         32858
+#define ID_CLOSE_SILENT                 32859
 
 // Next default values for new objects
 // 
@@ -425,7 +426,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        211
-#define _APS_NEXT_COMMAND_VALUE         32859
+#define _APS_NEXT_COMMAND_VALUE         32860
 #define _APS_NEXT_CONTROL_VALUE         1292
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
