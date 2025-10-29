@@ -315,7 +315,7 @@ void SessionDialog::LoadFromFile(char *fname)
   fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
-  fUseOnlyDefaultConfigFile = readInt("UseCustomConfigFile", (int)fUseOnlyDefaultConfigFile, fname) ? true : false;
+  fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, fname) ? true : false;
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
