@@ -466,10 +466,10 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	if (GetDlgItem(hwnd, IDC_BLANK)) {
 		SendMessage(GetDlgItem(hwnd, IDC_BLANK), BM_SETCHECK, settings->getEnableBlankMonitor(), 0);
-		if (!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
+		/*if (!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
 			SetDlgItemText(hwnd, IDC_BLANK, "Enable Blank Monitor on Viewer Request require Min Win10 build 19041 ");
 		if (VNC_OSVersion::getInstance()->OS_WIN8)
-			SetDlgItemText(hwnd, IDC_BLANK, "Enable Blank Monitor on Viewer Not supported on windows 8 ");
+			SetDlgItemText(hwnd, IDC_BLANK, "Enable Blank Monitor on Viewer Not supported on windows 8 ");*/
 	}
 
 	if (GetDlgItem(hwnd, IDC_BLANK2)) //PGM

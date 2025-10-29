@@ -230,6 +230,8 @@ bool LayeredWindows::create_black_window(void)
     SetWindowPos(hwnd, HWND_TOPMOST, x, y, cx, cy, SWP_FRAMECHANGED | SWP_NOACTIVATE);
     if (VNC_OSVersion::getInstance()->OS_WIN10_TRANS)
         SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    else
+        SetWindowDisplayAffinity(hwnd, WDA_MONITOR);
     return true;
 }
 
@@ -392,6 +394,8 @@ bool LayeredWindows::create_border_window(RECT rect)
     SetWindowPos(hwnd, HWND_TOPMOST, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_NOACTIVATE);
     if (VNC_OSVersion::getInstance()->OS_WIN10_TRANS)
         SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    else
+        SetWindowDisplayAffinity(hwnd, WDA_MONITOR);
     return true;
 }
 
@@ -401,7 +405,7 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
     if (blankMonitorEnabled)
     {
 
-        if ((!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
+        /*if ((!VNC_OSVersion::getInstance()->OS_WIN10_TRANS && VNC_OSVersion::getInstance()->OS_WIN10)
             || VNC_OSVersion::getInstance()->OS_WIN8)
         {
             if (enabled) {
@@ -424,7 +428,7 @@ bool LayeredWindows::SetBlankMonitor(bool enabled, bool blankMonitorEnabled, boo
             }
 
         }
-        else {
+        else*/ {
             if (enabled) {
                 if (VNC_OSVersion::getInstance()->OS_AERO_ON)
                     VNC_OSVersion::getInstance()->DisableAero();
