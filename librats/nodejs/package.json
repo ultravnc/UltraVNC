@@ -1,0 +1,56 @@
+{
+  "name": "librats",
+  "version": "0.3.1",
+  "description": "Node.js bindings for librats - A high-performance peer-to-peer networking library",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "install": "node-gyp rebuild",
+    "test": "node test/test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "p2p",
+    "peer-to-peer",
+    "networking",
+    "dht",
+    "gossipsub",
+    "file-transfer",
+    "mdns",
+    "stun",
+    "ice",
+    "nat-traversal",
+    "encryption",
+    "native"
+  ],
+  "author": "librats team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/librats/librats.git",
+    "directory": "nodejs"
+  },
+  "bugs": {
+    "url": "https://github.com/librats/librats/issues"
+  },
+  "homepage": "https://github.com/librats/librats#readme",
+  "dependencies": {
+    "node-addon-api": "^8.5.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^11.4.2",
+    "@types/node": "^24.3.1"
+  },
+  "files": [
+    "lib/**/*",
+    "src/**/*",
+    "binding.gyp",
+    "README.md"
+  ],
+  "gypfile": true
+}

@@ -1,0 +1,79 @@
+# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+name: Deploy GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Get latest release version
+        id: get_version
+        run: |
+          # Fetch the latest release tag from GitHub API
+          LATEST_TAG=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
+          echo "Latest release tag: $LATEST_TAG"
+          
+          # Remove 'v' prefix if present for VERSION_TAG (e.g., v0.3.0 -> 0.3.0)
+          VERSION_TAG="${LATEST_TAG#v}"
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
+          echo "VERSION=v$VERSION_TAG" >> $GITHUB_OUTPUT
+          
+          echo "Version tag (no v): $VERSION_TAG"
+          echo "Version (with v): v$VERSION_TAG"
+      
+      - name: Replace version placeholders in index.html
+        run: |
+          # Replace {{VERSION}} with vX.Y.Z format (e.g., v0.3.0)
+          sed -i "s/{{VERSION}}/${{ steps.get_version.outputs.VERSION }}/g" docs/index.html
+          
+          # Replace {{VERSION_TAG}} with X.Y.Z format (e.g., 0.3.0)
+          sed -i "s/{{VERSION_TAG}}/${{ steps.get_version.outputs.VERSION_TAG }}/g" docs/index.html
+          
+          echo "Replaced version placeholders with ${{ steps.get_version.outputs.VERSION }} and ${{ steps.get_version.outputs.VERSION_TAG }}"
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

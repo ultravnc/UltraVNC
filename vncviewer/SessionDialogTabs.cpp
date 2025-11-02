@@ -1334,7 +1334,6 @@ void SessionDialog::ReadDlgProc()
 {
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	TCHAR hostname[MAX_HOST_NAME_LEN];
-	TCHAR cloudhostname[MAX_HOST_NAME_LEN];
 	HWND hwnd = SessHwnd;
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, MAX_HOST_NAME_LEN);
 	if (ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &m_port)) {
@@ -1345,7 +1344,10 @@ void SessionDialog::ReadDlgProc()
 	_tcscpy_s(m_proxyhost, "");
 	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, MAX_HOST_NAME_LEN);
 	
-	m_fUseProxy = SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED;
+	if (SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		m_connectionType = REPEATER_SERVER;
+	if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		m_connectionType = UDP_BRIDGE;
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
 		TCHAR actualProxy[256];
@@ -1603,7 +1605,7 @@ void SessionDialog::StartListener()
 
 	m_pOpt->autoDetect = autoDetect;
 	m_pOpt->m_fExitCheck = fExitCheck;
-	m_pOpt->m_fUseProxy = m_fUseProxy;
+	m_pOpt->m_connectionType = m_connectionType;
 	m_pOpt->m_allowMonitorSpanning = allowMonitorSpanning;
 	m_pOpt->m_ChangeServerRes = changeServerRes;
 	m_pOpt->m_extendDisplay = extendDisplay;

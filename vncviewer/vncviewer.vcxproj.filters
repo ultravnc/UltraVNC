@@ -181,6 +181,9 @@
     <ClCompile Include="..\common\Hyperlinks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\librats\vnc_bridge\vnc_bridge_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -537,6 +540,12 @@
       <Filter>Resources</Filter>
     </Image>
     <Image Include="res\stat\FT.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="LedOrange.bmp">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="res\LedOrange.bmp">
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>

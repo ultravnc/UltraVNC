@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "librats-py"
+version = "1.0.0"
+description = "Python bindings for librats P2P networking library"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "librats contributors"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet",
+    "Topic :: System :: Networking",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.7"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-asyncio",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "mypy",
+]
+examples = [
+    "click",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/librats"
+Documentation = "https://your-org.github.io/librats"
+Repository = "https://github.com/your-org/librats"
+"Bug Tracker" = "https://github.com/your-org/librats/issues"
+
+[tool.setuptools.packages.find]
+include = ["librats_py*"]
+
+[tool.setuptools.package-data]
+librats_py = ["*.so", "*.dll", "*.dylib"]
+
+[tool.black]
+line-length = 100
+target-version = ['py37']
+
+[tool.pytest.ini_options]
+testpaths = ["librats_py/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+markers = [
+    "integration: integration tests requiring native library",
+    "slow: slow running tests",
+]
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true

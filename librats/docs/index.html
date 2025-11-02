@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>librats - High-Performance P2P Networking Library | C++, C, Java, Python, Android | Open Source</title>
+    <meta name="title" content="librats - High-Performance P2P Networking Library | C++, C, Java, Python, Android | Open Source">
+    <meta name="description" content="Enterprise-grade P2P networking library with C++, C, Java, Python, and Android support. 50x less memory than alternatives. Advanced NAT traversal (99% success), end-to-end encryption, GossipSub messaging, file transfer. Cross-platform: Windows, Linux, macOS, Android.">
+    <meta name="keywords" content="P2P networking, p2p, peer-to-peer, C++17, C++20, C++23, Python bindings, NAT traversal, ICE, STUN, TURN, DHT, BitTorrent, mDNS, GossipSub, file transfer, Noise Protocol, encryption, mesh networking, real-time communication, libp2p alternative, decentralized networking, open source">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://librats.com/">
+    <meta property="og:title" content="librats - High-Performance P2P Networking Library">
+    <meta property="og:description" content="Enterprise-grade P2P networking library with C++, C, Java, Python, and Android support. 50x less memory usage, 99% NAT traversal success rate, advanced encryption, and cross-platform support.">
+    <meta property="og:image" content="https://librats.com/logo.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="librats P2P networking library logo">
+    <meta property="og:site_name" content="librats">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://librats.com/librats/">
+    <meta property="twitter:title" content="librats - High-Performance P2P Networking Library">
+    <meta property="twitter:description" content="Enterprise-grade P2P networking library with C++, C, Java, Python, and Android support. 50x less memory usage, 99% NAT traversal success rate, advanced encryption, and cross-platform support.">
+    <meta property="twitter:image" content="https://librats.com/logo.png">
+    <meta property="twitter:image:alt" content="librats P2P networking library logo">
+    <meta property="twitter:creator" content="@librats_p2p">
+    <meta property="twitter:site" content="@librats_p2p">
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="msapplication-TileColor" content="#3b82f6">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SZZK3WSN0F"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-SZZK3WSN0F');
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="logo-rat.png" alt="librats" class="logo-img">
+                <span class="logo-text">librats</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#quickstart" class="nav-link">Quick Start</a></li>
+                <li><a href="#downloads" class="nav-link">Downloads</a></li>
+                <li><a href="#platforms" class="nav-link">Platforms</a></li>
+                <li><a href="#docs" class="nav-link">Documentation</a></li>
+                <li><a href="#performance" class="nav-link">Performance</a></li>
+                <li><a href="https://github.com/DEgITx/librats" class="nav-link github-link" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="grid-overlay"></div>
+            <div class="floating-particles"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-text">C++17 • Open Source • MIT License</span>
+            </div>
+            <h1 class="hero-title">
+                High-Performance
+                <span class="gradient-text">P2P Networking</span>
+                for Modern Applications
+            </h1>
+            <p class="hero-description">
+                Enterprise-grade peer-to-peer networking library with advanced NAT traversal, 
+                end-to-end encryption, and publish-subscribe messaging. Built from the ground up in C++17 with comprehensive C, Java, Python, and Android support.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">50x</div>
+                    <div class="stat-label">Less Memory</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">NAT Success</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1.6MB</div>
+                    <div class="stat-label">Footprint</div>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a href="#quickstart" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Get Started
+                </a>
+                <a href="https://github.com/DEgITx/librats" class="btn btn-secondary" target="_blank">
+                    <i class="fab fa-github"></i>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="network-animation">
+                <div class="node central-node">
+                    <div class="node-pulse"></div>
+                </div>
+                <div class="node peer-node peer-1">
+                    <div class="connection-line line-1"></div>
+                </div>
+                <div class="node peer-node peer-2">
+                    <div class="connection-line line-2"></div>
+                </div>
+                <div class="node peer-node peer-3">
+                    <div class="connection-line line-3"></div>
+                </div>
+                <div class="node peer-node peer-4">
+                    <div class="connection-line line-4"></div>
+                </div>
+                <div class="data-packet packet-1"></div>
+                <div class="data-packet packet-2"></div>
+                <div class="data-packet packet-3"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Enterprise-Grade Features</h2>
+                <p class="section-subtitle">Everything you need for robust P2P networking</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Advanced NAT Traversal</h3>
+                    <p>ICE, STUN, and TURN support with 99%+ success rate across any network topology. Automatic strategy selection for optimal connectivity.</p>
+                    <div class="feature-badge">RFC Compliant</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>End-to-End Encryption</h3>
+                    <p>Noise Protocol implementation with Curve25519 + ChaCha20-Poly1305. Automatic key management and perfect forward secrecy.</p>
+                    <div class="feature-badge">Noise Protocol</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>GossipSub Messaging</h3>
+                    <p>Scalable publish-subscribe messaging with mesh networking. Topic-based communication and message validation.</p>
+                    <div class="feature-badge">Pub/Sub</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-transfer"></i>
+                    </div>
+                    <h3>File Transfer</h3>
+                    <p>Chunked transfers with resume capability. Directory transfer support with parallel transmission and integrity verification.</p>
+                    <div class="feature-badge">Resumable</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Multi-Layer Discovery</h3>
+                    <p>DHT integration, mDNS local discovery, and STUN-based public IP discovery. Automatic peer reconnection.</p>
+                    <div class="feature-badge">Auto Discovery</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>High Performance</h3>
+                    <p>Native C++17 implementation with zero-copy operations. Thread-safe design and minimal memory footprint.</p>
+                    <div class="feature-badge">50x Faster</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Multi-Language Support</h3>
+                    <p>Comprehensive language bindings for C++, C, Java, Python, and Android. Consistent API across all platforms and languages.</p>
+                    <div class="feature-badge">4+ Languages</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Examples Section -->
+    <section id="quickstart" class="code-examples">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Quick Start</h2>
+                <p class="section-subtitle">Get up and running in minutes</p>
+            </div>
+            <div class="code-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="basic">Basic P2P</button>
+                    <!-- <button class="tab-button" data-tab="python">Python</button> -->
+                    <button class="tab-button" data-tab="protocol">Custom Protocol</button>
+                    <button class="tab-button" data-tab="chat">Chat App</button>
+                    <button class="tab-button" data-tab="gossipsub">GossipSub</button>
+                    <button class="tab-button" data-tab="files">File Transfer</button>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="basic">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Basic P2P Connection</span>
+                                <button class="copy-btn" onclick="copyCode('basic-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="basic-code">#include "librats.h"
+#include &lt;iostream&gt;
+#include &lt;thread&gt;
+#include &lt;chrono&gt;
+
+int main() {
+    // Create a simple P2P client
+    librats::RatsClient client(8080);
+    
+    // Set up connection callback
+    client.set_connection_callback([](socket_t socket, const std::string& peer_id) {
+        std::cout &lt;&lt; "✅ New peer connected: " &lt;&lt; peer_id &lt;&lt; std::endl;
+    });
+    
+    // Set up message callback
+    client.set_string_data_callback([](socket_t socket, const std::string& peer_id, const std::string& message) {
+        std::cout &lt;&lt; "💬 Message from " &lt;&lt; peer_id &lt;&lt; ": " &lt;&lt; message &lt;&lt; std::endl;
+    });
+    
+    // Start the client
+    if (!client.start()) {
+        std::cerr &lt;&lt; "Failed to start client" &lt;&lt; std::endl;
+        return 1;
+    }
+    
+    std::cout &lt;&lt; "🐀 librats client running on port 8080" &lt;&lt; std::endl;
+    
+    // Connect to another peer (optional)
+    // client.connect_to_peer("127.0.0.1", 8081);
+    
+    // Send a message to all connected peers
+    client.broadcast_string_to_peers("Hello from librats!");
+    
+    // Keep running
+    std::this_thread::sleep_for(std::chrono::minutes(1));
+    
+    return 0;
+}</code></pre>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="tab-pane" id="python">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Python P2P Connection</span>
+                                <button class="copy-btn" onclick="copyCode('python-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="python-code">import librats_py
+import time
+
+def main():
+    # Create a simple P2P client
+    client = librats_py.RatsClient(8080)
+    
+    # Set up connection callback
+    def on_connection(peer_id):
+        print(f"✅ New peer connected: {peer_id}")
+    
+    client.set_connection_callback(on_connection)
+    
+    # Set up message callback
+    def on_message(peer_id, message):
+        print(f"💬 Message from {peer_id}: {message}")
+    
+    client.set_string_data_callback(on_message)
+    
+    # Start the client
+    if not client.start():
+        print("Failed to start client")
+        return 1
+    
+    print("🐀 librats client running on port 8080")
+    
+    # Connect to another peer (optional)
+    # client.connect_to_peer("127.0.0.1", 8081)
+    
+    # Send a message to all connected peers
+    client.broadcast_string_to_peers("Hello from librats Python!")
+    
+    # Keep running
+    time.sleep(60)
+    
+    return 0
+
+if __name__ == "__main__":
+    main()</code></pre>
+                        </div>
+                    </div>
+                    -->
+                    <div class="tab-pane" id="protocol">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Custom Protocol Setup</span>
+                                <button class="copy-btn" onclick="copyCode('protocol-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="protocol-code">#include "librats.h"
+#include &lt;iostream&gt;
+
+int main() {
+    librats::RatsClient client(8080);
+    
+    // Configure custom protocol for your application
+    client.set_protocol_name("my_app");
+    client.set_protocol_version("1.0");
+    
+    std::cout &lt;&lt; "Protocol: " &lt;&lt; client.get_protocol_name() 
+              &lt;&lt; " v" &lt;&lt; client.get_protocol_version() &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Discovery hash: " &lt;&lt; client.get_discovery_hash() &lt;&lt; std::endl;
+    
+    client.start();
+    
+    // Start DHT discovery with custom protocol
+    if (client.start_dht_discovery()) {
+        // Announce our presence
+        client.announce_for_hash(client.get_discovery_hash());
+        
+        // Search for other peers using same protocol
+        client.find_peers_by_hash(client.get_discovery_hash(), 
+            [](const std::vector&lt;std::string&gt;& peers) {
+                std::cout &lt;&lt; "Found " &lt;&lt; peers.size() &lt;&lt; " peers" &lt;&lt; std::endl;
+            });
+    }
+    
+    return 0;
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="chat">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">Chat Application with Message Exchange API</span>
+                                <button class="copy-btn" onclick="copyCode('chat-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="chat-code">#include "librats.h"
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main() {
+    librats::RatsClient client(8080);
+    
+    // Set up message handlers using the modern API
+    client.on("chat", [](const std::string& peer_id, const nlohmann::json& data) {
+        std::cout &lt;&lt; "[CHAT] " &lt;&lt; peer_id &lt;&lt; ": " 
+                  &lt;&lt; data["message"].get&lt;std::string&gt;() &lt;&lt; std::endl;
+    });
+    
+    client.on("user_join", [](const std::string& peer_id, const nlohmann::json& data) {
+        std::cout &lt;&lt; "[JOIN] " &lt;&lt; data["username"].get&lt;std::string&gt;() 
+                  &lt;&lt; " joined" &lt;&lt; std::endl;
+    });
+    
+    // Connection callback
+    client.set_connection_callback([&](socket_t socket, const std::string& peer_id) {
+        std::cout &lt;&lt; "✅ Peer connected: " &lt;&lt; peer_id &lt;&lt; std::endl;
+        
+        // Send welcome message
+        nlohmann::json welcome;
+        welcome["username"] = "User_" + client.get_our_peer_id().substr(0, 8);
+        client.send("user_join", welcome);
+    });
+    
+    client.start();
+    
+    // Send a chat message
+    nlohmann::json chat_msg;
+    chat_msg["message"] = "Hello, P2P chat!";
+    chat_msg["timestamp"] = std::time(nullptr);
+    client.send("chat", chat_msg);
+    
+    return 0;
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="gossipsub">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">GossipSub Messaging</span>
+                                <button class="copy-btn" onclick="copyCode('gossipsub-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="gossipsub-code">int main() {
+    librats::RatsClient client(8080);
+    
+    // Set up topic message handlers
+    client.on_topic_message("chat", [](const std::string& peer_id, 
+        const std::string& topic, const std::string& message) {
+        std::cout << "Chat from " << peer_id << ": " << message << std::endl;
+    });
+    
+    client.on_topic_json_message("events", [](const std::string& peer_id, 
+        const std::string& topic, const nlohmann::json& data) {
+        std::cout << "Event: " << data["type"] << " from " << peer_id << std::endl;
+    });
+    
+    // Set message validator
+    client.set_topic_message_validator("chat", [](const std::string& topic, 
+        const std::string& message, const std::string& peer_id) {
+        // Only accept messages shorter than 1000 characters
+        return message.length() <= 1000 ? 
+            librats::ValidationResult::ACCEPT : 
+            librats::ValidationResult::REJECT;
+    });
+    
+    client.start();
+    client.start_dht_discovery();
+    
+    // Subscribe to topics
+    client.subscribe_to_topic("chat");
+    client.subscribe_to_topic("events");
+    
+    // Publish messages
+    client.publish_to_topic("chat", "Hello, GossipSub world!");
+    
+    nlohmann::json event_data;
+    event_data["type"] = "user_login";
+    event_data["timestamp"] = std::time(nullptr);
+    client.publish_json_to_topic("events", event_data);
+    
+    return 0;
+}</code></pre>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="files">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-title">File Transfer</span>
+                                <button class="copy-btn" onclick="copyCode('files-code')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <pre><code id="files-code">#include "librats.h"
+#include &lt;iostream&gt;
+
+int main() {
+    librats::RatsClient client(8080);
+    
+    // Set up file transfer callbacks
+    client.on_file_transfer_progress([](const librats::FileTransferProgress& progress) {
+        std::cout &lt;&lt; "\ud83d\udcc1 Transfer " &lt;&lt; progress.transfer_id.substr(0, 8) 
+                  &lt;&lt; ": " &lt;&lt; progress.get_completion_percentage() &lt;&lt; "% complete"
+                  &lt;&lt; " (" &lt;&lt; (progress.transfer_rate_bps / 1024) &lt;&lt; " KB/s)" &lt;&lt; std::endl;
+    });
+    
+    client.on_file_transfer_completed([](const std::string& transfer_id, bool success, const std::string& error) {
+        if (success) {
+            std::cout &lt;&lt; "\u2705 Transfer completed: " &lt;&lt; transfer_id.substr(0, 8) &lt;&lt; std::endl;
+        } else {
+            std::cout &lt;&lt; "\u274c Transfer failed: " &lt;&lt; error &lt;&lt; std::endl;
+        }
+    });
+    
+    // Auto-accept incoming file transfers
+    client.on_file_transfer_request([](const std::string& peer_id, 
+                                      const librats::FileMetadata& metadata, 
+                                      const std::string& transfer_id) {
+        std::cout &lt;&lt; "\ud83d\udce5 Incoming: " &lt;&lt; metadata.filename &lt;&lt; " from " &lt;&lt; peer_id.substr(0, 8) &lt;&lt; std::endl;
+        return true; // Auto-accept
+    });
+    
+    client.start();
+    
+    // Configure transfer settings
+    librats::FileTransferConfig config;
+    config.chunk_size = 64 * 1024;       // 64KB chunks
+    config.max_concurrent_chunks = 4;    // 4 parallel chunks
+    config.verify_checksums = true;      // Verify integrity
+    client.set_file_transfer_config(config);
+    
+    std::cout &lt;&lt; "File transfer ready. Connect peers and exchange files!" &lt;&lt; std::endl;
+    
+    // Example transfers (replace "peer_id" with actual peer ID)
+    //std::string file_transfer = client.send_file("peer_id", "my_file.txt");
+    //std::string dir_transfer = client.send_directory("peer_id", "./my_folder");
+    //std::string file_request = client.request_file("peer_id", "remote_file.txt", "./downloaded_file.txt");
+
+    return 0;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Section -->
+    <section id="performance" class="performance">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Exceptional Performance</h2>
+                <p class="section-subtitle">Engineered for efficiency and resource optimization</p>
+            </div>
+            <div class="performance-comparison">
+                <div class="comparison-header">
+                    <h3>librats vs libp2p (JavaScript)</h3>
+                    <p>Test Environment: AMD Ryzen 7 5700U, 16GB RAM</p>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-title">Startup Memory</div>
+                            <div class="metric-comparison">
+                                <div class="metric-value librats">1.6 MB</div>
+                                <div class="vs">vs</div>
+                                <div class="metric-value competitor">50-80 MB</div>
+                            </div>
+                            <div class="improvement">31-50x less memory</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-title">Memory per Peer</div>
+                            <div class="metric-comparison">
+                                <div class="metric-value librats">80 KB</div>
+                                <div class="vs">vs</div>
+                                <div class="metric-value competitor">4-6 MB</div>
+                            </div>
+                            <div class="improvement">50-75x more efficient</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-title">CPU Usage (idle)</div>
+                            <div class="metric-comparison">
+                                <div class="metric-value librats">0-1%</div>
+                                <div class="vs">vs</div>
+                                <div class="metric-value competitor">15-25%</div>
+                            </div>
+                            <div class="improvement">15-25x less CPU</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-title">Peak Memory (100 peers)</div>
+                            <div class="metric-comparison">
+                                <div class="metric-value librats">9.4 MB</div>
+                                <div class="vs">vs</div>
+                                <div class="metric-value competitor">400-600 MB</div>
+                            </div>
+                            <div class="improvement">42-64x less memory</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAT Traversal Section -->
+    <section class="nat-traversal">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Industry-Leading NAT Traversal</h2>
+                <p class="section-subtitle">Connect across virtually any network topology</p>
+            </div>
+            <div class="nat-table-container">
+                <table class="nat-table">
+                    <thead>
+                        <tr>
+                            <th>NAT Type</th>
+                            <th>Direct</th>
+                            <th>STUN</th>
+                            <th>ICE</th>
+                            <th>TURN</th>
+                            <th>Success Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Open Internet</strong></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate excellent">100%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Full Cone NAT</strong></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate excellent">95%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Restricted Cone</strong></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate good">90%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Port Restricted</strong></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate good">85%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Symmetric NAT</strong></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status warning">⚠️</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate fair">70%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Double NAT</strong></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status fail">❌</span></td>
+                            <td><span class="status success">✅</span></td>
+                            <td><span class="success-rate excellent">99%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Downloads Section -->
+    <section id="downloads" class="downloads">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Download librats</h2>
+                <p class="section-subtitle">Get the latest version for your platform</p>
+            </div>
+            <div class="downloads-content">
+                <div class="version-info">
+                    <div class="current-version">
+                        <span class="version-label">Latest Release</span>
+                        <span class="version-number">{{VERSION}}</span>
+                    </div>
+                    <div class="release-notes">
+                        <a href="https://github.com/DEgITx/librats/releases/latest" target="_blank" class="release-link">
+                            <i class="fas fa-file-alt"></i>
+                            View Release Notes
+                        </a>
+                    </div>
+                </div>
+                <div class="platform-downloads">
+                    <div class="download-card" data-platform="windows">
+                        <div class="platform-header">
+                            <div class="platform-icon">
+                                <i class="fab fa-windows"></i>
+                            </div>
+                            <div class="platform-info">
+                                <h3>Windows</h3>
+                                <p>Windows 10/11 (x64)</p>
+                            </div>
+                        </div>
+                        <div class="download-options">
+                            <a href="https://github.com/DEgITx/librats/releases/download/{{VERSION_TAG}}/librats-windows-{{VERSION_TAG}}.zip" class="download-btn primary">
+                                <i class="fas fa-download"></i>
+                                Download .zip
+                                <span class="file-size">~5.6 MB</span>
+                            </a>
+                            <!-- <a href="https://github.com/DEgITx/librats/releases/latest/download/librats-windows-installer.msi" class="download-btn secondary">
+                                <i class="fas fa-box-open"></i>
+                                Installer (.msi)
+                                <span class="file-size">~3.1 MB</span>
+                            </a> -->
+                        </div>
+                        <div class="platform-requirements">
+                            <small>Requires: Visual C++ Redistributable 2019+</small>
+                        </div>
+                    </div>
+                    
+                    <div class="download-card" data-platform="macos">
+                        <div class="platform-header">
+                            <div class="platform-icon">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                            <div class="platform-info">
+                                <h3>macOS</h3>
+                                <p>macOS 10.15+ (Universal)</p>
+                            </div>
+                        </div>
+                        <div class="download-options">
+                            <!-- <a href="https://github.com/DEgITx/librats/releases/latest/download/librats-macos-universal.dmg" class="download-btn secondary">
+                                <i class="fas fa-download"></i>
+                                Download .dmg
+                                <span class="file-size">~2.8 MB</span>
+                            </a> -->
+                            <a href="https://github.com/DEgITx/librats/releases/download/{{VERSION_TAG}}/librats-macos-{{VERSION_TAG}}.zip" class="download-btn primary">
+                                <i class="fas fa-file-archive"></i>
+                                Archive (.zip)
+                                <span class="file-size">~2.1 MB</span>
+                            </a>
+                        </div>
+                        <div class="platform-requirements">
+                            <small>Intel & Apple Silicon supported</small>
+                        </div>
+                    </div>
+                    
+                    <div class="download-card" data-platform="linux">
+                        <div class="platform-header">
+                            <div class="platform-icon">
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="platform-info">
+                                <h3>Linux</h3>
+                                <p>Ubuntu 18.04+ / CentOS 7+</p>
+                            </div>
+                        </div>
+                        <div class="download-options">
+                            <a href="https://github.com/DEgITx/librats/releases/download/{{VERSION_TAG}}/librats-linux-{{VERSION_TAG}}.zip" class="download-btn primary">
+                                <i class="fas fa-download"></i>
+                                Download .zip
+                                <span class="file-size">~2.3 MB</span>
+                            </a>
+                            <!-- <a href="https://github.com/DEgITx/librats/releases/latest/download/librats-linux-x64.deb" class="download-btn secondary">
+                                <i class="fas fa-box-open"></i>
+                                Debian Package
+                                <span class="file-size">~2.2 MB</span>
+                            </a> -->
+                        </div>
+                        <div class="platform-requirements">
+                            <small>glibc 2.27+ required</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="build-from-source">
+                    <div class="source-card">
+                        <div class="source-header">
+                            <div class="source-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="source-info">
+                                <h3>Build from Source</h3>
+                                <p>Compile librats yourself for maximum compatibility</p>
+                            </div>
+                        </div>
+                        <div class="source-commands">
+                            <div class="command-block">
+                                <pre><code>git clone https://github.com/DEgITx/librats.git
+cd librats
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)</code></pre>
+                                <button class="copy-source-btn" onclick="copySourceCode()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="source-links">
+                            <a href="https://github.com/DEgITx/librats" class="source-link" target="_blank">
+                                <i class="fab fa-github"></i>
+                                View on GitHub
+                            </a>
+                            <a href="#quickstart" class="source-link">
+                                <i class="fas fa-book"></i>
+                                Build Guide
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- <div class="package-managers">
+                    <h3>Package Managers</h3>
+                    <div class="package-grid">
+                        <div class="package-item">
+                            <div class="package-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="package-content">
+                                <h4>vcpkg</h4>
+                                <code>vcpkg install librats</code>
+                            </div>
+                        </div>
+                        <div class="package-item">
+                            <div class="package-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="package-content">
+                                <h4>Conan</h4>
+                                <code>conan install librats/2.1.0@</code>
+                            </div>
+                        </div>
+                        <div class="package-item">
+                            <div class="package-icon">
+                                <i class="fas fa-beer"></i>
+                            </div>
+                            <div class="package-content">
+                                <h4>Homebrew</h4>
+                                <code>brew install librats</code>
+                            </div>
+                        </div>
+                        <div class="package-item">
+                            <div class="package-icon">
+                                <i class="fas fa-archive"></i>
+                            </div>
+                            <div class="package-content">
+                                <h4>AUR</h4>
+                                <code>yay -S librats</code>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Platforms & Language Bindings Section -->
+    <section id="platforms" class="platforms">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Supported Platforms & Language Bindings</h2>
+                <p class="section-subtitle">Cross-platform support with bindings for multiple programming languages</p>
+            </div>
+            
+            <!-- Native C++ Support -->
+            <div class="platform-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>Native C++ Support</h3>
+                        <p>Production-ready implementations across all major platforms</p>
+                    </div>
+                </div>
+                
+                <div class="platform-table-container">
+                    <table class="platform-table">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Build Environment</th>
+                                <th>Compiler</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-windows platform-icon"></i>
+                                        <strong>Windows</strong>
+                                    </div>
+                                </td>
+                                <td>MinGW-w64</td>
+                                <td>GCC 7+</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-windows platform-icon"></i>
+                                        <strong>Windows</strong>
+                                    </div>
+                                </td>
+                                <td>Visual Studio</td>
+                                <td>MSVC 2017+</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-linux platform-icon"></i>
+                                        <strong>Linux</strong>
+                                    </div>
+                                </td>
+                                <td>Native</td>
+                                <td>GCC 7+, Clang 5+</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-apple platform-icon"></i>
+                                        <strong>macOS</strong>
+                                    </div>
+                                </td>
+                                <td>Xcode/Native</td>
+                                <td>Clang 10+</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Language Bindings -->
+            <div class="platform-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>Language Bindings & Wrappers</h3>
+                        <p>Multi-language support for diverse development ecosystems</p>
+                    </div>
+                </div>
+                
+                <div class="platform-table-container">
+                    <table class="platform-table">
+                        <thead>
+                            <tr>
+                                <th>Language/Platform</th>
+                                <th>Binding Type</th>
+                                <th>Status</th>
+                                <th>Timeline</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-cuttlefish platform-icon"></i>
+                                        <strong>C/C++</strong>
+                                    </div>
+                                </td>
+                                <td>Native Library</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline available">Available Now</span>
+                                </td>
+                                <td>Core implementation with full feature set</td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-android platform-icon"></i>
+                                        <strong>Android (NDK)</strong>
+                                    </div>
+                                </td>
+                                <td>Native C++</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline available">Available Now</span>
+                                </td>
+                                <td>Android NDK integration with JNI bindings</td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-java platform-icon"></i>
+                                        <strong>Android (Java)</strong>
+                                    </div>
+                                </td>
+                                <td>JNI Wrapper</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline available">Available Now</span>
+                                </td>
+                                <td>High-level Java API for Android apps</td>
+                            </tr>
+                            <tr class="platform-row planned">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-js-square platform-icon"></i>
+                                        <strong>JavaScript</strong>
+                                    </div>
+                                </td>
+                                <td>Native Module</td>
+                                <td>
+                                    <span class="status-badge planned">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Planned
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline q3-2024">Soon</span>
+                                </td>
+                                <td>Node.js native addon with async/await support</td>
+                            </tr>
+                            <tr class="platform-row supported">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-python platform-icon"></i>
+                                        <strong>Python</strong>
+                                    </div>
+                                </td>
+                                <td>C Extension</td>
+                                <td>
+                                    <span class="status-badge fully-supported">
+                                        <i class="fas fa-check-circle"></i>
+                                        Fully Supported
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline available">Available Now</span>
+                                </td>
+                                <td>CPython extension with asyncio integration</td>
+                            </tr>
+                            <tr class="platform-row planned">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-rust platform-icon"></i>
+                                        <strong>Rust</strong>
+                                    </div>
+                                </td>
+                                <td>FFI Bindings</td>
+                                <td>
+                                    <span class="status-badge planned">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Planned
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline q4-2024">Soon</span>
+                                </td>
+                                <td>Safe Rust bindings with tokio async support</td>
+                            </tr>
+                            <tr class="platform-row future">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-golang platform-icon"></i>
+                                        <strong>Go</strong>
+                                    </div>
+                                </td>
+                                <td>CGO Bindings</td>
+                                <td>
+                                    <span class="status-badge future">
+                                        <i class="fas fa-clock"></i>
+                                        Future
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline future-2025">Soon</span>
+                                </td>
+                                <td>CGO wrapper for Go applications</td>
+                            </tr>
+                            <tr class="platform-row future">
+                                <td>
+                                    <div class="platform-cell">
+                                        <i class="fab fa-microsoft platform-icon"></i>
+                                        <strong>C#/.NET</strong>
+                                    </div>
+                                </td>
+                                <td>P/Invoke</td>
+                                <td>
+                                    <span class="status-badge future">
+                                        <i class="fas fa-clock"></i>
+                                        Future
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="timeline future-2025">Soon</span>
+                                </td>
+                                <td>.NET bindings for Windows/Linux/macOS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Platform Support -->
+            <div class="platform-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>Mobile Platform Support</h3>
+                        <p>Native mobile development for iOS and Android</p>
+                    </div>
+                </div>
+                
+                <div class="mobile-platforms">
+                    <div class="mobile-card supported">
+                        <div class="mobile-header">
+                            <div class="mobile-icon">
+                                <i class="fab fa-android"></i>
+                            </div>
+                            <div class="mobile-info">
+                                <h4>Android</h4>
+                                <p>NDK + JNI Implementation</p>
+                            </div>
+                            <span class="status-badge fully-supported">
+                                <i class="fas fa-check-circle"></i>
+                                Fully Supported
+                            </span>
+                        </div>
+                        <div class="mobile-features">
+                            <ul>
+                                <li><i class="fas fa-check"></i> Full P2P networking</li>
+                                <li><i class="fas fa-check"></i> File transfer</li>
+                                <li><i class="fas fa-check"></i> GossipSub messaging</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-card planned">
+                        <div class="mobile-header">
+                            <div class="mobile-icon">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                            <div class="mobile-info">
+                                <h4>iOS</h4>
+                                <p>Native C++ Implementation</p>
+                            </div>
+                            <span class="status-badge planned">
+                                <i class="fas fa-calendar-alt"></i>
+                                Planned
+                            </span>
+                        </div>
+                        <div class="mobile-features">
+                            <ul>
+                                <li><i class="fas fa-clock"></i> Swift/Objective-C bindings planned</li>
+                                <li><i class="fas fa-clock"></i> Full feature parity with Android</li>
+                                <li><i class="fas fa-clock"></i> App Store compatible</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="framework-support">
+                    <h4>Cross-Platform Mobile Frameworks</h4>
+                    <div class="framework-grid">
+                        <div class="framework-item future">
+                            <div class="framework-icon">
+                                <i class="fab fa-react"></i>
+                            </div>
+                            <div class="framework-content">
+                                <h5>React Native</h5>
+                                <span class="status-badge future">Future</span>
+                            </div>
+                        </div>
+                        <div class="framework-item future">
+                            <div class="framework-icon">
+                                <i class="fas fa-feather-alt"></i>
+                            </div>
+                            <div class="framework-content">
+                                <h5>Flutter</h5>
+                                <span class="status-badge future">Future</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Web Platform Support -->
+            <div class="platform-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>Web Platform Support</h3>
+                        <p>Web and desktop application development</p>
+                    </div>
+                </div>
+                
+                <div class="web-platforms">
+                    <div class="web-card research">
+                        <div class="web-header">
+                            <div class="web-icon">
+                                <i class="fas fa-cube"></i>
+                            </div>
+                            <div class="web-info">
+                                <h4>Browser (WASM)</h4>
+                                <p>WebAssembly Implementation</p>
+                            </div>
+                            <span class="status-badge research">
+                                <i class="fas fa-search"></i>
+                                Research
+                            </span>
+                        </div>
+                        <div class="web-note">
+                            <i class="fas fa-info-circle"></i>
+                            Limited by browser networking APIs
+                        </div>
+                    </div>
+                    
+                    <div class="web-card planned">
+                        <div class="web-header">
+                            <div class="web-icon">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <div class="web-info">
+                                <h4>Electron</h4>
+                                <p>Node.js Module</p>
+                            </div>
+                            <span class="status-badge planned">
+                                <i class="fas fa-calendar-alt"></i>
+                                Planned
+                            </span>
+                        </div>
+                        <div class="web-note">
+                            <i class="fas fa-info-circle"></i>
+                            Desktop app development
+                        </div>
+                    </div>
+                    
+                    <div class="web-card future">
+                        <div class="web-header">
+                            <div class="web-icon">
+                                <i class="fas fa-feather"></i>
+                            </div>
+                            <div class="web-info">
+                                <h4>Tauri</h4>
+                                <p>Rust Bindings</p>
+                            </div>
+                            <span class="status-badge future">
+                                <i class="fas fa-clock"></i>
+                                Future
+                            </span>
+                        </div>
+                        <div class="web-note">
+                            <i class="fas fa-info-circle"></i>
+                            Lightweight desktop apps
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Legend -->
+            <div class="status-legend">
+                <h4>Status Legend</h4>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <span class="status-badge fully-supported">
+                            <i class="fas fa-check-circle"></i>
+                            Fully Supported
+                        </span>
+                        <span class="legend-description">Production-ready with comprehensive testing</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="status-badge in-development">
+                            <i class="fas fa-cog"></i>
+                            In Development
+                        </span>
+                        <span class="legend-description">Active development, preview/beta available</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="status-badge planned">
+                            <i class="fas fa-calendar-alt"></i>
+                            Planned
+                        </span>
+                        <span class="legend-description">Confirmed for development, timeline estimated</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="status-badge future">
+                            <i class="fas fa-clock"></i>
+                            Future
+                        </span>
+                        <span class="legend-description">Under consideration, timeline not confirmed</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="status-badge research">
+                            <i class="fas fa-search"></i>
+                            Research
+                        </span>
+                        <span class="legend-description">Investigating feasibility and implementation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="docs" class="documentation">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Comprehensive Documentation</h2>
+                <p class="section-subtitle">Everything you need to get started and build amazing P2P applications</p>
+            </div>
+            <div class="docs-grid">
+                <a href="NAT_TRAVERSAL.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>NAT Traversal Guide</h3>
+                    <p>Complete documentation for NAT traversal configuration and optimization</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="FILE_TRANSFER_EXAMPLE.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-file-transfer"></i>
+                    </div>
+                    <h3>File Transfer Example</h3>
+                    <p>Efficient P2P file and directory transfer with resume capability</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="MESSAGE_EXCHANGE_API.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Message Exchange API</h3>
+                    <p>Event-driven messaging system with JSON support and callbacks</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="GOSSIPSUB_EXAMPLE.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>GossipSub Example</h3>
+                    <p>Publish-subscribe messaging with mesh networking and topic routing</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="NOISE_ENCRYPTION.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Noise Encryption</h3>
+                    <p>End-to-end encryption details and key management</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+                <a href="CUSTOM_PROTOCOL.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Custom Protocol Setup</h3>
+                    <p>Configure custom protocols and discovery mechanisms</p>
+                    <div class="doc-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="footer-logo">
+                        <img src="logo.png" alt="librats" class="footer-logo-img">
+                        <span class="footer-logo-text">librats</span>
+                    </div>
+                    <p class="footer-description">
+                        High-performance P2P networking library for modern applications
+                    </p>
+                    <div class="footer-badges">
+                        <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+                        <img src="https://img.shields.io/badge/C%2B%2B-17-blue.svg" alt="C++17">
+                        <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status">
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Documentation</h4>
+                        <ul>
+                            <li><a href="#quickstart">Quick Start</a></li>
+                            <li><a href="NAT_TRAVERSAL.md">NAT Traversal</a></li>
+                            <li><a href="FILE_TRANSFER_EXAMPLE.md">File Transfer</a></li>
+                            <li><a href="GOSSIPSUB_EXAMPLE.md">GossipSub</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Community</h4>
+                        <ul>
+                            <li><a href="https://github.com/DEgITx/librats" target="_blank">GitHub</a></li>
+                            <li><a href="https://github.com/DEgITx/librats/issues" target="_blank">Issues</a></li>
+                            <li><a href="https://github.com/DEgITx/librats/discussions" target="_blank">Discussions</a></li>
+                            <li><a href="CONTRIBUTING.md">Contributing</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li><a href="../LICENSE">License</a></li>
+                            <li><a href="#performance">Performance</a></li>
+                            <li><a href="MDNS_DISCOVERY.md">mDNS Discovery</a></li>
+                            <li><a href="BITTORRENT_EXAMPLE.md">BitTorrent</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 librats. Released under the MIT License.</p>
+                <div class="footer-social">
+                    <a href="https://github.com/DEgITx/librats" target="_blank">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile navigation toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }));
+
+        // Code tabs functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                
+                // Remove active class from all buttons and panes
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding pane
+                button.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Copy code functionality
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Show feedback
+                const copyBtn = codeElement.parentElement.querySelector('.copy-btn');
+                const originalContent = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.color = '#10b981';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalContent;
+                    copyBtn.style.color = '';
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroBackground = document.querySelector('.hero-background');
+            if (heroBackground) {
+                heroBackground.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards and metric cards
+        document.querySelectorAll('.feature-card, .metric-card, .doc-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Floating particles animation
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 20 + 10) + 's';
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            document.querySelector('.floating-particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 30000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 3000);
+
+        // Platform detection and highlighting
+        function detectPlatform() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const platform = navigator.platform.toLowerCase();
+            
+            let detectedPlatform = 'linux'; // default
+            
+            if (userAgent.indexOf('win') !== -1 || platform.indexOf('win') !== -1) {
+                detectedPlatform = 'windows';
+            } else if (userAgent.indexOf('mac') !== -1 || platform.indexOf('mac') !== -1) {
+                detectedPlatform = 'macos';
+            }
+            
+            // Highlight detected platform
+            const platformCard = document.querySelector(`[data-platform="${detectedPlatform}"]`);
+            if (platformCard) {
+                platformCard.classList.add('recommended');
+            }
+        }
+
+        // Copy source code functionality
+        function copySourceCode() {
+            const sourceCode = `git clone https://github.com/DEgITx/librats.git
+cd librats
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)`;
+            
+            navigator.clipboard.writeText(sourceCode).then(() => {
+                const copyBtn = document.querySelector('.copy-source-btn');
+                const originalContent = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.color = '#10b981';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalContent;
+                    copyBtn.style.color = '';
+                }, 2000);
+            });
+        }
+
+        // Initialize platform detection when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            detectPlatform();
+            
+            // Add animation to download cards
+            const downloadCards = document.querySelectorAll('.download-card');
+            downloadCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate-in');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# No external dependencies required for basic functionality
+# The library uses only Python standard library and ctypes
+
+# Optional dependencies for development
+# pytest>=6.0
+# pytest-asyncio
+# pytest-cov
+# black
+# flake8
+# mypy

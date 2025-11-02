@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0EF3CE9B-836F-3257-931F-94962827A269}</ProjectGuid>
+    <ProjectName>rats</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Condition="'$(Configuration)'=='Debug'">
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <ClCompile Condition="'$(Configuration)'=='Release'">
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;iphlpapi.lib;bcrypt.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\socket.cpp" />
+    <ClCompile Include="src\network_utils.cpp" />
+    <ClCompile Include="src\dht.cpp" />
+    <ClCompile Include="src\bencode.cpp" />
+    <ClCompile Include="src\bittorrent.cpp" />
+    <ClCompile Include="src\krpc.cpp" />
+    <ClCompile Include="src\librats.cpp" />
+    <ClCompile Include="src\librats_logging.cpp" />
+    <ClCompile Include="src\librats_file_transfer.cpp" />
+    <ClCompile Include="src\librats_gossipsub.cpp" />
+    <ClCompile Include="src\librats_nat.cpp" />
+    <ClCompile Include="src\librats_ice.cpp" />
+    <ClCompile Include="src\librats_mdns.cpp" />
+    <ClCompile Include="src\librats_persistence.cpp" />
+    <ClCompile Include="src\librats_encryption.cpp" />
+    <ClCompile Include="src\librats_c.cpp" />
+    <ClCompile Include="src\sha1.cpp" />
+    <ClCompile Include="src\os.cpp" />
+    <ClCompile Include="src\stun.cpp" />
+    <ClCompile Include="src\ice.cpp" />
+    <ClCompile Include="src\fs.cpp" />
+    <ClCompile Include="src\noise.cpp" />
+    <ClCompile Include="src\encrypted_socket.cpp" />
+    <ClCompile Include="src\mdns.cpp" />
+    <ClCompile Include="src\threadmanager.cpp" />
+    <ClCompile Include="src\gossipsub.cpp" />
+    <ClCompile Include="src\file_transfer.cpp" />
+    <ClCompile Include="src\version.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\socket.h" />
+    <ClInclude Include="src\network_utils.h" />
+    <ClInclude Include="src\dht.h" />
+    <ClInclude Include="src\bencode.h" />
+    <ClInclude Include="src\bittorrent.h" />
+    <ClInclude Include="src\krpc.h" />
+    <ClInclude Include="src\librats.h" />
+    <ClInclude Include="src\librats_c.h" />
+    <ClInclude Include="src\sha1.h" />
+    <ClInclude Include="src\os.h" />
+    <ClInclude Include="src\stun.h" />
+    <ClInclude Include="src\ice.h" />
+    <ClInclude Include="src\fs.h" />
+    <ClInclude Include="src\logger.h" />
+    <ClInclude Include="src\noise.h" />
+    <ClInclude Include="src\encrypted_socket.h" />
+    <ClInclude Include="src\mdns.h" />
+    <ClInclude Include="src\threadmanager.h" />
+    <ClInclude Include="src\gossipsub.h" />
+    <ClInclude Include="src\file_transfer.h" />
+    <ClInclude Include="src\rats_export.h" />
+    <ClInclude Include="src\json.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

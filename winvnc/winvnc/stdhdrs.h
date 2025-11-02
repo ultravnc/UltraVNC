@@ -45,6 +45,8 @@
 #endif
 #endif
 
+#define _HAS_STD_BYTE 0
+
 /*#ifdef _USE_DESKTOPDUPLICATION
 #define _WIN32_WINNT 0x0602
 #ifndef WINVER

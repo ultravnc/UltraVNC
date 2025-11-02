@@ -1,0 +1,194 @@
+name: Android CMake CI
+
+on:
+#  push:
+#    branches: [main, master]
+#  pull_request:
+#    branches: [main, master]
+  release:
+    types: [created]
+
+jobs:
+  android-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [arm32, arm64]
+        build-type: [Release]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential wget unzip
+
+      - name: Install latest CMake
+        run: |
+          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+          sudo apt-get update
+          sudo apt-get install -y cmake
+
+      - name: Setup Android SDK and NDK
+        run: |
+          # Create shared directory structure
+          mkdir -p $HOME/shared
+          cd $HOME/shared
+
+          # Download and setup Android command line tools
+          CMD_TOOLS_ZIP=commandlinetools-linux-11076708_latest.zip
+          wget https://dl.google.com/android/repository/$CMD_TOOLS_ZIP
+          mkdir -p SDK
+          unzip -d SDK/cmdline-tools $CMD_TOOLS_ZIP
+          mv SDK/cmdline-tools/cmdline-tools SDK/cmdline-tools/latest
+
+          # Setup environment variables
+          export ANDROID_HOME=$HOME/shared/SDK
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
+          export SDK_MANAGER=${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager
+
+          # Accept licenses and install Android SDK components
+          yes | ${SDK_MANAGER} --licenses
+          ${SDK_MANAGER} --install "platforms;android-35"
+          ${SDK_MANAGER} --install "build-tools;36.0.0"
+          ${SDK_MANAGER} --install "ndk;27.2.12479018"
+
+          # Download and install Gradle
+          wget https://services.gradle.org/distributions/gradle-8.11.1-bin.zip
+          unzip -d gradle gradle-8.11.1-bin.zip
+
+          # Make paths available to subsequent steps
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
+          echo "$ANDROID_SDK_ROOT/build-tools/36.0.0" >> $GITHUB_PATH
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$ANDROID_NDK_ROOT" >> $GITHUB_PATH
+          echo "$HOME/shared/gradle/gradle-8.11.1/bin" >> $GITHUB_PATH
+
+      - name: Set Android architecture variables
+        run: |
+          if [ "${{ matrix.arch }}" = "arm32" ]; then
+            echo "TARGET=armv7a-linux-androideabi" >> $GITHUB_ENV
+            echo "ANDROID_ABI=armeabi-v7a" >> $GITHUB_ENV
+            echo "ARCH_NAME=arm32" >> $GITHUB_ENV
+          else
+            echo "TARGET=aarch64-linux-android" >> $GITHUB_ENV
+            echo "ANDROID_ABI=arm64-v8a" >> $GITHUB_ENV
+            echo "ARCH_NAME=arm64" >> $GITHUB_ENV
+          fi
+          echo "API=29" >> $GITHUB_ENV
+
+      - name: Setup Android toolchain environment
+        run: |
+          export NDK=$ANDROID_NDK_ROOT
+          export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64
+          export SYSROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+
+          # Set toolchain variables
+          echo "NDK=$NDK" >> $GITHUB_ENV
+          echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
+          echo "SYSROOT=$SYSROOT" >> $GITHUB_ENV
+          echo "CROSS_SYSROOT=$SYSROOT" >> $GITHUB_ENV
+
+          # Set compiler and tools
+          echo "AR=$TOOLCHAIN/bin/llvm-ar" >> $GITHUB_ENV
+          echo "AS=$TOOLCHAIN/bin/llvm-as" >> $GITHUB_ENV
+          echo "CC=$TOOLCHAIN/bin/$TARGET$API-clang" >> $GITHUB_ENV
+          echo "CXX=$TOOLCHAIN/bin/$TARGET$API-clang++" >> $GITHUB_ENV
+          echo "LD=$TOOLCHAIN/bin/ld" >> $GITHUB_ENV
+          echo "NM=$TOOLCHAIN/bin/llvm-nm" >> $GITHUB_ENV
+          echo "RANLIB=$TOOLCHAIN/bin/llvm-ranlib" >> $GITHUB_ENV
+          echo "OBJDUMP=$TOOLCHAIN/bin/llvm-objdump" >> $GITHUB_ENV
+          echo "STRIP=$TOOLCHAIN/bin/llvm-strip" >> $GITHUB_ENV
+
+          # Set compiler flags
+          CFLAGS="-Wno-error=int-conversion -DNDKDOCKER"
+          CPPFLAGS="-Wno-error=int-conversion -DNDKDOCKER"
+          echo "CFLAGS=$CFLAGS" >> $GITHUB_ENV
+          echo "CPPFLAGS=$CPPFLAGS" >> $GITHUB_ENV
+
+      - name: Configure CMake for Android
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} \
+            -DRATS_CROSSCOMPILING=ON
+
+      - name: Build
+        run: |
+          cmake --build build --config ${{ matrix.build-type }} --parallel
+
+      - name: Build Android AAR
+        if: matrix.arch == 'arm64'
+        run: |
+          cd android
+          gradle assembleRelease assembleDebug --no-daemon --stacktrace
+
+      - name: Prepare artifacts
+        if: matrix.build-type == 'Release'
+        run: |
+          mkdir -p artifacts/android-${{ env.ARCH_NAME }}/include
+          mkdir -p artifacts/android-${{ env.ARCH_NAME }}/aar
+          
+          # Copy binaries and libraries based on what's actually built
+          if [ -d "build/bin" ]; then
+            cp build/bin/* artifacts/android-${{ env.ARCH_NAME }}/ 2>/dev/null || true
+          fi
+          if [ -d "build/lib" ]; then
+            cp build/lib/* artifacts/android-${{ env.ARCH_NAME }}/ 2>/dev/null || true
+          fi
+          
+          # Copy headers if they exist
+          if [ -d "src" ]; then
+            cp src/*.h artifacts/android-${{ env.ARCH_NAME }}/include/ 2>/dev/null || true
+          fi
+          if [ -d "include" ]; then
+            cp include/*.h artifacts/android-${{ env.ARCH_NAME }}/include/ 2>/dev/null || true
+          fi
+          
+          # Copy AAR files (only for arm64 build since it contains all ABIs)
+          if [ "${{ matrix.arch }}" = "arm64" ] && [ -d "android/build/outputs/aar" ]; then
+            for aar in android/build/outputs/aar/*.aar; do
+              if [ -f "$aar" ]; then
+                aar_name=$(basename "$aar" .aar)
+                cp "$aar" "artifacts/android-${{ env.ARCH_NAME }}/aar/${aar_name}.aar"
+              fi
+            done
+          fi
+          
+          cd artifacts
+          if [ "${{ github.event_name }}" == "release" ]; then
+            VERSION=${{ github.ref_name }}
+            zip -r librats-android-${{ env.ARCH_NAME }}-${VERSION}.zip android-${{ env.ARCH_NAME }}/
+          else
+            zip -r librats-android-${{ env.ARCH_NAME }}.zip android-${{ env.ARCH_NAME }}/
+          fi
+
+      - name: Upload artifacts
+        if: matrix.build-type == 'Release' && github.event_name != 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: librats-android-${{ env.ARCH_NAME }}-${{ github.sha }}
+          path: artifacts/android-${{ env.ARCH_NAME }}/
+          retention-days: 30
+
+      - name: Upload to Release
+        if: matrix.build-type == 'Release' && github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/librats-android-${{ env.ARCH_NAME }}-${{ github.ref_name }}.zip
+            artifacts/android-${{ env.ARCH_NAME }}/aar/librats-release.aar
+            artifacts/android-${{ env.ARCH_NAME }}/aar/librats-debug.aar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

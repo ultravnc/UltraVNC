@@ -55,6 +55,9 @@ class VirtualDisplay;
 #include "stdhdrs.h"
 #include <omnithread.h>
 #include <list>
+#include <thread>
+#include <string>
+#include <memory>
 
 // adzm - 2010-07 - Extended clipboard
 #include "common/Clipboard.h"
@@ -154,6 +157,13 @@ public:
 
 	virtual void ShutdownServer();
 	HANDLE retryThreadHandle;
+	
+	// VNC Bridge methods
+	virtual BOOL StartBridge();
+	virtual void StopBridge();
+	virtual const char* GetDiscoveryCode();
+	virtual BOOL IsBridgeRunning();
+	virtual void UpdateBridgeSettings(); // Handle settings changes
 
 protected:
 	// Send a notification message
@@ -279,13 +289,6 @@ public:
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 
-
-	void cloudConnect(bool start, char* cloudServer);
-	bool isCloudThreadRunning();
-	char* getExternalIpAddress();
-	int getStatus();
-	void setVNcPort();
-
 protected:
 	// The vncServer UpdateTracker class
 	// Behaves like a standard UpdateTracker, but propagates update
@@ -370,6 +373,12 @@ protected:
 	bool KillAuthClientsBuzy;	
 	BOOL sethook;
 	CloudThread* cloudThread;
+	
+	// VNC Bridge support
+	std::unique_ptr<class VncBridge> m_bridge;
+	std::unique_ptr<std::thread> m_bridge_thread;
+	bool m_bridge_running;
+	std::string m_discovery_code;
 };
 
 #endif

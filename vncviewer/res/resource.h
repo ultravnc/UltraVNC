@@ -82,10 +82,7 @@
 #define IDD_SAVEIMAGE                   216
 #define IDB_EXPAND                      218
 #define IDB_COLLAPS                     219
-#define IDB_GREEN                       229
-#define IDB_RED                         230
 #define IDB_BITMAP1                     231
-#define IDB_YELLOW                      231
 #define IDB_CHAT                        238
 #define IDB_BITMAP8                     240
 #define IDB_FT                          240
@@ -270,6 +267,7 @@
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
 #define IDC_RADIO_NOVIRT                1185
+#define IDC_RADIOBRIDGE                 1185
 #define IDC_HIDEENDOFSTREAMERROR        1186
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
@@ -333,6 +331,8 @@
 #define IDC_RED                         2065
 #define IDC_YELLOW                      2066
 #define IDC_GNOME                       2067
+#define IDC_GREEN2                      2067
+#define IDC_ORANGE                      2067
 #define IDC_CATCHPHRASE                 2068
 #define IDC_SIGNATURE                   2069
 #define IDC_ABOUT                       2070
@@ -670,7 +670,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        241
+#define _APS_NEXT_RESOURCE_VALUE        242
 #define _APS_NEXT_COMMAND_VALUE         50025
 #define _APS_NEXT_CONTROL_VALUE         2083
 #define _APS_NEXT_SYMED_VALUE           154

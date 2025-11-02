@@ -189,7 +189,7 @@ void SessionDialog::SaveToFile(char *fname, bool asDefault)
 	saveInt("EnableZstd",			fEnableZstd, fname);
 	saveInt("QuickOption",			quickoption,	fname);
 	saveInt("UseDSMPlugin",			fUseDSMPlugin,	fname);
-	saveInt("UseProxy",				m_fUseProxy,	fname);
+	saveInt("UseProxy",				(int)m_connectionType,	fname);
 	saveInt("allowMonitorSpanning", allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", changeServerRes, fname);
 	saveInt("extendDisplay", extendDisplay, fname);
@@ -283,7 +283,7 @@ void SessionDialog::LoadFromFile(char *fname)
   fEnableZstd =			readInt("EnableZstd",		fEnableZstd, fname);
   quickoption  =		readInt("QuickOption",		quickoption, fname);
   fUseDSMPlugin =		readInt("UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
-  m_fUseProxy =			readInt("UseProxy",			m_fUseProxy, fname) != 0;
+  m_connectionType =			(ConnectionType)readInt("UseProxy",			(int)m_connectionType, fname);
   allowMonitorSpanning = readInt("allowMonitorSpanning", allowMonitorSpanning, fname);
   changeServerRes = readInt("ChangeServerRes", changeServerRes, fname);
   extendDisplay = readInt("extendDisplay", extendDisplay, fname);

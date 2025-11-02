@@ -80,7 +80,6 @@
     <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
     <ClCompile Include="ScSelect.cpp" />
     <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
     <ClCompile Include="UdpEchoServer.cpp" />
     <ClCompile Include="..\..\common\Hyperlinks.cpp" />
@@ -272,9 +271,6 @@
     </ClInclude>
     <ClInclude Include="ScSelect.h" />
     <ClInclude Include="cadthread.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="CloudDialog.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="credentials.h">

@@ -1,0 +1,225 @@
+# Build directories
+build/
+build2/
+cmake-build-*/
+out/
+bin/
+lib/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Native Visual Studio project (not CMake-generated)
+win32/
+!rats_native.vcxproj
+
+# C++ artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+
+# Compiled Dynamic libraries
+*.so.*
+*.dylib.*
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Visual Studio
+.vs/
+*.vcxproj
+!rats_native.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.ncb
+*.aps
+*.plg
+*.opt
+*.clw
+*.user
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.rsp
+*.pgc
+*.pgd
+*.meta
+*.tlog
+*.manifest
+*.res
+*.pch
+*.sbr
+*.bsc
+*.unsuccessfulbuild
+ipch/
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Code::Blocks
+*.cbp
+*.layout
+*.depend
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Ninja
+.ninja_deps
+.ninja_log
+
+# Conan
+conanfile.txt.user
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+
+# Package managers
+*.vcpkg
+.conan/
+
+# Testing
+Testing/
+test_results/
+googletest/
+catch2/
+
+# Documentation
+docs/build/
+docs/_build/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# Core dumps
+core
+*.core
+
+# GDB
+.gdb_history
+
+# Valgrind
+*.memcheck
+*.helgrind
+*.callgrind
+*.massif
+
+# Profiling
+*.prof
+*.gprof
+
+# Coverage
+*.gcov
+*.gcda
+*.gcno
+coverage/
+lcov/
+*.info
+
+# Doxygen
+html/
+latex/
+man/
+rtf/
+
+# Node.js (if using any JS build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log* 
