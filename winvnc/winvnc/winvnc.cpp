@@ -42,6 +42,7 @@
 #include <shlobj.h>
 #include <fstream>
 #include <direct.h>
+#include <errno.h>
 #include "credentials.h"
 
 #pragma comment (lib, "comctl32")
@@ -54,6 +55,10 @@ char configFile[256] = { 0 };
 int configfileskip = 0;
 bool showSettings = false;
 char winvncFolder[MAX_PATH];
+
+// Constants for portable mode and configuration
+const char* PORTABLE_MARKER_FILE = "ultravnc.portable";
+const char* CONFIG_SUBFOLDER = "\\UltraVNC";
 
 //adzm 2009-06-20
 char* g_szRepeaterHost = NULL;
@@ -205,6 +210,80 @@ void replaceFilename(char* path, const char* newFilename) {
 	}
 }
 
+// Check if running in portable mode
+// Portable mode is detected by the presence of "ultravnc.portable" file in the application folder
+bool IsPortableMode(const char* appFolder) {
+	char portableMarker[MAX_PATH]{};
+	strcpy_s(portableMarker, appFolder);
+	strcat_s(portableMarker, "\\");
+	strcat_s(portableMarker, PORTABLE_MARKER_FILE);
+	
+	// Check if marker file exists
+	std::ifstream markerFile(portableMarker);
+	bool isPortable = markerFile.good();
+	markerFile.close();
+	
+	if (isPortable) {
+		vnclog.Print(LL_LOGSCREEN, "Portable mode detected (marker file: %s)", portableMarker);
+	}
+	
+	return isPortable;
+}
+
+// Migrate INI file from install folder to ProgramData
+// Returns true if migration was performed or file already exists in target
+bool MigrateIniToProgramData(const char* installFolderPath, const char* programDataPath) {
+	char sourceIni[MAX_PATH]{};
+	char targetIni[MAX_PATH]{};
+	char targetFolder[MAX_PATH]{};
+
+	// Build paths
+	strcpy_s(sourceIni, installFolderPath);
+	strcat_s(sourceIni, "\\");
+	strcat_s(sourceIni, INIFILE_NAME);
+
+	strcpy_s(targetIni, programDataPath);
+	strcat_s(targetIni, CONFIG_SUBFOLDER);
+	strcpy_s(targetFolder, targetIni);
+	strcat_s(targetIni, "\\");
+	strcat_s(targetIni, INIFILE_NAME);
+
+	// Check if target already exists
+	std::ifstream targetFile(targetIni);
+	if (targetFile.good()) {
+		targetFile.close();
+		vnclog.Print(LL_LOGSCREEN, "Config already exists in ProgramData: %s", targetIni);
+		return true;
+	}
+	targetFile.close();
+
+	// Check if source exists
+	std::ifstream sourceFile(sourceIni);
+	if (!sourceFile.good()) {
+		sourceFile.close();
+		vnclog.Print(LL_LOGSCREEN, "No config to migrate from install folder: %s", sourceIni);
+		return false;
+	}
+	sourceFile.close();
+
+	// Create target directory if it doesn't exist
+	if (_mkdir(targetFolder) != 0 && errno != EEXIST) {
+		vnclog.Print(LL_LOGSCREEN, "Failed to create target directory: %s (errno: %d)", targetFolder, errno);
+		return false;
+	}
+
+	// Copy the file
+	if (CopyFileA(sourceIni, targetIni, FALSE)) {
+		vnclog.Print(LL_LOGSCREEN, "Migrated config from %s to %s", sourceIni, targetIni);
+		return true;
+	}
+	else {
+		DWORD error = GetLastError();
+		vnclog.Print(LL_LOGSCREEN, "Failed to migrate config (error %d): %s -> %s", error, sourceIni, targetIni);
+		return false;
+	}
+}
+
 void extractConfig(char* szCmdLine)
 {
 	size_t i = 0;
@@ -257,67 +336,89 @@ void extractConfig(char* szCmdLine)
 		i++;
 	}
 	if (strlen(configFile) == 0) {
+		char programdataPath[MAX_PATH]{};
+		char programdataFolder[MAX_PATH]{};
+		char programdataIni[MAX_PATH]{};
 		char appdataPath[MAX_PATH]{};
 		char appdataFolder[MAX_PATH]{};
-		char programdataPath[MAX_PATH]{};
-		char szCurrentDir[MAX_PATH]{};
-		strcpy_s(szCurrentDir, winvncFolder);		
-		strcat_s(szCurrentDir, "\\");
-		strcat_s(szCurrentDir, INIFILE_NAME);
+		char appdataIni[MAX_PATH]{};
 #ifndef SC_20
-		SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
-		SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
-		SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataFolder);
-		strcat_s(programdataPath, "\\UltraVNC");
-		strcat_s(programdataPath, "\\");
-		strcat_s(programdataPath, INIFILE_NAME);
-		strcat_s(appdataPath, "\\UltraVNC");
-		strcat_s(appdataPath, "\\");
-		strcat_s(appdataPath, INIFILE_NAME);
-
-
-		std::ifstream file;
-		file.open(appdataPath);
-		if (file.good()) {
-			strcpy_s(configFile, appdataPath);
+		// Check if running in portable mode
+		if (IsPortableMode(winvncFolder)) {
+			// Portable mode: Use install folder for config
+			strcpy_s(configFile, winvncFolder);
+			strcat_s(configFile, "\\");
+			strcat_s(configFile, INIFILE_NAME);
 			showSettings = true;
-			vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
+			vnclog.Print(LL_LOGSCREEN, "Portable mode: Using config file: %s", configFile);
 		}
 		else {
-			file.clear();
-			vnclog.Print(LL_LOGSCREEN, "config file not found %s", appdataPath);
-			file.open(programdataPath);
-			if (file.good()) {
-				strcpy_s(configFile, programdataPath);
-				//only admins can edit programdata
-				showSettings = Credentials::RunningAsAdministrator(false);
-				vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
-			}
-			else {
-				file.clear();
-				vnclog.Print(LL_LOGSCREEN, "config file not found %s", programdataPath);
-				file.open(szCurrentDir);
+			// Hybrid mode: LocalAppData (user-specific) → ProgramData (shared fallback)
+			
+			// Get LocalAppData path (user-specific)
+			SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
+			strcpy_s(appdataFolder, appdataPath);
+			strcat_s(appdataFolder, CONFIG_SUBFOLDER);
+			strcpy_s(appdataIni, appdataFolder);
+			strcat_s(appdataIni, "\\");
+			strcat_s(appdataIni, INIFILE_NAME);
+			
+			// Get ProgramData path (system-wide)
+			SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
+			strcpy_s(programdataFolder, programdataPath);
+			strcat_s(programdataFolder, CONFIG_SUBFOLDER);
+			strcpy_s(programdataIni, programdataFolder);
+			strcat_s(programdataIni, "\\");
+			strcat_s(programdataIni, INIFILE_NAME);
+
+			// Attempt to migrate from install folder to ProgramData (one-time)
+			MigrateIniToProgramData(winvncFolder, programdataPath);
+
+			// Priority: LocalAppData → ProgramData
+			// Check for user-specific config first
+			{
+				std::ifstream file(appdataIni);
 				if (file.good()) {
-					strcpy_s(configFile, szCurrentDir);
-					showSettings = true;
-					vnclog.Print(LL_LOGSCREEN, "using config file %s", configFile);
+					// User has personal config in LocalAppData
+					strcpy_s(configFile, appdataIni);
+					showSettings = true;  // Users can always edit their own AppData
+					vnclog.Print(LL_LOGSCREEN, "Using user config: %s", configFile);
+				}
+			}
+			
+			// If no user config, check for shared ProgramData config
+			if (strlen(configFile) == 0) {
+				std::ifstream file(programdataIni);
+				if (file.good()) {
+					// Fallback to ProgramData (shared config)
+					strcpy_s(configFile, programdataIni);
+					// Only admins can edit ProgramData
+					showSettings = Credentials::RunningAsAdministrator(false);
+					vnclog.Print(LL_LOGSCREEN, "Using shared config: %s (read-only for non-admins)", configFile);
 				}
 				else {
-					//nothing found, default to appdata
-					vnclog.Print(LL_LOGSCREEN, "config file not found %s", szCurrentDir);
-					strcpy_s(configFile, appdataPath);
-					_mkdir(appdataFolder);
-					vnclog.Print(LL_LOGSCREEN, "creating config file %s", configFile);
-					showSettings = true;
+					// No config found, create in ProgramData
+					vnclog.Print(LL_LOGSCREEN, "No config found, creating shared config: %s", programdataIni);
+					if (_mkdir(programdataFolder) != 0 && errno != EEXIST) {
+						vnclog.Print(LL_LOGSCREEN, "Warning: Failed to create ProgramData folder: %s (errno: %d)", programdataFolder, errno);
+					}
+					strcpy_s(configFile, programdataIni);
+					// Only admins can edit ProgramData
+					showSettings = Credentials::RunningAsAdministrator(false);
 				}
 			}
 		}
 #else
-		strcpy_s(configFile, szCurrentDir);
+		// SC_20 mode: Use install folder
+		strcpy_s(configFile, winvncFolder);
+		strcat_s(configFile, "\\");
+		strcat_s(configFile, INIFILE_NAME);
+		showSettings = true;
 #endif
 	}
 	else {
-		showSettings = true; // service
+		// Explicit config file specified via command line
+		showSettings = true;
 	}
 	char logFile[MAX_PATH];
 	strcpy(logFile, configFile);
