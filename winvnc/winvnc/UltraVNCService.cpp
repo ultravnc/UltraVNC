@@ -19,6 +19,7 @@
 #include <userenv.h>
 #include <shlobj.h>
 #include <direct.h>
+#include <errno.h>
 #include <fstream>
 
 
@@ -40,14 +41,81 @@ char UltraVNCService::configfilename[MAX_PATH] = "";
 char UltraVNCService::inifile[MAX_PATH] = "";
 IniFile UltraVNCService::iniFileService;
 
+// Constants for portable mode and configuration
+const char* SERVICE_PORTABLE_MARKER_FILE = "ultravnc.portable";
+const char* SERVICE_CONFIG_SUBFOLDER = "\\UltraVNC";
+
 void GetServiceExecutablePath(char* path, size_t size) {
 	if (GetModuleFileName(NULL, path, static_cast<DWORD>(size)))
 	{
 		char* p = strrchr(path, '\\');
-		*p = '\0';
+		if (p) *p = '\0';
 	}
 	else
-		path = '\0';
+		path[0] = '\0';
+}
+
+// Check if running in portable mode (service version)
+// Portable mode is detected by the presence of "ultravnc.portable" file in the application folder
+bool IsServicePortableMode(const char* appFolder) {
+	char portableMarker[MAX_PATH]{};
+	strcpy_s(portableMarker, appFolder);
+	strcat_s(portableMarker, "\\");
+	strcat_s(portableMarker, SERVICE_PORTABLE_MARKER_FILE);
+	
+	// Check if marker file exists
+	std::ifstream markerFile(portableMarker);
+	bool isPortable = markerFile.good();
+	markerFile.close();
+	
+	return isPortable;
+}
+
+// Migrate INI file from install folder to ProgramData (service version)
+// Returns true if migration was performed or file already exists in target
+bool MigrateServiceIniToProgramData(const char* installFolderPath, const char* programDataPath, const char* configFileName) {
+	char sourceIni[MAX_PATH]{};
+	char targetIni[MAX_PATH]{};
+	char targetFolder[MAX_PATH]{};
+
+	// Build paths
+	strcpy_s(sourceIni, installFolderPath);
+	strcat_s(sourceIni, "\\");
+	strcat_s(sourceIni, configFileName);
+
+	strcpy_s(targetIni, programDataPath);
+	strcat_s(targetIni, SERVICE_CONFIG_SUBFOLDER);
+	strcpy_s(targetFolder, targetIni);
+	strcat_s(targetIni, "\\");
+	strcat_s(targetIni, configFileName);
+
+	// Check if target already exists
+	std::ifstream targetFile(targetIni);
+	if (targetFile.good()) {
+		targetFile.close();
+		return true;
+	}
+	targetFile.close();
+
+	// Check if source exists
+	std::ifstream sourceFile(sourceIni);
+	if (!sourceFile.good()) {
+		sourceFile.close();
+		return false;
+	}
+	sourceFile.close();
+
+	// Create target directory if it doesn't exist
+	if (_mkdir(targetFolder) != 0 && errno != EEXIST) {
+		// Directory creation failed, but continue to try copying anyway
+		// in case the directory exists but _mkdir still failed
+	}
+
+	// Copy the file
+	if (CopyFileA(sourceIni, targetIni, FALSE)) {
+		return true;
+	}
+	return false;
 }
 
 UltraVNCService::UltraVNCService()
@@ -75,20 +143,42 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 	}
 
 	char programdataPath[MAX_PATH]{};
-	char currentFolder[MAX_PATH]{};
-	HRESULT result = SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
-	strcpy_s(inifile, "");
-	strcat_s(inifile, programdataPath);
-	strcat_s(inifile, "\\UltraVNC");
-	strcat_s(inifile, "\\");
-	strcat_s(inifile, configfilename);
-	std::ifstream file(inifile);
-	if (!file.good()) {
-		GetServiceExecutablePath(currentFolder, MAX_PATH);
-		strcpy_s(inifile, "");
-		strcat_s(inifile, currentFolder);
+	char programdataFolder[MAX_PATH]{};
+	char installFolder[MAX_PATH]{};
+	
+	// Get install folder
+	GetServiceExecutablePath(installFolder, MAX_PATH);
+	
+	// Check if running in portable mode
+	if (IsServicePortableMode(installFolder)) {
+		// Portable mode: Use install folder for config
+		strcpy_s(inifile, installFolder);
 		strcat_s(inifile, "\\");
-		strcat_s(inifile, "ultravnc.ini");
+		strcat_s(inifile, configfilename);
+	}
+	else {
+		// Standard mode: Use ProgramData for shared configuration
+		// Get ProgramData path
+		SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
+		
+		// Attempt to migrate from install folder to ProgramData
+		MigrateServiceIniToProgramData(installFolder, programdataPath, configfilename);
+		
+		// Build ProgramData INI path
+		strcpy_s(programdataFolder, programdataPath);
+		strcat_s(programdataFolder, SERVICE_CONFIG_SUBFOLDER);
+		strcpy_s(inifile, programdataFolder);
+		strcat_s(inifile, "\\");
+		strcat_s(inifile, configfilename);
+		
+		// Check if config exists, create folder if needed
+		std::ifstream file(inifile);
+		if (!file.good()) {
+			// Config doesn't exist, ensure directory exists
+			if (_mkdir(programdataFolder) != 0 && errno != EEXIST) {
+				// Failed to create directory, continue anyway
+			}
+		}
 	}
 
 	iniFileService.setIniFile(inifile);
