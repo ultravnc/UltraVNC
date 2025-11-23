@@ -328,7 +328,8 @@ void TextChat::SendLocalText(void)
 //
 int TextChat::DoDialog()
 {
- 	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_TEXTCHAT_DLG), 
+	extern HINSTANCE m_hInstResDLL;
+ 	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_TEXTCHAT_DLG), 
 							NULL, (DLGPROC) TextChatDlgProc, (LONG_PTR) this);
 }
 
@@ -478,7 +479,7 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 				if (_this->m_szRemoteText)
 				if (!_this->m_pCC->m_fUsePlugin)
 				{
-					if (LoadString(_this->m_pApp->m_instance, IDS_WARNING, _this->m_szRemoteText, TEXTMAXSIZE -1) )
+					if (LoadString(m_hInstResDLL, IDS_WARNING, _this->m_szRemoteText, TEXTMAXSIZE -1) )
 						_this->PrintMessage(_this->m_szRemoteText, NULL ,GREY);
 				}
 			}

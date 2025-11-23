@@ -75,6 +75,15 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE:
 			return FALSE;
 		case WM_DESTROY:
+			// Free language combobox item data
+			if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
+				HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+				int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+				for (int i = 0; i < count; i++) {
+					char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
+					if (langCode) free(langCode);
+				}
+			}
 			EndDialog(hwnd, FALSE);
 			return TRUE;
 	}
@@ -874,6 +883,90 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_SEC))
 		SendMessage(GetDlgItem(hwnd, IDC_SEC), BM_SETCHECK, settings->getSecondary(), 0);
 
+	// Initialize language combobox by scanning languages folder for DLLs
+	if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
+		HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+		SendMessage(hCombo, CB_RESETCONTENT, 0, 0);
+		
+		// Add English as default (always available, no DLL needed)
+		int idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)"English");
+		SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup("en"));
+		
+		// Get exe path to find languages folder
+		char exePath[MAX_PATH];
+		char languagesPath[MAX_PATH];
+		char dllPath[MAX_PATH];
+		GetModuleFileName(NULL, exePath, MAX_PATH);
+		char* lastSlash = strrchr(exePath, '\\');
+		if (lastSlash) *lastSlash = '\0';
+		
+		// Search for winvnclang_*.dll in languages subfolder
+		sprintf_s(languagesPath, "%s\\languages\\winvnclang_*.dll", exePath);
+		
+		WIN32_FIND_DATA findData;
+		HANDLE hFind = FindFirstFile(languagesPath, &findData);
+		
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				// Extract language code from filename (winvnclang_XX.dll)
+				char* underscore = strstr(findData.cFileName, "_");
+				char* dot = strstr(findData.cFileName, ".");
+				
+				if (underscore && dot && dot > underscore) {
+					char langCode[32] = {0};
+					size_t len = (size_t)(dot - underscore - 1);
+					if (len > 31) len = 31;
+					strncpy_s(langCode, underscore + 1, len);
+					
+					// Build full path to DLL
+					sprintf_s(dllPath, "%s\\languages\\%s", exePath, findData.cFileName);
+					
+					// Load DLL temporarily to read language name
+					HMODULE hLangDll = LoadLibraryEx(dllPath, NULL, LOAD_LIBRARY_AS_DATAFILE);
+					char displayName[64] = {0};
+					
+					if (hLangDll) {
+						// Try to load IDS_LANGUAGE_NAME string resource from DLL
+						if (LoadString(hLangDll, IDS_LANGUAGE_NAME, displayName, sizeof(displayName)) > 0) {
+							// Successfully loaded language name from DLL
+							idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+						}
+						else {
+							// Fallback: use language code if string not found
+							sprintf_s(displayName, "Language (%s)", langCode);
+							idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+						}
+						FreeLibrary(hLangDll);
+					}
+					else {
+						// DLL couldn't be loaded, use code as fallback
+						sprintf_s(displayName, "Language (%s)", langCode);
+						idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+						SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+					}
+				}
+			} while (FindNextFile(hFind, &findData));
+			FindClose(hFind);
+		}
+		
+		// Select current language
+		const char* currentLang = settings->getLanguage();
+		int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+		for (int i = 0; i < count; i++) {
+			char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
+			if (langCode && _stricmp(langCode, currentLang) == 0) {
+				SendMessage(hCombo, CB_SETCURSEL, i, 0);
+				break;
+			}
+		}
+		// If no match found, select English (index 0)
+		if (SendMessage(hCombo, CB_GETCURSEL, 0, 0) == CB_ERR) {
+			SendMessage(hCombo, CB_SETCURSEL, 0, 0);
+		}
+	}
+
 	SetForegroundWindow(hwnd);
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), false);
 
@@ -1633,6 +1726,18 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		settings->setPrimary(SendMessage(GetDlgItem(hwnd, IDC_PRIM), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	if (GetDlgItem(hwnd, IDC_SEC))
 		settings->setSecondary(SendMessage(GetDlgItem(hwnd, IDC_SEC), BM_GETCHECK, 0, 0) == BST_CHECKED);
+
+	// Save language setting (restart required for changes to take effect)
+	if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
+		HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+		int sel = (int)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+		if (sel >= 0) {
+			char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, sel, 0);
+			if (langCode) {
+				settings->setLanguage(langCode);
+			}
+		}
+	}
 
 	if (GetDlgItem(hwnd, IDC_MAXCPU)) {
 		int maxcpu = GetDlgItemInt(hwnd, IDC_MAXCPU, NULL, FALSE);

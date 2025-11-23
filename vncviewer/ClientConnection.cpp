@@ -589,10 +589,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_SavedAreaBIB=NULL;
     m_bClosedByUser = false;
     m_server_wants_keepalives = false;
-	hbmToolbig = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolsmall = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolbigX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolsmallX = (HBITMAP)LoadImage(m_pApp->m_instance, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolbig = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmall = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolbigX = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmallX = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	rcth=NULL;
 
 	// adzm - 2010-07 - Extended clipboard
@@ -1057,7 +1057,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE| TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
-				,(HINSTANCE)m_pApp->m_instance
+				,(HINSTANCE)m_hInstResDLL
 				,minibuttonmap
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
@@ -1075,7 +1075,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
-				,(HINSTANCE)m_pApp->m_instance
+				,(HINSTANCE)m_hInstResDLL
 				,buttonmap
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
@@ -1087,7 +1087,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		}
 		}
 
-		tbab.hInst = m_pApp->m_instance;
+		tbab.hInst = m_hInstResDLL;
 		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
 		RECT tbrect;
@@ -1108,7 +1108,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			CW_USEDEFAULT,
 			NULL,
 			(HMENU)NULL,
-			(HINSTANCE)m_pApp->m_instance,
+			(HINSTANCE)m_hInstResDLL,
 			NULL);
 		
         // 6 May 2008 jdp make topmost so they display in fullscreen mode
@@ -1121,7 +1121,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				ti.cbSize = sizeof(TOOLINFO);
 				ti.uFlags = 0 ;
 				ti.hwnd = m_hwndTB;
-				ti.hinst = m_pApp->m_instance;
+				ti.hinst = m_hInstResDLL;
 				ti.uId = (UINT) id;
 				ti.lpszText = (LPSTR) szTips[id++];
 				ti.rect.left = col * buttonWidth;
@@ -1188,7 +1188,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
-				,(HINSTANCE)m_pApp->m_instance
+				,(HINSTANCE)m_hInstResDLL
 				,IDB_BITMAPs
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
@@ -1206,7 +1206,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
 				,nr_buttons
-				,(HINSTANCE)m_pApp->m_instance
+				,(HINSTANCE)m_hInstResDLL
 				,IDB_BITMAPl
 				,(LPCTBBUTTON)&tbButtons
 				,nr_buttons
@@ -1217,7 +1217,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				,sizeof(TBBUTTON));
 		}
 
-		tbab.hInst = m_pApp->m_instance;
+		tbab.hInst = m_hInstResDLL;
 		tbab.nID = IDB_BITMAPl;
 		stdidx = SendMessage(m_hwndTB,TB_ADDBITMAP,6,(LPARAM)&tbab);
 		RECT tbrect;
@@ -1238,7 +1238,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			CW_USEDEFAULT,
 			NULL,
 			(HMENU)NULL,
-			(HINSTANCE)m_pApp->m_instance,
+			(HINSTANCE)m_hInstResDLL,
 			NULL);
 
         // 6 May 2008 jdp make topmost so they display in fullscreen mode
@@ -1252,7 +1252,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				ti.cbSize = sizeof(TOOLINFO);
 				ti.uFlags = 0 ;
 				ti.hwnd = m_hwndTB;
-				ti.hinst = m_pApp->m_instance;
+				ti.hinst = m_hInstResDLL;
 				ti.uId = (UINT) id;
 				ti.lpszText = (LPSTR) szTips[id++];
 				ti.rect.left = col * buttonWidth;
@@ -1300,23 +1300,25 @@ void ClientConnection::GTGBS_CreateToolbar()
 {
 	RECT clr;
 	WNDCLASS wndclass;
+	// Load icon and cursors from main executable, not language DLL
+	extern HINSTANCE hInstance;
 
 	wndclass.style			= 0;
 	wndclass.lpfnWndProc	= ClientConnection::WndProcTBwin;
 	wndclass.cbClsExtra		= 0;
 	wndclass.cbWndExtra		= 0;
-	wndclass.hInstance		= m_pApp->m_instance;
-	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
+	wndclass.hInstance		= m_hInstResDLL;
+	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDR_TRAY));
 	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
 	case NORMALCURSOR:
 		wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		break;
 	case DOTCURSOR:
 	default:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_DOTCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_DOTCURSOR));
 	}
 	//wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
 	wndclass.hbrBackground	=   (HBRUSH)(COLOR_BTNFACE+1);
@@ -1341,7 +1343,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 					//m_hwnd,                // Parent handle
 					m_hwndMain,
 					NULL,                // Menu handle
-					m_pApp->m_instance,
+					m_hInstResDLL,
 					NULL);
 	helper::SafeSetWindowUserData(m_hwndTBwin, (LONG_PTR)this);
 	ShowWindow(m_hwndTBwin, SW_HIDE);
@@ -1364,12 +1366,14 @@ void ClientConnection::GTGBS_CreateToolbar()
 											22,
 											m_hwndTBwin,
 											NULL,
-											m_pApp->m_instance,
+											m_hInstResDLL,
 											NULL);*/
 
-	m_bitmapNONE = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_NONE),IMAGE_BITMAP,22,20,LR_SHARED);
-	m_bitmapFRONT = LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_FRONT),IMAGE_BITMAP,22,20,LR_SHARED);
-	m_bitmapBACK= LoadImage(m_pApp->m_instance,MAKEINTRESOURCE(IDB_STAT_BACK),IMAGE_BITMAP,22,20,LR_SHARED);
+	// Load bitmaps from main executable, not language DLL
+	extern HINSTANCE hInstance;
+	m_bitmapNONE = LoadImage(hInstance,MAKEINTRESOURCE(IDB_STAT_NONE),IMAGE_BITMAP,22,20,LR_SHARED);
+	m_bitmapFRONT = LoadImage(hInstance,MAKEINTRESOURCE(IDB_STAT_FRONT),IMAGE_BITMAP,22,20,LR_SHARED);
+	m_bitmapBACK= LoadImage(hInstance,MAKEINTRESOURCE(IDB_STAT_BACK),IMAGE_BITMAP,22,20,LR_SHARED);
 	if (m_TrafficMonitor) {
 		HDC hdc = GetDC(m_TrafficMonitor);
 		HDC hdcBits;
@@ -1392,7 +1396,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 									28,
 									m_hwndTBwin,
 									(HMENU)9999,
-									m_pApp->m_instance,
+									m_hInstResDLL,
 									NULL);
 	m_button_wnd = CreateWindow(
 									"button",
@@ -1404,7 +1408,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 									20,
 									m_hwndTBwin,
 									(HMENU)9998,
-									m_pApp->m_instance,
+									m_hInstResDLL,
 									NULL);
 	TCHAR valname[256];
 	MRU *m_pMRU;
@@ -1435,22 +1439,24 @@ void ClientConnection::CreateDisplay()
 
 	WNDCLASS wndclass;
 
+	// Load icon and cursors from main executable, not language DLL
+	extern HINSTANCE hInstance;
 	wndclass.style			= 0;
 	wndclass.lpfnWndProc	= ClientConnection::WndProchwnd;
 	wndclass.cbClsExtra		= 0;
 	wndclass.cbWndExtra		= 0;
-	wndclass.hInstance		= m_pApp->m_instance;
-	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
+	wndclass.hInstance		= m_hInstResDLL;
+	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDR_TRAY));
 	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
 	case NORMALCURSOR:
 		wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		break;
 	case DOTCURSOR:
 	default:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_DOTCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_DOTCURSOR));
 	}
 	//wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
 	wndclass.hbrBackground	=   NULL;//(HBRUSH)(COLOR_WINDOW+1);
@@ -1469,7 +1475,7 @@ void ClientConnection::CreateDisplay()
 			      //NULL,                // Parent handle
 				  m_hwndMain,
 			      NULL,                // Menu handle
-			      m_pApp->m_instance,
+			      m_hInstResDLL,
 			      (LPVOID)this);
 
 	//ShowWindow(m_hwnd, SW_HIDE);
@@ -1606,7 +1612,7 @@ void ClientConnection::CreateDisplay()
 
 	//Added by: Lars Werner (http://lars.werner.no)
 	if(TitleBar.GetSafeHwnd()==NULL)
-		TitleBar.Create(m_pApp->m_instance, m_hwndMain, !m_opts->m_Directx, m_opts);
+		TitleBar.Create(m_hInstResDLL, m_hwndMain, !m_opts->m_Directx, m_opts);
 }
 
 // adzm - 2010-07 - Fix clipboard hangs
@@ -1904,16 +1910,31 @@ void ClientConnection::GetConnectDetails()
 	else {
 			if (!command_line)
 				LoadConnection(m_opts->getDefaultOptionsFileName(), true, true);
-			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
-			if (!sessdlg.DoDialog())
-				QuietException_helper(sz_L42);
-			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
-			m_port = sessdlg.m_port;
-			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-			m_proxyport = sessdlg.m_proxyport;
-			m_connectionType = sessdlg.m_connectionType;
-			if (m_opts->autoDetect)
-				m_opts->m_Use8Bit = rfbPFFullColors;				
+			
+			// Loop to handle language changes (return code -2)
+			int dialogResult;
+			do {
+				SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
+				dialogResult = sessdlg.DoDialog();
+				
+				if (dialogResult == -2) {
+					// Language changed, reload dialog
+					continue;
+				}
+				
+				if (!dialogResult)
+					QuietException_helper(sz_L42);
+					
+				_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
+				m_port = sessdlg.m_port;
+				_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
+				m_proxyport = sessdlg.m_proxyport;
+				m_connectionType = sessdlg.m_connectionType;
+				if (m_opts->autoDetect)
+					m_opts->m_Use8Bit = rfbPFFullColors;
+					
+				break; // Exit loop if connection established
+			} while (dialogResult == -2);
 	}
 	// This is a bit of a hack:
 	// The config file may set various things in the app-level defaults which
@@ -3801,10 +3822,11 @@ void ClientConnection::AuthSessionSelect()
 	}
 
 	INITCOMMONCONTROLSEX InitCtrls;
+	extern HINSTANCE m_hInstResDLL;
 	InitCtrls.dwICC = ICC_LISTVIEW_CLASSES|ICC_INTERNET_CLASSES;
 	InitCtrls.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	BOOL bRet = InitCommonControlsEx(&InitCtrls);
-	int tt=DialogBoxParam(m_pApp->m_instance, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LONG_PTR)this);
+	int tt=DialogBoxParam(m_hInstResDLL, MAKEINTRESOURCE(IDD_SESSIONSELECTOR), NULL, (DLGPROC)DialogProc,(LONG_PTR)this);
 	WriteExact((char *)&tt,sizeof(int));
 }
 
@@ -7752,22 +7774,24 @@ void ClientConnection::GTGBS_CreateDisplay()
 	// welches das VNC-Fenster und die Toolbar enth�lt
 	WNDCLASS wndclass;
 
+	// Load icon and cursors from main executable, not language DLL
+	extern HINSTANCE hInstance;
 	wndclass.style			= 0;
 	wndclass.lpfnWndProc	= ClientConnection::WndProc;
 	wndclass.cbClsExtra		= 0;
 	wndclass.cbWndExtra		= 0;
-	wndclass.hInstance		= m_pApp->m_instance;
-	wndclass.hIcon			= LoadIcon(m_pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
+	wndclass.hInstance		= m_hInstResDLL;
+	wndclass.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDR_TRAY));
 	switch (m_opts->m_localCursor) {
 	case NOCURSOR:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_NOCURSOR));
 		break;
 	case NORMALCURSOR:
 		wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
 		break;
 	case DOTCURSOR:
 	default:
-		wndclass.hCursor		= LoadCursor(m_pApp->m_instance, MAKEINTRESOURCE(IDC_DOTCURSOR));
+		wndclass.hCursor		= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_DOTCURSOR));
 	}
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
     wndclass.lpszMenuName	= (const TCHAR *) NULL;
@@ -7785,7 +7809,7 @@ void ClientConnection::GTGBS_CreateDisplay()
 			  //320,200,
 			  NULL,                // Parent handle
 			  NULL,                // Menu handle
-			  m_pApp->m_instance,
+			  m_hInstResDLL,
 			  (LPVOID)this);
 	helper::SafeSetWindowUserData(m_hwndMain, (LONG_PTR)this);
 	ImmAssociateContext(m_hwndMain, NULL);	
@@ -7796,10 +7820,11 @@ void ClientConnection::GTGBS_CreateDisplay()
 //
 LRESULT CALLBACK ClientConnection::GTGBS_ShowStatusWindow(LPVOID lpParameter)
 {
+	extern HINSTANCE m_hInstResDLL;
 	ClientConnection *_this = (ClientConnection*)lpParameter;
 
 	 _this->m_fStatusOpen = true;
-	DialogBoxParam(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_STATUS),NULL,(DLGPROC)ClientConnection::GTGBS_StatusProc,(LONG_PTR)_this);
+	DialogBoxParam(m_hInstResDLL,MAKEINTRESOURCE(IDD_STATUS),NULL,(DLGPROC)ClientConnection::GTGBS_StatusProc,(LONG_PTR)_this);
 	// _this->m_fStatusOpen = false;
 	return 0;
 }
@@ -9184,7 +9209,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 					UINT Key;
 					//_this->SendKeyEvent(XK_Execute,     true);
 					//_this->SendKeyEvent(XK_Execute,     false);
-					Key = DialogBox(_this->m_pApp->m_instance,MAKEINTRESOURCE(IDD_CUSTUM_KEY),NULL,(DLGPROC)ClientConnection::GTGBS_SendCustomKey_proc);
+					Key = DialogBox(m_hInstResDLL,MAKEINTRESOURCE(IDD_CUSTUM_KEY),NULL,(DLGPROC)ClientConnection::GTGBS_SendCustomKey_proc);
 					if (Key>0){
 						vnclog.Print(0,_T("START Send Custom Key %d\n"),Key);
 						if ( (Key & KEYMAP_LALT_FLAG) == KEYMAP_LALT_FLAG){
@@ -9649,28 +9674,30 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 
 			case WM_SETCURSOR:
-				{
-					// if we have the focus, let the cursor change as normal
-					if (GetFocus() == hwnd)
-						break;
-
+			{
+				// if we have the focus, let the cursor change as normal
+				if ((lParam & 0xffff) == HTCLIENT) {
 					HCURSOR h;
+					// Load cursors from main executable, not language DLL
+					extern HINSTANCE hInstance;
 					switch (_this->m_opts->m_localCursor) {
 					case NOCURSOR:
-						h= LoadCursor(_this->m_pApp->m_instance, MAKEINTRESOURCE(IDC_NOCURSOR));
+						h= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_NOCURSOR));
 						break;
 					case NORMALCURSOR:
 						h= LoadCursor(NULL, IDC_ARROW);
 						break;
 					case DOTCURSOR:
 					default:
-						h= LoadCursor(_this->m_pApp->m_instance, MAKEINTRESOURCE(IDC_DOTCURSOR));
+						h= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_DOTCURSOR));
 					}
-					if (_this->m_SWselect) h= LoadCursor(_this->m_pApp->m_instance, MAKEINTRESOURCE(IDC_CURSOR1));
+					if (_this->m_SWselect) h= LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR1));
 					SetCursor(h);
 
 					return 0;
 				}
+				break;
+			}
 
 			case WM_DRAWCLIPBOARD:
 				_this->ProcessLocalClipboardChange();

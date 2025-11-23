@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "vncOSVersion.h"
 #include "ScreenCapture.h"
+#include "Localization.h"
 
 DWORD MessageBoxSecure(HWND hWnd,LPCTSTR lpText,LPCTSTR lpCaption,UINT uType);
 typedef BOOL (WINAPI* pEnumDisplayDevices)(PVOID,DWORD,PVOID,DWORD);
@@ -142,39 +143,39 @@ CheckVideoDriver(bool Box)
 						char buf2[512];
 						strcpy_s(buf,"");
 						strcpy_s(buf2,"");
-						strcpy_s(buf2,"Driver found. \n");
+						strcat_s(buf2,sz_ID_DRIVER_FOUND);
 						GetDllProductVersion("mv2.dll",buf,512);
 						if (strcmp(buf,"1.00.22")==0)
 						{
-							strcat_s(buf2,"Driver version OK \n");
+							strcat_s(buf2,sz_ID_DRIVER_VERSION_OK);
 						}
 						else
 						{
-							strcat_s(buf2,"Driver verion is not 1.00.22 \n");
+							strcat_s(buf2,sz_ID_DRIVER_VERSION_NOT_OK);
 							strcat_s(buf2,buf);
 							strcat_s(buf2," \n");
 						}
 
 						if (dd.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP)
 						{
-							strcat_s(buf2," driver Active");
+							strcat_s(buf2,sz_ID_DRIVER_ACTIVE);
 							HDC testdc=NULL;
 							deviceName = (LPSTR)&dd.DeviceName[0];
 							testdc = CreateDC("DISPLAY",deviceName,NULL,NULL);	
 							if (testdc)
 							{
 								DeleteDC(testdc);
-								strcat_s(buf2," access ok");
+								strcat_s(buf2,sz_ID_DRIVER_ACCESS_OK);
 							}
 							else
 							{
-								strcat_s(buf2," access denied, permission problem");
+								strcat_s(buf2,sz_ID_DRIVER_ACCESS_DENIED);
 							}
 						}
                         else
                         {
-                            strcat_s(buf2, "Driver Not Activated, is the viewer current connected?\n");
-                            strcat_s(buf2, "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin\n");
+                            strcat_s(buf2, sz_ID_DRIVER_NOT_ACTIVATED);
+                            strcat_s(buf2, sz_ID_DRIVER_ONLY_SERVICE_ADMIN);
                         }
 						MessageBoxSecure(NULL,buf2,buf,0);
 					}

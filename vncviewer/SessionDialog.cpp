@@ -138,8 +138,9 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	NoHotKeys = m_pOpt->m_NoHotKeys;
 	setdefaults = false;
 	/////////////////////////////////////////////////
-	hBmpExpand = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_EXPAND), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
-	hBmpCollaps = (HBITMAP)::LoadImage(pApp->m_instance, MAKEINTRESOURCE(IDB_COLLAPS), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
+	extern HINSTANCE hInstance;
+	hBmpExpand = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_EXPAND), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
+	hBmpCollaps = (HBITMAP)::LoadImage(hInstance, MAKEINTRESOURCE(IDB_COLLAPS), IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT);
 	hTabEncoders = NULL;
 	hTabKeyboardMouse = NULL;
 	hTabDisplay = NULL;
@@ -178,7 +179,8 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 // window procedure and this method could overwrite each other.
 int SessionDialog::DoDialog()
 {
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_SESSION_DLG),
+	// Use m_hInstResDLL for dialog resources (contains translated dialogs)
+	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_SESSION_DLG),
 		NULL, (DLGPROC)SessDlgProc, (LONG_PTR)this);
 }
 
@@ -213,6 +215,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		l_this->m_pCC->m_hSessionDialog = hwnd;
 		l_this->SessHwnd = hwnd;
 		_this->InitDlgProc();
+		_this->InitLanguage(hwnd);
 		HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
 		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 
@@ -348,6 +351,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		// [v1.0.2-jp1 fix]
 		case IDC_HOSTNAME_DEL:
+		{
 			_this->SettingsFromUI();
 			HWND hcombo = GetDlgItem(hwnd, IDC_HOSTNAME_EDIT);
 			int sel = SendMessage(hcombo, CB_GETCURSEL, 0, 0);
@@ -367,6 +371,19 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				_this->SetDefaults();
 			}
 			return TRUE;
+		}
+		case IDC_LANGUAGE_COMBO:
+			if (HIWORD(wParam) == CBN_SELCHANGE) {
+				HWND hLangCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+				int selIdx = SendMessage(hLangCombo, CB_GETCURSEL, 0, 0);
+				if (selIdx != CB_ERR) {
+					char* langCode = (char*)SendMessage(hLangCombo, CB_GETITEMDATA, selIdx, 0);
+					if (langCode) {
+						_this->SwitchLanguage(langCode);
+					}
+				}
+			}
+			break;
 		}
 
 		break;
@@ -794,4 +811,102 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
 	}
+}
+
+void SessionDialog::InitLanguage(HWND hwnd)
+{
+	HWND hLanguageCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+	if (!hLanguageCombo) return;
+
+	SendMessage(hLanguageCombo, CB_RESETCONTENT, 0, 0);
+
+	// Add English (default - no DLL needed)
+	int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)"English");
+	SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup("en"));
+
+	// Get viewer executable path
+	char exePath[MAX_PATH];
+	char languagesPath[MAX_PATH];
+	char dllPath[MAX_PATH];
+	
+	if (GetModuleFileName(NULL, exePath, MAX_PATH)) {
+		char* lastSlash = strrchr(exePath, '\\');
+		if (lastSlash) {
+			*lastSlash = '\0';
+			sprintf_s(languagesPath, "%s\\languages\\vnclang_*.dll", exePath);
+
+			WIN32_FIND_DATA findData;
+			HANDLE hFind = FindFirstFile(languagesPath, &findData);
+			
+			if (hFind != INVALID_HANDLE_VALUE) {
+				do {
+					// Extract language code from filename (vnclang_XX.dll)
+					char* underscore = strstr(findData.cFileName, "_");
+					char* dot = strstr(findData.cFileName, ".");
+					
+					if (underscore && dot && dot > underscore) {
+						char langCode[8] = {0};
+						size_t len = min(static_cast<size_t>(dot - underscore - 1), static_cast<size_t>(7));
+						strncpy_s(langCode, underscore + 1, len);
+						
+						// Build full path to DLL
+						sprintf_s(dllPath, "%s\\languages\\%s", exePath, findData.cFileName);
+						
+						// Load DLL temporarily to read language name
+						HMODULE hLangDll = LoadLibraryEx(dllPath, NULL, LOAD_LIBRARY_AS_DATAFILE);
+						char displayName[64] = {0};
+						
+						if (hLangDll) {
+							// Try to load IDS_LANGUAGE_NAME string resource from DLL
+							if (LoadString(hLangDll, IDS_LANGUAGE_NAME, displayName, sizeof(displayName)) > 0) {
+								// Successfully loaded language name from DLL
+								int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+								SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+							}
+							else {
+								// Fallback: use language code if string not found
+								sprintf_s(displayName, "Language (%s)", langCode);
+								int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+								SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+							}
+							FreeLibrary(hLangDll);
+						}
+						else {
+							// DLL couldn't be loaded, use code as fallback
+							sprintf_s(displayName, "Language (%s)", langCode);
+							int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+							SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+						}
+					}
+				} while (FindNextFile(hFind, &findData));
+				FindClose(hFind);
+			}
+		}
+	}
+
+	// Select current language
+	int count = SendMessage(hLanguageCombo, CB_GETCOUNT, 0, 0);
+	for (int i = 0; i < count; i++) {
+		char* langCode = (char*)SendMessage(hLanguageCombo, CB_GETITEMDATA, i, 0);
+		if (langCode && _stricmp(langCode, m_pOpt->m_language) == 0) {
+			SendMessage(hLanguageCombo, CB_SETCURSEL, i, 0);
+			return;
+		}
+	}
+	
+	SendMessage(hLanguageCombo, CB_SETCURSEL, 0, 0);
+}
+
+void SessionDialog::SwitchLanguage(const char* langCode)
+{
+	if (!langCode) return;
+	
+	_tcscpy_s(m_pOpt->m_language, langCode);
+	m_pOpt->SaveOptions(m_pOpt->getDefaultOptionsFileName());
+	
+	// Reload language DLL and all strings
+	ReloadLanguage(langCode);
+	
+	// Close and reopen the dialog to refresh UI
+	EndDialog(SessHwnd, -2);  // Special code to indicate language change
 }

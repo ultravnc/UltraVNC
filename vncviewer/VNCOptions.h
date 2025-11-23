@@ -67,6 +67,7 @@ public:
 	bool	m_NoStatus;
 	bool	m_NoHotKeys;
 	bool	m_FullScreen;
+	TCHAR	m_language[32];  // Language preference (en, fr, de, es)
 	bool	m_SavePos;
 	bool	m_SaveSize;
 	bool	m_Directx;

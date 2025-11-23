@@ -389,6 +389,11 @@ private:
 	bool m_pref_AllowUserSettingsWithPassword;
 	bool showAllLogs = false;
 	bool showSettings = false;
+	char m_pref_language[16];
+
+public:
+	void setLanguage(const char* value) { strncpy_s(m_pref_language, value, 15); m_pref_language[15] = '\0'; }
+	const char* getLanguage() { return m_pref_language; }
 };
 
 extern SettingsManager* settings;

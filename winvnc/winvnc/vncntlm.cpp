@@ -222,7 +222,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_AUTHADMIN_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -244,7 +244,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_WORKGRPDOMNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -260,7 +260,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -277,7 +277,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTHNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -293,7 +293,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH9X_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -315,7 +315,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_WORKGRPDOMNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -330,7 +330,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_AUTHADMIN_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -346,7 +346,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -362,7 +362,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTHNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -378,7 +378,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH9X_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -400,7 +400,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "workgrpdomnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_WORKGRPDOMNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -415,7 +415,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "authadmin.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_AUTHADMIN_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -431,7 +431,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -447,7 +447,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauthnt4.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTHNT4_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}
@@ -463,7 +463,7 @@ int CheckUserGroupPasswordUni2(char* userin, char* password, const char* machine
 			}
 			else
 			{
-				MessageBoxSecure(NULL, "ldapauth9x.dll not found", sz_ID_WARNING, MB_OK);
+				MessageBoxSecure(NULL, sz_ID_LDAPAUTH9X_DLL_NOT_FOUND, sz_ID_WARNING, MB_OK);
 				result = 0;
 			}
 		}

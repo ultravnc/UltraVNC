@@ -46,6 +46,8 @@ public:
 	void InitPlugin(HWND hwnd);
 	void InitMRU(HWND hwnd);
 	void InitTab(HWND hwnd);
+	void InitLanguage(HWND hwnd);
+	void SwitchLanguage(const char* langCode);
 	int HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam);
 	int HandeleEncodersMessages(HWND hwnd, WPARAM wParam);
 

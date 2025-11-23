@@ -127,28 +127,7 @@ Myinit(HINSTANCE hInstance)
 {
 	setbuf(stderr, 0);
 
-	// [v1.0.2-jp1 fix] Load resouce from dll
-
-	hInstResDLL = NULL;
-
-	 //limit the vnclang.dll searchpath to avoid	
-	char szCurrentDir_vnclangdll[MAX_PATH];
-	char szCurrentDir[MAX_PATH];
-	strcpy_s(szCurrentDir, winvncFolder);
-	strcpy_s(szCurrentDir_vnclangdll,szCurrentDir);
-	strcat_s(szCurrentDir_vnclangdll,"\\");
-	strcat_s(szCurrentDir_vnclangdll,"vnclang_server.dll");
-
-	hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
-
-	if (hInstResDLL == NULL)
-	{
-		hInstResDLL = hInstance;
-	}
-//	RegisterLinkLabel(hInstResDLL);
-
-    //Load all messages from ressource file
-    Load_Localization(hInstResDLL) ;
+	// Note: Language DLL and localization already loaded early in WinMain
 
 #ifdef _DEBUG
 	{
@@ -438,6 +417,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		*p = '\0';
 	}
 	extractConfig(szCmdLine2);
+
+	// Load language DLL early - before any localization strings are used
+	{
+		char szCurrentDir_vnclangdll[MAX_PATH];
+		char savedLanguage[16] = "en";  // Default to English
+		
+		// Try to read language from the config file (already determined by extractConfig)
+		GetPrivateProfileStringA("admin", "Language", "en", savedLanguage, sizeof(savedLanguage), configFile);
+		
+		// Load appropriate language DLL based on saved preference
+		hInstResDLL = hInstance;  // Default to English (embedded resources)
+		
+		if (_stricmp(savedLanguage, "en") != 0) {
+			// Try to load language DLL from languages subfolder first
+			sprintf_s(szCurrentDir_vnclangdll, "%s\\languages\\winvnclang_%s.dll", winvncFolder, savedLanguage);
+			HMODULE hLangDLL = LoadLibrary(szCurrentDir_vnclangdll);
+			
+			if (hLangDLL) {
+				hInstResDLL = hLangDLL;
+			} else {
+				// Fallback: try root folder
+				sprintf_s(szCurrentDir_vnclangdll, "%s\\winvnclang_%s.dll", winvncFolder, savedLanguage);
+				hLangDLL = LoadLibrary(szCurrentDir_vnclangdll);
+				if (hLangDLL) {
+					hInstResDLL = hLangDLL;
+				} else {
+					// Fallback: try old single language DLL (vnclang_server.dll)
+					sprintf_s(szCurrentDir_vnclangdll, "%s\\vnclang_server.dll", winvncFolder);
+					hLangDLL = LoadLibrary(szCurrentDir_vnclangdll);
+					if (hLangDLL) {
+						hInstResDLL = hLangDLL;
+					}
+				}
+			}
+		}
+		
+		// Load all messages from resource file
+		Load_Localization(hInstResDLL);
+	}
+
 	InitCommonControls();
 	INITCOMMONCONTROLSEX icex;
 	memset(&icex, 0x0, sizeof(INITCOMMONCONTROLSEX));
@@ -446,11 +465,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	InitCommonControlsEx(&icex);
 	try {
 		if (VNC_OSVersion::getInstance()->OS_XP == true)
-			MessageBoxSecure(NULL, "Windows XP requires special build", "Warning", MB_ICONERROR);
+			MessageBoxSecure(NULL, sz_ID_WINDOWS_XP_SPECIAL_BUILD, sz_ID_WARNING_CAPTION, MB_ICONERROR);
 
 		if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED == true)
 		{
-			MessageBoxSecure(NULL, "Error OS not supported", "Unsupported OS", MB_ICONERROR);
+			MessageBoxSecure(NULL, sz_ID_ERROR_OS_NOT_SUPPORTED, sz_ID_UNSUPPORTED_OS_CAPTION, MB_ICONERROR);
 			return return2(true);
 		}
 		// make vnc last service to stop
@@ -482,27 +501,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	#endif // SC_20
 		setbuf(stderr, 0);
 
-		// [v1.0.2-jp1 fix] Load resouce from dll
-		hInstResDLL = NULL;
-
-		//limit the vnclang.dll searchpath to avoid
-		char szCurrentDir[MAX_PATH];
-		char szCurrentDir_vnclangdll[MAX_PATH];
-		strcpy_s(szCurrentDir, winvncFolder);
-		strcpy_s(szCurrentDir_vnclangdll, szCurrentDir);
-		strcat_s(szCurrentDir_vnclangdll, "\\");
-		strcat_s(szCurrentDir_vnclangdll, "vnclang_server.dll");
-
-		hInstResDLL = LoadLibrary(szCurrentDir_vnclangdll);
-
-		if (hInstResDLL == NULL)
-		{
-			hInstResDLL = hInstance;
-		}
-		//	RegisterLinkLabel(hInstResDLL);
-
-			//Load all messages from ressource file
-		Load_Localization(hInstResDLL);
+		// Note: Language DLL and localization already loaded early in WinMain
 
 	#ifdef _DEBUG
 		{

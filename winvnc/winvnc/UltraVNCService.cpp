@@ -21,6 +21,7 @@
 #include <direct.h>
 #include <errno.h>
 #include <fstream>
+#include "Localization.h"
 
 
 
@@ -321,7 +322,7 @@ int UltraVNCService::install_service(void) {
 
     scm=OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
     if(!scm) {
-        MessageBoxSecure(NULL, "Failed to open service control manager",
+        MessageBoxSecure(NULL, sz_ID_FAILED_OPEN_SVC_MGR,
             app_name, MB_ICONERROR);
         return 1;
     }
@@ -334,7 +335,7 @@ int UltraVNCService::install_service(void) {
 		DWORD myerror=GetLastError();
 		if (myerror==ERROR_ACCESS_DENIED)
 		{
-			MessageBoxSecure(NULL, "Failed: Permission denied",
+			MessageBoxSecure(NULL, sz_ID_FAILED_PERMISSION_DENIED,
             app_name, MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
@@ -345,7 +346,7 @@ int UltraVNCService::install_service(void) {
 			return 1;
 		}
 
-        MessageBoxSecure(NULL, "Failed to create a new service",
+        MessageBoxSecure(NULL, sz_ID_FAILED_CREATE_SVC,
             app_name, MB_ICONERROR);
         CloseServiceHandle(scm);
         return 1;
@@ -363,7 +364,7 @@ int UltraVNCService::uninstall_service(void) {
 
     scm=OpenSCManager(0, 0, SC_MANAGER_CONNECT);
     if(!scm) {
-        MessageBoxSecure(NULL, "Failed to open service control manager",
+        MessageBoxSecure(NULL, sz_ID_FAILED_OPEN_SVC_MGR,
             app_name, MB_ICONERROR);
         return 1;
     }
@@ -374,7 +375,7 @@ int UltraVNCService::uninstall_service(void) {
 		DWORD myerror=GetLastError();
 		if (myerror==ERROR_ACCESS_DENIED)
 		{
-			MessageBoxSecure(NULL, "Failed: Permission denied",
+			MessageBoxSecure(NULL, sz_ID_FAILED_PERMISSION_DENIED,
             app_name, MB_ICONERROR);
 			CloseServiceHandle(scm);
 			return 1;
@@ -389,13 +390,13 @@ int UltraVNCService::uninstall_service(void) {
 			return 1;
 		}
 
-        MessageBoxSecure(NULL, "Failed to open the service",
+        MessageBoxSecure(NULL, sz_ID_FAILED_OPEN_SVC,
             app_name, MB_ICONERROR);
         CloseServiceHandle(scm);
         return 1;
     }
     if(!QueryServiceStatus(service, &serviceStatus)) {
-        MessageBoxSecure(NULL, "Failed to query service status",
+        MessageBoxSecure(NULL, sz_ID_FAILED_QUERY_SVC_STATUS,
             app_name, MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);
@@ -408,7 +409,7 @@ int UltraVNCService::uninstall_service(void) {
         return 1;
     }
     if(!DeleteService(service)) {
-        MessageBoxSecure(NULL, "Failed to delete the service",
+        MessageBoxSecure(NULL, sz_ID_FAILED_DELETE_SVC,
             app_name, MB_ICONERROR);
         CloseServiceHandle(service);
         CloseServiceHandle(scm);

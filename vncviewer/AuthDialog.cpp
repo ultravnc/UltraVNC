@@ -42,22 +42,23 @@ int AuthDialog::DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN]
 	this->dialogType = dialogType;
 	strcpy(this->hex, hex);
 	strcpy(this->catchphrase, catchphrase);
+	extern HINSTANCE m_hInstResDLL;
 	switch (dialogType)
 	{
 	case dtUserPass:
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
 	case dtPass:
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
 	case  dtUserPassNotEncryption:
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
 	case dtPassUpgrade:
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
 	case dtUserPassRSA:
 		m_bPassphraseMode = true;
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG4), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG4), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
 	case dtPassRSA:
 		m_bPassphraseMode = true;
-		return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
 	}
 	return 0;
 }

@@ -40,6 +40,7 @@
 #include <commctrl.h>
 #include "LayeredWindows.h"
 #include "SettingsManager.h"
+#include "Localization.h"
 
 extern bool PreConnect;
 int getinfo(char mytext[1024]);
@@ -2286,7 +2287,7 @@ BOOL vncDesktop::VideoBuffer()
 
 DWORD WINAPI Warningbox_non_locked(LPVOID lpParam)
 {
-	MessageBoxSecure(NULL, "Current driver is too old for this version\nUpdate driver or disable Video hook driver\n in the Server Settings", "", 0);
+	MessageBoxSecure(NULL, sz_ID_CURRENT_DRIVER_OLD, "", 0);
 	return 0;
 }
 
