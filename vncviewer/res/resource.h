@@ -664,6 +664,31 @@
 #define IDS_STRING50296                 50296
 #define IDS_STRING107                   50297
 #define IDS_STRING50297                 50297
+#define IDS_TLS1                        50298
+#define IDS_TLS2                        50299
+#define IDS_TLS3                        50300
+#define IDS_TLS4                        50301
+#define IDS_TLS5                        50302
+#define IDS_TLS6                        50303
+#define IDS_TLS7                        50304
+#define IDS_TLS8                        50305
+#define IDS_TLS9                        50306
+#define IDS_TLS10                       50307
+#define IDS_TLS11                       50308
+#define IDS_N1                          50309
+#define IDS_N2                          50310
+#define IDS_N3                          50311
+#define IDS_N4                          50312
+#define IDS_N5                          50313
+#define IDS_N6                          50314
+#define IDS_N7                          50315
+#define IDS_N8                          50316
+#define IDS_N9                          50317
+#define IDS_N10                         50318
+#define IDS_N11                         50319
+#define IDS_N12                         50320
+#define IDS_N13                         50321
+#define IDS_N14                         50322
 
 // Next default values for new objects
 // 

@@ -13,10 +13,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// Spanish (Spain) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESP)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH
 #pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -450,7 +450,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright ï¿½ 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
+    LTEXT           "Copyright ? 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
     LTEXT           "Built",IDC_STATIC,44,18,15,11
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
     LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,55,8
@@ -1558,7 +1558,36 @@ BEGIN
     IDS_L92                 "No authentication needed"
 END
 
-#endif    // English (United States) resources
+STRINGTABLE
+BEGIN
+    IDS_TLS1                "Conexión cerrada"
+    IDS_TLS2                "AcquireCredentialsHandle falló"
+    IDS_TLS3                "QueryContextAttributes falló"
+    IDS_TLS4                "No hay suficientes búferes de E/S"
+    IDS_TLS5                "Handshake abortado"
+    IDS_TLS6                "No se puede completar el handshake"
+    IDS_TLS7                "EncryptMessage falló"
+    IDS_TLS8                "DecryptMessage falló"
+    IDS_TLS9                "Resultado inesperado de DecryptMessage"
+    IDS_TLS10               "ApplyControlToken falló"
+    IDS_TLS11               "CertGetCertificateChain falló"
+    IDS_N1                  "No hay elementos en ListView"
+    IDS_N2                  "No se seleccionó ningún servidor VNC"
+    IDS_N3                  "Dispositivo multitáctil TCVNC"
+    IDS_N4                  "Función solo compatible en modo 1:1"
+    IDS_N5                  "Visor UltraVNC - Captura de pantalla"
+    IDS_N6                  "Visor UltraVNC - Información de conexión"
+    IDS_N7                  "Visor UltraVNC - Conexión perdida, intentando reconectar ("
+    IDS_N8                  "Visor UltraVNC - Chat con <%s>"
+    IDS_N9                  "Visor UltraVNC -"
+    IDS_N10                 "Todas las pantallas"
+    IDS_N11                 "Monitor predeterminado"
+    IDS_N12                 "Memoria insuficiente para asignar búfer zlib."
+    IDS_N13                 "Código de descubrimiento no válido\n"
+    IDS_N14                 "¡Ya no se puede usar la autenticación IDEA!"
+END
+
+#endif    // Spanish (Spain) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
