@@ -13,10 +13,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English (Neutral) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 #pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -307,10 +307,11 @@ BEGIN
     CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,243,172
     PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,124,258,60,13
     PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,191,258,60,13
-    PUSHBUTTON      "About",IDC_ABOUT,9,277,60,13
-    PUSHBUTTON      "Save as",IDC_SAVEAS,124,277,60,13
-    PUSHBUTTON      "Restore defaults",IDC_RESET_DEFAULTS,9,258,60,13
-    PUSHBUTTON      "Save",IDC_SAVE,191,277,60,13
+    PUSHBUTTON      "About",IDC_ABOUT,75,277,60,13
+    PUSHBUTTON      "Save as",IDC_SAVEAS,141,277,60,13
+    PUSHBUTTON      "Restore defaults",IDC_RESET_DEFAULTS,75,258,60,13
+    PUSHBUTTON      "Save",IDC_SAVE,207,277,44,13
+    COMBOBOX        IDC_LANGUAGE_COMBO,9,277,60,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Computer",IDC_LINE1,33,32,46,8
     CTEXT           "UltraVNC Viewer",IDC_LOGO,46,7,156,8,SS_CENTERIMAGE
     LTEXT           "Computer",IDC_LINE2,33,46,47,8
@@ -1411,6 +1412,7 @@ BEGIN
     IDS_I1                  "Error creating Daemon socket"
     IDS_I2                  "Error binding Daemon socket"
     IDS_I3                  "Error when Daemon listens"
+    IDS_I4                  "Daemon error"
     IDS_J1                  "To exit from full-screen mode, use Ctrl-Esc Esc and then\r\nright-click on the UltraVNC Viewer taskbar icon to see the menu."
     IDS_J2                  "UltraVNC Viewer full-screen mode"
     IDS_K2                  "Error saving file"

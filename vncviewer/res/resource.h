@@ -318,6 +318,7 @@
 #define IDC_SAVEASDEFAULT               2047
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_ZSTD                        2049
+#define IDC_LANGUAGE_COMBO              2050
 #define IDC_LINE1                       2053
 #define IDC_LINE2                       2054
 #define IDC_SLIDERRES                   2054
@@ -502,6 +503,7 @@
 #define IDS_I1                          50136
 #define IDS_I2                          50137
 #define IDS_I3                          50138
+#define IDS_I4                          50324
 #define IDS_J1                          50139
 #define IDS_J2                          50140
 #define IDS_K2                          50141
@@ -689,6 +691,7 @@
 #define IDS_N12                         50320
 #define IDS_N13                         50321
 #define IDS_N14                         50322
+#define IDS_LANGUAGE_NAME               50323
 
 // Next default values for new objects
 // 

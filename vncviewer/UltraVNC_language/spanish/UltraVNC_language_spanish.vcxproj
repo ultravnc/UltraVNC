@@ -95,6 +95,11 @@
       <EnableUAC>false</EnableUAC>
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\Debug\languages\" mkdir "$(SolutionDir)..\Debug\languages\"
+copy /Y "$(TargetPath)" "$(SolutionDir)..\Debug\languages\vnclang_es.dll"</Command>
+      <Message>Copying Spanish language DLL to vncviewer Debug folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -113,6 +118,11 @@
       <EnableUAC>false</EnableUAC>
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\Release\languages\" mkdir "$(SolutionDir)..\Release\languages\"
+copy /Y "$(TargetPath)" "$(SolutionDir)..\Release\languages\vnclang_es.dll"</Command>
+      <Message>Copying Spanish language DLL to vncviewer Release folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -127,6 +137,11 @@
       <EnableUAC>false</EnableUAC>
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\x64\Debug\languages\" mkdir "$(SolutionDir)..\x64\Debug\languages\"
+copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Debug\languages\vnclang_es.dll"</Command>
+      <Message>Copying Spanish language DLL to vncviewer x64 Debug folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -145,9 +160,56 @@
       <EnableUAC>false</EnableUAC>
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\x64\Release\languages\" mkdir "$(SolutionDir)..\x64\Release\languages\"
+copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Release\languages\vnclang_es.dll"</Command>
+      <Message>Copying Spanish language DLL to vncviewer x64 Release folder</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="vncviewer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\res\cursor1.cur" />
+    <None Include="..\..\res\cursorsel.cur" />
+    <None Include="..\..\res\Finger.cur" />
+    <None Include="..\..\res\nocursor.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\res\B46.ico" />
+    <Image Include="..\..\res\dir.ico" />
+    <Image Include="..\..\res\down.bmp" />
+    <Image Include="..\..\res\drive.ico" />
+    <Image Include="..\..\res\file.ico" />
+    <Image Include="..\..\res\hoch.bmp" />
+    <Image Include="..\..\res\idr_tray.ico" />
+    <Image Include="..\..\res\idr_tray_disabled.ico" />
+    <Image Include="..\..\res\quer.bmp" />
+    <Image Include="..\..\res\stat\1op1.bmp" />
+    <Image Include="..\..\res\stat\back.bmp" />
+    <Image Include="..\..\res\stat\both.bmp" />
+    <Image Include="..\..\res\stat\chat.bmp" />
+    <Image Include="..\..\res\stat\closeup.bmp" />
+    <Image Include="..\..\res\stat\front.bmp" />
+    <Image Include="..\..\res\stat\FT.bmp" />
+    <Image Include="..\..\res\stat\full.bmp" />
+    <Image Include="..\..\res\stat\maximizeup.bmp" />
+    <Image Include="..\..\res\stat\minimizeup.bmp" />
+    <Image Include="..\..\res\stat\none.bmp" />
+    <Image Include="..\..\res\stat\photo.bmp" />
+    <Image Include="..\..\res\stat\pindown.bmp" />
+    <Image Include="..\..\res\stat\pinup.bmp" />
+    <Image Include="..\..\res\stat\switch.bmp" />
+    <Image Include="..\..\res\Tango_l.bmp" />
+    <Image Include="..\..\res\Tango_lx.bmp" />
+    <Image Include="..\..\res\Tango_s.bmp" />
+    <Image Include="..\..\res\Tango_sx.bmp" />
+    <Image Include="..\..\res\up.bmp" />
+    <Image Include="..\..\res\vnc32.BMP" />
+    <Image Include="..\..\res\vnc64.BMP" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
