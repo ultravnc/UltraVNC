@@ -13,10 +13,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 #pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -292,29 +292,30 @@ BEGIN
     PUSHBUTTON      "Forced Close",IDCANCEL2,246,340,66,14
 END
 
-IDD_SESSION_DLG DIALOGEX 0, 0, 260, 297
+IDD_SESSION_DLG DIALOGEX 0, 0, 290, 297
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Viewer 1.4.4.0-dev - Connection"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,81,30,103,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_PROXY_EDIT,81,44,103,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Connect",IDCONNECT,204,29,47,14
+    DEFPUSHBUTTON   "Connect",IDCONNECT,234,29,47,14
     PUSHBUTTON      "Options",IDC_BUTTON_EXPAND,9,62,50,13,BS_ICON
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,5,26,23
     CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,83,17,47,10
     CONTROL         "Repeater",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,133,17,47,10
-    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,243,172
-    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,124,258,60,13
-    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,191,258,60,13
-    PUSHBUTTON      "About",IDC_ABOUT,9,277,60,13
-    PUSHBUTTON      "Save as",IDC_SAVEAS,124,277,60,13
-    PUSHBUTTON      "Restore defaults",IDC_RESET_DEFAULTS,9,258,60,13
-    PUSHBUTTON      "Save",IDC_SAVE,191,277,60,13
+    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,273,172
+    PUSHBUTTON      "Delete",IDC_HOSTNAME_DEL,148,258,60,13
+    PUSHBUTTON      "Load ",IDC_LOADPROFILE_B,221,258,60,13
+    PUSHBUTTON      "About",IDC_ABOUT,75,277,60,13
+    PUSHBUTTON      "Save as",IDC_SAVEAS,148,277,60,13
+    PUSHBUTTON      "Restore defaults",IDC_RESET_DEFAULTS,75,258,60,13
+    PUSHBUTTON      "Save",IDC_SAVE,221,277,60,13
+    COMBOBOX        IDC_LANGUAGE_COMBO,9,277,60,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Computer",IDC_LINE1,33,32,46,8
     CTEXT           "UltraVNC Viewer",IDC_LOGO,46,7,156,8,SS_CENTERIMAGE
     LTEXT           "Computer",IDC_LINE2,33,46,47,8
-    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,4,0,255,84
+    CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,4,0,285,84
     CONTROL         "Bridge",IDC_RADIOBRIDGE,"Button",BS_AUTORADIOBUTTON,184,17,36,10
 END
 
@@ -450,7 +451,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2025 UltraVNC Team Members",IDC_STATIC,44,31,184,13
+    LTEXT           "Copyright Â© 2002-2025 UltraVNC Team Members",IDC_STATIC,44,31,184,13
     LTEXT           "Built",IDC_STATIC,44,18,15,11
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
     LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,54,55,8
@@ -1253,6 +1254,12 @@ BEGIN
     IDS_STRING50295         "File transfer interrupted: Connection with server lost"
     IDS_STRING50296         "Warning"
     IDS_STRING50297         "The server is sending a screen size that exceeds the limits"
+    IDS_TLS1                "Connection closed"
+    IDS_TLS2                "AcquireCredentialsHandle failed"
+    IDS_TLS3                "QueryContextAttributes failed"
+    IDS_TLS4                "Not enough I/O buffers"
+    IDS_TLS5                "Handshake aborted"
+    IDS_TLS6                "Handshake cannot be completed"
 END
 
 STRINGTABLE
@@ -1420,6 +1427,14 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_N12                 "Insufficient memory to allocate zlib buffer."
+    IDS_N13                 "Invalid Discovery Code\n"
+    IDS_N14                 "Can't use IDEA authentication any more!"
+    IDS_I4                  "Daemon error"
+END
+
+STRINGTABLE
+BEGIN
     IDS_H58                 "File(s)/Folder(s)"
     IDS_H59                 "Decompressing Folder"
     IDS_H60                 "after reception. Please Wait..."
@@ -1558,7 +1573,39 @@ BEGIN
     IDS_L92                 "No authentication needed"
 END
 
-#endif    // English (United States) resources
+STRINGTABLE
+BEGIN
+    IDS_TLS7                "EncryptMessage failed"
+    IDS_TLS8                "DecryptMessage failed"
+    IDS_TLS9                "Unexpected DecryptMessage result"
+    IDS_TLS10               "ApplyControlToken failed"
+    IDS_TLS11               "CertGetCertificateChain failed"
+    IDS_N1                  "No Items in ListView"
+    IDS_N2                  "No VNC Server selected"
+    IDS_N3                  "TCVNC Multitouch Device"
+    IDS_N4                  "Function only supported in 1:1 mode"
+    IDS_N5                  "UltraVNC Viewer - Snapshot"
+    IDS_N6                  "UltraVNC Viewer - Connection Informations"
+    IDS_N7                  "UltraVNC Viewer - Connection dropped, trying to reconnect ("
+    IDS_N8                  "UltraVNC Viewer - Chat with <%s>"
+    IDS_N9                  "UltraVNC Viewer -"
+    IDS_N10                 "All displays"
+    IDS_N11                 "Default Monitor"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TAB_ENCODERS        "Encoders"
+    IDS_TAB_INPUT           "Input"
+    IDS_TAB_DISPLAY         "Display"
+    IDS_TAB_MISC            "Misc"
+    IDS_TAB_SECURITY        "Security"
+    IDS_TAB_QUICKENC        "Quick encoder"
+    IDS_TAB_LISTEN          "Listen"
+    IDS_TAB_CONF            "Config"
+END
+
+#endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
 

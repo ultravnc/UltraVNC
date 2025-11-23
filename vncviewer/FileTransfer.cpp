@@ -3271,7 +3271,8 @@ bool FileTransfer::IsDirectoryGetIt(char* szName, int size)
 
 int FileTransfer::DoDialog()
 {
- 	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FILETRANSFER_DLG), 
+	extern HINSTANCE m_hInstResDLL;
+ 	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_FILETRANSFER_DLG), 
 		NULL, (DLGPROC) FileTransferDlgProc, (LONG_PTR) this);
 }
 
@@ -4476,9 +4477,10 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 // 
 int FileTransfer::DoFTParamDialog(LPSTR szTitle, LPSTR szComment)
 {
+	extern HINSTANCE m_hInstResDLL;
 	strcpy_s(m_szFTParamTitle, szTitle);
 	strcpy_s(m_szFTParamComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), hWnd, (DLGPROC) FTParamDlgProc, (LONG_PTR) this);
+	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_FTPARAM_DLG), hWnd, (DLGPROC) FTParamDlgProc, (LONG_PTR) this);
 }
 
 
@@ -4556,9 +4558,10 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 // 
 int FileTransfer::DoFTConfirmDialog(LPSTR szTitle, LPSTR szComment)
 {
+	extern HINSTANCE m_hInstResDLL;
 	strcpy_s(m_szFTConfirmTitle, szTitle);
 	strcpy_s(m_szFTConfirmComment, szComment);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG_PTR) this);
+	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG_PTR) this);
 }
 
 
@@ -4716,15 +4719,17 @@ void FileTransfer::InitListViewImagesList(HWND hListView)
 {
     HIMAGELIST hImageList = ImageList_Create(16, 16, ILC_MASK, 2, 2); 
 
-    HICON hIcon = LoadIcon(pApp->m_instance, MAKEINTRESOURCE(IDI_DIR)); 
+    // Load icons from main executable, not language DLL
+    extern HINSTANCE hInstance;
+    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DIR)); 
     ImageList_AddIcon(hImageList, hIcon);  
     DestroyIcon(hIcon); 
 
-    hIcon = LoadIcon(pApp->m_instance, MAKEINTRESOURCE(IDI_FILE)); 
+    hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_FILE)); 
     ImageList_AddIcon(hImageList, hIcon); 
     DestroyIcon(hIcon); 
 
-    hIcon = LoadIcon(pApp->m_instance, MAKEINTRESOURCE(IDI_DRIVE)); 
+    hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DRIVE)); 
     ImageList_AddIcon(hImageList, hIcon); 
     DestroyIcon(hIcon); 
 

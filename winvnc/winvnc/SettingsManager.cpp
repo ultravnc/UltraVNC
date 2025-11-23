@@ -22,6 +22,7 @@
 #include <sodium.h>
 #include "common/win32_helpers.h"
 #include <fstream>
+#include "Localization.h"
 
 #pragma comment(lib, "libsodium.lib")
 
@@ -266,6 +267,7 @@ void SettingsManager::setDefaults()
 	memset(m_pref_alternateShell, 0, 129);
 	m_pref_cloudEnabled = false;
 	m_pref_AllowUserSettingsWithPassword = false;
+	strcpy_s(m_pref_language, "en");  // Default to English
 
 };
 
@@ -388,6 +390,9 @@ void SettingsManager::load()
 	m_pref_Hook = iniFile.ReadInt("poll", "EnableHook", m_pref_Hook);
 	m_pref_Virtual = iniFile.ReadInt("poll", "EnableVirtual", m_pref_Virtual);
 	m_pref_autocapt = iniFile.ReadInt("poll", "autocapt", m_pref_autocapt);
+	
+	// Language setting
+	iniFile.ReadString("admin", "Language", m_pref_language, 16);
 }
 
 void SettingsManager::savePassword() {
@@ -502,7 +507,10 @@ void SettingsManager::save()
 
 	iniFile.WriteInt("admin_auth", "locdom1", m_pref_locdom1);
 	iniFile.WriteInt("admin_auth", "locdom2", m_pref_locdom2);
-	iniFile.WriteInt("admin_auth", "locdom3", m_pref_locdom3);	
+	iniFile.WriteInt("admin_auth", "locdom3", m_pref_locdom3);
+	
+	// Language setting
+	iniFile.WriteString("admin", "Language", m_pref_language);
 }
 
 void SettingsManager::setkeepAliveInterval(int secs) {
@@ -573,7 +581,7 @@ bool SettingsManager::checkAdminPassword()
 				return true;
 			}
 			else {
-				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry?", "Error", MB_OK);
+				DWORD result = MessageBoxSecure(NULL, sz_ID_WRONG_PASSWORD_RETRY, sz_ID_ERROR_CAPTION, MB_OK);
 				if (result == 1)
 					Sleep(2000);
 				else

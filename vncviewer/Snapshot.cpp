@@ -165,9 +165,10 @@ Snapshot::~Snapshot()
 
 int Snapshot::DoDialogSnapshot(TCHAR folder[MAX_PATH], TCHAR prefix[56])
 {
+	extern HINSTANCE m_hInstResDLL;
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_SAVEIMAGE), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
+	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_SAVEIMAGE), NULL, (DLGPROC) DlgProc, (LONG_PTR) this);
 }
 
 BOOL CALLBACK Snapshot::DlgProc(  HWND hwnd,  UINT uMsg,  

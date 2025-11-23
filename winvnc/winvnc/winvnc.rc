@@ -79,7 +79,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2025 UltraVNC Team Members",IDC_NAME,49,27,222,12
+    LTEXT           "Copyright Â© 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
@@ -568,15 +568,62 @@ BEGIN
     ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
 END
 
+STRINGTABLE 
+BEGIN 
+    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP requires special build" 
+    IDS_WARNING_CAPTION             "Warning" 
+    IDS_ERROR_OS_NOT_SUPPORTED      "Error OS not supported" 
+    IDS_UNSUPPORTED_OS_CAPTION      "Unsupported OS" 
+    IDS_AUTHADMIN_DLL_NOT_FOUND     "authadmin.dll not found" 
+    IDS_WORKGRPDOMNT4_DLL_NOT_FOUND "workgrpdomnt4.dll not found" 
+    IDS_LDAPAUTH_DLL_NOT_FOUND      "ldapauth.dll not found" 
+    IDS_LDAPAUTHNT4_DLL_NOT_FOUND   "ldapauthnt4.dll not found" 
+    IDS_LDAPAUTH9X_DLL_NOT_FOUND    "ldapauth9x.dll not found" 
+    IDS_KILL_VIEWERS_QUESTION       "Do you want to kill all connected Viewers?" 
+    IDS_RESTART_SERVER_QUESTION     "Do you want to restart the UltraVNC Server?" 
+    IDS_CLOSE_SERVER_QUESTION       "Do you want to close the UltraVNC Server?" 
+    IDS_REBOOT_SYSTEM_QUESTION      "Do you want to reboot the System?" 
+    IDS_FORCE_REBOOT_QUESTION       "Do you want to force reboot the System?" 
+    IDS_UNINSTALL_SERVICE_QUESTION  "Do you want to uninstall the UltraVNC service?" 
+    IDS_INSTALL_SERVICE_QUESTION    "Do you want to install UltraVNC as service?" 
+    IDS_STOP_SERVICE_QUESTION       "Do you want to stop the UltraVNC service?" 
+    IDS_START_SERVICE_QUESTION      "Do you want to start the UltraVNC service?" 
+    IDS_SYSTEM_CAPTION               "System" 
+    IDS_SERVICE_CAPTION              "Service" 
+    IDS_CURRENT_DRIVER_OLD          "Current driver is too old for this version\nUpdate driver or disable Video hook driver\n in the Server Settings" 
+    IDS_DRIVER_NOT_FOUND_REBOOT     "Driver not found: Perhaps you need to reboot after install" 
+    IDS_DRIVER_INFO_REQUIRED_VERSION "Driver Info: Required version 1.00.22" 
+    IDS_FAILED_OPEN_SVC_MGR         "Failed to open service control manager" 
+    IDS_FAILED_PERMISSION_DENIED    "Failed: Permission denied" 
+    IDS_FAILED_CREATE_SVC           "Failed to create a new service" 
+    IDS_FAILED_SVC_NOT_INSTALLED    "Failed: Service is not installed" 
+    IDS_FAILED_OPEN_SVC             "Failed to open the service" 
+    IDS_FAILED_QUERY_SVC_STATUS     "Failed to query service status" 
+    IDS_FAILED_DELETE_SVC           "Failed to delete the service" 
+    IDS_WRONG_PASSWORD_RETRY        "Wrong password, do you want to retry?" 
+    IDS_ERROR_CAPTION                "Error" 
+    IDS_UAC_DISABLED_REGISTRY        "UAC is disabled, make registry changes to allow CAD" 
+    IDS_VERIFY_SAME_FOLDER           "Verify that winvnc.exe and uvnc_settings are in the same folder\n can not create the uvnc_service"
+    IDS_DRIVER_FOUND                 "Driver found. " 
+    IDS_DRIVER_VERSION_OK            "Driver version OK " 
+    IDS_DRIVER_VERSION_NOT_OK        "Driver verion is not 1.00.22 " 
+    IDS_DRIVER_NOT_ACTIVATED         "Driver Not Activated, is the viewer current connected?" 
+    IDS_DRIVER_ONLY_SERVICE_ADMIN    "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin" 
+    IDS_DRIVER_ACTIVE                " driver Active" 
+    IDS_DRIVER_ACCESS_OK             " access ok" 
+    IDS_DRIVER_ACCESS_DENIED         " access denied, permission problem"
+    IDS_LANGUAGE_NAME                "English"
+END 
+
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
+// English (Neutral) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 #pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -859,6 +906,9 @@ BEGIN
     LTEXT           "Default screen",IDC_STATIC,14,129,47,8
     CONTROL         "Primary",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
     CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
+    LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,40,8
+    COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "(restart required)",IDC_STATIC,180,145,60,8
 END
 
 IDD_FORM_Service DIALOGEX 0, 0, 362, 209
@@ -1101,7 +1151,7 @@ BEGIN
     0
 END
 
-#endif    // English (United States) resources
+#endif    // English (Neutral) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -1113,5 +1163,4 @@ END
 //
 #include "version.rc2"
 /////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-
+#endif    // not APSTUDIO_INVOKED 

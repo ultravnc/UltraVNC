@@ -150,7 +150,7 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 
 void ShowAboutBox()
 {
-	int res = DialogBox(pApp->m_instance, 
+	int res = DialogBox(m_hInstResDLL, 
  		DIALOG_MAKEINTRESOURCE(IDD_APP_ABOUT),
 		NULL, (DLGPROC) AboutDlgProc);
 }

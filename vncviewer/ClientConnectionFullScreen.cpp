@@ -31,7 +31,7 @@ void ClientConnection::saveScreenPosition()
 //	if (!m_opts->m_SavePos)
 	GetWindowRect(m_hwndMain, &mainRect);
 
-	// if doubleclick Title don´t save     
+	// if doubleclick Title donï¿½t save     
 	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
 	MONITORINFO mi;
 	mi.cbSize = sizeof(MONITORINFO);

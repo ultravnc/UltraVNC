@@ -78,6 +78,6 @@ void ShowMessageBox2(char *info,int error_nr)
 {
 	infomsg2 = info;
 	g_error_nr2 = error_nr;
-	int res = DialogBox(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE2), NULL, (DLGPROC) MessageDlgProc2);
+	int res = DialogBox(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_APP_MESSAGE2), NULL, (DLGPROC) MessageDlgProc2);
 }
 	

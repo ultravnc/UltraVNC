@@ -41,7 +41,7 @@ Daemon::Daemon(int port, bool ipv6)
 	wndclass.lpfnWndProc	= Daemon::WndProc;
 	wndclass.cbClsExtra		= 0;
 	wndclass.cbWndExtra		= 0;
-	wndclass.hInstance		= pApp->m_instance;
+	wndclass.hInstance		= m_hInstResDLL;
 	wndclass.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
 	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(WHITE_BRUSH);
@@ -59,14 +59,14 @@ Daemon::Daemon(int port, bool ipv6)
 				200, 200,
 				NULL,
 				NULL,
-				pApp->m_instance,
+				m_hInstResDLL,
 				NULL);
 	
 	// record which client created this window
     helper::SafeSetWindowUserData(m_hwnd, (LONG_PTR)this);
 
 	// Load a popup menu
-	m_hmenu = LoadMenu(pApp->m_instance, MAKEINTRESOURCE(IDR_TRAYMENU));
+	m_hmenu = LoadMenu(m_hInstResDLL, MAKEINTRESOURCE(IDR_TRAYMENU));
 
 	// sf@2003 - Store Port number for systray display
 	m_nPort = port;
@@ -208,10 +208,12 @@ bool Daemon::SendTrayMsg(DWORD msg)
 	m_nid.uID = IDR_TRAY;	// never changes after construction
 
 	// Phil Money @ Advantig, LLC 7-9-2005
+	// Load icons from main executable, not language DLL
+	extern HINSTANCE hInstance;
 if (GetListenMode()){ 
-        m_nid.hIcon = LoadIcon(pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY));
+        m_nid.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_TRAY));
 	}else{ 
-        m_nid.hIcon = LoadIcon(pApp->m_instance, MAKEINTRESOURCE(IDR_TRAY_DISABLED)); // Phil Money @ Advantig, LLC 7-9-2005
+        m_nid.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDR_TRAY_DISABLED)); // Phil Money @ Advantig, LLC 7-9-2005
 	} 
   	
 
@@ -219,7 +221,7 @@ if (GetListenMode()){
 	m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 	m_nid.szTip[0] = '\0';
 	// Use resource string as tip if there is one
-	if (LoadString(pApp->m_instance, IDR_TRAY, m_nid.szTip, sizeof(m_nid.szTip))) {
+	if (LoadString(m_hInstResDLL, IDR_TRAY, m_nid.szTip, sizeof(m_nid.szTip))) {
 		m_nid.uFlags |= NIF_TIP;
 	}
 

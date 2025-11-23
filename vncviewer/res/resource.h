@@ -318,6 +318,7 @@
 #define IDC_SAVEASDEFAULT               2047
 #define IDC_BUTTON_EXPAND               2048
 #define IDC_ZSTD                        2049
+#define IDC_LANGUAGE_COMBO              2050
 #define IDC_LINE1                       2053
 #define IDC_LINE2                       2054
 #define IDC_SLIDERRES                   2054
@@ -502,6 +503,7 @@
 #define IDS_I1                          50136
 #define IDS_I2                          50137
 #define IDS_I3                          50138
+#define IDS_I4                          50324
 #define IDS_J1                          50139
 #define IDS_J2                          50140
 #define IDS_K2                          50141
@@ -664,6 +666,40 @@
 #define IDS_STRING50296                 50296
 #define IDS_STRING107                   50297
 #define IDS_STRING50297                 50297
+#define IDS_TLS1                        50298
+#define IDS_TLS2                        50299
+#define IDS_TLS3                        50300
+#define IDS_TLS4                        50301
+#define IDS_TLS5                        50302
+#define IDS_TLS6                        50303
+#define IDS_TLS7                        50304
+#define IDS_TLS8                        50305
+#define IDS_TLS9                        50306
+#define IDS_TLS10                       50307
+#define IDS_TLS11                       50308
+#define IDS_N1                          50309
+#define IDS_N2                          50310
+#define IDS_N3                          50311
+#define IDS_N4                          50312
+#define IDS_N5                          50313
+#define IDS_N6                          50314
+#define IDS_N7                          50315
+#define IDS_N8                          50316
+#define IDS_N9                          50317
+#define IDS_N10                         50318
+#define IDS_N11                         50319
+#define IDS_N12                         50320
+#define IDS_N13                         50321
+#define IDS_N14                         50322
+#define IDS_LANGUAGE_NAME               50323
+#define IDS_TAB_ENCODERS                50400
+#define IDS_TAB_INPUT                   50401
+#define IDS_TAB_DISPLAY                 50402
+#define IDS_TAB_MISC                    50403
+#define IDS_TAB_SECURITY                50404
+#define IDS_TAB_QUICKENC                50405
+#define IDS_TAB_LISTEN                  50406
+#define IDS_TAB_CONF                    50407
 
 // Next default values for new objects
 // 

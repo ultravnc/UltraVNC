@@ -146,6 +146,8 @@ VNCOptions::VNCOptions()
 	m_fAutoScalingLimit = false;
 	m_NoStatus = false;
 	m_NoHotKeys = false;
+	m_FullScreen = false;
+	_tcscpy_s(m_language, "en"); // Default to English
 	m_PreferredEncodings.push_back(rfbEncodingUltra2);
 	m_JapKeyboard = false;
 	m_SwapMouse = false;
@@ -1207,6 +1209,7 @@ void VNCOptions::SaveOptions(char* fname)
 	WritePrivateProfileString("options", "prefix", m_prefix, fname);
 	WritePrivateProfileString("options", "imageFormat", m_imageFormat, fname);
 	WritePrivateProfileString("options", "InfoMsg", m_InfoMsg, fname);
+	WritePrivateProfileString("options", "language", m_language, fname);
 	saveInt("AutoReconnect", m_autoReconnect, fname);
 
 	saveInt("ExitCheck", m_fExitCheck, fname); //PGM @ Advantig
@@ -1309,6 +1312,7 @@ void VNCOptions::LoadOptions(char* fname)
 	GetPrivateProfileString("options", "prefix", m_prefix, m_prefix, 56, fname);
 	GetPrivateProfileString("options", "imageFormat", m_imageFormat, m_imageFormat, 56, fname);
 	GetPrivateProfileString("options", "InfoMsg", m_InfoMsg, m_InfoMsg, 254, fname);
+	GetPrivateProfileString("options", "language", "en", m_language, 32, fname);
 	if (!g_disable_sponsor) g_disable_sponsor = readInt("sponsor", g_disable_sponsor, fname) != 0;
 
 	m_autoReconnect = readInt("AutoReconnect", m_autoReconnect, fname);
@@ -1374,8 +1378,9 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 // The dialog box allows you to change the session-specific parameters
 int VNCOptions::DoDialog(bool running, HWND hwnd)
 {
+	extern HINSTANCE m_hInstResDLL;
 	m_running = running;
-	return DialogBoxParam(pApp->m_instance, DIALOG_MAKEINTRESOURCE(IDD_OPTIONDIALOG),
+	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_OPTIONDIALOG),
 		hwnd, (DLGPROC)OptDlgProc, (LONG_PTR)this);
 }
 

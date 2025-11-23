@@ -30,6 +30,8 @@ VNCviewerApp *pApp;
 
 VNCviewerApp::VNCviewerApp(HINSTANCE hInstance, LPTSTR szCmdLine) {
 	pApp = this;
+	// m_instance points to the resource DLL (language DLL or main exe)
+	// Language DLLs contain dialogs, strings, AND images
 	m_instance = m_hInstResDLL;
 
 	// Read the command line
