@@ -36,6 +36,7 @@
 #include <sodium.h>
 #include "common/win32_helpers.h"
 #include <fstream>
+#include "Localization.h"
 
 #pragma comment(lib, "libsodium.lib")
 
@@ -587,7 +588,7 @@ bool SettingsManager::checkAdminPassword()
 				return true;
 			}
 			else {
-				DWORD result = MessageBoxSecure(NULL, "Wrong password, do you want to retry?", "Error", MB_OK);
+				DWORD result = MessageBoxSecure(NULL, sz_ID_WRONG_PASSWORD_RETRY, sz_ID_ERROR_CAPTION, MB_OK);
 				if (result == 1)
 					Sleep(2000);
 				else

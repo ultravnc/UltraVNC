@@ -460,11 +460,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	InitCommonControlsEx(&icex);
 	try {
 		if (VNC_OSVersion::getInstance()->OS_XP == true)
-			MessageBoxSecure(NULL, "Windows XP requires special build", "Warning", MB_ICONERROR);
+			MessageBoxSecure(NULL, sz_ID_WINDOWS_XP_SPECIAL_BUILD, sz_ID_WARNING_CAPTION, MB_ICONERROR);
 
 		if (VNC_OSVersion::getInstance()->OS_NOTSUPPORTED == true)
 		{
-			MessageBoxSecure(NULL, "Error OS not supported", "Unsupported OS", MB_ICONERROR);
+			MessageBoxSecure(NULL, sz_ID_ERROR_OS_NOT_SUPPORTED, sz_ID_UNSUPPORTED_OS_CAPTION, MB_ICONERROR);
 			return return2(true);
 		}
 		// make vnc last service to stop
