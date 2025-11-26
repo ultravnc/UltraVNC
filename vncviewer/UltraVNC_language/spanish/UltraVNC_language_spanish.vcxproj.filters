@@ -19,4 +19,118 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\res\B46.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\dir.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\down.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\drive.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\file.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\hoch.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\idr_tray.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\idr_tray_disabled.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\quer.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\1op1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\back.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\both.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\chat.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\closeup.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\front.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\FT.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\full.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\maximizeup.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\minimizeup.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\none.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\photo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\pindown.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\pinup.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\stat\switch.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\Tango_l.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\Tango_lx.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\Tango_s.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\Tango_sx.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\up.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\vnc32.BMP">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\res\vnc64.BMP">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\res\cursor1.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\res\cursorsel.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\res\Finger.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\res\nocursor.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

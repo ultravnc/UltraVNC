@@ -1428,6 +1428,7 @@ BEGIN
     IDS_N12                 "Nicht genügend Speicher zum Zuweisen des zlib-Puffers."
     IDS_N13                 "Ungültiger Erkennungscode\n"
     IDS_N14                 "IDEA-Authentifizierung kann nicht mehr verwendet werden!"
+    IDS_LANGUAGE_NAME       "Deutsch"
     IDS_I4                  "Daemon-Fehler"
 END
 

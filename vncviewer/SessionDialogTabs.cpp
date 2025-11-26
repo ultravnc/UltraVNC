@@ -75,42 +75,43 @@ void SessionDialog::InitTab(HWND hwnd)
 	TabCtrl_InsertItem(m_hTab, 6, &item);
 	item.pszText = "Conf";
 	TabCtrl_InsertItem(m_hTab, 7, &item);
-	hTabEncoders = CreateDialogParam(pApp->m_instance,
+	// Use m_hInstResDLL for dialog resources (translated dialogs)
+	hTabEncoders = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_ENCODERS),
 		hwnd,
 		(DLGPROC)DlgProcEncoders,
 		(LONG_PTR)this);
-	hTabKeyboardMouse = CreateDialogParam(pApp->m_instance,
+	hTabKeyboardMouse = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_KEYBOARDMOUSE),
 		hwnd,
 		(DLGPROC)DlgProcKeyboardMouse,
 		(LONG_PTR)this);
-	hTabDisplay = CreateDialogParam(pApp->m_instance,
+	hTabDisplay = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_DISPLAY),
 		hwnd,
 		(DLGPROC)DlgProcDisplay,
 		(LONG_PTR)this);
-	hTabMisc = CreateDialogParam(pApp->m_instance,
+	hTabMisc = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_MISC),
 		hwnd,
 		(DLGPROC)DlgProcMisc,
 		(LONG_PTR)this);
-	hTabSecurity = CreateDialogParam(pApp->m_instance,
+	hTabSecurity = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_SECURITY),
 		hwnd,
 		(DLGPROC)DlgProcSecurity,
 		(LONG_PTR)this);
-	hTabQuickOptions = CreateDialogParam(pApp->m_instance,
+	hTabQuickOptions = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_QUICKOPTIONS),
 		hwnd,
 		(DLGPROC)DlgProcQuickOptions,
 		(LONG_PTR)this);
-	hTabListen = CreateDialogParam(pApp->m_instance,
+	hTabListen = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_LISTEN),
 		hwnd,
 		(DLGPROC)DlgProcListen,
 		(LONG_PTR)this);
-	hTabConfig = CreateDialogParam(pApp->m_instance,
+	hTabConfig = CreateDialogParam(m_hInstResDLL,
 		MAKEINTRESOURCE(IDD_CONFIG),
 		hwnd,
 		(DLGPROC)DlgProcConfig,

@@ -100,6 +100,9 @@
 copy /Y "$(TargetPath)" "$(SolutionDir)..\Debug\languages\vnclang_fr.dll"</Command>
       <Message>Copying French language DLL to vncviewer Debug folder</Message>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\res</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -123,6 +126,9 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\Debug\languages\vnclang_fr.dll"</Comma
 copy /Y "$(TargetPath)" "$(SolutionDir)..\Release\languages\vnclang_fr.dll"</Command>
       <Message>Copying French language DLL to vncviewer Release folder</Message>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\res</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -142,6 +148,9 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\Release\languages\vnclang_fr.dll"</Com
 copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Debug\languages\vnclang_fr.dll"</Command>
       <Message>Copying French language DLL to vncviewer x64 Debug folder</Message>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\res</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -165,6 +174,9 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Debug\languages\vnclang_fr.dll"</C
 copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Release\languages\vnclang_fr.dll"</Command>
       <Message>Copying French language DLL to vncviewer x64 Release folder</Message>
     </PostBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>..\..\res</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="vncviewer.rc" />

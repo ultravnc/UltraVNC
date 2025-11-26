@@ -1426,6 +1426,7 @@ BEGIN
     IDS_N12                 "Mémoire insuffisante (tampon zlib)."
     IDS_N13                 "Code de découverte invalide\n"
     IDS_N14                 "Authentification IDEA impossible !"
+    IDS_LANGUAGE_NAME       "Fran�ais"
     IDS_I4                  "Erreur Daemon"
 END
 
