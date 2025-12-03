@@ -39,7 +39,6 @@ class vncMenu;
 #include "PropertiesDialog.h"
 #include "vncabout.h"
 #include "vncListDlg.h"
-#include "CloudDialog.h"
 
 // The tray menu class itself
 class vncMenu
@@ -56,10 +55,11 @@ public:
 	static void updateMenu();
 	void updateUser(HWND hwnd);
 	static HMENU m_hmenu;
+	static vncServer *s_server; // Static pointer for access from static methods
 
 protected:
 	// Tray icon handling
-	void AddTrayIcon();
+	BOOL AddTrayIcon();
 	void DelTrayIcon();
 	void FlashTrayIcon(BOOL flash);
 	void SendTrayMsg(DWORD msg, bool balloon, BOOL flash);

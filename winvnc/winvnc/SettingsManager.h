@@ -43,6 +43,7 @@ public:
 	void savePassword();
 	void saveViewOnlyPassword();
 	BOOL getAllowProperties() { return m_pref_allowproperties; };
+	BOOL getUseBridge() { return m_pref_fUseBridge; };
 	BOOL getAllowInjection() { return m_pref_allowInjection; };
 	BOOL getAllowShutdown() { return m_pref_allowshutdown; };
 	BOOL getAllowEditClients() { return m_pref_alloweditclients; };
@@ -122,6 +123,7 @@ public:
 
 	void setQueryIfNoLogon(BOOL value) { m_pref_QueryIfNoLogon = value; };
 	void setAllowProperties(BOOL value) { m_pref_allowproperties = value; };
+	void setUseBridge(BOOL value) { m_pref_fUseBridge = value; };
 	void setAllowInjection(BOOL value) { m_pref_allowInjection = value; };
 	void setAllowShutdown(BOOL value) { m_pref_allowshutdown = value; };
 	void setAllowEditClients(BOOL value) { m_pref_alloweditclients = value; };
@@ -290,6 +292,7 @@ private:
 	void initTemp();
 	IniFile iniFile;
 
+	BOOL	m_pref_fUseBridge;
 	BOOL	m_pref_allowproperties;
 	BOOL	m_pref_allowInjection;
 	BOOL	m_pref_allowshutdown;
