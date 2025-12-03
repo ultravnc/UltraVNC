@@ -73,7 +73,6 @@ bool PostAddAutoConnectClient_bool_null=false;
 bool PostAddConnectClient_bool=false;
 bool PostAddConnectClient_bool_null=false;
 bool PostAddNewRepeaterClient_bool=false;
-bool PostAddNewCloudClient_bool = false;
 
 char pszId_char[20];
 VCard32 address_vcard4;
@@ -1240,12 +1239,6 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 		PostAddNewRepeaterClient_bool=false;
 		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewRepeaterClient II\n"));
 		postHelper::PostAddNewRepeaterClient();
-	}
-	if (PostAddNewCloudClient_bool)
-	{
-		PostAddNewCloudClient_bool = false;
-		vnclog.Print(LL_INTERR, VNCLOG("PostAddNewCloudClient II\n"));
-		postHelper::PostAddNewCloudClient();
 	}
 	bool Runonce=false;
 	MSG msg;

@@ -32,10 +32,7 @@
 #include "SettingsManager.h"
 #include "Localization.h" // ACT : Add localization on messages
 #include "ScSelect.h"
-
-#ifdef _CLOUD
-#include "./UdtCloudlib/proxy/Cloudthread.h"
-#endif
+#include "../../common/vnc_bridge.h"
 
 #pragma comment(lib, "iphlpapi.lib")
 
@@ -175,17 +172,17 @@ vncServer::vncServer()
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
-#ifdef _CLOUD
-	cloudThread = new CloudThread();
-#endif
+	
+	// VNC Bridge initialization
+	m_bridge_running = false;
 }
 
 vncServer::~vncServer()
 {
 	// Stop bridge before other cleanup
-	//StopBridge();
-	ShutdownServer();
-}
+	StopBridge();
+	
+	ShutdownServer();}
 
 void
 vncServer::ShutdownServer()
@@ -1254,6 +1251,8 @@ vncServer::EnableConnections(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
+			// Auto-start bridge if enabled in settings
+			UpdateBridgeSettings();
 		}
 	}
 	else {
@@ -2086,46 +2085,97 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 		EnableConnections(SockConnected());
 };
 
-void vncServer::cloudConnect(bool start, char *cloudServer)
+// VNC Bridge implementation
+BOOL vncServer::StartBridge()
 {
-#ifdef _CLOUD
-	if (start)
-		cloudThread->startThread(5352, cloudServer, code, ctSERVER);
-	else
-		cloudThread->stopThread();
-#endif
+	if (m_bridge_running) {
+		return TRUE; // Already running
+	}
+
+	try {
+		// Generate deterministic discovery code based on hardware
+		// This will always be the same for the same machine (CPU + MAC + Disk)
+		m_discovery_code = VncBridge::get_auto_generated_code();
+
+		// Create bridge instance in server mode
+		m_bridge = std::make_unique<VncBridge>("server", m_discovery_code, "127.0.0.1", m_port);
+
+		// Start bridge thread
+		m_bridge_running = true;
+		m_bridge_thread = std::make_unique<std::thread>([this]() {
+			try {
+				m_bridge->run_server_mode();
+			}
+			catch (const std::exception& e) {
+				vnclog.Print(LL_INTERR, VNCLOG("Bridge thread error: %s\n"), e.what());
+				m_bridge_running = false;
+			}
+			});
+
+		vnclog.Print(LL_STATE, VNCLOG("Bridge started with code: %s\n"), m_discovery_code.c_str());
+		return TRUE;
+
+	}
+	catch (const std::exception& e) {
+		vnclog.Print(LL_INTERR, VNCLOG("Failed to start bridge: %s\n"), e.what());
+		StopBridge();
+		return FALSE;
+	}
 }
 
-bool vncServer::isCloudThreadRunning()
+void vncServer::StopBridge()
 {
-#ifdef _CLOUD
-	return cloudThread->isThreadRunning();
-#else
-	return false;
-#endif
+	if (m_bridge_running && m_bridge_thread) {
+		m_bridge_running = false;
+
+		// Signal bridge to stop
+		if (m_bridge) {
+			m_bridge->stop();
+		}
+
+		// Wait for thread to finish
+		if (m_bridge_thread->joinable()) {
+			m_bridge_thread->join();
+		}
+
+		m_bridge_thread.reset();
+	}
+
+	if (m_bridge) {
+		m_bridge.reset();
+	}
+
+	m_discovery_code.clear();
+	vnclog.Print(LL_STATE, VNCLOG("Bridge stopped\n"));
 }
 
-char *vncServer::getExternalIpAddress()
+const char* vncServer::GetDiscoveryCode()
 {
-#ifdef _CLOUD
-	return cloudThread->getExternalIpAddress();
-#else
-	return "";
-#endif
+	return m_discovery_code.c_str();
 }
 
-int vncServer::getStatus()
+BOOL vncServer::IsBridgeRunning()
 {
-#ifdef _CLOUD
-	return cloudThread->getStatus();
-#else
-	return 0;
-#endif
+	return m_bridge_running && m_bridge && m_bridge->is_running();
 }
 
-void vncServer::setVNcPort()
+void vncServer::UpdateBridgeSettings()
 {
-#ifdef _CLOUD
-	cloudThread->setVNcPort(m_port);
-#endif
+	// Check if bridge should be running based on settings
+	BOOL shouldRun = settings->getUseBridge();
+	BOOL isRunning = IsBridgeRunning();
+
+	if (shouldRun && !isRunning) {
+		// Start bridge
+		vnclog.Print(LL_STATE, VNCLOG("Starting bridge due to settings\n"));
+		StartBridge();
+	}
+	else if (!shouldRun && isRunning) {
+		// Stop bridge
+		vnclog.Print(LL_STATE, VNCLOG("Stopping bridge due to settings\n"));
+		StopBridge();
+	}
+	
+	// Update menu to reflect bridge status
+	vncMenu::updateMenu();
 }

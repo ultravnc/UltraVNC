@@ -133,7 +133,7 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	TabCtrl_InsertItem(hTabControl, 3, &item);
 	item.pszText = "Notifications";
 	TabCtrl_InsertItem(hTabControl, 4, &item);
-	item.pszText = "Reverse";
+	item.pszText = "Network";
 	TabCtrl_InsertItem(hTabControl, 5, &item);
 	item.pszText = "Rules";
 	TabCtrl_InsertItem(hTabControl, 6, &item);
@@ -180,8 +180,8 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
-	hTabReverse = CreateDialogParam(hInstResDLL,
-		MAKEINTRESOURCE(IDD_FORM_Reverse),
+	hTabNetwork = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_Network),
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
@@ -229,7 +229,7 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	SetWindowPos(hTabNotifications, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
-	SetWindowPos(hTabReverse, HWND_TOP, rc.left, rc.top,
+	SetWindowPos(hTabNetwork, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabRules, HWND_TOP, rc.left, rc.top,
@@ -283,8 +283,8 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				return 0;
 
 			case 5:
-				ShowWindow(hTabReverse, SW_SHOW);
-				SetFocus(hTabReverse);
+				ShowWindow(hTabNetwork, SW_SHOW);
+				SetFocus(hTabNetwork);
 				return 0;
 
 			case 6:
@@ -338,7 +338,7 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				break;
 
 			case 5:
-				ShowWindow(hTabReverse, SW_HIDE);
+				ShowWindow(hTabNetwork, SW_HIDE);
 				break;
 
 			case 6:
@@ -560,6 +560,10 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 
 	if (GetDlgItem(hwnd, IDC_REVERSEAUTH))
 		SendMessage(GetDlgItem(hwnd, IDC_REVERSEAUTH), BM_SETCHECK, settings->getReverseAuthRequired(), 0);
+
+	if (GetDlgItem(hwnd, IDC_CHECKBRIDGE))
+		SendMessage(GetDlgItem(hwnd, IDC_CHECKBRIDGE), BM_SETCHECK, settings->getUseBridge(), 0);
+	
 
 	SetDlgItemInt(hwnd, IDC_SCALE, settings->getDefaultScale(), false);
 
@@ -1036,6 +1040,9 @@ void PropertiesDialog::UpdateServer()
 		m_server->SetPorts(settings->getPortNumber(), settings->getHttpPortNumber());
 
 	m_server->EnableConnections(settings->getEnableConnections());
+	
+	// VNC Bridge settings
+	m_server->UpdateBridgeSettings();
 
 	// DSM Plugin prefs
 	if (settings->getUseDSMPlugin())
@@ -2032,6 +2039,12 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		settings->setReverseAuthRequired(SendMessage(hReverseAuth, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	}
 
+	if (GetDlgItem(hwnd, IDC_CHECKBRIDGE)) {
+		HWND hUseBridge = GetDlgItem(hwnd, IDC_CHECKBRIDGE);
+		settings->setUseBridge(SendMessage(hUseBridge, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		m_server->UpdateBridgeSettings();
+	}
+
 	if (GetDlgItem(hwnd, IDC_SCALE)) {
 		int nDScale = GetDlgItemInt(hwnd, IDC_SCALE, NULL, FALSE);
 		if (nDScale < 1 || nDScale > 9) nDScale = 1;
@@ -2142,7 +2155,7 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabInput, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabMisc, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabNotifications, WM_COMMAND, IDC_APPLY, 0);
-	SendMessage(hTabReverse, WM_COMMAND, IDC_APPLY, 0);
+	SendMessage(hTabNetwork, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
@@ -2159,7 +2172,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabInput, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabMisc, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabNotifications, WM_COMMAND, IDOK, 0);
-	SendMessage(hTabReverse, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabNetwork, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
@@ -2175,7 +2188,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabInput);
 	DestroyWindow(hTabMisc);
 	DestroyWindow(hTabNotifications);
-	DestroyWindow(hTabReverse);
+	DestroyWindow(hTabNetwork);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
@@ -2190,7 +2203,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabInput, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabMisc, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabNotifications, WM_COMMAND, IDCANCEL, 0);
-	SendMessage(hTabReverse, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabNetwork, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabRules, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDCANCEL, 0);
@@ -2201,7 +2214,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabInput);
 	DestroyWindow(hTabMisc);
 	DestroyWindow(hTabNotifications);
-	DestroyWindow(hTabReverse);
+	DestroyWindow(hTabNetwork);
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);

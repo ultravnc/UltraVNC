@@ -41,7 +41,6 @@ namespace postHelper {
 	extern UINT MENU_STOP_RECONNECT_MSG;
 	extern UINT MENU_STOP_ALL_RECONNECT_MSG;
 	extern UINT MENU_ADD_CLIENT_MSG_INIT;
-	extern UINT MENU_ADD_CLOUD_MSG;
 	extern UINT MENU_ADD_CLIENT6_MSG_INIT;
 	extern UINT MENU_ADD_CLIENT6_MSG;
 	extern UINT MENU_TRAYICON_BALLOON_MSG;
@@ -50,7 +49,6 @@ namespace postHelper {
 
 	BOOL PostAddAutoConnectClient(const char* pszId);
 	BOOL PostAddNewRepeaterClient();
-	BOOL PostAddNewCloudClient();
 	BOOL PostAddStopConnectClient();
 	BOOL PostAddStopConnectClientAll();
 	BOOL PostAddNewClientInit(unsigned long ipaddress, unsigned short port);

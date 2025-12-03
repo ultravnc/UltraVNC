@@ -318,6 +318,8 @@ BEGIN
     BEGIN
         MENUITEM "&Settings",                   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
+        MENUITEM "Copy bridge code",            ID_COPY_BRIDGE_CODE
+        MENUITEM SEPARATOR
         MENUITEM "&About UltraVNC Server...",   ID_ABOUT
         POPUP "Visit our links"
         BEGIN
@@ -619,7 +621,7 @@ BEGIN
     PUSHBUTTON      "CLEAR",IDC_CLEARPASSWORDVO,161,37,50,14
 END
 
-IDD_FORM_Reverse DIALOGEX 0, 0, 361, 207
+IDD_FORM_Network DIALOGEX 0, 0, 361, 207
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -631,6 +633,9 @@ BEGIN
     CONTROL         "Authentication required for server initiated connections",IDC_REVERSEAUTH,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,266,16
     GROUPBOX        "Reverse connection",IDC_STATIC,7,7,344,88
+    CONTROL         "Allow Bridge connections (disconnect take 5s)",IDC_CHECKBRIDGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,161,10
+    GROUPBOX        "Bridge",IDC_STATIC,7,101,314,29
 END
 
 IDD_FORM_Log DIALOGEX 0, 0, 361, 211
@@ -896,7 +901,7 @@ BEGIN
         BOTTOMMARGIN, 202
     END
 
-    IDD_FORM_Reverse, DIALOG
+    IDD_FORM_Network, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 351
@@ -1031,7 +1036,7 @@ BEGIN
     0
 END
 
-IDD_FORM_Reverse AFX_DIALOG_LAYOUT
+IDD_FORM_Network AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

@@ -129,6 +129,7 @@ void SettingsManager::setDefaults()
 	memset(reinterpret_cast<void*>(m_pref_authhosts), 0, sizeof(m_pref_authhosts));
 	strcpy(m_pref_authhosts, "?");
 
+	m_pref_fUseBridge = TRUE;
 	m_pref_alloweditclients = TRUE;
 	m_pref_allowproperties = TRUE;
 	m_pref_allowInjection = FALSE;
@@ -181,6 +182,7 @@ void SettingsManager::setDefaults()
 	m_pref_RemoveFontSmoothing = FALSE;
 	m_pref_alloweditclients = TRUE;
 	m_pref_allowshutdown = TRUE;
+	m_pref_fUseBridge = TRUE;
 	m_pref_allowproperties = TRUE;
 	m_pref_allowInjection = FALSE;
 	m_pref_UseDSMPlugin = FALSE;
@@ -294,6 +296,7 @@ void SettingsManager::load()
 	iniFile.ReadString("admin", "AuthHosts", m_pref_authhosts2, 1280);
 	m_pref_allowshutdown = iniFile.ReadInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	m_pref_allowproperties = iniFile.ReadInt("admin", "AllowProperties", m_pref_allowproperties);
+	m_pref_fUseBridge = iniFile.ReadInt("admin", "UseBridge", m_pref_fUseBridge);
 	m_pref_allowInjection = iniFile.ReadInt("admin", "AllowInjection", m_pref_allowInjection);
 	m_pref_alloweditclients = iniFile.ReadInt("admin", "AllowEditClients", m_pref_alloweditclients);
 	m_pref_ftTimeout = iniFile.ReadInt("admin", "FileTransferTimeout", m_pref_ftTimeout);
@@ -460,6 +463,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "LoopbackOnly", m_pref_LoopbackOnly);
 	iniFile.WriteInt("admin", "AllowShutdown", m_pref_allowshutdown);
 	iniFile.WriteInt("admin", "AllowProperties", m_pref_allowproperties);
+	iniFile.WriteInt("admin", "UseBridge", m_pref_fUseBridge);
 	iniFile.WriteInt("admin", "AllowInjection", m_pref_allowInjection);
 	iniFile.WriteInt("admin", "AllowEditClients", m_pref_alloweditclients);
 	iniFile.WriteInt("admin", "FileTransferTimeout", m_pref_ftTimeout);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -358,7 +358,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../omnithread;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../omnithread;..;../librats/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_CRT_SECURE_NO_WARNINGS;_VIEWER;_XZ;_VCPKG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -366,6 +366,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CLOUD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -376,9 +377,9 @@
       <Command>cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../librats/Win32/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
@@ -405,7 +406,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../omnithread;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../omnithread;..;../librats/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_CRT_SECURE_NO_WARNINGS;_X64;_VIEWER;_XZ;%(PreprocessorDefinitions);_VCPKG</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -413,6 +414,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -423,7 +425,7 @@
       <Command>cl /nologo /MTd /Fo.\x64\Debug\ /Fd.\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -432,7 +434,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\winvnc\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\winvnc\omnithread\x64\Debug;..\winvnc\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\winvnc\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\winvnc\omnithread\x64\Debug;..\winvnc\x64\debug;..\librats\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -468,6 +470,7 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -529,6 +532,7 @@
       <StructMemberAlignment>16Bytes</StructMemberAlignment>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -821,6 +825,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1150,6 +1155,7 @@
     <ClCompile Include="..\common\mnemonic.c" />
     <ClCompile Include="..\common\mn_wordlist.c" />
     <ClCompile Include="..\common\UltraVncZ.cpp" />
+    <ClCompile Include="..\common\vnc_bridge_impl.cpp" />
     <ClCompile Include="AboutBox.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2388,6 +2394,9 @@
     <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\librats\rats_native.vcxproj">
+      <Project>{0ef3ce9b-836f-3257-931f-94962827a269}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>
@@ -2405,6 +2414,7 @@
     <ResourceCompile Include="res\vncviewer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="LedOrange.bmp" />
     <Image Include="res\B46.ico" />
     <Image Include="res\dir.ico" />
     <Image Include="res\down.bmp" />
@@ -2414,6 +2424,7 @@
     <Image Include="res\idr_tray.ico" />
     <Image Include="res\idr_tray_disabled.ico" />
     <Image Include="res\LedGreen.bmp" />
+    <Image Include="res\LedOrange.bmp" />
     <Image Include="res\LedRed.bmp" />
     <Image Include="res\LedYellow.bmp" />
     <Image Include="res\quer.bmp" />

@@ -74,7 +74,7 @@
 #define IDC_CHECKIP                     1020
 #define IDC_CAPTION_STATIC              1021
 #define IDC_CHATAREA_EDIT               1022
-#define IDC_CHECK1                      1023
+#define IDC_CHECKBRIDGE                 1023
 #define IDC_PRIM                        1024
 #define IDC_ALLOWUSERSSETTINGS          1025
 #define IDC_CHECK2                      1026
@@ -298,7 +298,7 @@
 #define IDC_IDLETIMEINPUT               1252
 #define IDC_KINTERVAL                   1253
 #define IDD_FORM_NETWORK                1256
-#define IDD_FORM_Reverse                1257
+#define IDD_FORM_Network                1257
 #define IDD_FORM_Clients                1258
 #define IDD_FORM_Misc                   1261
 #define IDD_FORM_input                  1262
@@ -419,6 +419,9 @@
 #define ID_WINVNC_WARNIN                32857
 #define ID_WVNC                         32858
 #define ID_CLOSE_SILENT                 32859
+#define ID_COPY_BRIDGE_CODE             32860
+#define ID_TRAY_COPYBRIDGECODE          32861
+#define ID_Menu                         32862
 
 // Next default values for new objects
 // 
@@ -426,7 +429,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        211
-#define _APS_NEXT_COMMAND_VALUE         32860
+#define _APS_NEXT_COMMAND_VALUE         32863
 #define _APS_NEXT_CONTROL_VALUE         1292
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
