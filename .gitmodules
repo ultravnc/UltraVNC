@@ -1,0 +1,6 @@
+[submodule "librats"]
+	path = librats
+	url = https://github.com/ultravnc/ultravnc-librats.git
+[submodule "cmake/CCM"]
+	path = cmake/CCM
+	url = https://github.com/cenit/CCM.git
