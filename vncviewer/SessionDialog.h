@@ -28,7 +28,7 @@ public:
 	int DoDialog();
 	int m_port;
 	int m_proxyport;
-	bool m_fUseProxy;
+	ConnectionType m_connectionType;
 	bool m_fFromOptions; // sf@2002
 	bool m_fFromFile; // sf@2002
 	TCHAR m_host_dialog[MAX_HOST_NAME_LEN];

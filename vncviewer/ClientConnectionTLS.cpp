@@ -761,7 +761,7 @@ void ClientConnection::AuthVeNCrypt()
 						WriteExact((char *)outbuf.GetHead(), size);
 						outbuf.size = 0;
 					}
-					throw QuietException("Authentication cancelled");
+					QuietException_helper("Authentication cancelled");
 					break;
 				default:
 					if (bPersist)
@@ -792,7 +792,7 @@ void ClientConnection::AuthVeNCrypt()
 		{
 			AuthDialog ad;
 			if (!ad.DoDialog(dtUserPass, m_host, m_port))
-				throw QuietException("Authentication cancelled");
+				QuietException_helper("Authentication cancelled");
 			strcpy_s(m_cmdlnUser, ad.m_user);
 			strcpy_s(m_clearPasswd, ad.m_passwd);
 		}

@@ -26,6 +26,13 @@
 #define DOTCURSOR 1
 #define NORMALCURSOR 2
 
+// Connection type enumeration
+enum ConnectionType {
+	DIRECT_TCP = 0,      // Direct TCP connection
+	REPEATER_SERVER = 1, // Repeater server (proxy mode)
+	UDP_BRIDGE = 2       // Bridge over UDP NAT
+};
+
 inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
 	return (arg[0] == '-' || arg[0] == '/') &&
 		(_tcsicmp(&arg[1], swtch) == 0);
@@ -114,7 +121,7 @@ public:
 	int     m_port;
 	TCHAR   m_proxyhost[MAX_HOST_NAME_LEN];
 	int     m_proxyport;
-	bool	m_fUseProxy;
+	ConnectionType	m_connectionType;
 	bool	m_allowMonitorSpanning;
 	bool	m_ChangeServerRes;
 	bool	m_extendDisplay;

@@ -54,6 +54,8 @@ extern "C"
 
 #include <vector>
 #include <algorithm>
+#include <thread>
+#include <memory>
 #include "./directx/directxviewer.h"
 #include "FpsCounter.h"
 #include "shellscalingapi.h"
@@ -94,9 +96,6 @@ extern const UINT FileTransferSendPacketMessage;
 #define TIGHT_ZLIB_BUFFER_SIZE 512 // Tight encoding
 class ClientConnection;
 class CDSMPlugin;
-#ifdef _CLOUD
-class CloudThread;
-#endif
 typedef void (ClientConnection:: *tightFilterFunc)(int);
 
 void JpegErrorHeader(j_common_ptr cinfo);
@@ -137,7 +136,7 @@ public:
 	bool saved_set;
     TCHAR m_host[MAX_HOST_NAME_LEN];
 	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
-	bool m_fUseProxy;
+	ConnectionType m_connectionType;
 //	TCHAR m_remotehost[MAX_HOST_NAME_LEN];
 	int  LoadConnection(char *fname, bool fFromDialog, bool defaultOption = false);
 	void HandleQuickOption();
@@ -155,6 +154,9 @@ public:
 	void Run();
 	void KillThread();
 	void SuspendThread();
+
+	// Helper to centralize QuietException throwing with bridge cleanup
+	void QuietException_helper(const char* info);
 
 	// Exceptions 
 	class UserCancelExc {};
@@ -192,6 +194,12 @@ private:
 	bool brfbClientInitExtraMsgSupportNew = false;
 	CRITICAL_SECTION crit;
 	UltraVncZ *ultraVncZlib;
+	
+	// VNC Bridge support
+	std::unique_ptr<class VncBridge> m_bridge;
+	std::unique_ptr<std::thread> m_bridge_thread;
+	bool m_bridge_running;
+
 	UltraVncZ ultraVncZTight[4];
 	Fps fps;
 #ifdef _Gii
@@ -236,7 +244,8 @@ private:
 	void LoadDSMPlugin(bool fForceReload); // sf@2002 - DSM Plugin
 	void SetDSMPluginStuff();
 	void GetConnectDetails();
-	void Connect(bool cloud);
+	void Connect();
+	void ConnectBridge();
 	void ConnectProxy();
 	void SetSocketOptions();
 	///////////////////////////////////////////////
@@ -848,9 +857,6 @@ public:
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
 
 	// RFB settings
-#ifdef _CLOUD
-	CloudThread* cloudThread = NULL;
-#endif
 	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;
 	int m_autoReconnect;
@@ -866,8 +872,6 @@ public:
 	bool tbWM_Set;
 	RECT tbWM_rect;
 	TCHAR c_proxyhost[MAX_HOST_NAME_LEN]{};
-	TCHAR c_Cloudhost[MAX_HOST_NAME_LEN]{};
-	bool c_fUseCloud = false;
 };
 
 // Some handy classes for temporary GDI object selection

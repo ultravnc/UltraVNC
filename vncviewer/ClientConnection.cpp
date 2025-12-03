@@ -30,6 +30,11 @@ extern "C" {
 	#include "vncauth.h"
 }
 
+// VNC Bridge functionality
+#include "../common/vnc_bridge.h"
+#include <thread>
+#include <memory>
+
 #include <rdr/FdInStream.h>
 #include <rdr/ZlibInStream.h>
 #include <rdr/ZstdInStream.h>
@@ -56,9 +61,6 @@ extern "C" {
 #include "common/win32_helpers.h"
 using namespace helper;
 
-#ifdef _CLOUD
-#include "../UdtCloudlib/proxy/Cloudthread.h"
-#endif
 #include "UltraVNCHelperFunctions.h"
 extern HINSTANCE m_hInstResDLL;
 
@@ -221,6 +223,25 @@ extern char sz_F5[128];
 extern char sz_F6[64];
 extern bool command_line;
 
+void ClientConnection::QuietException_helper(const char* info)
+{
+	// Stop the viewer-side bridge thread if it's running
+	if (m_bridge_running && m_bridge) {
+		m_bridge_running = false;
+		
+		// Don't call stop() - it blocks on thread joins
+		// Just detach and let the process exit naturally
+		if (m_bridge_thread && m_bridge_thread->joinable()) {
+			m_bridge_thread->detach();
+		}
+		
+		// The bridge thread will eventually notice running_ is false and exit
+		// When the process terminates, all threads are forcibly stopped anyway
+	}
+	
+	throw QuietException(info);
+}
+
 // *************************************************************************
 //  A Client connection involves two threads - the main one which sets up
 //  connections and processes window messages and inputs, and a
@@ -343,7 +364,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, LPTSTR host, int port)
 	m_port = port;
 	_tcsncpy_s(m_proxyhost,m_opts->m_proxyhost, MAX_HOST_NAME_LEN);
 	m_proxyport=m_opts->m_proxyport;
-	m_fUseProxy = m_opts->m_fUseProxy;
+	m_connectionType = m_opts->m_connectionType;
 }
 
 typedef LONG(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
@@ -360,11 +381,6 @@ bool GetRealOSVersion(OSVERSIONINFOW& osInfo) {
 
 void ClientConnection::Init(VNCviewerApp *pApp)
 {
-#ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
-	cloudThread = new CloudThread();
-#endif
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
@@ -422,7 +438,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_nTO = 1;
 	m_pDSMPlugin = new CDSMPlugin();
 	m_fUsePlugin = false;
-	m_fUseProxy = false;
+	m_connectionType = DIRECT_TCP;
+	m_bridge_running = false;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false;  //
 	m_nNetRectBufOffset = 0;
@@ -778,17 +795,19 @@ void ClientConnection::DoConnection(bool reconnect)
 	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET)
-		if (strcmp(m_proxyhost, "") != 0 && m_fUseProxy)
+		if (strcmp(m_proxyhost, "") != 0 && m_connectionType == REPEATER_SERVER)
 			ConnectProxy();
+		if (m_connectionType == UDP_BRIDGE)
+			ConnectBridge();
 		else
-			Connect(false);
+			Connect();
 
 	SetSocketOptions();
 
 	SetDSMPluginStuff(); // The Plugin is now activated BEFORE the protocol negociation
 						 // so ALL the communication data travel through the DSMPlugin
 
-	if (strcmp(m_proxyhost,"")!=0 && m_fUseProxy)
+	if (strcmp(m_proxyhost,"")!=0 && m_connectionType == REPEATER_SERVER)
 		NegotiateProxy();
 
 	NegotiateProtocolVersion();
@@ -1391,7 +1410,7 @@ void ClientConnection::GTGBS_CreateToolbar()
 	MRU *m_pMRU;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,98);
 	//adzm 2009-06-21 - show the proxy in the 'recent' box
-	if (m_fUseProxy && strlen(m_proxyhost) > 0) {
+	if (m_connectionType == REPEATER_SERVER && strlen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
 		_snprintf_s(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
@@ -1887,12 +1906,12 @@ void ClientConnection::GetConnectDetails()
 				LoadConnection(m_opts->getDefaultOptionsFileName(), true, true);
 			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 			if (!sessdlg.DoDialog())
-				throw QuietException(sz_L42);
+				QuietException_helper(sz_L42);
 			_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 			m_port = sessdlg.m_port;
 			_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 			m_proxyport = sessdlg.m_proxyport;
-			m_fUseProxy = sessdlg.m_fUseProxy;
+			m_connectionType = sessdlg.m_connectionType;
 			if (m_opts->autoDetect)
 				m_opts->m_Use8Bit = rfbPFFullColors;				
 	}
@@ -1927,13 +1946,81 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	}
 	return 0;
 }
-void ClientConnection::Connect(bool cloud)
-{
-	if (cloud) {
-		strcpy_s(m_host, "127.0.0.1");
-		m_port = 5953;
-	}
 
+void ClientConnection::ConnectBridge()
+{
+	if (!m_opts->m_NoStatus && !m_hwndStatus)
+		GTGBS_ShowConnectWindow();
+
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Validating discovery code..."); Sleep(100); }
+	
+	std::string discovery_code = m_host;
+	
+	// Use VncBridge validation functions
+	if (!VncBridge::validate_discovery_code(discovery_code)) {
+		std::string error = VncBridge::get_validation_error(discovery_code);
+		std::string full_error = "Invalid Discovery Code\n" + error;
+		throw WarningException(full_error.c_str());
+	}
+	
+	// Normalize the code to digits only
+	discovery_code = VncBridge::normalize_discovery_code(discovery_code);
+
+	
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Discovery code validated successfully"); Sleep(100); }
+
+	
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Starting embedded bridge..."); Sleep(100); }
+	
+	try {
+		// Create VNC Bridge instance
+		m_bridge = std::make_unique<VncBridge>("client", discovery_code);
+		
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge created, starting client thread..."); Sleep(100); }
+		
+		// Start bridge thread
+		m_bridge_running = true;
+		m_bridge_thread = std::make_unique<std::thread>([this]() {
+			try {
+				m_bridge->run_client_mode();
+			} catch (const std::exception& e) {
+				m_bridge_running = false;
+			}
+		});
+		
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge thread started, waiting for connection..."); Sleep(100); }
+		
+		// Wait a moment for bridge to start listening
+		Sleep(2000);
+		
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Connecting to bridge on localhost:5901..."); Sleep(100); }
+		
+		// Connect to the bridge's TCP port
+		strcpy_s(m_host, "127.0.0.1");
+		m_port = 5901;
+		
+		// Call the regular Connect method to connect to the bridge
+		Connect();
+		
+	} catch (const std::exception& e) {
+		// Clean up on error
+		if (m_bridge_thread && m_bridge_thread->joinable()) {
+			m_bridge_running = false;
+			m_bridge_thread->join();
+		}
+		m_bridge_thread.reset();
+		m_bridge.reset();
+		
+		std::string error_msg = "Failed to start embedded bridge:\n\n";
+		error_msg += e.what();
+		error_msg += "\n\nPlease use the external bridge client:\n";
+		error_msg += "vnc_bridge client \"" + discovery_code + "\"\n\n";
+		error_msg += "Then connect VNC viewer to localhost:5901";
+		throw WarningException(error_msg.c_str());
+	}
+}
+void ClientConnection::Connect()
+{
 	if (m_opts->m_ipv6) {
 		bool IsIpv4 = false;
 		bool IsIpv6 = false;
@@ -2025,8 +2112,8 @@ void ClientConnection::Connect(bool cloud)
 			escapecounter++;
 			if (escapecounter > 50) break;
 		}
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
 		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
 
 		if (!IsIpv4 && !IsIpv6)
@@ -2039,19 +2126,19 @@ void ClientConnection::Connect(bool cloud)
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv6)
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv4)
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 
 		if (IsIpv6)
@@ -2091,7 +2178,7 @@ void ClientConnection::Connect(bool cloud)
 					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
 					SetEvent(KillEvent);
 					if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-					else throw QuietException(sz_L48);
+					else QuietException_helper(sz_L48);
 				}
 				if (res != SOCKET_ERROR)
 				{
@@ -2103,7 +2190,7 @@ void ClientConnection::Connect(bool cloud)
 					return;
 				}
 				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
-				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 
 			}
 		}
@@ -2143,7 +2230,7 @@ void ClientConnection::Connect(bool cloud)
 				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
 				SetEvent(KillEvent);
 				if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-				else throw QuietException(sz_L48);
+				else QuietException_helper(sz_L48);
 			}
 			vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
 			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
@@ -2203,7 +2290,8 @@ void ClientConnection::Connect(bool cloud)
 		thataddr.sin_port = htons(m_port);
 		///Force break after timeout
 		DWORD				  threadID;
-		if (ThreadSocketTimeout) {
+		if (ThreadSocketTimeout)
+		{
 			havetobekilled = false; //force SocketTimeout thread to quit
 			WaitForSingleObject(ThreadSocketTimeout, 5000);
 			CloseHandle(ThreadSocketTimeout);
@@ -2223,7 +2311,7 @@ void ClientConnection::Connect(bool cloud)
 			if (!Pressed_Cancel)
 				throw WarningException(sz_L48, IDS_L48);
 			else
-				throw QuietException(sz_L48);
+				QuietException_helper(sz_L48);
 		}
 		vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
 		if (m_hwndStatus) {
@@ -2328,8 +2416,8 @@ void ClientConnection::ConnectProxy()
 			escapecounter++;
 			if (escapecounter > 50) break;
 		}
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(200); }
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(200); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
 		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
 
 		if (!IsIpv4 && !IsIpv6)
@@ -2342,19 +2430,19 @@ void ClientConnection::ConnectProxy()
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv6)
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv4)
 		{
 			char			szText[256];
 			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 
 		if (IsIpv6)
@@ -2400,7 +2488,7 @@ void ClientConnection::ConnectProxy()
 					return;
 				}
 				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
-				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(500); }
+				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 
 			}
 		}
@@ -2559,7 +2647,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									"- Bad connection\r\n",1004
 									);
 		}
-		throw QuietException(c.str());
+		QuietException_helper(c.str());
 	}
 	catch (Exception &c)
 	{
@@ -2587,7 +2675,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									);
 		}
 
-		throw QuietException(c.m_info);
+		QuietException_helper(c.m_info);
 	}
 
     pv[sz_rfbProtocolVersionMsg] = 0;
@@ -3481,7 +3569,7 @@ void ClientConnection::AuthMsLogonII()
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
 		strcpy_s(m_ms_user, user);
 	} else {
-		throw QuietException(sz_L54);
+		QuietException_helper(sz_L54);
 	}
 	//user = domain + "\\" + user;
 	}
@@ -3578,7 +3666,7 @@ void ClientConnection::AuthMsLogonI()
 		else
 		{
 //					if (flash) {flash->Killflash();}
-			throw QuietException(sz_L54);
+			QuietException_helper(sz_L54);
 		}
 	}
 
@@ -3655,7 +3743,7 @@ void ClientConnection::AuthVnc()
 		}
 		else
 		{
-			throw QuietException(sz_L54);
+			QuietException_helper(sz_L54);
 		}
 	}
 	ReadExact((char *)challenge, CHALLENGESIZE);
@@ -4557,6 +4645,17 @@ ClientConnection::CloseWindows()
 }
 ClientConnection::~ClientConnection()
 {
+	// Stop bridge thread if running
+	if (m_bridge_running && m_bridge_thread) {
+		m_bridge_running = false;
+		// Don't call join() - it blocks. Just detach and let it finish on its own.
+		if (m_bridge_thread->joinable()) {
+			m_bridge_thread->detach();
+		}
+		m_bridge_thread.reset();
+		m_bridge.reset();
+	}
+	
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);
@@ -4687,10 +4786,6 @@ ClientConnection::~ClientConnection()
 	delete directx_output;
 	delete ultraVncZlib;
 	DeleteCriticalSection(&crit);
-#ifdef _CLOUD
-	if (cloudThread)
-		delete cloudThread;
-#endif
 }
 
 // You can specify a dx & dy outside the limits; the return value will
@@ -6884,7 +6979,7 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 	{
 		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
 		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
-		throw QuietException(e.str());
+		QuietException_helper(e.str());
 	}
 }
 

@@ -21,7 +21,7 @@ class PropertiesDialog
 {
 private:
 	HWND hTabControl, hTabAuthentication, hTabIncoming, hTabInput, hTabMisc, hTabNotifications,
-		hTabReverse, hTabRules, hTabCapture, hTabLog, hTabAdministration, hTabService;
+		hTabNetwork, hTabRules, hTabCapture, hTabLog, hTabAdministration, hTabService;
 	BOOL		m_dlgvisible;
 	BOOL bConnectSock = true;
 	int ListPlugins(HWND hComboBox);

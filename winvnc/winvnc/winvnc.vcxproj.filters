@@ -91,7 +91,6 @@
     <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
     <ClCompile Include="ScSelect.cpp" />
     <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="..\..\common\d3des.c" />
     <ClCompile Include="UdpEchoServer.cpp" />
     <ClCompile Include="..\..\common\Hyperlinks.cpp" />
@@ -99,6 +98,7 @@
     <ClCompile Include="RulesListView.cpp" />
     <ClCompile Include="DlgChangePassword.cpp" />
     <ClCompile Include="..\..\common\inifile.cpp" />
+    <ClCompile Include="..\..\common\vnc_bridge_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -285,9 +285,6 @@
     <ClInclude Include="cadthread.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="CloudDialog.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="credentials.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -324,6 +321,9 @@
     <ClInclude Include="RulesListView.h" />
     <ClInclude Include="DlgChangePassword.h" />
     <ClInclude Include="..\..\common\inifile.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\vnc_bridge.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

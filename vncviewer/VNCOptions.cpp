@@ -207,7 +207,7 @@ VNCOptions::VNCOptions()
 	m_fUseDSMPlugin = false;
 	m_oldplugin = false;
 	//g_disable_sponsor= false;
-	m_fUseProxy = false;
+	m_connectionType = DIRECT_TCP;
 	m_allowMonitorSpanning = 0;
 	m_ChangeServerRes = 0;
 	m_extendDisplay = 0;
@@ -375,7 +375,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	strcpy_s(m_proxyhost, MAX_HOST_NAME_LEN, s.m_proxyhost);
 	m_proxyport = s.m_proxyport;
-	m_fUseProxy = s.m_fUseProxy;
+	m_connectionType = s.m_connectionType;
 	m_allowMonitorSpanning = s.m_allowMonitorSpanning;
 	m_ChangeServerRes = s.m_ChangeServerRes;
 	m_extendDisplay = s.m_extendDisplay;
@@ -920,6 +920,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			m_fUseDSMPlugin = true;
 			strcpy_s(m_szDSMPluginFilename, args[j]);
 		}
+		else if (SwitchMatch(args[j], _T("bridge")))
+		{
+			m_connectionType = UDP_BRIDGE;
+		}
 		else if (SwitchMatch(args[j], _T("proxy")))
 		{
 			if (++j == i)
@@ -927,19 +931,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError(sz_D27); // sf@ - Todo: put correct message here
 				continue;
 			}
-			m_fUseProxy = true;
+			m_connectionType = REPEATER_SERVER;
 			_tcscpy_s(m_proxyhost, args[j]);
 			//adzm 2010-02-15
 			CheckProxyAndHost();
-		}
-		else if (SwitchMatch(args[j], _T("cloud")))
-		{
-			if (++j == i)
-			{
-				ArgError("no cloud server defined"); // sf@ - Todo: put correct message here
-				continue;
-			}
-			//adzm 2010-02-15
 		}
 		else if (SwitchMatch(args[j], _T("reconnectcounter")))
 		{
@@ -1196,7 +1191,7 @@ void VNCOptions::SaveOptions(char* fname)
 	saveInt("EnableZstd", m_fEnableZstd, fname);
 	saveInt("QuickOption", m_quickoption, fname);
 	saveInt("UseDSMPlugin", m_fUseDSMPlugin, fname);
-	saveInt("UseProxy", m_fUseProxy, fname);
+	saveInt("UseProxy", (int)m_connectionType, fname);
 	saveInt("sponsor", g_disable_sponsor, fname);
 	saveInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	saveInt("ChangeServerRes", m_ChangeServerRes, fname);
@@ -1299,7 +1294,7 @@ void VNCOptions::LoadOptions(char* fname)
 	m_fEnableZstd = readInt("EnableZstd", m_fEnableZstd, fname);
 	m_quickoption = readInt("QuickOption", m_quickoption, fname);
 	m_fUseDSMPlugin = readInt("UseDSMPlugin", m_fUseDSMPlugin, fname) != 0;
-	m_fUseProxy = readInt("UseProxy", m_fUseProxy, fname) != 0;
+	m_connectionType = (ConnectionType)readInt("UseProxy", (int)m_connectionType, fname);
 	m_allowMonitorSpanning = readInt("allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	m_ChangeServerRes = readInt("ChangeServerRes", m_ChangeServerRes, fname);
 	m_extendDisplay = readInt("extendDisplay", m_extendDisplay, fname);

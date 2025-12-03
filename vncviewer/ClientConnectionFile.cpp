@@ -187,7 +187,7 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 	}
 	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
 	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
-    m_fUseProxy = GetPrivateProfileInt("options", "UseProxy", 0, fname) ? true : false;
+    m_connectionType = (ConnectionType)GetPrivateProfileInt("options", "UseProxy", DIRECT_TCP, fname);
 
 	char buf[32];
 	m_encPasswd[0] = '\0';
@@ -205,23 +205,23 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 		// Load the rest of params 
 		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
 		m_opts->m_proxyport=m_proxyport;
-		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->m_connectionType=m_connectionType;
 		m_opts->LoadOptions(fname);
 		//m_opts->Register();
 		// Then display the session dialog to get missing params again
 		SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
 		if (!sessdlg.DoDialog())
-			throw QuietException("");
+			QuietException_helper("");
 		_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
 		m_port = sessdlg.m_port;	
 		_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 		m_proxyport = sessdlg.m_proxyport;
-		m_fUseProxy = sessdlg.m_fUseProxy;
+		m_connectionType = sessdlg.m_connectionType;
 	}
 	else if (config_specified) {
 		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
 		m_opts->m_proxyport=m_proxyport;
-		m_opts->m_fUseProxy=m_fUseProxy;
+		m_opts->m_connectionType=m_connectionType;
 		m_opts->LoadOptions(fname);
 	}
 	return 0;
