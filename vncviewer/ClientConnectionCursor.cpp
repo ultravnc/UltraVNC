@@ -46,7 +46,7 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 	if (pfburh->r.x>m_si.framebufferWidth)return;
 	if (pfburh->r.y>m_si.framebufferHeight)return;
 	if (pfburh->r.x<0)return;
-	if (pfburh->r.x<0)return;
+	if (pfburh->r.y<0)return;
 
 
 	// Ignore cursor shape updates if requested by user

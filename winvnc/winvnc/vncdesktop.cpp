@@ -1949,8 +1949,10 @@ vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int hei
 		return FALSE;
 	}
 
-	// Draw the cursor
-	DrawIconEx(m_hmemdc, 0, 0, hcursor, 0, 0, 0, NULL, DI_IMAGE);
+	// Draw the cursor at the specified size
+	// Use explicit width/height for enlarged accessibility cursors
+	// Use DI_NORMAL (DI_IMAGE | DI_MASK) to properly render colored/accessibility cursors
+	DrawIconEx(m_hmemdc, 0, 0, hcursor, width, height, 0, NULL, DI_NORMAL);
 	SelectObject(m_hmemdc, oldbitmap);
 
 	// Prepare BITMAPINFO structure (copy most m_bminfo fields)
