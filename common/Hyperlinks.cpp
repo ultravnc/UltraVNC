@@ -128,10 +128,10 @@ LRESULT CALLBACK _HyperlinkProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		{
 			// Since IDC_HAND is not available on all operating systems,
 			// we will load the arrow cursor if IDC_HAND is not present.
-			HCURSOR hCursor = LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND));
+			HCURSOR hCursor = LoadCursor(NULL, IDC_HAND);
 			if (NULL == hCursor)
 			{
-				hCursor = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+				hCursor = LoadCursor(NULL, IDC_ARROW);
 			}
 			SetCursor(hCursor);
 			return TRUE;

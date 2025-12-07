@@ -299,7 +299,7 @@ struct TLSSession
 		outbuf.EnsureFree(tlsSizes.cbHeader * cnt + nDataLen + tlsSizes.cbTrailer * cnt);
 		for (int i = 0; i < nDataLen; i += tlsSizes.cbMaximumMessage)
 		{
-			int size = minimum(nDataLen - i, tlsSizes.cbMaximumMessage);
+			int size = minimum(nDataLen - i, (int)tlsSizes.cbMaximumMessage);
 			BYTE *dst = outbuf.EnsureFree(tlsSizes.cbHeader + size + tlsSizes.cbTrailer);
 			outBuffers[0].BufferType = SECBUFFER_STREAM_HEADER;
 			outBuffers[0].pvBuffer = dst;

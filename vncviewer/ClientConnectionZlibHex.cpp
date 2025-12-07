@@ -127,7 +127,7 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
 void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, int h, int subencoding)		\
 {																				\
     CARD##bpp bg, fg;															\
-    int i;																		\
+    int i;																			\
     CARD8 *ptr;																	\
     int sx, sy, sw, sh;															\
     CARD8 nSubrects;															\
@@ -155,7 +155,7 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 																				\
 		ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));						\
 																				\
-		for (i = 0; i < nSubrects; i++) {										\
+		for (i = 0; i < (int)nSubrects; i++) {								\
 			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\
@@ -168,7 +168,7 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 	} else {																	\
 		ReadExact(m_netbuf, nSubrects * 2);										\
 																				\
-		for (i = 0; i < nSubrects; i++) {										\
+		for (i = 0; i < (int)nSubrects; i++) {								\
 			sx = *ptr >> 4;														\
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\
@@ -182,7 +182,7 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int h, int subencoding, unsigned char *buffer)		\
 {																				\
 	CARD##bpp bg, fg;															\
-	int i;																		\
+	int i;																			\
 	CARD8 *ptr;																	\
 	int sx, sy, sw, sh;															\
 	CARD8 nSubrects;															\
@@ -217,7 +217,7 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 																				\
 		/* ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8))); */				\
 																				\
-		for (i = 0; i < nSubrects; i++) {										\
+		for (i = 0; i < (int)nSubrects; i++) {								\
 			memcpy(pfgcolor,ptr,bpp/8);											\
 			ptr += (bpp/8);														\
 			sx = *ptr >> 4;														\
@@ -230,7 +230,7 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 	} else {																	\
 		/* ReadExact(m_netbuf, nSubrects * 2); */								\
 																				\
-		for (i = 0; i < nSubrects; i++) {										\
+		for (i = 0; i < (int)nSubrects; i++) {								\
 			sx = *ptr >> 4;														\
 			sy = *ptr++ & 0x0f;													\
 			sw = (*ptr >> 4) + 1;												\

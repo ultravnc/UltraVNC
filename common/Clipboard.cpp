@@ -744,12 +744,20 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 			int nConvertedSize = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)clipboardData.m_pDataText, clipboardData.m_lengthText, NULL, 0);
 
 			if (nConvertedSize > 0) {
-				wchar_t* clipStr = new wchar_t[nConvertedSize];
+				wchar_t* clipStr = new wchar_t[nConvertedSize + 1];
 				int nFinalConvertedSize = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)clipboardData.m_pDataText, clipboardData.m_lengthText, (LPWSTR)clipStr, nConvertedSize);
 
 				if (nFinalConvertedSize > 0) {
-					std::wstring wstrClipboard(clipStr);
-					m_strLastCutText.assign(wstrClipboard.begin(), wstrClipboard.end());
+					clipStr[nFinalConvertedSize] = L'\0';
+					// Convert UTF-16 to ANSI for legacy clipboard support
+					int nAnsiSize = WideCharToMultiByte(CP_ACP, 0, clipStr, nFinalConvertedSize, NULL, 0, NULL, NULL);
+					if (nAnsiSize > 0) {
+						char* ansiStr = new char[nAnsiSize + 1];
+						WideCharToMultiByte(CP_ACP, 0, clipStr, nFinalConvertedSize, ansiStr, nAnsiSize, NULL, NULL);
+						ansiStr[nAnsiSize] = '\0';
+						m_strLastCutText.assign(ansiStr, nAnsiSize);
+						delete[] ansiStr;
+					}
 				}
 
 				delete[] clipStr;

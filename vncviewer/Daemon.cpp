@@ -22,6 +22,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#pragma warning(disable: 4996) // Suppress deprecated API warnings
 
 // Daemon.cpp: implementation of the Daemon class.
 

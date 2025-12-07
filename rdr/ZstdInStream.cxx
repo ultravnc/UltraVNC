@@ -116,7 +116,7 @@ void ZstdInStream::decompress()
 	inBuffer->size = underlying->getend() - underlying->getptr();
 	inBuffer->pos = 0;
 
-	if (inBuffer->size > bytesIn)
+	if (inBuffer->size > (size_t)bytesIn)
 		inBuffer->size = bytesIn;
 
 	auto result = ZSTD_decompressStream(zstds, outBuffer, inBuffer);

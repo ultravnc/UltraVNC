@@ -346,16 +346,25 @@ void ClientConnection::SoftCursorDraw() {
 	const int fbWidth = m_si.framebufferWidth;
 	const int fbHeight = m_si.framebufferHeight;
 
+	// Pre-calculate row stride with 4-byte alignment
+	int bytesPerOutputRow = fbWidth * bytesPerPixel;
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
+
+	BYTE* destBase = (BYTE*)m_DIBbits;
+
 	for (int y = 0; y < rcHeight; y++) {
 		const int y0 = baseY + y;
 		if (y0 >= 0 && y0 < fbHeight) {
 			const int rowOffset = y * rcWidth;
+			BYTE* destRow = destBase + (bytesPerOutputRow * y0);
 			for (int x = 0; x < rcWidth; x++) {
 				const int x0 = baseX + x;
 				if (x0 >= 0 && x0 < fbWidth) {
 					const int offset = rowOffset + x;
 					if (rcMask[offset]) {
-						ConvertPixel(x0, y0, bytesPerPixel, (BYTE*)&rcSource[offset], (BYTE*)m_DIBbits, fbWidth);
+						// Inline pixel copy - avoids per-pixel function call overhead
+						memcpy(destRow + (x0 * bytesPerPixel), &rcSource[offset], bytesPerPixel);
 					}
 				}
 			}

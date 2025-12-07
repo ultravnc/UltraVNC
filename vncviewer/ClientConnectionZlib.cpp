@@ -95,8 +95,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 
 
 	newbuf = (unsigned char *)new char[bufsize+256];
-	ZeroMemory(newbuf, bufsize+256);
-	
+	// Note: ZeroMemory removed - buffer will be overwritten by decompression
 	if (newbuf == NULL) {
 		throw ErrorException("Insufficient memory to allocate zlib buffer.");
 	}

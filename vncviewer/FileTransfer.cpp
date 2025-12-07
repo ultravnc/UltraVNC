@@ -2174,10 +2174,10 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 			if (nCSBufferSize > std::numeric_limits<size_t>::max())			
 				return false;
 			
-			std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(nCSBufferSize);
+			std::unique_ptr<char[]> lpCSBuff = std::make_unique<char[]>(static_cast<size_t>(nCSBufferSize));
 			if (lpCSBuff)
 			{
-				int nCSBufferLen = GenerateFileChecksums(m_hDestFile, lpCSBuff.get(), nCSBufferSize
+				int nCSBufferLen = GenerateFileChecksums(m_hDestFile, lpCSBuff.get(), static_cast<int>(nCSBufferSize)
 				);
 				if (nCSBufferLen != -1)
 				{
@@ -4246,7 +4246,6 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		int icyb;
 		int lf_an;
 		int rg_an;
-		int iProgressRight;
 		RECT rc;
 		RECT rcLMStatic;
 		RECT rcUpload;

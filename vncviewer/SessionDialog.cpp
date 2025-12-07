@@ -78,7 +78,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	}
 
 	PreferredEncodings.clear();
-	for (int i = 0; i < m_pOpt->m_PreferredEncodings.size(); i++)
+	for (size_t i = 0; i < m_pOpt->m_PreferredEncodings.size(); i++)
 		PreferredEncodings.push_back(m_pOpt->m_PreferredEncodings[i]);
 
 	ViewOnly = m_pOpt->m_ViewOnly;
@@ -614,7 +614,7 @@ bool SessionDialog::connect(HWND hwnd)
 	}
 
 	m_pOpt->m_PreferredEncodings.clear();
-	for (int i = 0; i < PreferredEncodings.size(); i++)
+	for (size_t i = 0; i < PreferredEncodings.size(); i++)
 		m_pOpt->m_PreferredEncodings.push_back(PreferredEncodings[i]);
 
 	m_pOpt->autoDetect = autoDetect;

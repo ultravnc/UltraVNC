@@ -102,7 +102,7 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
 				}															\
                 ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));            \
                                                                               \
-                for (i = 0; i < nSubrects; i++) {                             \
+                for (i = 0; i < (int)nSubrects; i++) {                        \
 					memcpy(&fg,ptr,bpp/8);									  \
 					ptr += (bpp/8);                                           \
                     sx = *ptr >> 4;                                           \
@@ -119,7 +119,7 @@ void ClientConnection::HandleHextileEncoding##bpp(int rx, int ry, int rw, int rh
 				}															\
                 ReadExact(m_netbuf, nSubrects * 2);                           \
                                                                               \
-                for (i = 0; i < nSubrects; i++) {                             \
+                for (i = 0; i < (int)nSubrects; i++) {                        \
                     sx = *ptr >> 4;                                           \
                     sy = *ptr++ & 0x0f;                                       \
                     sw = (*ptr >> 4) + 1;                                     \

@@ -22,6 +22,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+// Suppress deprecated API warnings for legacy compatibility
+#pragma warning(disable: 4996)
 
 #include "stdhdrs.h"
 #include "vncviewer.h"

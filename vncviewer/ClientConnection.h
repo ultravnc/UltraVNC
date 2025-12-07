@@ -813,6 +813,7 @@ private:
 	void Copyfrom0buffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth,int framebufferHeight);
 	void Switchbuffer(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	void ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
+	void ConvertPixels_to_bpp_from_32_batch(int x, int y, int w, int h, int bytes_per_pixel, BYTE* source, BYTE* dest, int framebufferWidth, int framebufferHeight);
 	void SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth);
 	HDC				m_hmemdc;
  	HBITMAP			m_membitmap;
@@ -963,17 +964,9 @@ public:
 
 #define SETPIXELS_NOCONV(buffer, x, y, w, h)									\
 	{																			\
-		if ( ((w + x) * (h + y)) > (m_si.framebufferWidth * m_si.framebufferHeight)) { \
-			assert(true);														\
-			return;																\
-		}																		\
-		CARD32 *p = (CARD32 *) buffer;											\
-		for (int k = y; k < y+h; k++) {											\
-			for (int j = x; j < x+w; j++) {										\
-							if (m_DIBbits) ConvertPixel_to_bpp_from_32(j,k,m_myFormat.bitsPerPixel/8,(BYTE*)p,(BYTE*)m_DIBbits,m_si.framebufferWidth);\
-					p++;														\
-			}																	\
-		}																		\
+		if (m_DIBbits) ConvertPixels_to_bpp_from_32_batch(x, y, w, h,			\
+			m_myFormat.bitsPerPixel/8, (BYTE*)buffer, (BYTE*)m_DIBbits,			\
+			m_si.framebufferWidth, m_si.framebufferHeight);						\
 	}
 
 #define SETXORPIXELS(mask,buffer, bpp, x, y, w, h,aantal)						\

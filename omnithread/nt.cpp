@@ -378,7 +378,7 @@ omni_semaphore::~omni_semaphore(void)
   if (!CloseHandle(nt_sem)) {
     DB( cerr << "omni_semaphore::~omni_semaphore: CloseHandle error "
 	     << GetLastError() << endl );
-    throw omni_thread_fatal(GetLastError());
+    // Destructors should not throw exceptions
   }
 }
 
@@ -594,11 +594,15 @@ omni_thread::~omni_thread(void)
     DB(cerr << "destructor called for thread " << id() << endl);
 // sf@ - _endthread() that is used for BCC already does a CloseHandle (that's not the case for _endthreadEx())
 // #ifndef __BCPLUSPLUS__
-    if (handle && !CloseHandle(handle))
-	throw omni_thread_fatal(GetLastError());
+    if (handle && !CloseHandle(handle)) {
+	DB(cerr << "omni_thread::~omni_thread: CloseHandle(handle) error " << GetLastError() << endl);
+	// Destructors should not throw exceptions
+    }
 //#endif
-if (!CloseHandle(cond_semaphore))
-	throw omni_thread_fatal(GetLastError());
+    if (!CloseHandle(cond_semaphore)) {
+	DB(cerr << "omni_thread::~omni_thread: CloseHandle(cond_semaphore) error " << GetLastError() << endl);
+	// Destructors should not throw exceptions
+    }
 }
 
 

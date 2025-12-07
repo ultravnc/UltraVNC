@@ -22,6 +22,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#pragma warning(disable: 4996) // Suppress deprecated API warnings
 
 #include "stdhdrs.h"
 
@@ -286,11 +288,11 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 			if (svraddr.ss_family == AF_INET) {
 				struct sockaddr_in* s = (struct sockaddr_in*)&svraddr;
 				m_port = ntohs(s->sin_port);
-				_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
-					s->sin_addr.S_un.S_un_b.s_b1,
-					s->sin_addr.S_un.S_un_b.s_b2,
-					s->sin_addr.S_un.S_un_b.s_b3,
-					s->sin_addr.S_un.S_un_b.s_b4);
+				_snprintf_s(m_host, 250, _T("%u.%u.%u.%u"),
+					(unsigned int)s->sin_addr.S_un.S_un_b.s_b1,
+					(unsigned int)s->sin_addr.S_un.S_un_b.s_b2,
+					(unsigned int)s->sin_addr.S_un.S_un_b.s_b3,
+					(unsigned int)s->sin_addr.S_un.S_un_b.s_b4);
 			}
 			else
 			{
@@ -326,11 +328,11 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		int sasize = sizeof(svraddr);
 		if (getpeername(sock, (struct sockaddr*)&svraddr,
 			&sasize) != SOCKET_ERROR) {
-			_snprintf_s(m_host, 250, _T("%d.%d.%d.%d"),
-				svraddr.sin_addr.S_un.S_un_b.s_b1,
-				svraddr.sin_addr.S_un.S_un_b.s_b2,
-				svraddr.sin_addr.S_un.S_un_b.s_b3,
-				svraddr.sin_addr.S_un.S_un_b.s_b4);
+			_snprintf_s(m_host, 250, _T("%u.%u.%u.%u"),
+				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b1,
+				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b2,
+				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b3,
+				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b4);
 			m_port = svraddr.sin_port;
 		}
 		else {
@@ -2970,7 +2972,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 			if (authScheme == rfbClientInitExtraMsgSupport) {
 				rfbClientInitExtraMsg msg;
-				msg.textLength = strlen(m_opts->m_InfoMsg);
+				msg.textLength = (CARD8)strlen(m_opts->m_InfoMsg);
 				WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
 				if (strlen(m_opts->m_InfoMsg) > 0) {					
 					WriteExact(m_opts->m_InfoMsg, msg.textLength);
@@ -3283,7 +3285,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				if (strlen(passwd)>0)
 				{
 					//password was passed via commandline
-					lengt=strlen(passwd);
+					lengt=(WORD)strlen(passwd);
 				}
 				else
 				{
@@ -3293,7 +3295,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 							if (!bPassphraseRequired && strlen(passwd) > 8) {
 								passwd[8] = '\0';
 							}
-							lengt=strlen(passwd);												
+							lengt=(WORD)strlen(passwd);												
 						}
 					else
 						{
@@ -3747,7 +3749,7 @@ void ClientConnection::SendClientInit()
 	if (brfbClientInitExtraMsgSupportNew) {
 		brfbClientInitExtraMsgSupportNew = false;
 		rfbClientInitExtraMsg msg;
-		msg.textLength = strlen(m_opts->m_InfoMsg);
+		msg.textLength = (CARD8)strlen(m_opts->m_InfoMsg);
 		WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
 		if (strlen(m_opts->m_InfoMsg) > 0) {
 			WriteExact(m_opts->m_InfoMsg, msg.textLength);
@@ -4635,10 +4637,10 @@ ClientConnection::~ClientConnection()
 	if (m_DIBbitsCache!=NULL) delete []m_DIBbitsCache;
 	m_DIBbitsCache=NULL;
 
-	if (m_hBitmapDC != NULL)
+	if (m_hBitmapDC != NULL) {
 		DeleteDC(m_hBitmapDC);
-	if (m_hBitmapDC != NULL)
-		DeleteObject(m_hBitmapDC);
+		m_hBitmapDC = NULL;
+	}
 //	if (m_hBitmap != NULL)
 //		DeleteObject(m_hBitmap);
 
@@ -5249,10 +5251,10 @@ inline void ClientConnection::DoBlit()
 							ps.rcPaint.right - ps.rcPaint.left,
 							ps.rcPaint.bottom - ps.rcPaint.top,
 							m_hmemdc,
-							(ps.rcPaint.left + m_hScrollPos)     / horizontalRatio,
-							(ps.rcPaint.top + m_vScrollPos)      / verticalRatio,
-							(ps.rcPaint.right - ps.rcPaint.left) / horizontalRatio,
-							(ps.rcPaint.bottom - ps.rcPaint.top) / verticalRatio,
+							(int)((ps.rcPaint.left + m_hScrollPos)     / horizontalRatio),
+							(int)((ps.rcPaint.top + m_vScrollPos)      / verticalRatio),
+							(int)((ps.rcPaint.right - ps.rcPaint.left) / horizontalRatio),
+							(int)((ps.rcPaint.bottom - ps.rcPaint.top) / verticalRatio),
 							SRCCOPY);
 					}
 				}
@@ -5316,9 +5318,9 @@ void ClientConnection::ShowConnInfo()
 		_T("Connected to: %s\n\r\n\r")
 		_T("Host: %s  Port: %d\n\r")
 		_T("%s %s  %s\n\r\n\r")
-		_T("Desktop geometry: %d x %d x %d\n\r")
-		_T("Using depth: %d\n\r")
-		_T("Line speed estimate: %d kbit/s\n")
+		_T("Desktop geometry: %u x %u x %u\n\r")
+		_T("Using depth: %u\n\r")
+		_T("Line speed estimate: %u kbit/s\n")
 		_T("Current protocol version: %d.%d\n\r\n\r")
 		_T("Current keyboard name: %s\n\r\n\r")
 		_T("Using Plugin : %s - %s\n\r\n\r"), // sf@2002 - v1.1.2
@@ -6349,7 +6351,7 @@ inline void ClientConnection::ReadScreenUpdate()
 	// sf@2002
 	// We only change the preferred encoding if File Transfer is not running and if
 	// the last encoding change occured more than 30s ago
-	if (avg_kbitsPerSecond !=0 && m_opts->autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
+	if (avg_kbitsPerSecond !=0 && m_opts->autoDetect && !m_pFileTransfer->m_fFileTransferRunning && (int)(timeGetTime() - m_lLastChangeTime) > m_lLastChangeTimeTimeout)
 	{
 		//Beep(1000,1000);
 		m_lLastChangeTimeTimeout=60000;  // set to 1 minutes
@@ -7752,8 +7754,8 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 			strcat_s(title, GetVersionFromResource(version));
 			SetDlgItemText(hwnd, IDC_UVVERSION, title);
 
-			SetDlgItemInt(hwnd,IDC_RECEIVED,_this->m_BytesRead,false);
-			SetDlgItemInt(hwnd,IDC_SEND,_this->m_BytesSend,false);
+			SetDlgItemInt(hwnd,IDC_RECEIVED,(UINT)_this->m_BytesRead,false);
+			SetDlgItemInt(hwnd,IDC_SEND,(UINT)_this->m_BytesSend,false);
 
 			if (_this->m_host != NULL) {
 				SetDlgItemText(hwnd,IDC_VNCSERVER,_this->m_host);
@@ -8778,8 +8780,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						try {
 							void *p;
 							_this->join(&p);  // After joining, _this is no longer valid
-						} catch (omni_thread_invalid& e) {
-							// The thread probably hasn't been started yet,
+						} catch (omni_thread_invalid&) {
 						}
 
 						//PostQuitMessage(0);
@@ -9328,7 +9329,7 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						}
 						else
 						{
-							_snprintf_s(szText, 256,  "RegisterTouchWindow Failed with error code = %i \n", err);
+							_snprintf_s(szText, 256,  "RegisterTouchWindow Failed with error code = %lu \n", err);
 						}
 						OutputDebugString(szText);
 #endif
@@ -9885,6 +9886,75 @@ ClientConnection:: ConvertPixel_to_bpp_from_32(int xx, int yy,int bytes_per_pixe
 	}
 }
 
+// Optimized batch version - processes all pixels with a single bytesPerOutputRow calculation
+void
+ClientConnection::ConvertPixels_to_bpp_from_32_batch(int x, int y, int w, int h, int bytes_per_pixel, BYTE* source, BYTE* dest, int framebufferWidth, int framebufferHeight)
+{
+	if (!dest || w <= 0 || h <= 0 || x < 0 || y < 0)
+		return;
+	
+	// Bounds check
+	if ((x + w) > framebufferWidth || (y + h) > framebufferHeight)
+		return;
+
+	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
+	// 8-bit pitch alignment
+	if (bytesPerOutputRow % 4)
+		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
+
+	SETUP_COLOR_SHORTCUTS;
+	CARD32 *p = (CARD32*)source;
+
+	switch (bytes_per_pixel)
+	{
+	case 1:
+		for (int row = y; row < y + h; row++) {
+			BYTE *destRow = dest + (bytesPerOutputRow * row) + (x * bytes_per_pixel);
+			for (int col = 0; col < w; col++) {
+				BYTE r = ((BYTE*)p)[0];
+				BYTE g = ((BYTE*)p)[1];
+				BYTE b = ((BYTE*)p)[2];
+				*destRow = (((b * (bm + 1)) >> 8) << bs)
+					| (((g * (gm + 1)) >> 8) << gs)
+					| (((r * (rm + 1)) >> 8) << rs);
+				destRow++;
+				p++;
+			}
+		}
+		break;
+	case 2:
+		for (int row = y; row < y + h; row++) {
+			CARD16 *destRow = (CARD16*)(dest + (bytesPerOutputRow * row) + (x * bytes_per_pixel));
+			for (int col = 0; col < w; col++) {
+				BYTE r = ((BYTE*)p)[0];
+				BYTE g = ((BYTE*)p)[1];
+				BYTE b = ((BYTE*)p)[2];
+				*destRow = ((((CARD16)b * (bm + 1)) >> 8) << bs)
+					| ((((CARD16)g * (gm + 1)) >> 8) << gs)
+					| ((((CARD16)r * (rm + 1)) >> 8) << rs);
+				destRow++;
+				p++;
+			}
+		}
+		break;
+	case 4:
+		for (int row = y; row < y + h; row++) {
+			CARD32 *destRow = (CARD32*)(dest + (bytesPerOutputRow * row) + (x * bytes_per_pixel));
+			for (int col = 0; col < w; col++) {
+				BYTE r = ((BYTE*)p)[0];
+				BYTE g = ((BYTE*)p)[1];
+				BYTE b = ((BYTE*)p)[2];
+				*destRow = ((((CARD32)b * (bm + 1)) >> 8) << bs)
+					| ((((CARD32)g * (gm + 1)) >> 8) << gs)
+					| ((((CARD32)r * (rm + 1)) >> 8) << rs);
+				destRow++;
+				p++;
+			}
+		}
+		break;
+	}
+}
+
 void
 ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per_pixel,BYTE* source,BYTE* dest,int framebufferWidth)
 {
@@ -9894,18 +9964,26 @@ ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per
 	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
-	BYTE *sourcepos,*destpos;
+	BYTE *destpos;
 	destpos = (BYTE *)dest + (bytesPerOutputRow * yy)+(xx * bytes_per_pixel);
-	sourcepos=(BYTE*)source;
 
-    int y,x;
-    for (y=0; y<height; y++) {
-		for (x=0; x< width;x++)
-			{
-				memcpy(destpos+x*bytes_per_pixel, sourcepos, bytes_per_pixel);
-			}
-        destpos = (BYTE*)destpos + bytesPerOutputRow;
-    }
+	// Optimized: fill first row, then copy entire rows
+	int rowBytes = width * bytes_per_pixel;
+	
+	// Fill the first row with the solid color pattern
+	BYTE *rowPtr = destpos;
+	for (int x = 0; x < width; x++) {
+		memcpy(rowPtr, source, bytes_per_pixel);
+		rowPtr += bytes_per_pixel;
+	}
+	
+	// Copy the first row to all subsequent rows
+	BYTE *firstRow = destpos;
+	destpos += bytesPerOutputRow;
+	for (int y = 1; y < height; y++) {
+		memcpy(destpos, firstRow, rowBytes);
+		destpos += bytesPerOutputRow;
+	}
 }
 
 bool
@@ -10272,8 +10350,8 @@ void ClientConnection::ResizeToolbar(RECT& Rtb)
 			m_winwidth - 200, 10, 10, 10, TRUE);
 	}
 	UpdateWindow(m_hwndTB);
-	UpdateWindow(m_logo_wnd);
-	UpdateWindow(m_button_wnd);
+	if (m_logo_wnd) UpdateWindow(m_logo_wnd);
+	if (m_button_wnd) UpdateWindow(m_button_wnd);
 }
 
 void ClientConnection::Scollbar_wm_sizing(WPARAM wParam, LPARAM lParam)

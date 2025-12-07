@@ -1334,7 +1334,6 @@ void SessionDialog::ReadDlgProc()
 {
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	TCHAR hostname[MAX_HOST_NAME_LEN];
-	TCHAR cloudhostname[MAX_HOST_NAME_LEN];
 	HWND hwnd = SessHwnd;
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, MAX_HOST_NAME_LEN);
 	if (ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &m_port)) {
