@@ -41,7 +41,7 @@ vncEncodeZlib::vncEncodeZlib()
 	if (m_Queuebuffer == NULL)
 		vnclog.Print(LL_INTINFO, VNCLOG("Memory error"));
 	m_QueueCompressedbuffer = new BYTE [MaxQueuebufflen+(MaxQueuebufflen/100)+8];
-	if (m_Queuebuffer == NULL)
+	if (m_QueueCompressedbuffer == NULL)
 		vnclog.Print(LL_INTINFO, VNCLOG("Memory error"));
 }
 //------------------------------------------------------------------
@@ -222,12 +222,14 @@ void vncEncodeZlib::SendZlibrects(VSocket *outConn)
 	if (NRects==0) return; // NO update
 	if (m_nNbRects<3 && !must_be_zipped) {
 		outConn->SendExactQueue( (char *)m_Queuebuffer, m_Queuelen); // 1 Small update
-		m_nNbRects=0;
-		m_Queuelen=0;
 		encodedSize += m_Queuelen-sz_rfbFramebufferUpdateRectHeader;
 		rectangleOverhead += sz_rfbFramebufferUpdateRectHeader;
+		m_nNbRects=0;
+		m_Queuelen=0;
 		return;
 	}
+	encodedSize += m_Queuelen-sz_rfbFramebufferUpdateRectHeader;
+	rectangleOverhead += sz_rfbFramebufferUpdateRectHeader;
 	m_nNbRects=0;
 	m_Queuelen=0;
 	must_be_zipped=false;

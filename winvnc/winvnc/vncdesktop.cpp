@@ -2572,7 +2572,7 @@ bool vncDesktop::block_input(bool first)
 		{
 			returnvalue = (*pbi)(Blockinput_val);
 			DWORD aa = GetLastError();
-			if (old_Blockinput != Blockinput_val && aa == 5)
+			if (old_Blockinput != (int)Blockinput_val && aa == 5)
 			{
 				if (m_hookinited)
 					PostMessage(m_hwnd, WM_HOOKCHANGE, 2, 0);

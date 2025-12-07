@@ -1685,6 +1685,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin_old(std::string& auth_message)
 		if (!m_socket->ReadExact((char*)&wResponseLength, sizeof(wResponseLength))) {
 			return FALSE;
 		}
+		if (wResponseLength > 2024) return FALSE;
 
 		BYTE* pResponseData = new BYTE[wResponseLength];
 
@@ -1752,10 +1753,7 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	}
 
 	if (result) {
-		if (user != NULL)
-			m_client->m_client_domain_username = _strdup(user);
-		else
-			m_client->m_client_domain_username = _strdup("<unknown>");
+		m_client->m_client_domain_username = _strdup(user);
 		return TRUE;
 	}
 	else {
@@ -1945,11 +1943,8 @@ void GetIPString(char* buffer, int buflen)
 		hint.ai_socktype = SOCK_STREAM;
 		hint.ai_protocol = IPPROTO_TCP;
 		struct sockaddr_in6* pIpv6Addr;
-		struct sockaddr_in* pIpv4Addr;
 		struct sockaddr_in6 Ipv6Addr;
-		struct sockaddr_in Ipv4Addr;
 		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
-		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
 
 		//make sure the buffer is not overwritten
 

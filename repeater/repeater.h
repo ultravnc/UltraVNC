@@ -65,7 +65,9 @@
 #ifndef FD_ALLOC
 #define FD_ALLOC(nfds) ((fd_set*)malloc((nfds+7)/8))
 #endif
+#ifndef ECONNRESET
 #define ECONNRESET WSAECONNRESET
+#endif
 #define RFB_PORT_OFFSET 5900
 #define true TRUE
 #define false FALSE

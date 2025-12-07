@@ -196,11 +196,10 @@ vncServer::vncServer()
 
 vncServer::~vncServer()
 {
-#ifdef _CLOUD
-	cloudThread->stopThread();
-	delete cloudThread;
-#endif
-	ShutdownServer();}
+	// Stop bridge before other cleanup
+	//StopBridge();
+	ShutdownServer();
+}
 
 void
 vncServer::ShutdownServer()

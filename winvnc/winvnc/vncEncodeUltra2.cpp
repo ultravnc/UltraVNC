@@ -177,7 +177,7 @@ void vncEncodeUltra2::checkRowPointer(int h)
 int
 vncEncodeUltra2::SendJpegRect(BYTE *src,BYTE *dst, int dst_size, int w, int h, int quality,rfbPixelFormat m_remoteformat)
 {
-  BYTE *srcBuf=NULL;
+  BYTE *srcBuf = src;
 
   cinfo.image_width = w;
   cinfo.image_height = h;

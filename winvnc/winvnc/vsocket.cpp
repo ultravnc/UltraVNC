@@ -260,8 +260,8 @@ VSocket::CreateBindConnect(const VString address, const VCard port)
 				}
 			else
 			{
-				closesocket(sock6);
-				sock6 = INVALID_SOCKET;
+				closesocket(sock4);
+				sock4 = INVALID_SOCKET;
 			}
 		}
 		if (AI->ai_family == AF_INET6)

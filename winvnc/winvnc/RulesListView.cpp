@@ -411,7 +411,8 @@ bool RulesListView::isValidIPAddress(const char* ip) {
 char* RulesListView::getAuthHost()
 {
 	int itemCount = ListView_GetItemCount(hListView);
-	char result[10000]{};
+	static char result[10000];
+	result[0] = '\0';  // Clear buffer for each call
 	for (int i = 0; i < itemCount; i++) {
 		// Define a LVITEM structure to hold the item's data
 		LVITEM lvItem;
