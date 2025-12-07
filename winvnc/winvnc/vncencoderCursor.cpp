@@ -34,10 +34,51 @@
 BOOL
 vncEncoder::IsXCursorSupported()
 {
-	if (m_use_xcursor) return true;
-	if (m_use_richcursor) return true;
-	return false;
+	return m_use_xcursor || m_use_richcursor;
 }
+
+// Cache for accessibility cursor size (avoid reading registry on every cursor update)
+static DWORD s_cachedCursorBaseSize = 0;
+static DWORD s_lastCursorSizeCheck = 0;
+
+static DWORD GetAccessibilityCursorSize()
+{
+	// Cache cursor size for 5 seconds to avoid registry reads on every cursor update
+	DWORD now = GetTickCount();
+	if (s_cachedCursorBaseSize != 0 && (now - s_lastCursorSizeCheck) < 5000) {
+		return s_cachedCursorBaseSize;
+	}
+	
+	DWORD cursorBaseSize = 32;  // Default cursor size
+	HKEY hKey;
+	
+	// Try primary location: Control Panel\Cursors\CursorBaseSize
+	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Control Panel\\Cursors", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+		DWORD dataSize = sizeof(DWORD);
+		RegQueryValueEx(hKey, "CursorBaseSize", NULL, NULL, (LPBYTE)&cursorBaseSize, &dataSize);
+		RegCloseKey(hKey);
+	}
+	
+	// Also check Software\Microsoft\Accessibility for CursorSize multiplier (Windows 10/11)
+	if (cursorBaseSize == 32) {
+		if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Accessibility", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+			DWORD cursorSizeMultiplier = 1;
+			DWORD dataSize = sizeof(DWORD);
+			if (RegQueryValueEx(hKey, "CursorSize", NULL, NULL, (LPBYTE)&cursorSizeMultiplier, &dataSize) == ERROR_SUCCESS) {
+				// CursorSize is a multiplier (1-15), convert to pixel size
+				if (cursorSizeMultiplier > 1) {
+					cursorBaseSize = 32 + (cursorSizeMultiplier - 1) * 8;
+				}
+			}
+			RegCloseKey(hKey);
+		}
+	}
+	
+	s_cachedCursorBaseSize = cursorBaseSize;
+	s_lastCursorSizeCheck = now;
+	return cursorBaseSize;
+}
+
 BOOL
 vncEncoder::SendEmptyCursorShape(VSocket *outConn)
 {
@@ -113,51 +154,19 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 		height = (isColorCursor) ? bmMask.bmHeight : bmMask.bmHeight/2;
 	}
 
-	// Check for Windows accessibility cursor scaling
-	// Windows scales cursors at the compositor level, so GetIconInfo returns original size
-	// We need to read the scale factor from registry and apply it ourselves
-	int scaledWidth = width;
-	int scaledHeight = height;
+	// Check for Windows accessibility cursor scaling (cached to avoid registry reads)
 	int xHotspot = IconInfo.xHotspot;
 	int yHotspot = IconInfo.yHotspot;
-	DWORD cursorBaseSize = 32;  // Default cursor size
-	HKEY hKey;
-	
-	// Try primary location: Control Panel\Cursors\CursorBaseSize
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Control Panel\\Cursors", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-		DWORD dataSize = sizeof(DWORD);
-		RegQueryValueEx(hKey, "CursorBaseSize", NULL, NULL, (LPBYTE)&cursorBaseSize, &dataSize);
-		RegCloseKey(hKey);
-	}
-	
-	// Also check Software\Microsoft\Accessibility for CursorSize multiplier (Windows 10/11)
-	if (cursorBaseSize == 32) {
-		if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Accessibility", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-			DWORD cursorSizeMultiplier = 1;
-			DWORD dataSize = sizeof(DWORD);
-			if (RegQueryValueEx(hKey, "CursorSize", NULL, NULL, (LPBYTE)&cursorSizeMultiplier, &dataSize) == ERROR_SUCCESS) {
-				// CursorSize is a multiplier (1-15), convert to pixel size
-				if (cursorSizeMultiplier > 1) {
-					cursorBaseSize = 32 + (cursorSizeMultiplier - 1) * 8;
-				}
-			}
-			RegCloseKey(hKey);
-		}
-	}
+	DWORD cursorBaseSize = GetAccessibilityCursorSize();
 	
 	// If cursor base size is larger than default, scale the cursor
 	if (cursorBaseSize > 32 && width == 32 && height == 32) {
-		scaledWidth = cursorBaseSize;
-		scaledHeight = cursorBaseSize;
+		width = cursorBaseSize;
+		height = cursorBaseSize;
 		// Scale hotspot proportionally
 		xHotspot = (IconInfo.xHotspot * cursorBaseSize) / 32;
 		yHotspot = (IconInfo.yHotspot * cursorBaseSize) / 32;
 	}
-
-	// Use scaled dimensions for the rest of the function
-	BOOL isScaledCursor = (scaledWidth != width || scaledHeight != height);
-	width = scaledWidth;
-	height = scaledHeight;
 
 	// Get monochrome bitmap data for cursor
 	// NOTE: they say we should use GetDIBits() instead of GetBitmapBits().
@@ -221,27 +230,35 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 		if (needsGeneratedMask) {
 			// For enlarged accessibility cursors, generate mask from color data
 			// Mask bit 1 = visible pixel, bit 0 = transparent
-			int bytes_pixel = m_localformat.bitsPerPixel / 8;
+			const int bytes_pixel = m_localformat.bitsPerPixel / 8;
 			int bytes_row = width * bytes_pixel;
 			while (bytes_row % sizeof(DWORD))
 				bytes_row++;
-			int packed_width_bytes = workMaskWidthBytes;
+			const int packed_width_bytes = workMaskWidthBytes;
+			
 			for (int y = 0; y < height; y++) {
+				BYTE *srcRow = cbits + y * bytes_row;
+				BYTE *dstRow = workMbits + y * packed_width_bytes;
 				BYTE bitmask = 0x80;
+				int dstByteIdx = 0;
+				
 				for (int x = 0; x < width; x++) {
 					// Check if pixel has any non-zero color component (visible)
+					BYTE *pixel = srcRow + x * bytes_pixel;
 					BOOL hasColor = FALSE;
 					for (int b = 0; b < bytes_pixel; b++) {
-						if (cbits[y * bytes_row + x * bytes_pixel + b] != 0) {
+						if (pixel[b] != 0) {
 							hasColor = TRUE;
 							break;
 						}
 					}
 					if (hasColor) {
-						workMbits[y * packed_width_bytes + x / 8] |= bitmask;
+						dstRow[dstByteIdx] |= bitmask;
 					}
-					if ((bitmask >>= 1) == 0)
+					if ((bitmask >>= 1) == 0) {
 						bitmask = 0x80;
+						dstByteIdx++;
+					}
 				}
 			}
 		} else {

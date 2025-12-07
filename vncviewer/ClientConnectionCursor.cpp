@@ -29,24 +29,26 @@
 
 void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
+	const int cursorWidth = pfburh->r.w;
+	const int cursorHeight = pfburh->r.h;
+	const int cursorPixels = cursorWidth * cursorHeight;
+	
 	vnclog.Print(6, _T("Receiving cursor shape update, cursor %dx%d\n"),
-				 (int)pfburh->r.w, (int)pfburh->r.h);
+				 cursorWidth, cursorHeight);
 
-	int bytesPerRow = (pfburh->r.w + 7) / 8;
-	int bytesMaskData = bytesPerRow * pfburh->r.h;
-	int bytesSourceData =
-		pfburh->r.w * pfburh->r.h * (m_myFormat.bitsPerPixel / 8);
+	const int bytesPerRow = (cursorWidth + 7) / 8;
+	const int bytesMaskData = bytesPerRow * cursorHeight;
+	const int bytesSourceData = cursorPixels * (m_myFormat.bitsPerPixel / 8);
 	CheckBufferSize(bytesMaskData);
 
 	SoftCursorFree();
 
-	if (pfburh->r.w * pfburh->r.h == 0)
+	if (cursorPixels == 0)
 		return;
 
-	if (pfburh->r.x>m_si.framebufferWidth)return;
-	if (pfburh->r.y>m_si.framebufferHeight)return;
-	if (pfburh->r.x<0)return;
-	if (pfburh->r.y<0)return;
+	if (pfburh->r.x > m_si.framebufferWidth || pfburh->r.y > m_si.framebufferHeight ||
+		pfburh->r.x < 0 || pfburh->r.y < 0)
+		return;
 
 
 	// Ignore cursor shape updates if requested by user
@@ -60,7 +62,7 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	// Read cursor pixel data.
 
-	rcSource = new COLORREF[pfburh->r.w * pfburh->r.h];
+	rcSource = new COLORREF[cursorPixels];
 
 	if (pfburh->encoding == rfbEncodingXCursor) {
 		CARD8 xcolors[6];
@@ -70,16 +72,20 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 		rcolors[0] = PALETTERGB(xcolors[3], xcolors[4], xcolors[5]);
 
 		ReadExact(m_netbuf, bytesMaskData);
-		int x, y, n, b;
+		const int fullBytes = cursorWidth / 8;
+		const int remainBits = cursorWidth % 8;
 		int i = 0;
-		for (y = 0; y < pfburh->r.h; y++) {
-			for (x = 0; x < pfburh->r.w / 8; x++) {
-				b = m_netbuf[y * bytesPerRow + x];
-				for (n = 7; n >= 0; n--)
-					rcSource[i++] = rcolors[b >> n & 1];
+		for (int y = 0; y < cursorHeight; y++) {
+			char *rowPtr = m_netbuf + y * bytesPerRow;
+			for (int x = 0; x < fullBytes; x++) {
+				int b = rowPtr[x];
+				for (int n = 7; n >= 0; n--)
+					rcSource[i++] = rcolors[(b >> n) & 1];
 			}
-			for (n = 7; n >= 8 - pfburh->r.w % 8; n--) {
-				rcSource[i++] = rcolors[m_netbuf[y * bytesPerRow + x] >> n & 1];
+			if (remainBits > 0) {
+				int b = rowPtr[fullBytes];
+				for (int n = 7; n >= 8 - remainBits; n--)
+					rcSource[i++] = rcolors[(b >> n) & 1];
 			}
 		}
 	} else {
@@ -88,20 +94,18 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 		ReadExact(m_netbuf, bytesSourceData);
 		SETUP_COLOR_SHORTCUTS;
 		char *p = m_netbuf;
-		for (int i = 0; i < pfburh->r.w * pfburh->r.h; i++) {
+		for (int i = 0; i < cursorPixels; i++) {
 			switch (m_myFormat.bitsPerPixel) {
 			case 8:
 				rcSource[i] = COLOR_FROM_PIXEL8_ADDRESS(p);
 				p++;
 				break;
 			case 16:
-				// rcSource[i] = COLOR_FROM_PIXEL16_ADDRESS(p);
-				rcSource[i] = *(CARD16*)p; /* No conversion because BI_BITFIELDS is used. */
+				rcSource[i] = *(CARD16*)p;
 				p += 2;
 				break;
 			case 32:
-				//rcSource[i] = COLOR_FROM_PIXEL32_ADDRESS(p);
-				rcSource[i] = *(CARD32*)p; /* No conversion because BI_BITFIELDS is used. */
+				rcSource[i] = *(CARD32*)p;
 				p += 4;
 				break;
 			}
@@ -112,35 +116,38 @@ void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	ReadExact(m_netbuf, bytesMaskData);
 
-	rcMask = new bool[pfburh->r.w * pfburh->r.h];
+	rcMask = new bool[cursorPixels];
 
-	int x, y, n, b;
-	int i = 0;
-	for (y = 0; y < pfburh->r.h; y++) {
-		for (x = 0; x < pfburh->r.w / 8; x++) {
-			b = m_netbuf[y * bytesPerRow + x];
-			for (n = 7; n >= 0; n--)
-				rcMask[i++] = (b >> n & 1) != 0;
-		}
-		for (n = 7; n >= 8 - pfburh->r.w % 8; n--) {
-			rcMask[i++] = (m_netbuf[y * bytesPerRow + x] >> n & 1) != 0;
+	{
+		const int fullBytes = cursorWidth / 8;
+		const int remainBits = cursorWidth % 8;
+		int i = 0;
+		for (int y = 0; y < cursorHeight; y++) {
+			char *rowPtr = m_netbuf + y * bytesPerRow;
+			for (int x = 0; x < fullBytes; x++) {
+				int b = rowPtr[x];
+				for (int n = 7; n >= 0; n--)
+					rcMask[i++] = ((b >> n) & 1) != 0;
+			}
+			if (remainBits > 0) {
+				int b = rowPtr[fullBytes];
+				for (int n = 7; n >= 8 - remainBits; n--)
+					rcMask[i++] = ((b >> n) & 1) != 0;
+			}
 		}
 	}
 
 	// Set remaining data associated with cursor.
 
-	omni_mutex_lock l(m_bitmapdcMutex);//m_cursorMutex);
+	omni_mutex_lock l(m_bitmapdcMutex);
 
-	rcWidth = pfburh->r.w;
-	rcHeight = pfburh->r.h;
+	rcWidth = cursorWidth;
+	rcHeight = cursorHeight;
 	rcHotX = (pfburh->r.x < rcWidth) ? pfburh->r.x : rcWidth - 1;
 	rcHotY = (pfburh->r.y < rcHeight) ? pfburh->r.y : rcHeight - 1;
 
-	{
-		omni_mutex_lock l(m_bitmapdcMutex);
-		if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
-		m_SavedAreaBIB = new BYTE [rcWidth * rcHeight * m_myFormat.bitsPerPixel];
-	}
+	if (m_SavedAreaBIB) delete[] m_SavedAreaBIB;
+	m_SavedAreaBIB = new BYTE[cursorPixels * (m_myFormat.bitsPerPixel / 8)];
 
 	SoftCursorSaveArea();
 	SoftCursorDraw();
@@ -328,20 +335,27 @@ void ClientConnection::SoftCursorRestoreArea() {
 
 void ClientConnection::SoftCursorDraw() {
 
-	int x, y, x0, y0;
-	int offset;
-
 	omni_mutex_lock l(m_bitmapdcMutex);
+	
+	if (!m_DIBbits)
+		return;
 
-	for (y = 0; y < rcHeight; y++) {
-		y0 = rcCursorY - rcHotY + y;
-		if (y0 >= 0 && y0 < m_si.framebufferHeight) {
-			for (x = 0; x < rcWidth; x++) {
-				x0 = rcCursorX - rcHotX + x;
-				if (x0 >= 0 && x0 < m_si.framebufferWidth) {
-					offset = y * rcWidth + x;
+	const int bytesPerPixel = m_myFormat.bitsPerPixel / 8;
+	const int baseX = rcCursorX - rcHotX;
+	const int baseY = rcCursorY - rcHotY;
+	const int fbWidth = m_si.framebufferWidth;
+	const int fbHeight = m_si.framebufferHeight;
+
+	for (int y = 0; y < rcHeight; y++) {
+		const int y0 = baseY + y;
+		if (y0 >= 0 && y0 < fbHeight) {
+			const int rowOffset = y * rcWidth;
+			for (int x = 0; x < rcWidth; x++) {
+				const int x0 = baseX + x;
+				if (x0 >= 0 && x0 < fbWidth) {
+					const int offset = rowOffset + x;
 					if (rcMask[offset]) {
-						if (m_DIBbits)ConvertPixel(x0,y0,m_myFormat.bitsPerPixel/8,(BYTE*)&rcSource[offset],(BYTE*)m_DIBbits,m_si.framebufferWidth);
+						ConvertPixel(x0, y0, bytesPerPixel, (BYTE*)&rcSource[offset], (BYTE*)m_DIBbits, fbWidth);
 					}
 				}
 			}
