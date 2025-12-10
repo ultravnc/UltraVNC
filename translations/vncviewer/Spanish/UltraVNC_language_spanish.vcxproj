@@ -72,15 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>vnclang_es</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>vnclang_es</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>vnclang_es</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>vnclang_es</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,9 +100,10 @@
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)..\Debug\languages\" mkdir "$(SolutionDir)..\Debug\languages\"
-copy /Y "$(TargetPath)" "$(SolutionDir)..\Debug\languages\vnclang_es.dll"</Command>
-      <Message>Copying Spanish language DLL to vncviewer Debug folder</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\vncviewer\res</AdditionalIncludeDirectories>
@@ -122,9 +127,12 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\Debug\languages\vnclang_es.dll"</Comma
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)..\Release\languages\" mkdir "$(SolutionDir)..\Release\languages\"
-copy /Y "$(TargetPath)" "$(SolutionDir)..\Release\languages\vnclang_es.dll"</Command>
-      <Message>Copying Spanish language DLL to vncviewer Release folder</Message>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\languages
+)</Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\vncviewer\res</AdditionalIncludeDirectories>
@@ -144,9 +152,10 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\Release\languages\vnclang_es.dll"</Com
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)..\x64\Debug\languages\" mkdir "$(SolutionDir)..\x64\Debug\languages\"
-copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Debug\languages\vnclang_es.dll"</Command>
-      <Message>Copying Spanish language DLL to vncviewer x64 Debug folder</Message>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\vncviewer\res</AdditionalIncludeDirectories>
@@ -170,9 +179,12 @@ copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Debug\languages\vnclang_es.dll"</C
       <NoEntryPoint>true</NoEntryPoint>
     </Link>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)..\x64\Release\languages\" mkdir "$(SolutionDir)..\x64\Release\languages\"
-copy /Y "$(TargetPath)" "$(SolutionDir)..\x64\Release\languages\vnclang_es.dll"</Command>
-      <Message>Copying Spanish language DLL to vncviewer x64 Release folder</Message>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\languages
+)</Command>
+      <Message>
+      </Message>
     </PostBuildEvent>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\vncviewer\res</AdditionalIncludeDirectories>

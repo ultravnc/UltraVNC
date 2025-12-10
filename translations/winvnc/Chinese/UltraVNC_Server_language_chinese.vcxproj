@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{C3D4E5F6-A7B8-4C5D-9E8F-34567890CDEF}</ProjectGuid>
+    <ProjectGuid>{BC585A77-A4CD-4996-9CE1-F8D86E6D7E7A}</ProjectGuid>
     <RootNamespace>UltraVNCServerlanguagechinese</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>UltraVNC_Server_language_chinese</ProjectName>
@@ -73,19 +73,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>winvnclang_chinese</TargetName>
+    <TargetName>winvnclang_zh</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>winvnclang_chinese</TargetName>
+    <TargetName>winvnclang_zh</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>winvnclang_chinese</TargetName>
+    <TargetName>winvnclang_zh</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>winvnclang_chinese</TargetName>
+    <TargetName>winvnclang_zh</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,6 +122,12 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\winvnc\winvnc</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\languages
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -158,6 +164,12 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\winvnc\winvnc</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\languages
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="winvnc.rc" />

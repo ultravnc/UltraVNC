@@ -73,19 +73,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>winvnclang_french</TargetName>
+    <TargetName>winvnclang_fr</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>winvnclang_french</TargetName>
+    <TargetName>winvnclang_fr</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>winvnclang_french</TargetName>
+    <TargetName>winvnclang_fr</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>winvnclang_french</TargetName>
+    <TargetName>winvnclang_fr</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,6 +122,12 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\winvnc\winvnc</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\32\xp\languages
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -158,6 +164,12 @@
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\winvnc\winvnc</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if exist c:\uvnc\sign.bat (
+    c:\uvnc\sign.bat  "$(OutDir)$(TargetName)$(TargetExt)"
+    copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp\languages
+)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="winvnc.rc" />
