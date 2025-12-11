@@ -1165,7 +1165,7 @@ typedef struct _rfbFileTransferMsg {
 #define rfbRErrorUnknownCmd     1  // Unknown File Transfer command.
 #define rfbRErrorCmd			0xFFFFFFFF// Error when a command fails on remote side (ret in "size" field)
 
-#define sz_rfbBlockSize			8192  // Size of a File Transfer packet (before compression)
+#define sz_rfbBlockSize			32768  // Size of a File Transfer packet (before compression) - increased from 8192 for better throughput on fast networks
 #define rfbZipDirectoryPrefix   "!UVNCDIR-\0" // Transfered directory are zipped in a file with this prefix. Must end with "-"
 #define sz_rfbZipDirectoryPrefix 9 
 #define rfbDirPrefix			"[ "

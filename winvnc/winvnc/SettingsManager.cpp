@@ -222,8 +222,8 @@ void SettingsManager::setDefaults()
 	m_pref_Avilog = 0;
 	m_pref_UseIpv6 = 0;
 	// ethernet packet 1500 - 40 tcp/ip header - 8 PPPoE info
-//unsigned int G_SENDBUFFER=8192;
-	G_SENDBUFFER_EX = 1452;
+	// Increased from 1452 to 8192 for better file transfer throughput on fast networks
+	G_SENDBUFFER_EX = 8192;
 
 	m_pref_fEnableStateUpdates = false;
 	m_pref_fEnableKeepAlive = false;
