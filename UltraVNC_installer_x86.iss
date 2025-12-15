@@ -12,17 +12,17 @@
 #define MyAppName          "UltraVNC"
 #define MyAppID            "Ultravnc2"
 #define MyAppPublisher     "uvnc bvba"
-#define MyAppCopyright     "Copyright © 2002-2024 UltraVNC Team Members. All Rights Reserved."
+#define MyAppCopyright     "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
 #define MyAppPublisherURL  "https://uvnc.com/"
 #define MyAppSupportURL    "https://forum.uvnc.com/"
 #define MyAppUpdatesURL    "https://uvnc.com/"
+
 #define Major
 #define Minor
 #define Rev
 #define Build
 #define MyAppVersion GetVersionComponents('32\xp\winvnc.exe', Major, Minor, Rev, Build)
 #define MyAppOutputVersion Str(Major) + Str(Minor) + Str(Rev) + Str(Build) 
-
 
 [Setup]
 AppName={#MyAppName}
