@@ -1,3 +1,16 @@
+<!--
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
+//
+-->
+
+
 <!-- This is an example of how to set default options in the Java UltraVNC Viewer
      applet - in this case the "Share Desktop" option is set to "Yes". Any
      option can be set by giving a parameter with the same name as the

@@ -1,3 +1,16 @@
+<!--
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
+//
+-->
+
+
 <!-- Qt Creator resource script from the authadmin.rc to authadmin.qrc -->
 <!-- Sample Comment for qrc files from XML spec https://www.w3.org/TR/REC-xml/#sec-comments -->
 <!-- To Do if needed Visual Studio rc files to Qt Creator qrc files -->
