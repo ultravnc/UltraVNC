@@ -1118,7 +1118,7 @@ vncDesktop::InitBitmap()
 		vnclog.Print(LL_INTERR, VNCLOG("unable to get display format\n"));
 		return ERROR_DESKTOP_NO_DISPLAYFORMAT;
 	}
-	//needed, no dubble, need to be executed 2 times
+	// Necessary, no duplicate, must be executed 2 times
 	result = ::GetDIBits(m_hmemdc, m_membitmap, 0, 1, NULL, &m_bminfo.bmi, DIB_RGB_COLORS);
 	if (result == 0) {
 		vnclog.Print(LL_INTERR, VNCLOG("unable to get display colour info\n"));
