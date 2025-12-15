@@ -10,7 +10,7 @@
 
 
 [TITLE]
-           UltraVNC SC
+UltraVNC SC
 
 [HOST]
 Internet support
@@ -21,7 +21,7 @@ Internet support eéncryption
 -secureplugin -connect localhost:5500 -noregistry
 
 [TEXTTOP]
-Dubble Click to make a connection
+Double Click to make a connection
 
 [TEXTMIDDLE]
 Before making a connection
@@ -36,13 +36,13 @@ Please Call 56 576896 to get your ticket
 Kasteelpleinstraat 56
 
 [TEXTRTOP]
-Ultravnc PC support
+UltraVNC PC Support
 
 [TEXTBUTTON]
 More Info
 
 [WEBPAGE]
-http://www.ultravnc.net
+https://uvnc.com/
 
 [TEXTCLOSEBUTTON]
 STOP test
@@ -77,4 +77,4 @@ by using the close button
 [ENTERCODE]
 
 [WEBPAGE]
-http://www.ultravnc.net
+https://uvnc.com/
