@@ -97,13 +97,12 @@ bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* bod
     wchar_t w_checkbox[1024];
     wchar_t w_okStr[512];
     wchar_t w_cancelStr[512];
-    size_t outSize;
-    mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
-    mbstowcs_s(&outSize, w_body, body, strlen(body) + 1);
+    MultiByteToWideChar(CP_ACP, 0, szHeader, -1, w_header, 128);
+    MultiByteToWideChar(CP_ACP, 0, body, -1, w_body, 1024);
     if (strlen(checkbox) > 0)
-        mbstowcs_s(&outSize, w_checkbox, checkbox, strlen(checkbox) + 1);
-    mbstowcs_s(&outSize, w_okStr, okStr, strlen(okStr) + 1);
-    mbstowcs_s(&outSize, w_cancelStr, cancelStr, strlen(cancelStr) + 1);
+        MultiByteToWideChar(CP_ACP, 0, checkbox, -1, w_checkbox, 1024);
+    MultiByteToWideChar(CP_ACP, 0, okStr, -1, w_okStr, 512);
+    MultiByteToWideChar(CP_ACP, 0, cancelStr, -1, w_cancelStr, 512);
 
     HRESULT hr;
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
@@ -146,10 +145,8 @@ bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader,
 {
     wchar_t w_header[128];
     wchar_t w_body[2048];
-    size_t outSize;
-
-    mbstowcs_s(&outSize, w_header, szHeader, strlen(szHeader) + 1);
-    mbstowcs_s(&outSize, w_body, body, strlen(body) + 1);
+    MultiByteToWideChar(CP_ACP, 0, szHeader, -1, w_header, 128);
+    MultiByteToWideChar(CP_ACP, 0, body, -1, w_body, 2048);
 
     HRESULT hr;
     TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
