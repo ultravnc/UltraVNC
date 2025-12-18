@@ -9,7 +9,6 @@
     "zlib",
     "zstd",
     "libjpeg-turbo",
-    "liblzma",
-    "libsodium"
+    "liblzma"
   ]
 }
