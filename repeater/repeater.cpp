@@ -242,7 +242,7 @@ main_test()// int argc, char **argv )
 		Clean_viewer_List();
 	
 
-		debug("Copyright (C) 2002-2024 UltraVNC Team Members. All Rights Reserved.\n");
+		debug("Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.\n");
 		debug("\n");
 		debug("\n");
 		debug("The Repeater is free software; you can redistribute it and/or modify\n");
