@@ -290,6 +290,143 @@ BEGIN
     IDD_MSLOGON, DIALOG
     BEGIN
     END
+
+    IDD_PROPERTIESDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 366
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 246
+    END
+
+    IDD_FORM_AUTHENTICATION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 11
+        VERTGUIDE, 183
+        VERTGUIDE, 191
+        VERTGUIDE, 342
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_FORM_Reverse, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        VERTGUIDE, 321
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 200
+    END
+
+    IDD_FORM_Log, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 204
+    END
+
+    IDD_FORM_administration, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 331
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_FORM_Incoming, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 14
+        VERTGUIDE, 296
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_EDIT_IP_ACESS_CONTROL, DIALOG
+    BEGIN
+        RIGHTMARGIN, 223
+        VERTGUIDE, 2
+        BOTTOMMARGIN, 142
+    END
+
+    IDD_FORM_capture, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_FORM_Rules, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        VERTGUIDE, 296
+        VERTGUIDE, 355
+        VERTGUIDE, 360
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_FORM_Notifications, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 204
+    END
+
+    IDD_FORM_input_FT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
+
+    IDD_ADMINPASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 249
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 45
+    END
+
+    IDD_CHANGE_PASSWORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 175
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+
+    IDD_FORM_Misc, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        VERTGUIDE, 12
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 204
+    END
+
+    IDD_FORM_Service, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 355
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 202
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -869,154 +1006,6 @@ BEGIN
     PUSHBUTTON      "Stop service",IDC_STOP_SERVICE,17,70,84,14
     LTEXT           "Static",IDC_SERVICE_STATUS,17,100,217,31
 END
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_PROPERTIESDIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 366
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 246
-    END
-
-    IDD_FORM_AUTHENTICATION, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 11
-        VERTGUIDE, 183
-        VERTGUIDE, 191
-        VERTGUIDE, 342
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Reverse, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        VERTGUIDE, 321
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 200
-    END
-
-    IDD_FORM_Log, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
-    END
-
-    IDD_FORM_administration, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 331
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Incoming, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 14
-        VERTGUIDE, 296
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_EDIT_IP_ACESS_CONTROL, DIALOG
-    BEGIN
-        RIGHTMARGIN, 223
-        VERTGUIDE, 2
-        BOTTOMMARGIN, 142
-    END
-
-    IDD_FORM_capture, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Rules, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        VERTGUIDE, 296
-        VERTGUIDE, 355
-        VERTGUIDE, 360
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Notifications, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
-    END
-
-    IDD_FORM_input_FT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_ADMINPASSWORD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 249
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 45
-    END
-
-    IDD_CHANGE_PASSWORD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 175
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 98
-    END
-
-    IDD_FORM_Misc, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
-    END
-
-    IDD_FORM_Service, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 355
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-END
-#endif    // APSTUDIO_INVOKED
 
 
 /////////////////////////////////////////////////////////////////////////////
