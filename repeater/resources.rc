@@ -153,12 +153,12 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     ID_SETTINGS, DIALOG

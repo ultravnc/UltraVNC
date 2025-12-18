@@ -197,12 +197,12 @@ BEGIN
 END
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     IDD_TEXTCHAT_DLG, DIALOG
@@ -871,12 +871,12 @@ BEGIN
 END
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     IDD_PROPERTIESDIALOG, DIALOG

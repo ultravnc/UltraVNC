@@ -71,12 +71,12 @@ BEGIN
 END
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO DISCARDABLE 
 BEGIN
     IDD_CONFIG_DIALOG, DIALOG

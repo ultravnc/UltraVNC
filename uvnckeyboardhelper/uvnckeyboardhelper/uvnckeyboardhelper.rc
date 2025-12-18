@@ -96,12 +96,12 @@ BEGIN
 END
 
 
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
 //
 
-#ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
