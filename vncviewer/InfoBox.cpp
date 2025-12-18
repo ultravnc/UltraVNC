@@ -59,13 +59,13 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			EndDialog(hwnd, TRUE);
 		}
 		if (LOWORD(wParam) == IDC_FORUMHYPERLINK) {
-			ShellExecute(GetDesktopWindow(), "open", "https://forum.uvnc.com", "", 0, SW_SHOWNORMAL);
+			ShellExecute(GetDesktopWindow(), "open", "https://forum.uvnc.com/", "", 0, SW_SHOWNORMAL);
 		}
 		if (LOWORD(wParam) == IDC_WEBSITE) {
-			ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com", "", 0, SW_SHOWNORMAL);
+			ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com/", "", 0, SW_SHOWNORMAL);
 		}
 		if (LOWORD(wParam) == IDC_GIT) {
-			ShellExecute(GetDesktopWindow(), "open", "https://github.com/ultravnc/ultravnc", "", 0, SW_SHOWNORMAL);
+			ShellExecute(GetDesktopWindow(), "open", "https://github.com/ultravnc/UltraVNC", "", 0, SW_SHOWNORMAL);
 		}
 		if (LOWORD(wParam) == IDC_WEBDOWNLOAD) {
 			ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com/downloads/ultravnc.html", "", 0, SW_SHOWNORMAL);
