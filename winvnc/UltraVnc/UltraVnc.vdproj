@@ -948,7 +948,7 @@
             {
             "Name" = "8:UltraVNC Server"
             "Arguments" = "8:"
-            "Description" = "8:UltraVNC Server - Remote access tool"
+            "Description" = "8:UltraVNC Server - Remote Access Tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
@@ -960,9 +960,9 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_7A5A97D5C5844F3980E926DBF229662D"
             {
-            "Name" = "8:UltraVNC Settings"
+            "Name" = "8:UltraVNC Server Settings"
             "Arguments" = "8:-settings"
-            "Description" = "8:"
+            "Description" = "8:UltraVNC Server Settings - Remote Access Tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
@@ -976,7 +976,7 @@
             {
             "Name" = "8:UltraVNC Viewer"
             "Arguments" = "8:"
-            "Description" = "8:UltraVNC Viewer - Remote access tool "
+            "Description" = "8:UltraVNC Viewer - Remote Access Tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
@@ -990,7 +990,7 @@
             {
             "Name" = "8:UltraVNC Viewer"
             "Arguments" = "8:"
-            "Description" = "8:UltraVNC Viewer - Remote access tool"
+            "Description" = "8:UltraVNC Viewer - Remote Access Tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
@@ -1004,7 +1004,7 @@
             {
             "Name" = "8:UltraVNC Server"
             "Arguments" = "8:"
-            "Description" = "8:UltraVNC Server - Remote access tool"
+            "Description" = "8:UltraVNC Server - Remote Access Tool"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:9"
             "Transitive" = "11:FALSE"
