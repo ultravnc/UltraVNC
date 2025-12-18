@@ -11,7 +11,7 @@
 
 #define MyAppName          "UltraVNC"
 #define MyAppID            "Ultravnc2"
-#define MyAppPublisher     "uvnc bvba"
+#define MyAppPublisher     "uvnc bv"
 #define MyAppCopyright     "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
 #define MyAppPublisherURL  "https://uvnc.com/"
 #define MyAppSupportURL    "https://forum.uvnc.com/"
