@@ -79,7 +79,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
+    LTEXT           "Copyright © 2002-2025 UltraVNC Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10

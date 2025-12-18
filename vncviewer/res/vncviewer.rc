@@ -458,7 +458,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
+    LTEXT           "Copyright © 2002-2025 UltraVNC Team Members",IDC_STATIC,44,31,184,13
     LTEXT           "Built",IDC_STATIC,44,18,15,11
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
     LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,54,55,8

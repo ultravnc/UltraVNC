@@ -105,8 +105,8 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,167,17,32,14,WS_GROUP
     ICON            IDI_MYICON,-1,8,6,20,20
-    LTEXT           "UltraVNC Repeater 2024",-1,39,4,153,8
-    LTEXT           "© 2002-2024 UltraVNC Team Members",-1,39,15,102,8
+    LTEXT           "UltraVNC Repeater 2025",-1,39,4,153,8
+    LTEXT           "© 2002-2025 UltraVNC Team Members",-1,39,15,102,8
     LTEXT           "All Rights Reserved",-1,39,25,102,8
 END
 
