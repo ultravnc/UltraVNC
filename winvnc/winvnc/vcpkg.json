@@ -1,8 +1,11 @@
 {
-    "name": "ultravnc",
-    "version": "1.0",
-    "description": "UltraVNC",
-  "dependencies": [
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "ultravnc",
+  "version": "1.7.0.0",
+  "homepage": "https://github.com/ultravnc/UltraVNC",
+  "description": "UltraVNC Server, UltraVNC Viewer, UltraVNC Repeater and UltraVNC SC",
+  "dependencies":
+  [
     "zlib",
     "zstd",
     "libjpeg-turbo",
