@@ -33,7 +33,7 @@
 
 // =========== No further configuration needed below this line =================
 
-// some helper macros (see http://http://gcc.gnu.org/onlinedocs/cpp/Stringification.html)
+// some helper macros (see https://web.archive.org/web/20161117060202/https://gcc.gnu.org/onlinedocs/cpp/Stringification.html)
 #define XSTR(x) STR(x)
 #define STR(x) #x
 
