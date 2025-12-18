@@ -430,7 +430,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	//else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
-	rcDefaultBox.left += 2;
+	rcDefaultBox.right += 6;
 	// enable/disable all of the child window outside of the default box.
 	wndChild = GetTopWindow(hDlg);
 

@@ -503,7 +503,6 @@
 #define IDS_I1                          50136
 #define IDS_I2                          50137
 #define IDS_I3                          50138
-#define IDS_I4                          50324
 #define IDS_J1                          50139
 #define IDS_J2                          50140
 #define IDS_K2                          50141
@@ -692,6 +691,7 @@
 #define IDS_N13                         50321
 #define IDS_N14                         50322
 #define IDS_LANGUAGE_NAME               50323
+#define IDS_I4                          50324
 #define IDS_TAB_ENCODERS                50400
 #define IDS_TAB_INPUT                   50401
 #define IDS_TAB_DISPLAY                 50402
