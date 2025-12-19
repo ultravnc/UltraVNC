@@ -1352,8 +1352,10 @@ void SessionDialog::ReadDlgProc()
 	
 	if (SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		m_connectionType = REPEATER_SERVER;
-	if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) == BST_CHECKED)
+	else if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		m_connectionType = UDP_BRIDGE;
+	else if (SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		m_connectionType = DIRECT_TCP;
 	//adzm 2010-02-15
 	if (strlen(hostname) > 0) {
 		TCHAR actualProxy[256];
