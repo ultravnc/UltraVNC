@@ -1,6 +1,4 @@
-﻿Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-# // This file is part of UltraVNC
+﻿# // This file is part of UltraVNC
 # // https://github.com/ultravnc/UltraVNC
 # // https://uvnc.com/
 # //
@@ -9,6 +7,10 @@
 # // SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
 # // SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
 # //
+
+
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setpasswd", "setpasswd\setpasswd.vcproj", "{7DDBFA32-44F6-44CA-BDBE-CF8B32EDC6B1}"
 EndProject
 Global
