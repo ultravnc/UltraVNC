@@ -2147,7 +2147,8 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_CHECKBRIDGE)) {
 		HWND hUseBridge = GetDlgItem(hwnd, IDC_CHECKBRIDGE);
 		settings->setUseBridge(SendMessage(hUseBridge, BM_GETCHECK, 0, 0) == BST_CHECKED);
-		m_server->UpdateBridgeSettings();
+		if (m_server)
+			m_server->UpdateBridgeSettings();
 	}
 
 	if (GetDlgItem(hwnd, IDC_SCALE)) {

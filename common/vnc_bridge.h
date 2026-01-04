@@ -3,6 +3,7 @@
 #include "../librats/src/librats.h"
 #include "../librats/src/logger.h"
 #include <iostream>
+#include <functional>
 #include <string>
 #include <thread>
 #include <chrono>
@@ -11,6 +12,8 @@
 #include <mutex>
 #include <queue>
 #include <sstream>
+#include <set>
+#include <map>
 #include <iomanip>
 
 #ifdef _WIN32
@@ -33,7 +36,12 @@ private:
     std::string mode_;
     std::string discovery_code_;  // Discovery code for peer identification
     bool connected_;
-    std::string connected_peer_id_;
+    std::string connected_peer_id_;  // For client mode (single server connection)
+    
+    // Multi-client support for server mode
+    std::set<std::string> connected_peers_;  // All connected bridge clients
+    std::map<int, std::string> connection_to_peer_;  // connection_id -> peer_id mapping
+    std::mutex peers_mutex_;
     
     // Fixed ports - no derivation needed
     static const int BRIDGE_SERVER_PORT = 50000;  // Bridge server UDP (high dynamic range)
@@ -94,4 +102,12 @@ public:
     static bool validate_discovery_code(const std::string& code);
     static std::string get_validation_error(const std::string& code);
     static std::string normalize_discovery_code(const std::string& code);
+    
+    // Logging control - set to true to enable std::cout logging (for vnc_bridge app)
+    // Default is false (silent) for embedded use in server/viewer
+    static void set_console_logging(bool enabled) { console_logging_enabled_ = enabled; }
+    static bool is_console_logging_enabled() { return console_logging_enabled_; }
+    
+private:
+    static bool console_logging_enabled_;
 };

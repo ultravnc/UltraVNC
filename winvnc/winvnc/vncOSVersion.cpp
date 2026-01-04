@@ -59,10 +59,11 @@ VNC_OSVersion::VNC_OSVersion()
 	OS_NOTSUPPORTED=false;
 	OS_BEFOREVISTA = false;
 	OS_WIN10_TRANS = false;
+	OS_WINPE = isWINPE();
+
 	OSVERSIONINFO OSversion;	
 	OSversion.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
 	GetVersionEx(&OSversion);
-	OS_WINPE = isWINPE();
 
 	switch(OSversion.dwPlatformId)
 	{

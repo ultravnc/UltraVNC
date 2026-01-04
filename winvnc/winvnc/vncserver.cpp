@@ -2125,23 +2125,19 @@ BOOL vncServer::StartBridge()
 
 void vncServer::StopBridge()
 {
-	if (m_bridge_running && m_bridge_thread) {
+	if (m_bridge_running && m_bridge) {
 		m_bridge_running = false;
 
-		// Signal bridge to stop
-		if (m_bridge) {
-			m_bridge->stop();
-		}
+		// Signal bridge to stop - this signals all internal threads
+		m_bridge->stop();
 
-		// Wait for thread to finish
-		if (m_bridge_thread->joinable()) {
+		// Wait for the bridge thread to finish
+		if (m_bridge_thread && m_bridge_thread->joinable()) {
 			m_bridge_thread->join();
 		}
-
 		m_bridge_thread.reset();
-	}
-
-	if (m_bridge) {
+		
+		// Now safe to destroy the bridge
 		m_bridge.reset();
 	}
 

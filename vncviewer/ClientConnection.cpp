@@ -228,15 +228,12 @@ void ClientConnection::QuietException_helper(const char* info)
 	// Stop the viewer-side bridge thread if it's running
 	if (m_bridge_running && m_bridge) {
 		m_bridge_running = false;
+		m_bridge->stop();  // Signal the bridge to stop its loops
 		
-		// Don't call stop() - it blocks on thread joins
-		// Just detach and let the process exit naturally
+		// Detach and let the process exit - stop() already set running_ = false
 		if (m_bridge_thread && m_bridge_thread->joinable()) {
 			m_bridge_thread->detach();
 		}
-		
-		// The bridge thread will eventually notice running_ is false and exit
-		// When the process terminates, all threads are forcibly stopped anyway
 	}
 	
 	throw QuietException(info);
@@ -2009,10 +2006,34 @@ void ClientConnection::ConnectBridge()
 			}
 		});
 		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge thread started, waiting for connection..."); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge thread started, waiting for UDP tunnel..."); Sleep(100); }
 		
-		// Wait a moment for bridge to start listening
-		Sleep(2000);
+		// Wait for bridge to establish UDP tunnel (up to 30 seconds)
+		int wait_count = 0;
+		const int max_wait = 60;  // 30 seconds (60 * 500ms)
+		while (!m_bridge->is_connected() && m_bridge_running && wait_count < max_wait && !Pressed_Cancel) {
+			Sleep(500);
+			wait_count++;
+			if (m_hwndStatus && (wait_count % 4 == 0)) {
+				char status[128];
+				sprintf_s(status, "Waiting for UDP tunnel... (%d/%d sec)", wait_count / 2, max_wait / 2);
+				SetDlgItemText(m_hwndStatus, IDC_STATUS, status);
+			}
+		}
+		
+		// Check if user cancelled
+		if (Pressed_Cancel) {
+			throw std::runtime_error("Connection cancelled by user");
+		}
+		
+		if (!m_bridge->is_connected()) {
+			throw std::runtime_error("UDP tunnel connection timed out after 30 seconds");
+		}
+		
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "UDP tunnel established! Connecting to bridge..."); Sleep(500); }
+		
+		// Give the TCP server a moment to start after connection
+		Sleep(1000);
 		
 		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Connecting to bridge on localhost:5901..."); Sleep(100); }
 		
@@ -2024,13 +2045,26 @@ void ClientConnection::ConnectBridge()
 		Connect();
 		
 	} catch (const std::exception& e) {
-		// Clean up on error
+		// Clean up on error - signal bridge to stop but don't block
+		m_bridge_running = false;
+		if (m_bridge) {
+			m_bridge->stop();
+		}
 		if (m_bridge_thread && m_bridge_thread->joinable()) {
-			m_bridge_running = false;
-			m_bridge_thread->join();
+			m_bridge_thread->detach();  // Don't block - let it exit on its own
 		}
 		m_bridge_thread.reset();
-		m_bridge.reset();
+		// Release the bridge pointer without destroying it
+		// The detached thread may still be using it, so we can't delete it
+		// It will be cleaned up when the process exits (intentional leak)
+		if (m_bridge) {
+			m_bridge.release();
+		}
+		
+		// If user cancelled, throw quietly
+		if (Pressed_Cancel) {
+			throw QuietException("Connection cancelled");
+		}
 		
 		std::string error_msg = "Failed to start embedded bridge:\n\n";
 		error_msg += e.what();
@@ -4668,14 +4702,20 @@ ClientConnection::CloseWindows()
 ClientConnection::~ClientConnection()
 {
 	// Stop bridge thread if running
-	if (m_bridge_running && m_bridge_thread) {
+	if (m_bridge_running && m_bridge) {
 		m_bridge_running = false;
-		// Don't call join() - it blocks. Just detach and let it finish on its own.
-		if (m_bridge_thread->joinable()) {
+		m_bridge->stop();  // Signal the bridge to stop its loops
+		
+		// Detach the thread - don't try to join as it may block
+		if (m_bridge_thread && m_bridge_thread->joinable()) {
 			m_bridge_thread->detach();
 		}
 		m_bridge_thread.reset();
-		m_bridge.reset();
+		
+		// Release the bridge pointer without destroying it
+		// The detached thread may still be using it, so we can't delete it
+		// It will be cleaned up when the process exits (intentional leak)
+		m_bridge.release();
 	}
 	
 	omni_mutex_lock l(m_bitmapdcMutex);

@@ -4,6 +4,9 @@
 
 // Main function for standalone vnc_bridge.exe
 int main(int argc, char* argv[]) {
+    // Enable console logging for the standalone bridge app
+    VncBridge::set_console_logging(true);
+    
     if (argc < 3) {
         std::cout << "🌉 VNC BRIDGE - NAT Traversal for VNC (Fixed Ports)" << std::endl;
         std::cout << "Usage:" << std::endl;

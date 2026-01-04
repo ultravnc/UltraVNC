@@ -414,7 +414,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 	if (GetModuleFileName(NULL, winvncFolder, MAX_PATH))
 	{
 		char* p = strrchr(winvncFolder, '\\');
-		*p = '\0';
+		if (p) *p = '\0';
 	}
 	extractConfig(szCmdLine2);
 
