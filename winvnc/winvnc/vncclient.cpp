@@ -2597,6 +2597,19 @@ vncClientThread::run(void* arg)
 						continue;
 					}
 
+					if (Swap32IfLE(encoding) == rfbEncodingUnicodeTextChat) {
+						m_client->m_supportsUnicodeTextChat = true;
+						// Send ack to viewer so it knows server supports Unicode chat
+						m_client->SendServerStateUpdate(rfbUnicodeTextChatState, rfbServerState_Enabled);
+						vnclog.Print(LL_INTINFO, VNCLOG("Unicode Text Chat protocol extension enabled\n"));
+						continue;
+					}
+
+					if (Swap32IfLE(encoding) == rfbEncodingChatFileTransfer) {
+						m_client->m_supportsChatFileTransfer = true;
+						continue;
+					}
+
 					// Is this a CompressLevel encoding?
 					if ((Swap32IfLE(encoding) >= rfbEncodingCompressLevel0) &&
 						(Swap32IfLE(encoding) <= rfbEncodingCompressLevel9))
@@ -4601,6 +4614,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_wants_KeepAlive = false;
 	m_session_supported = false;
 	m_fFileSessionOpen = false;
+	m_supportsUnicodeTextChat = false;
+	m_supportsChatFileTransfer = false;
 	m_pBuff = 0;
 	m_pCompBuff = 0;
 	m_NewSWDesktop = 0;

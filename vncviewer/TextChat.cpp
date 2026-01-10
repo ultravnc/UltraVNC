@@ -35,6 +35,82 @@ extern HINSTANCE m_hInstResDLL;
 extern char sz_E1[64];
 extern char sz_E2[64];
 
+static bool IsValidUtf8(const char* s, size_t len)
+{
+	size_t i = 0;
+	while (i < len) {
+		unsigned char c = (unsigned char)s[i];
+		if (c <= 0x7F) {
+			i++;
+			continue;
+		}
+
+		size_t remaining = 0;
+		if ((c & 0xE0) == 0xC0) remaining = 1;
+		else if ((c & 0xF0) == 0xE0) remaining = 2;
+		else if ((c & 0xF8) == 0xF0) remaining = 3;
+		else return false;
+
+		if (i + remaining >= len) return false;
+		for (size_t j = 1; j <= remaining; j++) {
+			unsigned char cc = (unsigned char)s[i + j];
+			if ((cc & 0xC0) != 0x80) return false;
+		}
+		i += remaining + 1;
+	}
+	return true;
+}
+
+static bool WideToUtf8(const wchar_t* w, int wlen, char* out, int outCap)
+{
+	if (!out || outCap <= 0) return false;
+	out[0] = 0;
+	if (!w) return true;
+	int n = WideCharToMultiByte(CP_UTF8, 0, w, wlen, out, outCap - 1, NULL, NULL);
+	if (n <= 0) return false;
+	out[n] = 0;
+	return true;
+}
+
+static bool BytesToUtf8Display(const char* inBytes, int inLen, UINT assumedCodepage, char* outUtf8, int outCap)
+{
+	if (!outUtf8 || outCap <= 0) return false;
+	outUtf8[0] = 0;
+	if (!inBytes || inLen <= 0) return true;
+
+	UINT cp = assumedCodepage;
+	if (cp == CP_UTF8 && !IsValidUtf8(inBytes, (size_t)inLen)) {
+		cp = CP_ACP;
+	}
+
+	int wlen = MultiByteToWideChar(cp, 0, inBytes, inLen, NULL, 0);
+	if (wlen <= 0) return false;
+
+	wchar_t* wtmp = new wchar_t[wlen + 1];
+	wtmp[0] = 0;
+	int wlen2 = MultiByteToWideChar(cp, 0, inBytes, inLen, wtmp, wlen);
+	if (wlen2 <= 0) {
+		delete[] wtmp;
+		return false;
+	}
+	wtmp[wlen2] = 0;
+
+	bool ok = WideToUtf8(wtmp, wlen2, outUtf8, outCap);
+	delete[] wtmp;
+	return ok;
+}
+
+static bool WideToMultiByte(UINT codepage, const wchar_t* w, int wlen, char* out, int outCap)
+{
+	if (!out || outCap <= 0) return false;
+	out[0] = 0;
+	if (!w) return true;
+	int n = WideCharToMultiByte(codepage, 0, w, wlen, out, outCap - 1, NULL, NULL);
+	if (n <= 0) return false;
+	out[n] = 0;
+	return true;
+}
+
 //
 //
 //
@@ -178,8 +254,18 @@ void TextChat::ProcessTextChatMsg()
 		}
 		else
 		{
+			char* raw = new char[len];
+			m_pCC->ReadExact(raw, len);
+
 			memset(m_szRemoteText, 0, TEXTMAXSIZE);
-			m_pCC->ReadExact(m_szRemoteText, len);
+			UINT assumed = m_pCC->m_supportsUnicodeTextChat ? CP_UTF8 : CP_ACP;
+			if (!BytesToUtf8Display(raw, (int)len, assumed, m_szRemoteText, TEXTMAXSIZE)) {
+				int copyLen = (len >= (UINT)TEXTMAXSIZE) ? (TEXTMAXSIZE - 1) : (int)len;
+				memcpy(m_szRemoteText, raw, copyLen);
+				m_szRemoteText[copyLen] = 0;
+			}
+			delete[] raw;
+
 			PrintMessage(m_szRemoteText, m_szRemoteName, RED);
 			ShowChatWindow(true); // Show the chat window on new message reception
 		}
@@ -192,6 +278,7 @@ void TextChat::ProcessTextChatMsg()
 //
 void TextChat::SendTextChatRequest(int nMsg)
 {
+	if (m_pCC->m_bKillThread) return;
     rfbTextChatMsg tcm;
 	memset(&tcm, 0, sizeof(rfbTextChatMsg));
     tcm.type = rfbTextChat;
@@ -212,7 +299,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 	
 	GETTEXTLENGTHEX lpG;
 	lpG.flags = GTL_NUMBYTES;
-	lpG.codepage = CP_ACP; // ANSI
+	lpG.codepage = CP_UTF8;
 
 	int nLen = SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
 	if (nLen + 32 > TEXTMAXSIZE )
@@ -257,8 +344,11 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		}
 		// [<--v1.0.2-jp1 fix]
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE -1, _TRUNCATE, "<%s>: ", szSender);
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_REPLACESEL,FALSE,(LPARAM)m_szTextBoxBuffer); // Replace the selection with the message
+		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE - 1, _TRUNCATE, "<%s>: ", szSender);
+		SETTEXTEX st;
+		st.flags = ST_SELECTION;
+		st.codepage = CP_UTF8;
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)m_szTextBoxBuffer);
 	}
 
 	nLen = SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
@@ -279,8 +369,11 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		}
 		// [<--v1.0.2-jp1 fix]
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE-1, _TRUNCATE, "%s", szMessage);
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_REPLACESEL, FALSE, (LPARAM)m_szTextBoxBuffer); 
+		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE - 1, _TRUNCATE, "%s", szMessage);
+		SETTEXTEX st;
+		st.flags = ST_SELECTION;
+		st.codepage = CP_UTF8;
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)m_szTextBoxBuffer);
 	}
 
 	// Scroll down the chat window
@@ -307,19 +400,55 @@ void TextChat::SendLocalText(void)
 	// for future retype functionality. (F3)
 	memcpy(m_szLastLocalText, m_szLocalText, strlen(m_szLocalText));
 
+	// Read input as UTF-16 from the control (Windows-native)
+	wchar_t wbuf[TEXTMAXSIZE];
+	memset(wbuf, 0, sizeof(wbuf));
+	GetDlgItemTextW(m_hDlg, IDC_INPUTAREA_EDIT, wbuf, TEXTMAXSIZE - 2);
+	if (wbuf[0] == 0) {
+		SetDlgItemText(m_hDlg, IDC_INPUTAREA_EDIT, "");
+		return;
+	}
+	// Keep original behavior of appending newline
+	wcscat_s(wbuf, TEXTMAXSIZE, L"\n");
+
+	// Always convert to UTF-8 for local display (RichEdit insertion uses CP_UTF8)
+	char displayUtf8[TEXTMAXSIZE];
+	memset(displayUtf8, 0, TEXTMAXSIZE);
+	if (!WideToUtf8(wbuf, -1, displayUtf8, TEXTMAXSIZE)) {
+		displayUtf8[0] = 0;
+	}
+	if (displayUtf8[0] != 0) {
+		strcpy_s(m_szLocalText, TEXTMAXSIZE, displayUtf8);
+	}
+
 	PrintMessage(m_szLocalText, m_szLocalName, BLUE);
 
-    rfbTextChatMsg tcm;
+	// Backward compatible send:
+	// - If we are on a known-new UltraVNC server connection, send UTF-8 bytes.
+	// - Otherwise, send legacy ACP bytes.
+	char sendBytes[TEXTMAXSIZE];
+	memset(sendBytes, 0, TEXTMAXSIZE);
+	UINT sendCp = m_pCC->m_supportsUnicodeTextChat ? CP_UTF8 : CP_ACP;
+	if (!WideToMultiByte(sendCp, wbuf, -1, sendBytes, TEXTMAXSIZE)) {
+		// final fallback: if ACP conversion fails, try UTF-8
+		if (!WideToUtf8(wbuf, -1, sendBytes, TEXTMAXSIZE)) {
+			sendBytes[0] = 0;
+		}
+	}
+
+	rfbTextChatMsg tcm;
 	memset(&tcm, 0, sizeof(rfbTextChatMsg));
-    tcm.type = rfbTextChat;
-	tcm.length = Swap32IfLE(strlen(m_szLocalText));
+	tcm.type = rfbTextChat;
+	int sendLen = (int)strlen(sendBytes);
+	tcm.length = Swap32IfLE((CARD32)sendLen);
 	//adzm 2010-09
-    m_pCC->WriteExactQueue((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
-	m_pCC->WriteExact((char *)m_szLocalText, strlen(m_szLocalText));
+	m_pCC->WriteExactQueue((char *)&tcm, sz_rfbTextChatMsg, rfbTextChat);
+	if (sendLen > 0) {
+		m_pCC->WriteExact((char *)sendBytes, sendLen);
+	}
 
 	//and we clear the input box
 	SetDlgItemText(m_hDlg, IDC_INPUTAREA_EDIT, "");
-	return;
 }
 
 
@@ -542,9 +671,16 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 
 		case IDC_SEND_B:
 			{
-			memset(_this->m_szLocalText,0,TEXTMAXSIZE);
-			UINT nRes = GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE-1);
-			strcat_s(_this->m_szLocalText, TEXTMAXSIZE, "\n");
+			wchar_t wbuf[TEXTMAXSIZE];
+			wbuf[0] = 0;
+			GetDlgItemTextW(hWnd, IDC_INPUTAREA_EDIT, wbuf, TEXTMAXSIZE - 1);
+			wcscat_s(wbuf, TEXTMAXSIZE, L"\n");
+
+			memset(_this->m_szLocalText, 0, TEXTMAXSIZE);
+			if (!WideToUtf8(wbuf, -1, _this->m_szLocalText, TEXTMAXSIZE)) {
+				GetDlgItemText(hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE - 1);
+				strcat_s(_this->m_szLocalText, TEXTMAXSIZE, "\n");
+			}
 			_this->SendLocalText();		
 			SetFocus(GetDlgItem(hWnd, IDC_INPUTAREA_EDIT));
 			}
@@ -557,12 +693,18 @@ BOOL CALLBACK TextChat::TextChatDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM wParam,
 		case IDC_INPUTAREA_EDIT:
 			if(HIWORD(wParam) == EN_UPDATE)			
 			{
-				memset(_this->m_szLocalText,0,TEXTMAXSIZE);
-				UINT nRes = GetDlgItemText( hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE);
+				wchar_t wbuf[TEXTMAXSIZE];
+				wbuf[0] = 0;
+				GetDlgItemTextW(hWnd, IDC_INPUTAREA_EDIT, wbuf, TEXTMAXSIZE - 1);
+
+				memset(_this->m_szLocalText, 0, TEXTMAXSIZE);
+				if (!WideToUtf8(wbuf, -1, _this->m_szLocalText, TEXTMAXSIZE)) {
+					GetDlgItemText(hWnd, IDC_INPUTAREA_EDIT, _this->m_szLocalText, TEXTMAXSIZE - 1);
+				}
 				if (strstr(_this->m_szLocalText, "\n") != 0 )
 				{
 					_this->SendLocalText();			
-				}								
+				}							
 			}
 			return TRUE;
 		}

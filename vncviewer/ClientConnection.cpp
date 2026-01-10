@@ -381,6 +381,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	InitializeCriticalSection(&crit);
 	m_hSessionDialog = NULL;
 	new_ultra_server=false;
+	m_supportsUnicodeTextChat=false;
 	Pressed_Cancel=false;
 	saved_set=false;
 	m_hwndcn = 0;
@@ -4504,9 +4505,12 @@ void ClientConnection::SetFormatAndEncodings()
     encs[se->nEncodings++] = Swap32IfLE(rfbEncodingFTProtocolVersion);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingpseudoSession);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingMonitorInfo);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingUnicodeTextChat);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingChatFileTransfer);
 
 	// adzm - 2010-07 - Extended clipboard
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
+
 	// all multithreaded versions of the plugins support streaming
 	if (m_fUsePlugin && m_pDSMPlugin && m_pDSMPlugin->IsEnabled() && m_pDSMPlugin->SupportsMultithreaded()) {
 		encs[se->nEncodings++] = Swap32IfLE(rfbEncodingPluginStreaming);
@@ -6771,6 +6775,11 @@ void ClientConnection::ReadServerState()
 		else {
 			m_idle_timer = 0;
 		}
+		break;
+
+	case rfbUnicodeTextChatState:
+		m_supportsUnicodeTextChat = (value == rfbServerState_Enabled);
+		vnclog.Print(1, _T("Server Unicode text chat support: %u"), m_supportsUnicodeTextChat);
 		break;
 
     default:

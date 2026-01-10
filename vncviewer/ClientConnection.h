@@ -868,6 +868,7 @@ public:
 	HANDLE rcth;
 	void ReadExact(char *buf, int bytes);
 	bool new_ultra_server;
+	bool m_supportsUnicodeTextChat;  // Server confirmed Unicode chat support via rfbServerState
 	void Save_Latest_Connection();	
 	bool tbWM_Set;
 	RECT tbWM_rect;

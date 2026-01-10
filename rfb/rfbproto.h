@@ -501,6 +501,8 @@ typedef struct {
 #define rfbEncodingpseudoSession    		0xFFFF8003
 #define rfbEncodingEnableIdleTime           0xFFFF8004
 #define rfbEncodingMonitorInfo              0xFFFF8005
+#define rfbEncodingUnicodeTextChat          0xFFFF8006
+#define rfbEncodingChatFileTransfer         0xFFFF8007
 
 // Same encoder number as in tight 
 /*
@@ -1309,6 +1311,7 @@ typedef struct {
 #define rfbServerRemoteInputsState  1
 #define rfbKeepAliveInterval        2
 #define rfbIdleInputTimeout				3
+#define rfbUnicodeTextChatState     4
 
 typedef struct {
     CARD8   type;          /* always rfbServerState */

@@ -477,6 +477,8 @@ protected:
 	bool			m_GiiEnabled = true;
 	bool			m_jap;
 	bool			m_unicode;
+	bool			m_supportsUnicodeTextChat;
+	bool			m_supportsChatFileTransfer;
 	int				m_capability;
 	vncClientId		m_id;
 	long			m_lConnectTime;
