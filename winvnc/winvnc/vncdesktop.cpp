@@ -464,6 +464,7 @@ vncDesktop::vncDesktop()
 	m_formatmunged = FALSE;
 
 	m_clipboard_active = FALSE;
+	m_bClipboardFilesAvailable = false;
 
 	m_pollingcycle = 0;
 
@@ -2030,6 +2031,30 @@ void vncDesktop::SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDa
 		else {
 			vnclog.Print(LL_INTWARN, VNCLOG("Failed to set extended clipboard data\n"));
 		}
+	}
+}
+
+// Clipboard file transfer - RDP-style delayed rendering
+// This sets up the local clipboard to indicate files are available from the viewer
+void vncDesktop::SetClipboardFilesAvailable()
+{
+	m_bClipboardFilesAvailable = true;
+	vnclog.Print(LL_INTINFO, VNCLOG("Remote files available for clipboard transfer\n"));
+	
+	// Set up delayed rendering on the clipboard
+	// When an application tries to paste, Windows will send WM_RENDERFORMAT
+	if (OpenClipboard(m_hwnd))
+	{
+		EmptyClipboard();
+		// Set CF_HDROP with NULL data to indicate delayed rendering
+		// When an app requests this format, WM_RENDERFORMAT will be sent
+		SetClipboardData(CF_HDROP, NULL);
+		CloseClipboard();
+		vnclog.Print(LL_INTINFO, VNCLOG("Set up delayed rendering for CF_HDROP\n"));
+	}
+	else
+	{
+		vnclog.Print(LL_INTWARN, VNCLOG("Failed to open clipboard for delayed rendering setup\n"));
 	}
 }
 

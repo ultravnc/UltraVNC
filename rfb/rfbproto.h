@@ -1087,6 +1087,51 @@ typedef enum {
 } rfbExtendedClipboardDataFlags;
 
 
+// Clipboard File Transfer - RDP-style delayed rendering
+// When clipFiles is used with clipNotify, it indicates files are available
+// When clipFiles is used with clipRequest, it requests file list or file contents
+// When clipFiles is used with clipProvide, it provides file list or file contents
+
+// Sub-actions for clipFiles (stored in first CARD32 of data after flags)
+#define clipFileList		0x00000001	// File list metadata (names, sizes, attributes)
+#define clipFileContents	0x00000002	// File contents data
+
+// File entry structure for clipboard file list
+// Used when sending/receiving file metadata
+typedef struct {
+	CARD32 fileIndex;		// Index of this file in the list
+	CARD32 fileSizeLow;		// File size (low 32 bits)
+	CARD32 fileSizeHigh;	// File size (high 32 bits) 
+	CARD32 fileAttributes;	// Windows file attributes
+	CARD32 lastWriteTimeLow;	// Last write time (low 32 bits, FILETIME)
+	CARD32 lastWriteTimeHigh;	// Last write time (high 32 bits, FILETIME)
+	CARD32 fileNameLength;	// Length of file name in bytes (UTF-8)
+	// followed by char fileName[fileNameLength] - UTF-8 encoded, relative path
+} rfbClipboardFileEntry;
+
+#define sz_rfbClipboardFileEntry 28
+
+// File contents request structure
+typedef struct {
+	CARD32 fileIndex;		// Which file to get contents from
+	CARD32 offsetLow;		// Offset into file (low 32 bits)
+	CARD32 offsetHigh;		// Offset into file (high 32 bits)
+	CARD32 length;			// Number of bytes requested
+} rfbClipboardFileContentsRequest;
+
+#define sz_rfbClipboardFileContentsRequest 16
+
+// File contents response structure  
+typedef struct {
+	CARD32 fileIndex;		// Which file this data is from
+	CARD32 offsetLow;		// Offset into file (low 32 bits)
+	CARD32 offsetHigh;		// Offset into file (high 32 bits)
+	CARD32 length;			// Number of bytes in this response
+	// followed by char data[length]
+} rfbClipboardFileContentsResponse;
+
+#define sz_rfbClipboardFileContentsResponse 16
+
 
 // adzm 2010-09 - Notify streaming DSM plugin support
 typedef struct {

@@ -180,6 +180,16 @@ public:
 	virtual void UpdateLocalClipText(LPSTR text);
 	// adzm - 2010-07 - Extended clipboard
 	virtual void UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, vncClient* sourceClient);
+	// Clipboard file transfer (RDP-style delayed rendering)
+	virtual void SetClipboardFilesAvailable(vncClient* sourceClient);
+	virtual void RequestClipboardFiles(vncClient* targetClient);
+	virtual void HandleClipboardFileData(ExtendedClipboardDataMessage& extendedDataMessage, vncClient* sourceClient);
+	virtual void RequestFileContents(vncClient* targetClient, CARD32 fileIndex, CARD64 offset, CARD32 length);
+	virtual void SetClipboardWithReceivedFiles();
+	vncClient* m_clipboardFileClient;  // Client that has files available
+	// Storage for received file list
+	std::vector<ClipboardFileInfo> m_receivedFiles;
+	std::wstring m_clipboardFileTempDir;
 
 	virtual void SetName(const char * name);
 	virtual void SetPorts(const UINT port_rfb, const UINT port_http);	

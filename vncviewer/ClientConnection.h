@@ -440,11 +440,20 @@ private:
 	void ReadServerCutText();
 	void SaveClipboardPreferences();
 	bool LoadClipboardPreferences();
-	
+	// Clipboard file transfer (RDP-style delayed rendering)
+	void SendClipboardFilesNotification();
+	void SendClipboardFileList();
+	void SendClipboardFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length);
+	void HandleClipboardFileRequest(ExtendedClipboardDataMessage& extendedDataMessage);
+	void SetupLocalClipboardForRemoteFiles();
+	void HandleClipboardFileData(ExtendedClipboardDataMessage& extendedDataMessage);
+	void RequestRemoteFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length);
+	void SetLocalClipboardWithReceivedFiles();
+	std::vector<ClipboardFileInfo> m_remoteFiles;
+	std::wstring m_clipboardFileTempDir;
+
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	void NotifyPluginStreamingSupport();
-
-	// adzm - 2010-07 - Extended clipboard
 	Clipboard m_clipboard;
 
 	void ReadBell();

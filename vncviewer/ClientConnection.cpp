@@ -6651,16 +6651,22 @@ void ClientConnection::ReadServerCutText()
 				{
 					{
 						if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
-							omni_mutex_lock l(m_clipMutex);
-
-							ClipboardData newClipboard;
-
-							if (newClipboard.Restore(m_hwndcn, extendedClipboardDataMessage)) {
-								vnclog.Print(6, _T("Successfuly restored new clipboard data\n"));
-								m_clipboard.m_crc = newClipboard.m_crc;
-								m_clipboard.m_notifiedRemoteFormats = 0;
+							// Check if this is file data from server
+							if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
+								omni_mutex_lock l(m_clipMutex);
+								HandleClipboardFileData(extendedClipboardDataMessage);
 							} else {
-								vnclog.Print(6, _T("Failed to set new clipboard data\n"));
+								omni_mutex_lock l(m_clipMutex);
+
+								ClipboardData newClipboard;
+
+								if (newClipboard.Restore(m_hwndcn, extendedClipboardDataMessage)) {
+									vnclog.Print(6, _T("Successfuly restored new clipboard data\n"));
+									m_clipboard.m_crc = newClipboard.m_crc;
+									m_clipboard.m_notifiedRemoteFormats = 0;
+								} else {
+									vnclog.Print(6, _T("Failed to set new clipboard data\n"));
+								}
 							}
 						}
 					}
@@ -6670,17 +6676,30 @@ void ClientConnection::ReadServerCutText()
 				{
 					omni_mutex_lock l(m_clipMutex);
 					m_clipboard.m_notifiedRemoteFormats = (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+					// Handle file notification from server (RDP-style delayed rendering)
+					if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
+						m_clipboard.m_bFilesAvailable = true;
+						vnclog.Print(6, _T("Server has files available for clipboard transfer\n"));
+						// Set up delayed rendering on local clipboard
+						SetupLocalClipboardForRemoteFiles();
+					}
 				}
 				break;
 			case clipRequest:
 				if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
-					ClipboardData clipboardData;
-
-					// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
-					if (clipboardData.Load(NULL)) {
+					// Check if this is a file request
+					if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
 						omni_mutex_lock l(m_clipMutex);
-						m_clipboard.UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
-						PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARD, extendedClipboardDataMessage.GetFlags(), NULL);						
+						HandleClipboardFileRequest(extendedClipboardDataMessage);
+					} else {
+						ClipboardData clipboardData;
+
+						// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
+						if (clipboardData.Load(NULL)) {
+							omni_mutex_lock l(m_clipMutex);
+							m_clipboard.UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
+							PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARD, extendedClipboardDataMessage.GetFlags(), NULL);						
+						}
 					}
 				}
 				break;

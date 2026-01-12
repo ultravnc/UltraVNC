@@ -23,6 +23,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <string>
+#include <vector>
 #include <rdr/MemOutStream.h>
 #include "rfb.h"
 
@@ -112,6 +113,16 @@ struct ClipboardHolder {
 	bool m_bIsOpen;
 };
 
+// Structure to hold information about a single file in clipboard
+struct ClipboardFileInfo {
+	std::wstring fileName;		// Full path on local system
+	std::wstring relativeName;	// Relative path for transfer
+	DWORD fileSizeLow;
+	DWORD fileSizeHigh;
+	DWORD fileAttributes;
+	FILETIME lastWriteTime;
+};
+
 struct ClipboardData {
 	ClipboardData();
 
@@ -129,9 +140,14 @@ struct ClipboardData {
 	BYTE* m_pDataHTML;
 	BYTE* m_pDataDIB;
 
+	// Clipboard file transfer support
+	bool m_bHasFiles;
+	std::vector<ClipboardFileInfo> m_files;
+
 	void FreeData();
 
 	bool Load(HWND hwndOwner); // will return false on failure
+	bool LoadFiles(HWND hwndOwner); // Load CF_HDROP file list
 
 	bool Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extendedClipboardDataMessage);
 };
@@ -147,10 +163,16 @@ struct Clipboard {
 
 	bool m_bNeedToProvide;
 	bool m_bNeedToNotify;
+	bool m_bNeedToNotifyFiles;  // Files available for delayed rendering
 
 	CARD32 m_notifiedRemoteFormats;
 
+	// Clipboard file transfer - store files for delayed rendering
+	std::vector<ClipboardFileInfo> m_pendingFiles;
+	bool m_bFilesAvailable;
+
 	ExtendedClipboardDataMessage extendedClipboardDataMessage;
 	ExtendedClipboardDataMessage extendedClipboardDataNotifyMessage;
+	ExtendedClipboardDataMessage extendedClipboardFileListMessage;
 };
 

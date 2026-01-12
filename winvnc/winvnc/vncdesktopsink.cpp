@@ -440,6 +440,30 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 		return 0;
 
+	case WM_RENDERFORMAT:
+		// Delayed rendering - an application is requesting clipboard data
+		// If we have files available from viewer, request them now
+		if (_this->m_bClipboardFilesAvailable && wParam == CF_HDROP)
+		{
+			vnclog.Print(LL_INTINFO, VNCLOG("WM_RENDERFORMAT for CF_HDROP - requesting files from viewer\n"));
+			_this->m_server->RequestClipboardFiles(_this->m_server->m_clipboardFileClient);
+		}
+		return 0;
+
+	case WM_RENDERALLFORMATS:
+		// Called when clipboard owner is closing - render all delayed formats
+		if (_this->m_bClipboardFilesAvailable)
+		{
+			if (OpenClipboard(_this->Window()))
+			{
+				// Render CF_HDROP if we have files
+				// For now, just clear the flag - full implementation would render actual data
+				_this->m_bClipboardFilesAvailable = false;
+				CloseClipboard();
+			}
+		}
+		return 0;
+
 	default:
 		return DefWindowProc(hwnd, iMsg, wParam, lParam);
 	}

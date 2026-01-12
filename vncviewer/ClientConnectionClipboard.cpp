@@ -11,6 +11,8 @@
 
 
 #include "stdhdrs.h"
+#include <shellapi.h>
+#include <shlobj.h>
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #include "Exception.h"
@@ -79,8 +81,21 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 	if (m_clipboard.settings.m_bSupportsEx) {
 		ClipboardData newClipboard;
 
+		// Check for files first (for delayed rendering)
+		bool hasFiles = newClipboard.LoadFiles(NULL);
+		if (hasFiles && (m_clipboard.settings.m_remoteCaps & clipFiles)) {
+			// Store files for later transfer and send notification
+			m_clipboard.m_pendingFiles = newClipboard.m_files;
+			m_clipboard.m_bFilesAvailable = true;
+			m_clipboard.m_bNeedToNotifyFiles = true;
+			vnclog.Print(6, _T("Clipboard has %d files available for transfer\n"), (int)newClipboard.m_files.size());
+		} else {
+			m_clipboard.m_bFilesAvailable = false;
+			m_clipboard.m_bNeedToNotifyFiles = false;
+		}
+
 		if (newClipboard.Load(NULL)) {
-			if (newClipboard.m_crc == m_clipboard.m_crc && overrideFlags == 0) {
+			if (newClipboard.m_crc == m_clipboard.m_crc && overrideFlags == 0 && !m_clipboard.m_bNeedToNotifyFiles) {
 				vnclog.Print(6, _T("Ignoring extended SendClientCutText due to identical data\n"));
 				return;
 			}
@@ -127,6 +142,12 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 
 		} else {
 			vnclog.Print(6, _T("Failed to load local clipboard!\n"));
+		}
+
+		// Send file notification if files are available (RDP-style delayed rendering)
+		if (m_clipboard.m_bNeedToNotifyFiles && m_clipboard.m_bFilesAvailable) {
+			m_clipboard.m_bNeedToNotifyFiles = false;
+			SendClipboardFilesNotification();
 		}
 	} else {		
 		vnclog.Print(6, _T("Checking clipboard...\n"));
@@ -320,4 +341,341 @@ bool ClientConnection::LoadClipboardPreferences()
 		m_clipboard.settings.m_nLimitHTML = 0;
 	}
 	return true;
+}
+
+// Clipboard file transfer - RDP-style delayed rendering
+// Send notification that files are available in clipboard
+void ClientConnection::SendClipboardFilesNotification()
+{
+	if (!m_clipboard.settings.m_bSupportsEx) return;
+	if (!(m_clipboard.settings.m_remoteCaps & clipFiles)) return;
+	if (m_clipboard.m_pendingFiles.empty()) return;
+
+	vnclog.Print(6, _T("Sending clipboard files notification (%d files)\n"), (int)m_clipboard.m_pendingFiles.size());
+
+	ExtendedClipboardDataMessage notifyMessage;
+	notifyMessage.AddFlag(clipNotify | clipFiles);
+
+	int actualLen = notifyMessage.GetDataLength();
+
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+	message.length = Swap32IfLE(-actualLen);
+
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(notifyMessage.GetData()), notifyMessage.GetDataLength());
+}
+
+// Send the file list metadata when requested
+void ClientConnection::SendClipboardFileList()
+{
+	if (!m_clipboard.settings.m_bSupportsEx) return;
+	if (m_clipboard.m_pendingFiles.empty()) return;
+
+	vnclog.Print(6, _T("Sending clipboard file list (%d files)\n"), (int)m_clipboard.m_pendingFiles.size());
+
+	ExtendedClipboardDataMessage fileListMessage;
+	fileListMessage.AddFlag(clipProvide | clipFiles);
+
+	// Add sub-action: file list
+	fileListMessage.AppendInt(clipFileList);
+
+	// Add file count
+	fileListMessage.AppendInt((CARD32)m_clipboard.m_pendingFiles.size());
+
+	// Add each file entry
+	for (size_t i = 0; i < m_clipboard.m_pendingFiles.size(); i++) {
+		const ClipboardFileInfo& fileInfo = m_clipboard.m_pendingFiles[i];
+
+		// Convert relative name to UTF-8
+		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, fileInfo.relativeName.c_str(), -1, NULL, 0, NULL, NULL);
+		std::string utf8Name(utf8Len, '\0');
+		WideCharToMultiByte(CP_UTF8, 0, fileInfo.relativeName.c_str(), -1, &utf8Name[0], utf8Len, NULL, NULL);
+		utf8Name.resize(utf8Len - 1); // Remove null terminator
+
+		// File index
+		fileListMessage.AppendInt((CARD32)i);
+		// File size (low, high)
+		fileListMessage.AppendInt(fileInfo.fileSizeLow);
+		fileListMessage.AppendInt(fileInfo.fileSizeHigh);
+		// File attributes
+		fileListMessage.AppendInt(fileInfo.fileAttributes);
+		// Last write time (low, high)
+		fileListMessage.AppendInt(fileInfo.lastWriteTime.dwLowDateTime);
+		fileListMessage.AppendInt(fileInfo.lastWriteTime.dwHighDateTime);
+		// File name length and name
+		fileListMessage.AppendInt((CARD32)utf8Name.length());
+		fileListMessage.AppendBytes((BYTE*)utf8Name.c_str(), (int)utf8Name.length());
+	}
+
+	int actualLen = fileListMessage.GetDataLength();
+
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+	message.length = Swap32IfLE(-actualLen);
+
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(fileListMessage.GetData()), fileListMessage.GetDataLength());
+}
+
+// Send file contents when requested
+void ClientConnection::SendClipboardFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length)
+{
+	if (!m_clipboard.settings.m_bSupportsEx) return;
+	if (fileIndex >= m_clipboard.m_pendingFiles.size()) {
+		vnclog.Print(0, _T("Invalid file index %d requested\n"), fileIndex);
+		return;
+	}
+
+	const ClipboardFileInfo& fileInfo = m_clipboard.m_pendingFiles[fileIndex];
+	
+	vnclog.Print(6, _T("Sending file contents: index=%d, offset=%lld, length=%d\n"), fileIndex, offset, length);
+
+	// Open the file
+	HANDLE hFile = CreateFileW(fileInfo.fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		vnclog.Print(0, _T("Failed to open file for clipboard transfer\n"));
+		return;
+	}
+
+	// Seek to offset
+	LARGE_INTEGER liOffset;
+	liOffset.QuadPart = offset;
+	if (!SetFilePointerEx(hFile, liOffset, NULL, FILE_BEGIN)) {
+		CloseHandle(hFile);
+		vnclog.Print(0, _T("Failed to seek in file for clipboard transfer\n"));
+		return;
+	}
+
+	// Read the data
+	std::vector<BYTE> fileData(length);
+	DWORD bytesRead = 0;
+	if (!ReadFile(hFile, fileData.data(), length, &bytesRead, NULL)) {
+		CloseHandle(hFile);
+		vnclog.Print(0, _T("Failed to read file for clipboard transfer\n"));
+		return;
+	}
+	CloseHandle(hFile);
+
+	// Build response message
+	ExtendedClipboardDataMessage contentsMessage;
+	contentsMessage.AddFlag(clipProvide | clipFiles);
+
+	// Add sub-action: file contents
+	contentsMessage.AppendInt(clipFileContents);
+
+	// Add file contents response header
+	contentsMessage.AppendInt(fileIndex);
+	contentsMessage.AppendInt((CARD32)(offset & 0xFFFFFFFF));
+	contentsMessage.AppendInt((CARD32)(offset >> 32));
+	contentsMessage.AppendInt(bytesRead);
+
+	// Add file data
+	contentsMessage.AppendBytes(fileData.data(), bytesRead);
+
+	int actualLen = contentsMessage.GetDataLength();
+
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+	message.length = Swap32IfLE(-actualLen);
+
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(contentsMessage.GetData()), contentsMessage.GetDataLength());
+}
+
+// Handle incoming file request from server
+void ClientConnection::HandleClipboardFileRequest(ExtendedClipboardDataMessage& extendedDataMessage)
+{
+	// Read the sub-action
+	CARD32 subAction = extendedDataMessage.ReadInt();
+
+	if (subAction == clipFileList) {
+		// Server is requesting the file list
+		SendClipboardFileList();
+	}
+	else if (subAction == clipFileContents) {
+		// Server is requesting file contents
+		CARD32 fileIndex = extendedDataMessage.ReadInt();
+		CARD32 offsetLow = extendedDataMessage.ReadInt();
+		CARD32 offsetHigh = extendedDataMessage.ReadInt();
+		CARD32 length = extendedDataMessage.ReadInt();
+
+		CARD64 offset = ((CARD64)offsetHigh << 32) | offsetLow;
+		SendClipboardFileContents(fileIndex, offset, length);
+	}
+}
+
+// Set up local clipboard for delayed rendering when server has files
+void ClientConnection::SetupLocalClipboardForRemoteFiles()
+{
+	// Set up delayed rendering on the local clipboard
+	if (OpenClipboard(m_hwndcn))
+	{
+		EmptyClipboard();
+		SetClipboardData(CF_HDROP, NULL);  // Delayed rendering
+		CloseClipboard();
+		vnclog.Print(6, _T("Set up delayed rendering for remote files\n"));
+	}
+}
+
+// Handle file data received from server
+void ClientConnection::HandleClipboardFileData(ExtendedClipboardDataMessage& extendedDataMessage)
+{
+	CARD32 subAction = extendedDataMessage.ReadInt();
+
+	if (subAction == clipFileList) {
+		m_remoteFiles.clear();
+		CARD32 fileCount = extendedDataMessage.ReadInt();
+		vnclog.Print(6, _T("Received file list with %d files from server\n"), fileCount);
+
+		for (CARD32 i = 0; i < fileCount; i++) {
+			ClipboardFileInfo fileInfo;
+			CARD32 fileIndex = extendedDataMessage.ReadInt();
+			fileInfo.fileSizeLow = extendedDataMessage.ReadInt();
+			fileInfo.fileSizeHigh = extendedDataMessage.ReadInt();
+			fileInfo.fileAttributes = extendedDataMessage.ReadInt();
+			fileInfo.lastWriteTime.dwLowDateTime = extendedDataMessage.ReadInt();
+			fileInfo.lastWriteTime.dwHighDateTime = extendedDataMessage.ReadInt();
+			CARD32 nameLen = extendedDataMessage.ReadInt();
+
+			std::string utf8Name(nameLen, '\0');
+			const BYTE* nameData = extendedDataMessage.GetCurrentPos();
+			memcpy(&utf8Name[0], nameData, nameLen);
+			extendedDataMessage.Advance(nameLen);
+
+			int wideLen = MultiByteToWideChar(CP_UTF8, 0, utf8Name.c_str(), -1, NULL, 0);
+			fileInfo.relativeName.resize(wideLen);
+			MultiByteToWideChar(CP_UTF8, 0, utf8Name.c_str(), -1, &fileInfo.relativeName[0], wideLen);
+			fileInfo.relativeName.resize(wideLen - 1);
+
+			m_remoteFiles.push_back(fileInfo);
+		}
+
+		if (!m_remoteFiles.empty()) {
+			WCHAR tempPath[MAX_PATH];
+			GetTempPathW(MAX_PATH, tempPath);
+			m_clipboardFileTempDir = tempPath;
+			m_clipboardFileTempDir += L"UltraVNC_Clipboard\\";
+			CreateDirectoryW(m_clipboardFileTempDir.c_str(), NULL);
+
+			RequestRemoteFileContents(0, 0, 65536);
+		}
+	}
+	else if (subAction == clipFileContents) {
+		CARD32 fileIndex = extendedDataMessage.ReadInt();
+		CARD32 offsetLow = extendedDataMessage.ReadInt();
+		CARD32 offsetHigh = extendedDataMessage.ReadInt();
+		CARD32 dataLen = extendedDataMessage.ReadInt();
+
+		if (fileIndex < m_remoteFiles.size()) {
+			ClipboardFileInfo& fileInfo = m_remoteFiles[fileIndex];
+			std::wstring fullPath = m_clipboardFileTempDir + fileInfo.relativeName;
+
+			size_t lastSlash = fullPath.rfind(L'\\');
+			if (lastSlash != std::wstring::npos) {
+				CreateDirectoryW(fullPath.substr(0, lastSlash).c_str(), NULL);
+			}
+
+			HANDLE hFile = CreateFileW(fullPath.c_str(), GENERIC_WRITE, 0, NULL,
+				(offsetLow == 0 && offsetHigh == 0) ? CREATE_ALWAYS : OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL, NULL);
+
+			if (hFile != INVALID_HANDLE_VALUE) {
+				if (offsetLow != 0 || offsetHigh != 0) {
+					LARGE_INTEGER liOffset;
+					liOffset.LowPart = offsetLow;
+					liOffset.HighPart = offsetHigh;
+					SetFilePointerEx(hFile, liOffset, NULL, FILE_BEGIN);
+				}
+
+				const BYTE* fileData = extendedDataMessage.GetCurrentPos();
+				DWORD bytesWritten;
+				WriteFile(hFile, fileData, dataLen, &bytesWritten, NULL);
+				CloseHandle(hFile);
+
+				fileInfo.fileName = fullPath;
+
+				CARD64 currentOffset = ((CARD64)offsetHigh << 32) | offsetLow;
+				CARD64 fileSize = ((CARD64)fileInfo.fileSizeHigh << 32) | fileInfo.fileSizeLow;
+				CARD64 nextOffset = currentOffset + dataLen;
+
+				if (nextOffset < fileSize) {
+					RequestRemoteFileContents(fileIndex, nextOffset, 65536);
+				}
+				else if (fileIndex + 1 < m_remoteFiles.size()) {
+					RequestRemoteFileContents(fileIndex + 1, 0, 65536);
+				}
+				else {
+					SetLocalClipboardWithReceivedFiles();
+				}
+			}
+		}
+	}
+}
+
+// Request file contents from server
+void ClientConnection::RequestRemoteFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length)
+{
+	ExtendedClipboardDataMessage requestMessage;
+	requestMessage.AddFlag(clipRequest | clipFiles);
+	requestMessage.AppendInt(clipFileContents);
+	requestMessage.AppendInt(fileIndex);
+	requestMessage.AppendInt((CARD32)(offset & 0xFFFFFFFF));
+	requestMessage.AppendInt((CARD32)(offset >> 32));
+	requestMessage.AppendInt(length);
+
+	int actualLen = requestMessage.GetDataLength();
+	rfbClientCutTextMsg message;
+	memset(&message, 0, sizeof(rfbClientCutTextMsg));
+	message.type = rfbClientCutText;
+	message.length = Swap32IfLE(-actualLen);
+
+	WriteExactQueue((char*)&message, sz_rfbClientCutTextMsg, rfbClientCutText);
+	WriteExact((char*)(requestMessage.GetData()), requestMessage.GetDataLength());
+}
+
+// Set local clipboard with received files
+void ClientConnection::SetLocalClipboardWithReceivedFiles()
+{
+	if (m_remoteFiles.empty()) return;
+
+	size_t totalSize = sizeof(DROPFILES);
+	for (const auto& file : m_remoteFiles) {
+		totalSize += (file.fileName.length() + 1) * sizeof(WCHAR);
+	}
+	totalSize += sizeof(WCHAR);
+
+	HGLOBAL hGlobal = GlobalAlloc(GHND, totalSize);
+	if (hGlobal == NULL) return;
+
+	DROPFILES* pDropFiles = (DROPFILES*)GlobalLock(hGlobal);
+	if (pDropFiles == NULL) {
+		GlobalFree(hGlobal);
+		return;
+	}
+
+	pDropFiles->pFiles = sizeof(DROPFILES);
+	pDropFiles->fWide = TRUE;
+
+	WCHAR* pFileList = (WCHAR*)((BYTE*)pDropFiles + sizeof(DROPFILES));
+	for (const auto& file : m_remoteFiles) {
+		wcscpy(pFileList, file.fileName.c_str());
+		pFileList += file.fileName.length() + 1;
+	}
+	*pFileList = L'\0';
+
+	GlobalUnlock(hGlobal);
+
+	if (OpenClipboard(m_hwndcn)) {
+		EmptyClipboard();
+		SetClipboardData(CF_HDROP, hGlobal);
+		CloseClipboard();
+		vnclog.Print(6, _T("Set local clipboard with %d received files\n"), (int)m_remoteFiles.size());
+	}
+	else {
+		GlobalFree(hGlobal);
+	}
 }

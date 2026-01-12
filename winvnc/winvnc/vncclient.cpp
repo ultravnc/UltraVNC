@@ -3471,20 +3471,38 @@ vncClientThread::run(void* arg)
 						m_client->m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, true);
 						break;
 					case clipProvide:
-						m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
+						// Check if this is file data
+						if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
+							m_server->HandleClipboardFileData(extendedClipboardDataMessage, m_client);
+						} else {
+							m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
+						}
 						break;
 					case clipRequest:
 					case clipPeek:
 					{
-						ClipboardData clipboardData;
+						// Check if this is a file request from viewer
+						if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
+							m_client->HandleClipboardFileRequest(extendedClipboardDataMessage);
+						} else {
+							ClipboardData clipboardData;
 
-						// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
-						if (clipboardData.Load(NULL)) {
-							m_client->UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
+							// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
+							if (clipboardData.Load(NULL)) {
+								m_client->UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
+							}
 						}
 					}
 					break;
-					case clipNotify:	// irrelevant coming from viewer
+					case clipNotify:
+					// Handle file notification from viewer (RDP-style delayed rendering)
+					if (extendedClipboardDataMessage.GetFlags() & clipFiles) {
+						m_client->m_bRemoteFilesAvailable = true;
+						vnclog.Print(LL_INTINFO, VNCLOG("Viewer has files available for clipboard transfer\n"));
+						// Set up delayed rendering on the server clipboard
+						m_server->SetClipboardFilesAvailable(m_client);
+					}
+					break;
 					default:
 						// unsupported or not implemented
 						break;
@@ -4532,6 +4550,8 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 
 	// adzm - 2010-07 - Extended clipboard
 	//m_clipboard_text = 0;
+	// Clipboard file transfer
+	m_bRemoteFilesAvailable = false;
 
 	// IMPORTANT: Initially, client is not protocol-ready.
 	m_disable_protocol = 1;
@@ -6675,6 +6695,112 @@ void vncClient::NotifyExtendedClipboardSupport()
 	//adzm 2010-09 - minimize packets. SendExact flushes the queue.
 	m_socket->SendExactQueue((char*)&msg, sz_rfbServerCutTextMsg, rfbServerCutText);
 	m_socket->SendExact((char*)(extendedDataMessage.GetData()), extendedDataMessage.GetDataLength());
+}
+
+// Send extended clipboard message to viewer (for file transfer requests, etc.)
+void vncClient::SendServerCutTextEx(ExtendedClipboardDataMessage& extendedDataMessage)
+{
+	rfbServerCutTextMsg msg;
+	memset(&msg, 0, sizeof(rfbServerCutTextMsg));
+	msg.type = rfbServerCutText;
+	msg.length = Swap32IfLE(-extendedDataMessage.GetDataLength());
+
+	m_socket->SendExactQueue((char*)&msg, sz_rfbServerCutTextMsg, rfbServerCutText);
+	m_socket->SendExact((char*)(extendedDataMessage.GetData()), extendedDataMessage.GetDataLength());
+}
+
+// Clipboard file transfer - Send notification that files are available
+void vncClient::SendClipboardFilesNotification()
+{
+	if (!(m_clipboard.settings.m_remoteCaps & clipFiles)) return;
+
+	ExtendedClipboardDataMessage notifyMessage;
+	notifyMessage.AddFlag(clipNotify | clipFiles);
+
+	SendServerCutTextEx(notifyMessage);
+	vnclog.Print(LL_INTINFO, VNCLOG("Sent clipboard files notification to viewer\n"));
+}
+
+// Send file list to viewer when requested
+void vncClient::SendClipboardFileList()
+{
+	if (m_server->m_receivedFiles.empty()) return;
+
+	ExtendedClipboardDataMessage fileListMessage;
+	fileListMessage.AddFlag(clipProvide | clipFiles);
+	fileListMessage.AppendInt(clipFileList);
+	fileListMessage.AppendInt((CARD32)m_server->m_receivedFiles.size());
+
+	for (size_t i = 0; i < m_server->m_receivedFiles.size(); i++) {
+		const ClipboardFileInfo& fileInfo = m_server->m_receivedFiles[i];
+
+		// Convert relative name to UTF-8
+		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, fileInfo.relativeName.c_str(), -1, NULL, 0, NULL, NULL);
+		std::string utf8Name(utf8Len, '\0');
+		WideCharToMultiByte(CP_UTF8, 0, fileInfo.relativeName.c_str(), -1, &utf8Name[0], utf8Len, NULL, NULL);
+		utf8Name.resize(utf8Len - 1);
+
+		fileListMessage.AppendInt((CARD32)i);
+		fileListMessage.AppendInt(fileInfo.fileSizeLow);
+		fileListMessage.AppendInt(fileInfo.fileSizeHigh);
+		fileListMessage.AppendInt(fileInfo.fileAttributes);
+		fileListMessage.AppendInt(fileInfo.lastWriteTime.dwLowDateTime);
+		fileListMessage.AppendInt(fileInfo.lastWriteTime.dwHighDateTime);
+		fileListMessage.AppendInt((CARD32)utf8Name.length());
+		fileListMessage.AppendBytes((BYTE*)utf8Name.c_str(), (int)utf8Name.length());
+	}
+
+	SendServerCutTextEx(fileListMessage);
+}
+
+// Send file contents to viewer when requested
+void vncClient::SendClipboardFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length)
+{
+	if (fileIndex >= m_server->m_receivedFiles.size()) return;
+
+	const ClipboardFileInfo& fileInfo = m_server->m_receivedFiles[fileIndex];
+
+	HANDLE hFile = CreateFileW(fileInfo.fileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) return;
+
+	LARGE_INTEGER liOffset;
+	liOffset.QuadPart = offset;
+	SetFilePointerEx(hFile, liOffset, NULL, FILE_BEGIN);
+
+	std::vector<BYTE> fileData(length);
+	DWORD bytesRead = 0;
+	ReadFile(hFile, fileData.data(), length, &bytesRead, NULL);
+	CloseHandle(hFile);
+
+	ExtendedClipboardDataMessage contentsMessage;
+	contentsMessage.AddFlag(clipProvide | clipFiles);
+	contentsMessage.AppendInt(clipFileContents);
+	contentsMessage.AppendInt(fileIndex);
+	contentsMessage.AppendInt((CARD32)(offset & 0xFFFFFFFF));
+	contentsMessage.AppendInt((CARD32)(offset >> 32));
+	contentsMessage.AppendInt(bytesRead);
+	contentsMessage.AppendBytes(fileData.data(), bytesRead);
+
+	SendServerCutTextEx(contentsMessage);
+}
+
+// Handle file request from viewer
+void vncClient::HandleClipboardFileRequest(ExtendedClipboardDataMessage& extendedDataMessage)
+{
+	CARD32 subAction = extendedDataMessage.ReadInt();
+
+	if (subAction == clipFileList) {
+		SendClipboardFileList();
+	}
+	else if (subAction == clipFileContents) {
+		CARD32 fileIndex = extendedDataMessage.ReadInt();
+		CARD32 offsetLow = extendedDataMessage.ReadInt();
+		CARD32 offsetHigh = extendedDataMessage.ReadInt();
+		CARD32 length = extendedDataMessage.ReadInt();
+
+		CARD64 offset = ((CARD64)offsetHigh << 32) | offsetLow;
+		SendClipboardFileContents(fileIndex, offset, length);
+	}
 }
 
 // adzm 2010-09 - Notify streaming DSM plugin support

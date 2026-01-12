@@ -23,6 +23,7 @@ typedef unsigned long CARD32;
 typedef unsigned short CARD16;
 typedef short INT16;
 typedef unsigned char  CARD8;
+typedef unsigned __int64 CARD64;
 
 // Define the port number offsets
 #define FLASH_PORT_OFFSET 5400

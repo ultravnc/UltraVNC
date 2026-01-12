@@ -21,6 +21,8 @@
 #include <omnithread.h>
 #include <string.h>
 #include <lmcons.h>
+#include <shellapi.h>
+#include <shlobj.h>
 #include "winvnc.h"
 #include "vncserver.h"
 #include "vncsockconnect.h"
@@ -172,6 +174,9 @@ vncServer::vncServer()
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
+	
+	// Clipboard file transfer
+	m_clipboardFileClient = NULL;
 	
 	// VNC Bridge initialization
 	m_bridge_running = false;
@@ -1053,6 +1058,10 @@ void
 vncServer::UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient)
 {
 	ClipboardData clipboardData;
+	
+	// Check for files first (for RDP-style delayed rendering)
+	bool hasFiles = clipboardData.LoadFiles(hwndOwner);
+	
 	if (clipboardData.Load(hwndOwner)) {
 		vncClientList::iterator i;
 		omni_mutex_lock l(m_clientsLock, 48);
@@ -1062,6 +1071,24 @@ vncServer::UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient)
 			vncClient* client = GetClient(*i);
 			if (client != excludeClient) {
 				client->UpdateClipTextEx(clipboardData);
+			}
+		}
+	}
+	
+	// If files are available, send file notification to clients
+	if (hasFiles) {
+		vncClientList::iterator i;
+		omni_mutex_lock l(m_clientsLock, 49);
+		for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
+			vncClient* client = GetClient(*i);
+			if (client != excludeClient && (client->m_clipboard.settings.m_remoteCaps & clipFiles)) {
+				// Store files for this server and send notification
+				m_receivedFiles.clear();
+				for (const auto& file : clipboardData.m_files) {
+					m_receivedFiles.push_back(file);
+				}
+				client->SendClipboardFilesNotification();
+				vnclog.Print(LL_INTINFO, VNCLOG("Sent file notification to viewer (%d files)\n"), clipboardData.m_files.size());
 			}
 		}
 	}
@@ -1119,6 +1146,217 @@ vncServer::UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboard
 	omni_mutex_lock l(m_desktopLock, 53);
 	if (m_desktop != NULL)
 		m_desktop->SetClipTextEx(extendedClipboardDataMessage);
+}
+
+// Clipboard file transfer - RDP-style delayed rendering
+void
+vncServer::SetClipboardFilesAvailable(vncClient* sourceClient)
+{
+	// Remember which client has files available
+	m_clipboardFileClient = sourceClient;
+	
+	// Set up delayed rendering on the server clipboard
+	// When a local application tries to paste, we'll request the files from the viewer
+	omni_mutex_lock l(m_desktopLock, 54);
+	if (m_desktop != NULL) {
+		m_desktop->SetClipboardFilesAvailable();
+	}
+}
+
+void
+vncServer::RequestClipboardFiles(vncClient* targetClient)
+{
+	if (targetClient == NULL || !targetClient->m_bRemoteFilesAvailable) {
+		return;
+	}
+	
+	// Send request for file list to the viewer
+	ExtendedClipboardDataMessage requestMessage;
+	requestMessage.AddFlag(clipRequest | clipFiles);
+	requestMessage.AppendInt(clipFileList);  // Request file list first
+	
+	targetClient->SendServerCutTextEx(requestMessage);
+}
+
+void
+vncServer::HandleClipboardFileData(ExtendedClipboardDataMessage& extendedDataMessage, vncClient* sourceClient)
+{
+	// Read the sub-action
+	CARD32 subAction = extendedDataMessage.ReadInt();
+	
+	if (subAction == clipFileList) {
+		// Received file list from viewer
+		m_receivedFiles.clear();
+		
+		CARD32 fileCount = extendedDataMessage.ReadInt();
+		vnclog.Print(LL_INTINFO, VNCLOG("Received file list with %d files\n"), fileCount);
+		
+		for (CARD32 i = 0; i < fileCount; i++) {
+			ClipboardFileInfo fileInfo;
+			
+			CARD32 fileIndex = extendedDataMessage.ReadInt();
+			fileInfo.fileSizeLow = extendedDataMessage.ReadInt();
+			fileInfo.fileSizeHigh = extendedDataMessage.ReadInt();
+			fileInfo.fileAttributes = extendedDataMessage.ReadInt();
+			fileInfo.lastWriteTime.dwLowDateTime = extendedDataMessage.ReadInt();
+			fileInfo.lastWriteTime.dwHighDateTime = extendedDataMessage.ReadInt();
+			CARD32 nameLen = extendedDataMessage.ReadInt();
+			
+			// Read UTF-8 file name
+			std::string utf8Name(nameLen, '\0');
+			const BYTE* nameData = extendedDataMessage.GetCurrentPos();
+			memcpy(&utf8Name[0], nameData, nameLen);
+			extendedDataMessage.Advance(nameLen);
+			
+			// Convert to wide string
+			int wideLen = MultiByteToWideChar(CP_UTF8, 0, utf8Name.c_str(), -1, NULL, 0);
+			fileInfo.relativeName.resize(wideLen);
+			MultiByteToWideChar(CP_UTF8, 0, utf8Name.c_str(), -1, &fileInfo.relativeName[0], wideLen);
+			fileInfo.relativeName.resize(wideLen - 1); // Remove null terminator
+			
+			m_receivedFiles.push_back(fileInfo);
+			vnclog.Print(LL_INTINFO, VNCLOG("  File %d: %S (%d bytes)\n"), i, fileInfo.relativeName.c_str(), fileInfo.fileSizeLow);
+		}
+		
+		// Now request the file contents
+		if (!m_receivedFiles.empty()) {
+			// Create temp directory for received files
+			WCHAR tempPath[MAX_PATH];
+			GetTempPathW(MAX_PATH, tempPath);
+			m_clipboardFileTempDir = tempPath;
+			m_clipboardFileTempDir += L"UltraVNC_Clipboard\\";
+			CreateDirectoryW(m_clipboardFileTempDir.c_str(), NULL);
+			
+			// Request first file contents
+			RequestFileContents(sourceClient, 0, 0, 65536);
+		}
+	}
+	else if (subAction == clipFileContents) {
+		// Received file contents from viewer
+		CARD32 fileIndex = extendedDataMessage.ReadInt();
+		CARD32 offsetLow = extendedDataMessage.ReadInt();
+		CARD32 offsetHigh = extendedDataMessage.ReadInt();
+		CARD32 dataLen = extendedDataMessage.ReadInt();
+		
+		if (fileIndex < m_receivedFiles.size()) {
+			ClipboardFileInfo& fileInfo = m_receivedFiles[fileIndex];
+			std::wstring fullPath = m_clipboardFileTempDir + fileInfo.relativeName;
+			
+			// Create directory structure if needed
+			size_t lastSlash = fullPath.rfind(L'\\');
+			if (lastSlash != std::wstring::npos) {
+				std::wstring dirPath = fullPath.substr(0, lastSlash);
+				CreateDirectoryW(dirPath.c_str(), NULL);
+			}
+			
+			// Write file data
+			HANDLE hFile = CreateFileW(fullPath.c_str(), GENERIC_WRITE, 0, NULL,
+				(offsetLow == 0 && offsetHigh == 0) ? CREATE_ALWAYS : OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL, NULL);
+			
+			if (hFile != INVALID_HANDLE_VALUE) {
+				if (offsetLow != 0 || offsetHigh != 0) {
+					LARGE_INTEGER liOffset;
+					liOffset.LowPart = offsetLow;
+					liOffset.HighPart = offsetHigh;
+					SetFilePointerEx(hFile, liOffset, NULL, FILE_BEGIN);
+				}
+				
+				const BYTE* fileData = extendedDataMessage.GetCurrentPos();
+				DWORD bytesWritten;
+				WriteFile(hFile, fileData, dataLen, &bytesWritten, NULL);
+				CloseHandle(hFile);
+				
+				// Update file name to full path for later use
+				fileInfo.fileName = fullPath;
+				
+				vnclog.Print(LL_INTINFO, VNCLOG("Wrote %d bytes to %S\n"), bytesWritten, fullPath.c_str());
+				
+				// Check if we need more data for this file or move to next file
+				CARD64 currentOffset = ((CARD64)offsetHigh << 32) | offsetLow;
+				CARD64 fileSize = ((CARD64)fileInfo.fileSizeHigh << 32) | fileInfo.fileSizeLow;
+				CARD64 nextOffset = currentOffset + dataLen;
+				
+				if (nextOffset < fileSize) {
+					// Request more data for this file
+					RequestFileContents(sourceClient, fileIndex, nextOffset, 65536);
+				}
+				else if (fileIndex + 1 < m_receivedFiles.size()) {
+					// Move to next file
+					RequestFileContents(sourceClient, fileIndex + 1, 0, 65536);
+				}
+				else {
+					// All files received - set up clipboard with CF_HDROP
+					SetClipboardWithReceivedFiles();
+				}
+			}
+		}
+	}
+}
+
+void
+vncServer::RequestFileContents(vncClient* targetClient, CARD32 fileIndex, CARD64 offset, CARD32 length)
+{
+	if (targetClient == NULL) return;
+	
+	ExtendedClipboardDataMessage requestMessage;
+	requestMessage.AddFlag(clipRequest | clipFiles);
+	requestMessage.AppendInt(clipFileContents);
+	requestMessage.AppendInt(fileIndex);
+	requestMessage.AppendInt((CARD32)(offset & 0xFFFFFFFF));
+	requestMessage.AppendInt((CARD32)(offset >> 32));
+	requestMessage.AppendInt(length);
+	
+	targetClient->SendServerCutTextEx(requestMessage);
+}
+
+void
+vncServer::SetClipboardWithReceivedFiles()
+{
+	if (m_receivedFiles.empty()) return;
+	
+	omni_mutex_lock l(m_desktopLock, 55);
+	if (m_desktop == NULL) return;
+	
+	// Build CF_HDROP structure
+	// Calculate size needed
+	size_t totalSize = sizeof(DROPFILES);
+	for (const auto& file : m_receivedFiles) {
+		totalSize += (file.fileName.length() + 1) * sizeof(WCHAR);
+	}
+	totalSize += sizeof(WCHAR); // Double null terminator
+	
+	HGLOBAL hGlobal = GlobalAlloc(GHND, totalSize);
+	if (hGlobal == NULL) return;
+	
+	DROPFILES* pDropFiles = (DROPFILES*)GlobalLock(hGlobal);
+	if (pDropFiles == NULL) {
+		GlobalFree(hGlobal);
+		return;
+	}
+	
+	pDropFiles->pFiles = sizeof(DROPFILES);
+	pDropFiles->fWide = TRUE;
+	
+	WCHAR* pFileList = (WCHAR*)((BYTE*)pDropFiles + sizeof(DROPFILES));
+	for (const auto& file : m_receivedFiles) {
+		wcscpy(pFileList, file.fileName.c_str());
+		pFileList += file.fileName.length() + 1;
+	}
+	*pFileList = L'\0'; // Double null terminator
+	
+	GlobalUnlock(hGlobal);
+	
+	// Set clipboard
+	if (OpenClipboard(m_desktop->Window())) {
+		EmptyClipboard();
+		SetClipboardData(CF_HDROP, hGlobal);
+		CloseClipboard();
+		vnclog.Print(LL_INTINFO, VNCLOG("Set clipboard with %d received files\n"), m_receivedFiles.size());
+	}
+	else {
+		GlobalFree(hGlobal);
+	}
 }
 
 // Name and port number handling

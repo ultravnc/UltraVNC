@@ -139,6 +139,7 @@ public:
 	// Allow the client thread to see inside the client object
 	friend class vncClientThread;
 	friend class vncClientUpdateThread;
+	friend class vncServer;
 
 	// Init
 	virtual BOOL Init(vncServer *server, VSocket *socket, BOOL auth, BOOL shared, vncClientId newid);
@@ -341,6 +342,12 @@ public:
     void SendFTProtocolMsg();
 	// adzm - 2010-07 - Extended clipboard
 	void NotifyExtendedClipboardSupport();
+	void SendServerCutTextEx(ExtendedClipboardDataMessage& extendedDataMessage);
+	// Clipboard file transfer (RDP-style delayed rendering)
+	void SendClipboardFilesNotification();
+	void SendClipboardFileList();
+	void SendClipboardFileContents(CARD32 fileIndex, CARD64 offset, CARD32 length);
+	void HandleClipboardFileRequest(ExtendedClipboardDataMessage& extendedDataMessage);
 	// adzm 2010-09 - Notify streaming DSM plugin support
 	void NotifyPluginStreamingSupport();
 	bool cl_connected;
@@ -538,6 +545,8 @@ protected:
 	// Clipboard data
 	//char*			m_clipboard_text;
 	Clipboard		m_clipboard;
+	// Clipboard file transfer (RDP-style delayed rendering)
+	bool			m_bRemoteFilesAvailable;
 
 	//SINGLE WINDOW
 	BOOL			m_use_NewSWSize;

@@ -22,6 +22,8 @@
 #define VC_EXTRALEAN
 #include <winsock2.h>
 #include <windows.h>
+#include <shellapi.h>
+#include <shlobj.h>
 
 #include <string>
 
@@ -211,9 +213,10 @@ ClipboardSettings::ClipboardSettings(CARD32 caps)
 CARD32 ClipboardSettings::defaultCaps = 
 	(clipCaps | clipRequest | clipProvide)  // capabilities
 	| 
-	(clipText | clipRTF | clipHTML | clipDIB); // supports Unicode text, RTF, and HTML, and DIB
-CARD32 ClipboardSettings::defaultViewerCaps = defaultCaps | clipNotify;
-CARD32 ClipboardSettings::defaultServerCaps = defaultCaps | clipPeek;
+	(clipText | clipRTF | clipHTML | clipDIB); // supports Unicode text, RTF, HTML, DIB
+// clipFiles is added separately to indicate file transfer support (RDP-style delayed rendering)
+CARD32 ClipboardSettings::defaultViewerCaps = defaultCaps | clipNotify | clipFiles;
+CARD32 ClipboardSettings::defaultServerCaps = defaultCaps | clipPeek | clipFiles;
 
 
 void ClipboardSettings::PrepareCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage)
@@ -295,6 +298,7 @@ ClipboardData::ClipboardData()
 	, m_pDataRTF(NULL)
 	, m_pDataHTML(NULL)
 	, m_pDataDIB(NULL)
+	, m_bHasFiles(false)
 {
 }
 
@@ -314,6 +318,9 @@ void ClipboardData::FreeData()
 	m_pDataRTF = NULL;
 	m_pDataHTML = NULL;
 	m_pDataDIB = NULL;
+
+	m_bHasFiles = false;
+	m_files.clear();
 }
 
 bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
@@ -447,6 +454,120 @@ bool ClipboardData::Load(HWND hwndOwner) // will return false on failure
 	}
 
 	return m_lengthText + m_lengthRTF + m_lengthHTML + m_lengthDIB > 0;
+}
+
+bool ClipboardData::LoadFiles(HWND hwndOwner)
+{
+	// Load CF_HDROP file list from clipboard for delayed rendering file transfer
+	m_bHasFiles = false;
+	m_files.clear();
+
+	ClipboardHolder holder(hwndOwner);
+	if (!holder.m_bIsOpen) {
+		return false;
+	}
+
+	if (!IsClipboardFormatAvailable(CF_HDROP)) {
+		return false;
+	}
+
+	HANDLE hDrop = ::GetClipboardData(CF_HDROP);
+	if (!hDrop) {
+		return false;
+	}
+
+	HDROP hDropInfo = (HDROP)GlobalLock(hDrop);
+	if (!hDropInfo) {
+		return false;
+	}
+
+	UINT fileCount = DragQueryFileW(hDropInfo, 0xFFFFFFFF, NULL, 0);
+	if (fileCount == 0) {
+		GlobalUnlock(hDrop);
+		return false;
+	}
+
+	// Find common base path for relative names
+	std::wstring commonBase;
+	bool firstFile = true;
+
+	for (UINT i = 0; i < fileCount; i++) {
+		UINT pathLen = DragQueryFileW(hDropInfo, i, NULL, 0);
+		if (pathLen == 0) continue;
+
+		std::wstring filePath(pathLen + 1, L'\0');
+		DragQueryFileW(hDropInfo, i, &filePath[0], pathLen + 1);
+		filePath.resize(pathLen); // Remove null terminator from string length
+
+		// Get file info
+		WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+		if (!GetFileAttributesExW(filePath.c_str(), GetFileExInfoStandard, &fileInfo)) {
+			continue; // Skip files we can't access
+		}
+
+		ClipboardFileInfo info;
+		info.fileName = filePath;
+		info.fileSizeLow = fileInfo.nFileSizeLow;
+		info.fileSizeHigh = fileInfo.nFileSizeHigh;
+		info.fileAttributes = fileInfo.dwFileAttributes;
+		info.lastWriteTime = fileInfo.ftLastWriteTime;
+
+		// Find parent directory for relative path calculation
+		size_t lastSlash = filePath.rfind(L'\\');
+		if (lastSlash == std::wstring::npos) {
+			lastSlash = filePath.rfind(L'/');
+		}
+
+		std::wstring parentDir;
+		std::wstring fileName;
+		if (lastSlash != std::wstring::npos) {
+			parentDir = filePath.substr(0, lastSlash);
+			fileName = filePath.substr(lastSlash + 1);
+		} else {
+			fileName = filePath;
+		}
+
+		if (firstFile) {
+			commonBase = parentDir;
+			firstFile = false;
+		} else {
+			// Find common prefix
+			size_t minLen = min(commonBase.length(), parentDir.length());
+			size_t commonLen = 0;
+			for (size_t j = 0; j < minLen; j++) {
+				if (towlower(commonBase[j]) == towlower(parentDir[j])) {
+					if (commonBase[j] == L'\\' || commonBase[j] == L'/') {
+						commonLen = j;
+					}
+				} else {
+					break;
+				}
+			}
+			if (commonLen > 0) {
+				commonBase = commonBase.substr(0, commonLen);
+			}
+		}
+
+		// For now, use just the filename as relative name
+		// Will be updated after we know the common base
+		info.relativeName = fileName;
+
+		m_files.push_back(info);
+	}
+
+	GlobalUnlock(hDrop);
+
+	// Update relative names based on common base
+	if (!commonBase.empty()) {
+		for (auto& file : m_files) {
+			if (file.fileName.length() > commonBase.length() + 1) {
+				file.relativeName = file.fileName.substr(commonBase.length() + 1);
+			}
+		}
+	}
+
+	m_bHasFiles = !m_files.empty();
+	return m_bHasFiles;
 }
 
 bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extendedClipboardDataMessage)
@@ -623,7 +744,9 @@ Clipboard::Clipboard(CARD32 caps)
 	, m_crc(0)
 	, m_bNeedToProvide(false)
 	, m_bNeedToNotify(false)
+	, m_bNeedToNotifyFiles(false)
 	, m_notifiedRemoteFormats(0)
+	, m_bFilesAvailable(false)
 {
 }
 
