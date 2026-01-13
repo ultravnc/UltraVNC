@@ -792,13 +792,14 @@ void ClientConnection::DoConnection(bool reconnect)
 	}
 	havetobekilled=true;
 	// Connect if we're not already connected
-	if (m_sock == INVALID_SOCKET)
+	if (m_sock == INVALID_SOCKET) {
 		if (strcmp(m_proxyhost, "") != 0 && m_connectionType == REPEATER_SERVER)
 			ConnectProxy();
-		if (m_connectionType == UDP_BRIDGE)
+		else if (m_connectionType == UDP_BRIDGE)
 			ConnectBridge();
 		else
 			Connect();
+	}
 
 	SetSocketOptions();
 
