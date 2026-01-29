@@ -292,6 +292,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 
 	// adzm 2009-08-02
 	memset(m_szLastLocalPath, 0, sizeof(m_szLastLocalPath));
+	memset(m_szLastRemotePath, 0, sizeof(m_szLastRemotePath));
 
 	for (int i = 0; i<3; i++)
 	{
@@ -1396,6 +1397,9 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 			SetDlgItemText(hWnd, IDC_CURR_REMOTE, "");
 	}
 
+	// Save current path before navigation so we can restore it on error
+	GetDlgItemText(hWnd, IDC_CURR_REMOTE, m_szLastRemotePath, sizeof(m_szLastRemotePath));
+
 	if (nSelected == nCount || lstrlen(ofDirT) == 0)
 	{
 		GetDlgItemText(hWnd, IDC_CURR_REMOTE, ofDirT, sizeof(ofDirT));
@@ -1481,6 +1485,10 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
 	{
 		sprintf_s(szRemoteStatus, sz_H10); 
 		SetDlgItemText(hWnd, IDC_REMOTE_STATUS, szRemoteStatus);
+		// Restore previous path so user can navigate back
+		if (strlen(m_szLastRemotePath) > 0)
+			SetDlgItemText(hWnd, IDC_CURR_REMOTE, m_szLastRemotePath);
+		m_fFileCommandPending = false;
 		return;
 	}
 
