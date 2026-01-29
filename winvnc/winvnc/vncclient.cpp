@@ -6658,6 +6658,7 @@ void vncClient::SendFTProtocolMsg()
 	ft.type = rfbFileTransfer;
 	ft.contentType = rfbFileTransferProtocolVersion;
 	ft.contentParam = FT_PROTO_VERSION_3;
+	ft.size = Swap32IfLE(sz_rfbBlockSize);
 	m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 }
 

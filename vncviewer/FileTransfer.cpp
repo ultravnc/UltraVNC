@@ -247,7 +247,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	memset(m_szNewFolderButtonLabel, 0, sizeof(m_szNewFolderButtonLabel));
 	memset(m_szRenameButtonLabel, 0, sizeof(m_szRenameButtonLabel));
     m_ServerFTProtocolVersion = FT_PROTO_VERSION_2;
-	m_nBlockSize = sz_rfbBlockSize;
+	m_nBlockSize = 8192;
 	m_dwCurrentValue = 0;
 	m_dwCurrentPercent = 0;
 	m_fSendFileChunk = false;
@@ -495,6 +495,13 @@ void FileTransfer::ProcessFileTransferMsg(void)
             int proto_ver = ft.contentParam;
             if ((proto_ver >= FT_PROTO_VERSION_OLD) && (proto_ver <= FT_PROTO_VERSION_3))
                 m_ServerFTProtocolVersion = proto_ver;
+
+			if (m_ServerFTProtocolVersion >= FT_PROTO_VERSION_3)
+			{
+				CARD32 serverBlockSize = Swap32IfLE(ft.size);
+				if (serverBlockSize >= 4096 && serverBlockSize <= 1048576)
+					m_nBlockSize = serverBlockSize;
+			}
         }
         break;
 
