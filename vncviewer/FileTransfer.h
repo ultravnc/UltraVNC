@@ -69,6 +69,7 @@ public:
 
 	// adzm 2009-08-02
 	char				m_szLastLocalPath[_MAX_PATH];
+	char				m_szLastRemotePath[_MAX_PATH];
 
 	__int64				m_nnFileSize;
 	DWORD				m_dwCurrentValue;
