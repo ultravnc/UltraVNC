@@ -104,7 +104,7 @@ protected:
 	// Tight - CURSOR HANDLING
 	BOOL SendXCursorShape(VSocket *outConn, BYTE *mask, int xhot,int yhot,int width,int height);
 	BOOL SendRichCursorShape(VSocket *outConn, BYTE *mbits, BYTE *cbits, int xhot,int yhot,int width,int height);
-	void FixCursorMask(BYTE *mbits, BYTE *cbits, int width, int height, int width_bytes);
+	void FixCursorMask(BYTE *mbits, BYTE *cbits, int width, int height, int width_bytes, BOOL isColorCursor);
 
 // Implementation
 protected:

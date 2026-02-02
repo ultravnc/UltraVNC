@@ -194,20 +194,25 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 
 	// Call appropriate routine to send cursor shape update
 	if (!isColorCursor && m_use_xcursor) {
-		FixCursorMask(workMbits, NULL, width, bmMask.bmHeight, workMaskWidthBytes);
+		FixCursorMask(workMbits, NULL, width, bmMask.bmHeight, workMaskWidthBytes, FALSE);
 		success = SendXCursorShape(outConn, workMbits,
 								   xHotspot, yHotspot,
 								   width, height);
 	}
 	else if (m_use_richcursor) {
-		int cbits_size = width * height * 4;
+		// Calculate cbits size with DWORD-aligned row stride
+		int bytes_pixel = m_localformat.bitsPerPixel / 8;
+		int cbits_row = width * bytes_pixel;
+		while (cbits_row % sizeof(DWORD))
+			cbits_row++;
+		int cbits_size = cbits_row * height;
 		BYTE *cbits = new BYTE[cbits_size];
 		if (cbits == NULL) {
 			if (needsGeneratedMask) delete[] workMbits;
 			delete[] mbits;
 			return FALSE;
 		}
-		if (!desktop->GetRichCursorData(cbits, hcursor, width, height)) {
+		if (!desktop->GetRichCursorData(cbits, hcursor, width, height, isColorCursor)) {
 			vnclog.Print(LL_INTINFO, VNCLOG("vncDesktop::GetRichCursorData() failed.\n"));
 			if (needsGeneratedMask) delete[] workMbits;
 			delete[] mbits;
@@ -216,6 +221,7 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 		}
 		if (needsGeneratedMask) {
 			// For enlarged accessibility cursors, generate mask from color data
+			// Magenta (RGB 255,0,255) is used as transparency key
 			// Mask bit 1 = visible pixel, bit 0 = transparent
 			const int bytes_pixel = m_localformat.bitsPerPixel / 8;
 			int bytes_row = width * bytes_pixel;
@@ -230,17 +236,26 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 				int dstByteIdx = 0;
 				
 				for (int x = 0; x < width; x++) {
-					// Check if pixel has any non-zero color component (visible)
 					BYTE *pixel = srcRow + x * bytes_pixel;
-					BOOL hasColor = FALSE;
-					for (int b = 0; b < bytes_pixel; b++) {
-						if (pixel[b] != 0) {
-							hasColor = TRUE;
-							break;
-						}
+					BOOL isMagenta = FALSE;
+					
+					// Check if pixel is magenta (transparency key)
+					if (bytes_pixel == 4) {
+						// 32-bit BGRA: B=255, G=0, R=255
+						isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255);
+					} else if (bytes_pixel == 3) {
+						isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255);
+					} else if (bytes_pixel == 2) {
+						WORD pixel16 = *(WORD*)pixel;
+						isMagenta = (pixel16 == 0xF81F || pixel16 == 0x7C1F);
 					}
-					if (hasColor) {
+					
+					if (!isMagenta) {
+						// Visible pixel - set mask bit
 						dstRow[dstByteIdx] |= bitmask;
+					} else {
+						// Transparent - clear color to black
+						memset(pixel, 0, bytes_pixel);
 					}
 					if ((bitmask >>= 1) == 0) {
 						bitmask = 0x80;
@@ -249,7 +264,7 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 				}
 			}
 		} else {
-			FixCursorMask(workMbits, cbits, width, height, workMaskWidthBytes);
+			FixCursorMask(workMbits, cbits, width, height, workMaskWidthBytes, isColorCursor);
 		}
 		success = SendRichCursorShape(outConn, workMbits, cbits,
 									  xHotspot, yHotspot,
@@ -307,75 +322,122 @@ vncEncoder::SendRichCursorShape(VSocket *outConn, BYTE *mbits, BYTE *cbits,
 	while (srcbuf_rowsize % sizeof(DWORD))
 		srcbuf_rowsize++;	// Actually, this should never happen
 
-	// Translate image to client pixel format
-	int dstbuf_size = width * height * (m_remoteformat.bitsPerPixel / 8);
-	BYTE *dstbuf = new BYTE[dstbuf_size];
-	Translate(cbits, dstbuf, width, height, srcbuf_rowsize);
+    // Translate image to client pixel format
+    int dstbuf_size = width * height * (m_remoteformat.bitsPerPixel / 8);
+    BYTE *dstbuf = new BYTE[dstbuf_size];
+    Translate(cbits, dstbuf, width, height, srcbuf_rowsize);
 
-	// Send the data
-	int mask_rowsize = (width + 7) / 8;
-	int mask_size = mask_rowsize * height;
-	if ( !outConn->SendExactQueue((char *)&hdr, sizeof(hdr)) ||
-		 !outConn->SendExactQueue((char *)dstbuf, dstbuf_size) ||
-		 !outConn->SendExactQueue((char *)mbits, mask_size) ) {
-		delete[] dstbuf;
-		return FALSE;
-	}
-	delete[] dstbuf;
-	return TRUE;
+    // Send the data
+    int mask_rowsize = (width + 7) / 8;
+    int mask_size = mask_rowsize * height;
+    if ( !outConn->SendExactQueue((char *)&hdr, sizeof(hdr)) ||
+         !outConn->SendExactQueue((char *)dstbuf, dstbuf_size) ||
+         !outConn->SendExactQueue((char *)mbits, mask_size) ) {
+        delete[] dstbuf;
+        return FALSE;
+    }
+    delete[] dstbuf;
+    return TRUE;
 }
 
 void
 vncEncoder::FixCursorMask(BYTE *mbits, BYTE *cbits,
-						  int width, int height, int width_bytes)
+                          int width, int height, int width_bytes, BOOL isColorCursor)
 {
-	int packed_width_bytes = (width + 7) / 8;
+    int packed_width_bytes = (width + 7) / 8;
 
-	// Pack and invert bitmap data (mbits)
-	int x, y;
-	for (y = 0; y < height; y++)
-		for (x = 0; x < packed_width_bytes; x++)
-			mbits[y * packed_width_bytes + x] = ~mbits[y * width_bytes + x];
+    // Pack and invert bitmap data (mbits)
+    // IMPORTANT: Process rows from end to beginning when packing in-place
+    // to avoid overwriting data we haven't read yet (when packed_width_bytes < width_bytes)
+    int x, y;
+    for (y = height - 1; y >= 0; y--)
+        for (x = packed_width_bytes - 1; x >= 0; x--)
+            mbits[y * packed_width_bytes + x] = ~mbits[y * width_bytes + x];
 
-	// Replace "inverted background" bits with black color to ensure
-	// cross-platform interoperability. Not beautiful but necessary code.
-	if (cbits == NULL) {
-		BYTE m, c;
-		height /= 2;
-		for (y = 0; y < height; y++) {
-			for (x = 0; x < packed_width_bytes; x++) {
-				m = mbits[y * packed_width_bytes + x];
-				c = mbits[(height + y) * packed_width_bytes + x];
-				mbits[y * packed_width_bytes + x] |= ~(m | c);
-				mbits[(height + y) * packed_width_bytes + x] |= ~(m | c);
-			}
-		}
-	} else {
-		int bytes_pixel = m_localformat.bitsPerPixel / 8;
-		int bytes_row = width * bytes_pixel;
-		while (bytes_row % sizeof(DWORD))
-			bytes_row++;	// Actually, this should never happen
+    // Replace "inverted background" bits with black color to ensure
+    // cross-platform interoperability. Not beautiful but necessary code.
+    if (cbits == NULL) {
+        BYTE m, c;
+        height /= 2;
+        for (y = 0; y < height; y++) {
+            for (x = 0; x < packed_width_bytes; x++) {
+                m = mbits[y * packed_width_bytes + x];
+                c = mbits[(height + y) * packed_width_bytes + x];
+                mbits[y * packed_width_bytes + x] |= ~(m | c);
+                mbits[(height + y) * packed_width_bytes + x] |= ~(m | c);
+            }
+        }
+    } else if (isColorCursor) {
+        // For color cursors: Magenta (RGB 255,0,255) is used as transparency key
+        int bytes_pixel = m_localformat.bitsPerPixel / 8;
+        int bytes_row = width * bytes_pixel;
+        while (bytes_row % sizeof(DWORD))
+            bytes_row++;
 
-		BYTE bitmask;
-		int b1, b2;
-		for (y = 0; y < height; y++) {
-			bitmask = 0x80;
-			for (x = 0; x < width; x++) {
-				if ((mbits[y * packed_width_bytes + x / 8] & bitmask) == 0) {
-					for (b1 = 0; b1 < bytes_pixel; b1++) {
-						if (cbits[y * bytes_row + x * bytes_pixel + b1] != 0) {
-							mbits[y * packed_width_bytes + x / 8] ^= bitmask;
-							for (b2 = b1; b2 < bytes_pixel; b2++)
-								cbits[y * bytes_row + x * bytes_pixel + b2] = 0x00;
-							break;
-						}
-					}
-				}
-				if ((bitmask >>= 1) == 0)
-					bitmask = 0x80;
-			}
-		}
-	}
+        BYTE bitmask;
+        for (y = 0; y < height; y++) {
+            bitmask = 0x80;
+            for (x = 0; x < width; x++) {
+                BYTE *pixel = &cbits[y * bytes_row + x * bytes_pixel];
+                BOOL isMagenta = FALSE;
+
+                // Check if pixel is magenta (transparency key)
+                if (bytes_pixel == 4) {
+                    // 32-bit BGRA: B=255, G=0, R=255 (or RGBA: R=255, G=0, B=255)
+                    isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255) ||
+                                (pixel[2] == 255 && pixel[1] == 0 && pixel[0] == 255);
+                } else if (bytes_pixel == 3) {
+                    // 24-bit BGR or RGB
+                    isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255);
+                } else if (bytes_pixel == 2) {
+                    // 16-bit: magenta would be specific bit pattern
+                    WORD pixel16 = *(WORD*)pixel;
+                    // For RGB565: R=31, G=0, B=31 -> 0xF81F
+                    // For RGB555: R=31, G=0, B=31 -> 0x7C1F
+                    isMagenta = (pixel16 == 0xF81F || pixel16 == 0x7C1F);
+                }
+
+                if (isMagenta) {
+                    // Transparent pixel - clear mask bit and set color to black
+                    mbits[y * packed_width_bytes + x / 8] &= ~bitmask;
+                    memset(pixel, 0, bytes_pixel);
+                } else {
+                    // Visible pixel - set mask bit
+                    mbits[y * packed_width_bytes + x / 8] |= bitmask;
+                }
+
+                if ((bitmask >>= 1) == 0)
+                    bitmask = 0x80;
+            }
+        }
+    } else {
+        // For monochrome cursors rendered as RichCursor: use original mask-based logic
+        // The mask is already inverted above, just need to handle XOR pixels
+        int bytes_pixel = m_localformat.bitsPerPixel / 8;
+        int bytes_row = width * bytes_pixel;
+        while (bytes_row % sizeof(DWORD))
+            bytes_row++;
+
+        BYTE bitmask;
+        int b1, b2;
+        for (y = 0; y < height; y++) {
+            bitmask = 0x80;
+            for (x = 0; x < width; x++) {
+                if ((mbits[y * packed_width_bytes + x / 8] & bitmask) == 0) {
+                    for (b1 = 0; b1 < bytes_pixel; b1++) {
+                        if (cbits[y * bytes_row + x * bytes_pixel + b1] != 0) {
+                            mbits[y * packed_width_bytes + x / 8] ^= bitmask;
+                            for (b2 = b1; b2 < bytes_pixel; b2++)
+                                cbits[y * bytes_row + x * bytes_pixel + b2] = 0x00;
+                            break;
+                        }
+                    }
+                }
+                if ((bitmask >>= 1) == 0)
+                    bitmask = 0x80;
+            }
+        }
+    }
 }
 
 // Translate a rectangle (using arbitrary m_bytesPerRow value,

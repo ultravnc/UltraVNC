@@ -1861,47 +1861,31 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 		// Copy the mouse cursor into the screen buffer, if any of it is visible
 		m_cursorpos = m_cursorpos.intersect(m_bmrect);
 
-		if (IconInfo.hbmMask && IconInfo.hbmColor)
+		// Select the memory bitmap into the memory DC
+		HBITMAP oldbitmap;
+		if ((oldbitmap = (HBITMAP)SelectObject(m_hmemdc, m_membitmap)) == NULL)
 		{
-			HBITMAP oldbitmap;
-			if ((oldbitmap = (HBITMAP)SelectObject(m_hmemdc, m_membitmap)) == NULL)
-				return;
-			HDC mdc1, mdc2;
-			mdc1 = CreateCompatibleDC(m_hmemdc);
-			mdc2 = CreateCompatibleDC(m_hmemdc);
-			HBITMAP oldbmp1 = (HBITMAP)SelectObject(mdc1, IconInfo.hbmMask);
-			HBITMAP oldbmp2 = (HBITMAP)SelectObject(mdc2, IconInfo.hbmColor);
-			BitBlt(m_hmemdc, m_cursorpos.tl.x, m_cursorpos.tl.y, m_cursorpos.br.x - m_cursorpos.tl.x, m_cursorpos.br.y - m_cursorpos.tl.y, mdc1, 0, 0, SRCAND);
-			BitBlt(m_hmemdc, m_cursorpos.tl.x, m_cursorpos.tl.y, m_cursorpos.br.x - m_cursorpos.tl.x, m_cursorpos.br.y - m_cursorpos.tl.y, mdc2, 0, 0, SRCINVERT);
-
-			SelectObject(m_hmemdc, oldbitmap);
-			SelectObject(mdc1, oldbmp1);
-			SelectObject(mdc2, oldbmp2);
-			DeleteDC(mdc1);
-			DeleteDC(mdc2);
+			if (IconInfo.hbmMask != NULL)
+				DeleteObject(IconInfo.hbmMask);
+			if (IconInfo.hbmColor != NULL)
+				DeleteObject(IconInfo.hbmColor);
+			return;
 		}
-		else
-		{
 
-			// Select the memory bitmap into the memory DC
-			HBITMAP oldbitmap;
-			if ((oldbitmap = (HBITMAP)SelectObject(m_hmemdc, m_membitmap)) == NULL)
-				return;
+		// Draw the cursor using DrawIconEx for both color and monochrome cursors
+		// This properly handles alpha blending and avoids artifacts from SRCAND/SRCINVERT
+		DrawIconEx(
+			m_hmemdc,
+			CursorPos.x, CursorPos.y,
+			m_hcursor,
+			0, 0,
+			0,
+			NULL,
+			DI_NORMAL
+		);
 
-			// Draw the cursor
-			DrawIconEx(
-				m_hmemdc,									// handle to device context 
-				CursorPos.x, CursorPos.y,
-				m_hcursor,									// handle to icon to draw 
-				0, 0,										// width of the icon 
-				0,											// index of frame in animated cursor 
-				NULL,										// handle to background brush 
-				DI_NORMAL | DI_COMPAT						// icon-drawing flags 
-			);
-
-			// Select the old bitmap back into the memory DC
-			SelectObject(m_hmemdc, oldbitmap);
-		}
+		// Select the old bitmap back into the memory DC
+		SelectObject(m_hmemdc, oldbitmap);
 
 		if (IconInfo.hbmMask != NULL)
 			DeleteObject(IconInfo.hbmMask);
@@ -1920,7 +1904,7 @@ vncDesktop::CaptureMouse(BYTE *scrBuff, UINT scrBuffSize)
 // Obtain cursor image data in server's local format.
 // The length of databuf[] should be at least (width * height * 4).
 BOOL
-vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int height)
+vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int height, BOOL isColorCursor)
 {
 	// Protect the memory bitmap (is it really necessary here?)
 	omni_mutex_lock l(m_update_lock, 278);
@@ -1934,6 +1918,19 @@ vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int hei
 	if (oldbitmap == NULL) {
 		DeleteObject(membitmap);
 		return FALSE;
+	}
+
+	// For color cursors, fill background with magenta (RGB 255,0,255) as transparency key
+	// This allows distinguishing transparent pixels from actual black cursor pixels
+	// For monochrome cursors, use black background (they use XOR blending)
+	if (isColorCursor) {
+		HBRUSH magentaBrush = CreateSolidBrush(RGB(255, 0, 255));
+		RECT rect = { 0, 0, width, height };
+		FillRect(m_hmemdc, &rect, magentaBrush);
+		DeleteObject(magentaBrush);
+	} else {
+		RECT rect = { 0, 0, width, height };
+		FillRect(m_hmemdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH));
 	}
 
 	// Draw the cursor at the specified size
@@ -1952,7 +1949,12 @@ vncDesktop::GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int hei
 		bmi->bmiHeader.biHeight = -height;
 
 		// Clear data buffer and extract RGB data
-		memset(databuf, 0x00, width * height * 4);
+		// Calculate row size with DWORD alignment
+		int bytes_pixel = bmi->bmiHeader.biBitCount / 8;
+		int row_bytes = width * bytes_pixel;
+		while (row_bytes % sizeof(DWORD))
+			row_bytes++;
+		memset(databuf, 0x00, row_bytes * height);
 		lines = GetDIBits(m_hmemdc, membitmap, 0, height, databuf, bmi, DIB_RGB_COLORS);
 
 		// Cleanup

@@ -189,7 +189,7 @@ public:
 	rfb::Rect MouseRect();
 	void SetCursor(HCURSOR cursor);
 	// CURSOR HANDLING
-	BOOL GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int height);
+	BOOL GetRichCursorData(BYTE *databuf, HCURSOR hcursor, int width, int height, BOOL isColorCursor);
 	HCURSOR GetCursor() { return m_hcursor; }
 
 	// Clipboard manipulation
