@@ -68,6 +68,7 @@ public:
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
+	BOOL getForceCursorShape() { return m_pref_ForceCursorShape; };
 	BOOL getEnableUnicodeInput() { return m_pref_EnableUnicodeInput; };
 	BOOL getEnableWin8Helper() { return m_pref_EnableWin8Helper; };
 	BOOL getClearconsole() { return m_pref_clearconsole; };
@@ -129,6 +130,7 @@ public:
 	void setEnableRemoteInputs(BOOL value) { m_pref_EnableRemoteInputs = value; };
 	void setDisableLocalInputs(BOOL value) { m_pref_DisableLocalInputs = value; };
 	void setEnableJapInput(BOOL value) { m_pref_EnableJapInput = value; };
+	void setForceCursorShape(BOOL value) { m_pref_ForceCursorShape = value; };
 	void setEnableUnicodeInput(BOOL value) { m_pref_EnableUnicodeInput = value; };
 	void setLoopbackOnly(BOOL value) { m_pref_LoopbackOnly = value; if (value) setAllowLoopback(true);};
 	void setAllowLoopback(BOOL value) { m_pref_AllowLoopback = value; };
@@ -312,6 +314,7 @@ private:
 	int m_pref_LockSettings;
 	BOOL m_pref_DisableLocalInputs;
 	BOOL m_pref_EnableJapInput;
+	BOOL m_pref_ForceCursorShape;
 	BOOL m_pref_EnableUnicodeInput;
 	BOOL m_pref_EnableWin8Helper;
 	BOOL m_pref_clearconsole;

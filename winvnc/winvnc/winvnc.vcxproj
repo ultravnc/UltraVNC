@@ -3369,6 +3369,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <Image Include="res\world3a.bmp" />
     <Image Include="up.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="winvnc.exe.manifest" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

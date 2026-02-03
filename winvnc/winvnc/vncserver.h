@@ -187,6 +187,7 @@ public:
 	virtual void SetAutoPortSelect(const BOOL autoport);
 	virtual void EnableRemoteInputs(BOOL enable);
 	virtual void EnableJapInput(BOOL enable);
+	virtual void ForceCursorShape(BOOL enable);
 	virtual void EnableUnicodeInput(BOOL enable);
 
 	// General connection handling

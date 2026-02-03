@@ -164,6 +164,7 @@ void SettingsManager::setDefaults()
 	m_pref_EnableRemoteInputs = TRUE;
 	m_pref_DisableLocalInputs = FALSE;
 	m_pref_EnableJapInput = FALSE;
+	m_pref_ForceCursorShape = FALSE;
 	m_pref_EnableUnicodeInput = TRUE;
 	m_pref_EnableWin8Helper = FALSE;
 	m_pref_clearconsole = FALSE;
@@ -353,6 +354,7 @@ void SettingsManager::load()
 	m_pref_LockSettings = iniFile.ReadInt("admin", "LockSetting", m_pref_LockSettings);
 	m_pref_DisableLocalInputs = iniFile.ReadInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
 	m_pref_EnableJapInput = iniFile.ReadInt("admin", "EnableJapInput", m_pref_EnableJapInput);
+	m_pref_ForceCursorShape = iniFile.ReadInt("admin", "ForceCursorShape", m_pref_ForceCursorShape);
 	m_pref_EnableUnicodeInput = iniFile.ReadInt("admin", "EnableUnicodeInput", m_pref_EnableUnicodeInput);
 	m_pref_EnableWin8Helper = iniFile.ReadInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole = iniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
@@ -441,6 +443,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "LocalInputsDisabled", m_pref_DisableLocalInputs);
 	iniFile.WriteInt("admin", "IdleTimeout", m_pref_IdleTimeout);
 	iniFile.WriteInt("admin", "EnableJapInput", m_pref_EnableJapInput);
+	iniFile.WriteInt("admin", "ForceCursorShape", m_pref_ForceCursorShape);
 	iniFile.WriteInt("admin", "EnableUnicodeInput", m_pref_EnableUnicodeInput);
 	iniFile.WriteInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	iniFile.WriteInt("admin", "QuerySetting", m_pref_QuerySetting);

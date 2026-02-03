@@ -320,6 +320,7 @@ vncClientId vncServer::AddClient(VSocket* socket, BOOL auth, BOOL shared, int ca
 	client->EnablePointer(settings->getEnableRemoteInputs());
 	client->EnableGii(settings->getEnableRemoteInputs());
 	client->EnableJap(settings->getEnableJapInput() ? true : false);
+	client->ForceCursorShape(settings->getForceCursorShape() ? true : false);
 	client->EnableUnicode(settings->getEnableUnicodeInput() ? true : false);
 
 	// adzm 2009-07-05 - repeater IDs
@@ -1170,6 +1171,18 @@ vncServer::EnableJapInput(BOOL enable)
 	omni_mutex_lock l(m_clientsLock, 55);
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
 		GetClient(*i)->EnableJap(settings->getEnableJapInput() ? true : false);
+	}
+}
+
+
+void
+vncServer::ForceCursorShape(BOOL enable)
+{
+	settings->setForceCursorShape(enable);
+	vncClientList::iterator i;
+	omni_mutex_lock l(m_clientsLock, 55);
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
+		GetClient(*i)->ForceCursorShape(settings->getForceCursorShape() ? true : false);
 	}
 }
 

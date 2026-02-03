@@ -329,6 +329,9 @@
 #define IDC_SERVICE_STATUS              1289
 #define IDC_INSTALL_SERVICE             1290
 #define IDC_STOP_SERVICE                1291
+#define IDC_LANGUAGE_COMBO              1292
+#define IDC_LANGUAGE_LABEL              1293
+#define IDC_FORCE_SHAPE                 1294
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -440,8 +443,8 @@
 #define IDS_INSTALL_SERVICE_QUESTION    32878
 #define IDS_STOP_SERVICE_QUESTION       32879
 #define IDS_START_SERVICE_QUESTION      32880
-#define IDS_SYSTEM_CAPTION               32881
-#define IDS_SERVICE_CAPTION              32882
+#define IDS_SYSTEM_CAPTION              32881
+#define IDS_SERVICE_CAPTION             32882
 #define IDS_CURRENT_DRIVER_OLD          32883
 #define IDS_DRIVER_NOT_FOUND_REBOOT     32884
 #define IDS_DRIVER_INFO_REQUIRED_VERSION 32885
@@ -453,20 +456,18 @@
 #define IDS_FAILED_QUERY_SVC_STATUS     32891
 #define IDS_FAILED_DELETE_SVC           32892
 #define IDS_WRONG_PASSWORD_RETRY        32893
-#define IDS_ERROR_CAPTION                32894
-#define IDS_UAC_DISABLED_REGISTRY        32895
-#define IDS_VERIFY_SAME_FOLDER           32896
-#define IDS_DRIVER_FOUND                 32897
-#define IDS_DRIVER_VERSION_OK            32898
-#define IDS_DRIVER_VERSION_NOT_OK        32899
-#define IDS_DRIVER_NOT_ACTIVATED         32900
-#define IDS_DRIVER_ONLY_SERVICE_ADMIN    32901
-#define IDS_DRIVER_ACTIVE                32902
-#define IDS_DRIVER_ACCESS_OK             32903
-#define IDS_DRIVER_ACCESS_DENIED         32904
-#define IDS_LANGUAGE_NAME                32905
-#define IDC_LANGUAGE_COMBO               1292
-#define IDC_LANGUAGE_LABEL               1293
+#define IDS_ERROR_CAPTION               32894
+#define IDS_UAC_DISABLED_REGISTRY       32895
+#define IDS_VERIFY_SAME_FOLDER          32896
+#define IDS_DRIVER_FOUND                32897
+#define IDS_DRIVER_VERSION_OK           32898
+#define IDS_DRIVER_VERSION_NOT_OK       32899
+#define IDS_DRIVER_NOT_ACTIVATED        32900
+#define IDS_DRIVER_ONLY_SERVICE_ADMIN   32901
+#define IDS_DRIVER_ACTIVE               32902
+#define IDS_DRIVER_ACCESS_OK            32903
+#define IDS_DRIVER_ACCESS_DENIED        32904
+#define IDS_LANGUAGE_NAME               32905
 
 // Next default values for new objects
 // 

@@ -223,6 +223,7 @@ public:
 	};
 
 	virtual void EnableJap(bool enable) {m_jap = enable;};
+	virtual void ForceCursorShape(bool enable) { m_ForceCursorShape = enable; };
 	virtual void EnableUnicode(bool enable) {m_unicode = enable;};
 	virtual void SetCapability(int capability) {m_capability = capability;};
 
@@ -476,6 +477,7 @@ protected:
 	bool			m_pointerenabled = true;
 	bool			m_GiiEnabled = true;
 	bool			m_jap;
+	bool			m_ForceCursorShape;
 	bool			m_unicode;
 	bool			m_supportsUnicodeTextChat;
 	bool			m_supportsChatFileTransfer;

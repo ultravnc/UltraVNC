@@ -183,454 +183,6 @@ BEGIN
     LTEXT           "3",IDC_STATIC,11,56,8,8
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_TEXTCHAT_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 5
-        RIGHTMARGIN, 303
-        TOPMARGIN, 5
-        BOTTOMMARGIN, 172
-    END
-
-    IDD_LIST_DLG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 291
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 116
-    END
-
-    IDD_ABOUT, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 267
-        VERTGUIDE, 80
-        VERTGUIDE, 90
-        VERTGUIDE, 100
-        VERTGUIDE, 120
-        TOPMARGIN, 5
-        BOTTOMMARGIN, 74
-        HORZGUIDE, 9
-        HORZGUIDE, 20
-        HORZGUIDE, 30
-        HORZGUIDE, 40
-        HORZGUIDE, 42
-        HORZGUIDE, 52
-    END
-
-    IDD_OUTGOING_CONN, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 216
-        VERTGUIDE, 7
-        VERTGUIDE, 50
-        VERTGUIDE, 55
-        VERTGUIDE, 185
-        VERTGUIDE, 190
-        TOPMARGIN, 6
-        BOTTOMMARGIN, 81
-        HORZGUIDE, 20
-        HORZGUIDE, 49
-    END
-
-    IDD_ACCEPT_CONN, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        VERTGUIDE, 60
-        VERTGUIDE, 130
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 88
-        HORZGUIDE, 24
-        HORZGUIDE, 30
-        HORZGUIDE, 46
-        HORZGUIDE, 50
-        HORZGUIDE, 65
-        HORZGUIDE, 74
-    END
-
-    IDD_DIALOGCLOUD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 304
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 96
-    END
-
-    IDC_TITLEWINDOW, DIALOG
-    BEGIN
-        LEFTMARGIN, 2
-        VERTGUIDE, 4
-        VERTGUIDE, 51
-        VERTGUIDE, 58
-        VERTGUIDE, 175
-    END
-
-    IDD_MSLOGON, DIALOG
-    BEGIN
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Cursor
-//
-
-IDC_FINGER              CURSOR                  "res/Finger.cur"
-
-IDC_CURSORBLANK         CURSOR                  "res/cursor5.cur"
-
-IDC_CURSOR9             CURSOR                  "res/cursor9.cur"
-
-IDC_CURSOR8             CURSOR                  "res/cursor8.cur"
-
-IDC_CURSOR7             CURSOR                  "res/cursor7.cur"
-
-IDC_CURSOR6             CURSOR                  "res/cursor6.cur"
-
-IDC_CURSOR4             CURSOR                  "res/cursor4.cur"
-
-IDC_CURSOR2             CURSOR                  "res/cursor2.cur"
-
-IDC_CURSOR1             CURSOR                  "res/cursor1.cur"
-
-IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDR_TRAYMENU MENU
-BEGIN
-    POPUP "tray"
-    BEGIN
-        MENUITEM "&Settings",                   ID_ADMIN_PROPERTIES
-        MENUITEM SEPARATOR
-        MENUITEM "Copy bridge code",            ID_COPY_BRIDGE_CODE
-        MENUITEM SEPARATOR
-        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
-        POPUP "Visit our links"
-        BEGIN
-            MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
-            MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
-            MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
-            MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
-            MENUITEM "Bluesky",                     ID_VISITUSONLINE_BLUESKY
-            MENUITEM "Facebook",                    ID_VISITUSONLINE_FACEBOOK
-            MENUITEM "X/Twitter",                   ID_VISITUSONLINE_XTWITTER
-            MENUITEM "Reddit",                      ID_VISITUSONLINE_REDDIT
-            MENUITEM "OpenHub",                     ID_VISITUSONLINE_OPENHUB
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "Add &New Client",             ID_OUTGOING_CONN
-        MENUITEM "&Kill All Clients",           ID_KILLCLIENTS
-        MENUITEM SEPARATOR
-        MENUITEM "&List All Clients",           ID_LISTCLIENTS
-        MENUITEM SEPARATOR
-        MENUITEM "Install Service",             ID_RUNASSERVICE
-        MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
-        MENUITEM "Stop Service",                ID_CLOSE_SERVICE
-        MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
-        MENUITEM "Reboot in safe mode",         ID_REBOOTSAFEMODE
-        MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
-        MENUITEM SEPARATOR
-        MENUITEM "&Close VNC Connections",      ID_CLOSE
-    END
-END
-
-IDR_TRAYMENU1 MENU
-BEGIN
-    POPUP "tray"
-    BEGIN
-        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
-        MENUITEM SEPARATOR
-        MENUITEM "&Close VNC Connections",      ID_CLOSE
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// JAVAARCHIVE
-//
-
-IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
-
-IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
-
-#if defined(SC_20)
-/////////////////////////////////////////////////////////////////////////////
-//
-// DLL
-//
-
-IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_OUTGOING_CONN AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_ABOUT AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDC_TITLEWINDOW AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_DIALOGCLOUD AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_ACCEPT_CONN AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_LIST_DLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_TEXTCHAT_DLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-IDD_MSLOGON AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#include ""version.rc2""\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_WINVNC              ICON                    "res/world3a.ico"
-
-IDI_FLASH               ICON                    "res/icon2.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDI_WINVNC              "UltraVNC Server"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
-END
-
-STRINGTABLE
-BEGIN
-    ID_CURRENT_USER_PROP    "UltraVNC Server: Current User Properties"
-    ID_DEFAULT_SYST_PROP    "UltraVNC Server: Default Local System Properties"
-    ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC Viewer"
-    ID_FAILED_INIT          "Failed to initialize the socket system"
-    ID_MB1                  "MB1"
-    ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
-    ID_NO_EXIST_INST        "No existing instance of UltraVNC Server could be contacted"
-END
-
-STRINGTABLE
-BEGIN
-    ID_WARNING              "WARNING"
-    ID_WINVNC_ERROR         "UltraVNC Server - Error"
-    ID_WINVNC_USAGE         "UltraVNC Server Usage"
-    ID_WINVNC_WARNIN        "UltraVNC Server - Warning"
-    ID_WVNC                 "WVNC"
-END
-
-STRINGTABLE
-BEGIN
-    ID_ANOTHER_INST         "Another instance of UltraVNC Server is already running"
-    ID_AUTHAD_NOT_FO        "You selected MS-Logon, but the authad.dll\nwas not found.Check you installation"
-    ID_AUTH_NOT_FO          "You selected MS-Logon, but the auth.dll\nwas not found.Check you installation"
-    ID_AUTOACCEPT_U         "AutoAccept: %u"
-    ID_AUTOREJECT_U         "AutoReject: %u"
-    ID_CADERROR             "Ctrl-alt-del require service, no permission"
-    ID_CADERRORFILE         "The file cad.exe was not found in the same folder as UltraVNC Server winvnc.exe"
-    ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
-    ID_CANNOT_EDIT_DEFAULT_PREFS 
-                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
-    ID_CHAT_WITH_S_ULTRAVNC "UltraVNC Server - Chat with <%s>"
-END
-
-STRINGTABLE
-BEGIN
-    ID_SERV_SUCCESS_UNREG   "The UltraVNC Server service has been unregistered"
-    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer!\nIt presumably does not support Text Chat\n"
-    ID_ULTRAVNC_WARNING     "UltraVNC Warning"
-    ID_UNABLE_INST          "Unable to install UltraVNC Server service"
-    ID_UNABLE_PROC_MSLOGON  "Unable to process MS-Logon"
-END
-
-STRINGTABLE
-BEGIN
-    ID_SCM_NOT_HERE         "The SCM could not be contacted - the UltraVNC Server service was not installed"
-    ID_SERVHELP_NREM        "WARNING: The ServiceHelper hook entry could not be removed from the registry"
-    ID_SERVHELP_UNAB        "WARNING: Unable to install the ServiceHelper hook\nGlobal user-specific registry settings will not be loaded"
-    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the UltraVNC Server service was not registered"
-    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the UltraVNC Server service was not unregistered"
-    ID_SERV_FAIL_ST         "The UltraVNC Server service failed to start"
-    ID_SERV_MK_UNREG        "The UltraVNC Server service is already marked to be unregistered"
-    ID_SERV_NCONTACT        "The UltraVNC Server service could not be contacted"
-    ID_SERV_NOT_REG         "The UltraVNC Server service could not be registered"
-    ID_SERV_NOT_STOP        "The UltraVNC Server service could not be stopped"
-    ID_SERV_NOT_UNRG        "The UltraVNC Server service could not be unregistered"
-    ID_SERV_NT_FOUND        "The UltraVNC Server service could not be found"
-    ID_SERV_OLD_REG         "The UltraVNC Server service is already registered"
-    ID_SERV_SUCCESS_INST    "The UltraVNC Server service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is rebooted"
-    ID_SERV_SUCCESS_REG     "The UltraVNC Server service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is rebooted"
-END
-
-STRINGTABLE
-BEGIN
-    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
-    ID_NO_PASSWD_NO_LOGON_WARN 
-                            "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
-    ID_NO_PASSWD_NO_OVERRIDE_ERR 
-                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN 
-                            "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
-    ID_NO_PLUGIN_DETECT     "No Plugin detected..."
-    ID_OUTGOING_CONNECTION  "Outgoing Connection"
-    ID_PLUGIN_LOADIN        "Plugin Loading"
-    ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
-    ID_RICHED32_DLL_LD      "Rich Edit Dll Loading"
-    ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
-END
-
-STRINGTABLE 
-BEGIN 
-    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP requires special build" 
-    IDS_WARNING_CAPTION             "Warning" 
-    IDS_ERROR_OS_NOT_SUPPORTED      "Error OS not supported" 
-    IDS_UNSUPPORTED_OS_CAPTION      "Unsupported OS" 
-    IDS_AUTHADMIN_DLL_NOT_FOUND     "authadmin.dll not found" 
-    IDS_WORKGRPDOMNT4_DLL_NOT_FOUND "workgrpdomnt4.dll not found" 
-    IDS_LDAPAUTH_DLL_NOT_FOUND      "ldapauth.dll not found" 
-    IDS_LDAPAUTHNT4_DLL_NOT_FOUND   "ldapauthnt4.dll not found" 
-    IDS_LDAPAUTH9X_DLL_NOT_FOUND    "ldapauth9x.dll not found" 
-    IDS_KILL_VIEWERS_QUESTION       "Do you want to kill all connected Viewers?" 
-    IDS_RESTART_SERVER_QUESTION     "Do you want to restart the UltraVNC Server?" 
-    IDS_CLOSE_SERVER_QUESTION       "Do you want to close the UltraVNC Server?" 
-    IDS_REBOOT_SYSTEM_QUESTION      "Do you want to reboot the System?" 
-    IDS_FORCE_REBOOT_QUESTION       "Do you want to force reboot the System?" 
-    IDS_UNINSTALL_SERVICE_QUESTION  "Do you want to uninstall the UltraVNC service?" 
-    IDS_INSTALL_SERVICE_QUESTION    "Do you want to install UltraVNC as service?" 
-    IDS_STOP_SERVICE_QUESTION       "Do you want to stop the UltraVNC service?" 
-    IDS_START_SERVICE_QUESTION      "Do you want to start the UltraVNC service?" 
-    IDS_SYSTEM_CAPTION               "System" 
-    IDS_SERVICE_CAPTION              "Service" 
-    IDS_CURRENT_DRIVER_OLD          "Current driver is too old for this version\nUpdate driver or disable Video hook driver\n in the Server Settings" 
-    IDS_DRIVER_NOT_FOUND_REBOOT     "Driver not found: Perhaps you need to reboot after install" 
-    IDS_DRIVER_INFO_REQUIRED_VERSION "Driver Info: Required version 1.00.22" 
-    IDS_FAILED_OPEN_SVC_MGR         "Failed to open service control manager" 
-    IDS_FAILED_PERMISSION_DENIED    "Failed: Permission denied" 
-    IDS_FAILED_CREATE_SVC           "Failed to create a new service" 
-    IDS_FAILED_SVC_NOT_INSTALLED    "Failed: Service is not installed" 
-    IDS_FAILED_OPEN_SVC             "Failed to open the service" 
-    IDS_FAILED_QUERY_SVC_STATUS     "Failed to query service status" 
-    IDS_FAILED_DELETE_SVC           "Failed to delete the service" 
-    IDS_WRONG_PASSWORD_RETRY        "Wrong password, do you want to retry?" 
-    IDS_ERROR_CAPTION                "Error" 
-    IDS_UAC_DISABLED_REGISTRY        "UAC is disabled, make registry changes to allow CAD" 
-    IDS_VERIFY_SAME_FOLDER           "Verify that winvnc.exe and uvnc_settings are in the same folder\n can not create the uvnc_service"
-    IDS_DRIVER_FOUND                 "Driver found. " 
-    IDS_DRIVER_VERSION_OK            "Driver version OK " 
-    IDS_DRIVER_VERSION_NOT_OK        "Driver verion is not 1.00.22 " 
-    IDS_DRIVER_NOT_ACTIVATED         "Driver Not Activated, is the viewer current connected?" 
-    IDS_DRIVER_ONLY_SERVICE_ADMIN    "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin" 
-    IDS_DRIVER_ACTIVE                " driver Active" 
-    IDS_DRIVER_ACCESS_OK             " access ok" 
-    IDS_DRIVER_ACCESS_DENIED         " access denied, permission problem"
-    IDS_LANGUAGE_NAME                "English"
-END 
-
-#endif    // English resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (Neutral) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
-#pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
 IDD_PROPERTIESDIALOG DIALOGEX 0, 0, 380, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "UltraVNC Server - Settings"
@@ -846,17 +398,18 @@ IDD_FORM_input_FT DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,7,344,49,BS_LEFT
+    GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,7,344,58,BS_LEFT
     CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
     CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
     CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
     CONTROL         "Windows 8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,110,10
     CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,74,10
     CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,58,10
-    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,67,36,10
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,77,36,10
     CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,79,133,10
-    GROUPBOX        "File Transfer",IDC_STATIC,7,56,344,41
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,89,133,10
+    GROUPBOX        "File Transfer",IDC_STATIC,7,66,344,41
+    CONTROL         "Force cursor shape",IDC_FORCE_SHAPE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,52,89,10
 END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
@@ -931,141 +484,94 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_PROPERTIESDIALOG, DIALOG
+    IDD_TEXTCHAT_DLG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 366
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 246
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 303
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 172
     END
 
-    IDD_FORM_AUTHENTICATION, DIALOG
+    IDD_LIST_DLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 11
-        VERTGUIDE, 183
-        VERTGUIDE, 191
-        VERTGUIDE, 342
+        RIGHTMARGIN, 291
         TOPMARGIN, 7
-        BOTTOMMARGIN, 202
+        BOTTOMMARGIN, 116
     END
 
-    IDD_FORM_Network, DIALOG
+    IDD_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        VERTGUIDE, 321
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 200
+        RIGHTMARGIN, 267
+        VERTGUIDE, 80
+        VERTGUIDE, 90
+        VERTGUIDE, 100
+        VERTGUIDE, 120
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 74
+        HORZGUIDE, 9
+        HORZGUIDE, 20
+        HORZGUIDE, 30
+        HORZGUIDE, 40
+        HORZGUIDE, 42
+        HORZGUIDE, 52
     END
 
-    IDD_FORM_Log, DIALOG
+    IDD_OUTGOING_CONN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
+        RIGHTMARGIN, 216
+        VERTGUIDE, 7
+        VERTGUIDE, 50
+        VERTGUIDE, 55
+        VERTGUIDE, 185
+        VERTGUIDE, 190
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 81
+        HORZGUIDE, 20
+        HORZGUIDE, 49
     END
 
-    IDD_FORM_administration, DIALOG
+    IDD_ACCEPT_CONN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 331
-        VERTGUIDE, 12
+        RIGHTMARGIN, 179
+        VERTGUIDE, 60
+        VERTGUIDE, 130
         TOPMARGIN, 7
-        BOTTOMMARGIN, 202
+        BOTTOMMARGIN, 88
+        HORZGUIDE, 24
+        HORZGUIDE, 30
+        HORZGUIDE, 46
+        HORZGUIDE, 50
+        HORZGUIDE, 65
+        HORZGUIDE, 74
     END
 
-    IDD_FORM_Incoming, DIALOG
+    IDD_DIALOGCLOUD, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 14
-        VERTGUIDE, 296
+        RIGHTMARGIN, 304
         TOPMARGIN, 7
-        BOTTOMMARGIN, 202
+        BOTTOMMARGIN, 96
     END
 
-    IDD_EDIT_IP_ACESS_CONTROL, DIALOG
+    IDC_TITLEWINDOW, DIALOG
     BEGIN
-        RIGHTMARGIN, 223
-        VERTGUIDE, 2
-        BOTTOMMARGIN, 142
+        LEFTMARGIN, 2
+        VERTGUIDE, 4
+        VERTGUIDE, 51
+        VERTGUIDE, 58
+        VERTGUIDE, 175
     END
 
-    IDD_FORM_capture, DIALOG
+    IDD_MSLOGON, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Rules, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        VERTGUIDE, 296
-        VERTGUIDE, 355
-        VERTGUIDE, 360
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_FORM_Notifications, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
     END
 
     IDD_FORM_input_FT, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
-    END
-
-    IDD_ADMINPASSWORD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 249
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 45
-    END
-
-    IDD_CHANGE_PASSWORD, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 175
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 98
-    END
-
-    IDD_FORM_Misc, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 351
-        VERTGUIDE, 12
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 204
-    END
-
-    IDD_FORM_Service, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 355
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 202
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -1073,8 +579,153 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Cursor
+//
+
+IDC_FINGER              CURSOR                  "res/Finger.cur"
+
+IDC_CURSORBLANK         CURSOR                  "res/cursor5.cur"
+
+IDC_CURSOR9             CURSOR                  "res/cursor9.cur"
+
+IDC_CURSOR8             CURSOR                  "res/cursor8.cur"
+
+IDC_CURSOR7             CURSOR                  "res/cursor7.cur"
+
+IDC_CURSOR6             CURSOR                  "res/cursor6.cur"
+
+IDC_CURSOR4             CURSOR                  "res/cursor4.cur"
+
+IDC_CURSOR2             CURSOR                  "res/cursor2.cur"
+
+IDC_CURSOR1             CURSOR                  "res/cursor1.cur"
+
+IDC_CURSOR3             CURSOR                  "res/cursor3.cur"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU
+BEGIN
+    POPUP "tray"
+    BEGIN
+        MENUITEM "&Settings",                   ID_ADMIN_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "Copy bridge code",            ID_COPY_BRIDGE_CODE
+        MENUITEM SEPARATOR
+        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
+        POPUP "Visit our links"
+        BEGIN
+            MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
+            MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
+            MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
+            MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
+            MENUITEM "Bluesky",                     ID_VISITUSONLINE_BLUESKY
+            MENUITEM "Facebook",                    ID_VISITUSONLINE_FACEBOOK
+            MENUITEM "X/Twitter",                   ID_VISITUSONLINE_XTWITTER
+            MENUITEM "Reddit",                      ID_VISITUSONLINE_REDDIT
+            MENUITEM "OpenHub",                     ID_VISITUSONLINE_OPENHUB
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Add &New Client",             ID_OUTGOING_CONN
+        MENUITEM "&Kill All Clients",           ID_KILLCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "&List All Clients",           ID_LISTCLIENTS
+        MENUITEM SEPARATOR
+        MENUITEM "Install Service",             ID_RUNASSERVICE
+        MENUITEM "Uninstall Service",           ID_UNINSTALL_SERVICE
+        MENUITEM "Stop Service",                ID_CLOSE_SERVICE
+        MENUITEM "Start Service (must be installed first)", ID_START_SERVICE
+        MENUITEM "Reboot in safe mode",         ID_REBOOTSAFEMODE
+        MENUITEM "Force Reboot (unsafe)",       ID_REBOOT_FORCE
+        MENUITEM SEPARATOR
+        MENUITEM "&Close VNC Connections",      ID_CLOSE
+    END
+END
+
+IDR_TRAYMENU1 MENU
+BEGIN
+    POPUP "tray"
+    BEGIN
+        MENUITEM "&About UltraVNC Server...",   ID_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Close VNC Connections",      ID_CLOSE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// JAVAARCHIVE
+//
+
+IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
+
+IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
+
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
+
+IDR_DLL1                DLL                     "res/ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // AFX_DIALOG_LAYOUT
 //
+
+IDD_OUTGOING_CONN AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDC_TITLEWINDOW AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOGCLOUD AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ACCEPT_CONN AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_LIST_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_TEXTCHAT_DLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_MSLOGON AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 IDD_PROPERTIESDIALOG AFX_DIALOG_LAYOUT
 BEGIN
@@ -1151,14 +802,215 @@ BEGIN
     0
 END
 
-#endif    // English (Neutral) resources
+
+#ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#include ""version.rc2""\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Manifest
+// Icon
 //
-1 RT_MANIFEST "winvnc.exe.manifest"
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_WINVNC              ICON                    "res/world3a.ico"
+
+IDI_FLASH               ICON                    "res/icon2.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "winvnc.exe.manifest"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDI_WINVNC              "UltraVNC Server"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
+END
+
+STRINGTABLE
+BEGIN
+    ID_CURRENT_USER_PROP    "UltraVNC Server: Current User Properties"
+    ID_DEFAULT_SYST_PROP    "UltraVNC Server: Default Local System Properties"
+    ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
+    ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphics device driver"
+    ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
+    ID_FAILED_CONNECT_LISTING_VIEW "Failed to connect to listening VNC Viewer"
+    ID_FAILED_INIT          "Failed to initialize the socket system"
+    ID_MB1                  "MB1"
+    ID_NO_CURRENT_USER_ERR  "The UltraVNC Server settings for the current user are unavailable at present."
+    ID_NO_EXIST_INST        "No existing instance of UltraVNC Server could be contacted"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WARNING              "WARNING"
+    ID_WINVNC_ERROR         "UltraVNC Server - Error"
+    ID_WINVNC_USAGE         "UltraVNC Server Usage"
+    ID_WINVNC_WARNIN        "UltraVNC Server - Warning"
+    ID_WVNC                 "WVNC"
+    IDS_WINDOWS_XP_SPECIAL_BUILD "Windows XP requires special build"
+END
+
+STRINGTABLE
+BEGIN
+    ID_ANOTHER_INST         "Another instance of UltraVNC Server is already running"
+    ID_AUTHAD_NOT_FO        "You selected MS-Logon, but the authad.dll\nwas not found.Check you installation"
+    ID_AUTH_NOT_FO          "You selected MS-Logon, but the auth.dll\nwas not found.Check you installation"
+    ID_AUTOACCEPT_U         "AutoAccept: %u"
+    ID_AUTOREJECT_U         "AutoReject: %u"
+    ID_CADERROR             "Ctrl-alt-del require service, no permission"
+    ID_CADERRORFILE         "The file cad.exe was not found in the same folder as UltraVNC Server winvnc.exe"
+    ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
+    ID_CANNOT_EDIT_DEFAULT_PREFS 
+                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
+    ID_CHAT_WITH_S_ULTRAVNC "UltraVNC Server - Chat with <%s>"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SERV_SUCCESS_UNREG   "The UltraVNC Server service has been unregistered"
+    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer!\nIt presumably does not support Text Chat\n"
+    ID_ULTRAVNC_WARNING     "UltraVNC Warning"
+    ID_UNABLE_INST          "Unable to install UltraVNC Server service"
+    ID_UNABLE_PROC_MSLOGON  "Unable to process MS-Logon"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SCM_NOT_HERE         "The SCM could not be contacted - the UltraVNC Server service was not installed"
+    ID_SERVHELP_NREM        "WARNING: The ServiceHelper hook entry could not be removed from the registry"
+    ID_SERVHELP_UNAB        "WARNING: Unable to install the ServiceHelper hook\nGlobal user-specific registry settings will not be loaded"
+    ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the UltraVNC Server service was not registered"
+    ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the UltraVNC Server service was not unregistered"
+    ID_SERV_FAIL_ST         "The UltraVNC Server service failed to start"
+    ID_SERV_MK_UNREG        "The UltraVNC Server service is already marked to be unregistered"
+    ID_SERV_NCONTACT        "The UltraVNC Server service could not be contacted"
+    ID_SERV_NOT_REG         "The UltraVNC Server service could not be registered"
+    ID_SERV_NOT_STOP        "The UltraVNC Server service could not be stopped"
+    ID_SERV_NOT_UNRG        "The UltraVNC Server service could not be unregistered"
+    ID_SERV_NT_FOUND        "The UltraVNC Server service could not be found"
+    ID_SERV_OLD_REG         "The UltraVNC Server service is already registered"
+    ID_SERV_SUCCESS_INST    "The UltraVNC Server service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is rebooted"
+    ID_SERV_SUCCESS_REG     "The UltraVNC Server service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is rebooted"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
+    ID_NO_PASSWD_NO_LOGON_WARN 
+                            "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
+    ID_NO_PASSWD_NO_OVERRIDE_ERR 
+                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
+    ID_NO_PASSWD_NO_OVERRIDE_WARN 
+                            "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
+    ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
+    ID_NO_PLUGIN_DETECT     "No Plugin detected..."
+    ID_OUTGOING_CONNECTION  "Outgoing Connection"
+    ID_PLUGIN_LOADIN        "Plugin Loading"
+    ID_PLUGIN_NOT_LOAD      "The Plugin cannot be loaded.\n\rPlease check its integrity."
+    ID_RICHED32_DLL_LD      "Rich Edit Dll Loading"
+    ID_RICHED32_UNLOAD      "Unable to load the Rich Edit (RICHED32.DLL) control!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_WARNING_CAPTION     "Warning"
+    IDS_ERROR_OS_NOT_SUPPORTED "Error OS not supported"
+    IDS_UNSUPPORTED_OS_CAPTION "Unsupported OS"
+    IDS_AUTHADMIN_DLL_NOT_FOUND "authadmin.dll not found"
+    IDS_WORKGRPDOMNT4_DLL_NOT_FOUND "workgrpdomnt4.dll not found"
+    IDS_LDAPAUTH_DLL_NOT_FOUND "ldapauth.dll not found"
+    IDS_LDAPAUTHNT4_DLL_NOT_FOUND "ldapauthnt4.dll not found"
+    IDS_LDAPAUTH9X_DLL_NOT_FOUND "ldapauth9x.dll not found"
+    IDS_KILL_VIEWERS_QUESTION "Do you want to kill all connected Viewers?"
+    IDS_RESTART_SERVER_QUESTION "Do you want to restart the UltraVNC Server?"
+    IDS_CLOSE_SERVER_QUESTION "Do you want to close the UltraVNC Server?"
+    IDS_REBOOT_SYSTEM_QUESTION "Do you want to reboot the System?"
+    IDS_FORCE_REBOOT_QUESTION "Do you want to force reboot the System?"
+    IDS_UNINSTALL_SERVICE_QUESTION 
+                            "Do you want to uninstall the UltraVNC service?"
+    IDS_INSTALL_SERVICE_QUESTION "Do you want to install UltraVNC as service?"
+    IDS_STOP_SERVICE_QUESTION "Do you want to stop the UltraVNC service?"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_START_SERVICE_QUESTION "Do you want to start the UltraVNC service?"
+    IDS_SYSTEM_CAPTION      "System"
+    IDS_SERVICE_CAPTION     "Service"
+    IDS_CURRENT_DRIVER_OLD  "Current driver is too old for this version\nUpdate driver or disable Video hook driver\n in the Server Settings"
+    IDS_DRIVER_NOT_FOUND_REBOOT 
+                            "Driver not found: Perhaps you need to reboot after install"
+    IDS_DRIVER_INFO_REQUIRED_VERSION "Driver Info: Required version 1.00.22"
+    IDS_FAILED_OPEN_SVC_MGR "Failed to open service control manager"
+    IDS_FAILED_PERMISSION_DENIED "Failed: Permission denied"
+    IDS_FAILED_CREATE_SVC   "Failed to create a new service"
+    IDS_FAILED_SVC_NOT_INSTALLED "Failed: Service is not installed"
+    IDS_FAILED_OPEN_SVC     "Failed to open the service"
+    IDS_FAILED_QUERY_SVC_STATUS "Failed to query service status"
+    IDS_FAILED_DELETE_SVC   "Failed to delete the service"
+    IDS_WRONG_PASSWORD_RETRY "Wrong password, do you want to retry?"
+    IDS_ERROR_CAPTION       "Error"
+    IDS_UAC_DISABLED_REGISTRY 
+                            "UAC is disabled, make registry changes to allow CAD"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_VERIFY_SAME_FOLDER  "Verify that winvnc.exe and uvnc_settings are in the same folder\n can not create the uvnc_service"
+    IDS_DRIVER_FOUND        "Driver found. "
+    IDS_DRIVER_VERSION_OK   "Driver version OK "
+    IDS_DRIVER_VERSION_NOT_OK "Driver verion is not 1.00.22 "
+    IDS_DRIVER_NOT_ACTIVATED 
+                            "Driver Not Activated, is the viewer current connected?"
+    IDS_DRIVER_ONLY_SERVICE_ADMIN 
+                            "A Mirrior Driver can only be started if UltraVNC Server is a service or running as admin"
+    IDS_DRIVER_ACTIVE       " driver Active"
+    IDS_DRIVER_ACCESS_OK    " access ok"
+    IDS_DRIVER_ACCESS_DENIED " access denied, permission problem"
+    IDS_LANGUAGE_NAME       "English"
+END
+
+#endif    // English resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -1167,4 +1019,5 @@ END
 //
 #include "version.rc2"
 /////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED 
+#endif    // not APSTUDIO_INVOKED
+

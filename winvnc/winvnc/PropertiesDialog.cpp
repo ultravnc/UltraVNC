@@ -588,6 +588,9 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_JAP_INPUTS))
 		SendMessage(GetDlgItem(hwnd, IDC_JAP_INPUTS), BM_SETCHECK, settings->getEnableJapInput(), 0);
 
+	if (GetDlgItem(hwnd, IDC_FORCE_SHAPE))
+		SendMessage(GetDlgItem(hwnd, IDC_FORCE_SHAPE), BM_SETCHECK, settings->getForceCursorShape(), 0);
+
 	if (GetDlgItem(hwnd, IDC_UNICODE_INPUTS))
 		SendMessage(GetDlgItem(hwnd, IDC_UNICODE_INPUTS), BM_SETCHECK, settings->getEnableUnicodeInput(), 0);
 
@@ -1123,6 +1126,7 @@ void PropertiesDialog::UpdateServer()
 	m_server->EnableHTTPConnect(settings->getHTTPConnect());
 	m_server->EnableRemoteInputs(settings->getEnableRemoteInputs());
 	m_server->EnableJapInput(settings->getEnableJapInput());
+	m_server->ForceCursorShape(settings->getForceCursorShape());
 	m_server->EnableUnicodeInput(settings->getEnableUnicodeInput());
 
 	// Update the password
@@ -1145,6 +1149,7 @@ void PropertiesDialog::UpdateServer()
 	m_server->EnableHTTPConnect(settings->getHTTPConnect());
 	m_server->EnableRemoteInputs(settings->getEnableRemoteInputs());
 	m_server->EnableJapInput(settings->getEnableJapInput());
+	m_server->ForceCursorShape(settings->getForceCursorShape());
 	m_server->EnableUnicodeInput(settings->getEnableUnicodeInput());
 
 	// Now change the listening port settings
@@ -1930,6 +1935,13 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		if (m_server)
 			m_server->EnableJapInput(SendMessage(hJapInputs, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		settings->setEnableJapInput(SendMessage(hJapInputs, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	}
+
+	if (GetDlgItem(hwnd, IDC_FORCE_SHAPE)) {
+		HWND hForceCursorShape = GetDlgItem(hwnd, IDC_FORCE_SHAPE);
+		if (m_server)
+			m_server->ForceCursorShape(SendMessage(hForceCursorShape, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setForceCursorShape(SendMessage(hForceCursorShape, BM_GETCHECK, 0, 0) == BST_CHECKED);
 	}
 
 	if (GetDlgItem(hwnd, IDC_UNICODE_INPUTS)) {
