@@ -1190,6 +1190,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	int nFileCount = 0;
 	char szLocalStatus[128];
 
+
 	HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
 	HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
 
@@ -1237,10 +1238,12 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 	}
 
+	char szSavedParentPath[MAX_PATH] = {0}; // To restore path if folder is unreadable
 
 	if (nSelected == nCount || lstrlen(ofDirT) == 0)
 	{
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
+		strcpy_s(szSavedParentPath, ofDirT); // Save current path
 		if (strlen(ofDirT) == 0) return; 
 	}
 	else
@@ -1267,6 +1270,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			return;
 
 		GetDlgItemText(hWnd, IDC_CURR_LOCAL, ofDirT, sizeof(ofDirT));
+		strcpy_s(szSavedParentPath, ofDirT); // Save parent path before modification
 		if (!_stricmp(ofDir, ".."))
 		{	
 			char* p;
@@ -1301,8 +1305,6 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	sprintf_s(szLocalStatus, sz_H8); 
 	SetDlgItemText(hWnd, IDC_LOCAL_STATUS, szLocalStatus);
 
-	ListView_DeleteAllItems(hWndLocalList);
-
 	WIN32_FIND_DATA fd;
 	HANDLE ff;
 	int bRet = 1;
@@ -1315,8 +1317,23 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	{
 		sprintf_s(szLocalStatus, sz_H9); 
 		SetDlgItemText(hWnd, IDC_LOCAL_STATUS, szLocalStatus);
-		return;
+		// Restore saved parent path and re-populate it
+		SetDlgItemText(hWnd, IDC_CURR_LOCAL, szSavedParentPath);
+		strcpy_s(ofDir, szSavedParentPath);
+		strcat_s(ofDir, "*");
+		ff = FindFirstFile(ofDir, &fd);
+		if (ff == INVALID_HANDLE_VALUE)
+			return; // Parent also unreadable, nothing we can do
+		ListView_DeleteAllItems(hWndLocalList);
+		// Update m_szLastLocalPath to parent
+		lstrcpy(m_szLastLocalPath, ofDir);
+		int len = strlen(m_szLastLocalPath);
+		if (len > 2) { // truncate off the *
+			m_szLastLocalPath[len-1] = '\0';
+		}
+		// Fall through to populate parent folder
 	} else {
+		ListView_DeleteAllItems(hWndLocalList);
 		// adzm 2009-08-02
 		lstrcpy(m_szLastLocalPath, ofDir);
 		int len = strlen(m_szLastLocalPath);
@@ -1329,7 +1346,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	{
 		AddFileToFileList(hWnd, IDC_LOCAL_FILELIST, fd, true);
 		nFileCount++;
-		if (!PseudoYield(GetParent(hWnd))) return;
+		if (!PseudoYield(GetParent(hWnd))) { FindClose(ff); return; }
 		bRet = FindNextFile(ff, &fd);
 	}
 
@@ -1457,7 +1474,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 	    SendDlgItemMessage(hWnd, IDC_REMOTE_DRIVECB, CB_SETCURSEL, nIndex, 0L);
 	}
 
-	ListView_DeleteAllItems(hWndRemoteList);
+	// Don't clear list here - wait until we know folder is readable (in PopulateRemoteListBox)
+	//ListView_DeleteAllItems(hWndRemoteList);
 
     rfbFileTransferMsg ft;
     ft.type = rfbFileTransfer;
@@ -1488,9 +1506,15 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
 		// Restore previous path so user can navigate back
 		if (strlen(m_szLastRemotePath) > 0)
 			SetDlgItemText(hWnd, IDC_CURR_REMOTE, m_szLastRemotePath);
+		// Don't clear list - keep showing parent folder contents
+		// User stays in parent folder with error message
 		m_fFileCommandPending = false;
 		return;
 	}
+
+	// Folder is readable, clear list and populate
+	HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
+	ListView_DeleteAllItems(hWndRemoteList);
 
 	// sf@2004 - Read the returned Directory full path
 	if (nLen > 1 && !UsingOldProtocol())
