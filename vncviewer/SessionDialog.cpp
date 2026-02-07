@@ -53,7 +53,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
 	if (strcmp(m_proxyhost, "") != 0) {
 		_tcscat_s(m_proxyhost, ":");
-		_tcscat_s(m_proxyhost, 256, _itoa(m_pOpt->m_proxyport, tmphost2, 10));
+		_tcscat_s(m_proxyhost, _itoa(m_pOpt->m_proxyport, tmphost2, 10));
 	}
 
 	for (int i = rfbEncodingRaw; i <= LASTENCODING; i++) {
