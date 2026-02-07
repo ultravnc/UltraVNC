@@ -265,10 +265,13 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			_this->SetDefaults();
 			return TRUE;
 		case IDC_SAVE:
+			_this->ReadDlgProcConfig();
 			if (_this->fUseOnlyDefaultConfigFile)
 				_this->SaveToFile(_this->m_pOpt->getDefaultOptionsFileName(), true);
-			else
-				_this->SaveConnection(hwnd, false);				
+			else {
+				_this->SaveConnection(hwnd, false);
+				_this->saveInt("UseOnlyDefaultConfigFile", _this->fUseOnlyDefaultConfigFile, _this->m_pOpt->getDefaultOptionsFileName());
+			}
 			break;
 		case IDC_SAVEAS:
 			_this->SaveConnection(hwnd, true);

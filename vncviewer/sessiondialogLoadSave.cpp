@@ -303,7 +303,6 @@ void SessionDialog::LoadFromFile(char *fname)
   fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
-  fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, fname) ? true : false;
   preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
@@ -716,11 +715,13 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	if (strlen(hostname) != 0 && fileExists && !m_pOpt->m_UseOnlyDefaultConfigFile) {
 		SetDefaults();
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
+		fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
 		LoadFromFile(buffer);
 		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG),customConfigFile);
 	}
 	else {
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
+		fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
 		// Always load connection-specific settings from per-host file
 		if (strlen(hostname) != 0 && fileExists) {
 			m_connectionType = (ConnectionType)GetPrivateProfileInt("options", "UseProxy", (int)m_connectionType, buffer);
