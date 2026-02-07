@@ -710,9 +710,10 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	strcat_s(buffer,"\\UltraVNC\\");
 	strcat_s(buffer,fname);
 	FILE *file = fopen(buffer, "r");
+	bool fileExists = (file != NULL);
+	if (file) fclose(file);
 	strcpy_s(customConfigFile, buffer);
-	if (strlen(hostname) != 0 && file && !m_pOpt->m_UseOnlyDefaultConfigFile) {
-		fclose(file);
+	if (strlen(hostname) != 0 && fileExists && !m_pOpt->m_UseOnlyDefaultConfigFile) {
 		SetDefaults();
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
 		LoadFromFile(buffer);
@@ -720,6 +721,12 @@ void SessionDialog::IfHostExistLoadSettings(char *hostname)
 	}
 	else {
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
+		// Always load connection-specific settings from per-host file
+		if (strlen(hostname) != 0 && fileExists) {
+			m_connectionType = (ConnectionType)GetPrivateProfileInt("options", "UseProxy", (int)m_connectionType, buffer);
+			GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, buffer);
+			m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, buffer);
+		}
 		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), "");
 	}
 	InitDlgProcListen();
