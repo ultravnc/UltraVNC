@@ -297,9 +297,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | 
 CAPTION "UltraVNC Viewer 1.4.4.0-dev - Connection"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    COMBOBOX        IDC_HOSTNAME_EDIT,91,30,103,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PROXY_EDIT,91,44,103,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Connect",IDCONNECT,234,29,47,14
+    COMBOBOX        IDC_HOSTNAME_EDIT,96,30,185,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PROXY_EDIT,96,44,185,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Connect",IDCONNECT,231,62,50,13
     PUSHBUTTON      "Options",IDC_BUTTON_EXPAND,9,62,50,13,BS_ICON
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,5,26,23
     CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,83,17,47,10
@@ -778,6 +778,7 @@ BEGIN
         VERTGUIDE, 213
         VERTGUIDE, 247
         VERTGUIDE, 251
+        VERTGUIDE, 281
         BOTTOMMARGIN, 293
         HORZGUIDE, 70
         HORZGUIDE, 77
@@ -1185,6 +1186,14 @@ IDD_SESSIONSELECTOR AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "vncviewer.exe.manifest"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1607,11 +1616,7 @@ END
 #endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Manifest
-//
-1 RT_MANIFEST "vncviewer.exe.manifest"
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
