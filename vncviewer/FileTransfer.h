@@ -38,6 +38,10 @@ public:
 	VNCviewerApp		*m_pApp; 
 	ClientConnection	*m_pCC;
 	HWND				hWnd;
+	enum : LPARAM
+	{
+		FT_LPARAM_UNREADABLE = 0x00000001
+	};
 	bool				m_fAbort;
     bool                m_fUserAbortedFileTransfer; // 21 April 2008 jdp 
 	bool                m_fUserForcedAbortedFileTransfer; // 21 April 2008 jdp 
@@ -70,6 +74,10 @@ public:
 	// adzm 2009-08-02
 	char				m_szLastLocalPath[_MAX_PATH];
 	char				m_szLastRemotePath[_MAX_PATH];
+	int                 m_nLastLocalAttemptItem;
+	char                m_szLastLocalAttemptName[MAX_PATH + 2];
+	int                 m_nLastRemoteAttemptItem;
+	char                m_szLastRemoteAttemptName[MAX_PATH + 2];
 
 	__int64				m_nnFileSize;
 	DWORD				m_dwCurrentValue;

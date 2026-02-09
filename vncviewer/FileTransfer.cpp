@@ -293,11 +293,15 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	// adzm 2009-08-02
 	memset(m_szLastLocalPath, 0, sizeof(m_szLastLocalPath));
 	memset(m_szLastRemotePath, 0, sizeof(m_szLastRemotePath));
+	m_nLastLocalAttemptItem = -1;
+	memset(m_szLastLocalAttemptName, 0, sizeof(m_szLastLocalAttemptName));
+	m_nLastRemoteAttemptItem = -1;
+	memset(m_szLastRemoteAttemptName, 0, sizeof(m_szLastRemoteAttemptName));
 
 	for (int i = 0; i<3; i++)
 	{
-		bSortDirectionsL[i] = true;
-		bSortDirectionsR[i] = true;
+		bSortDirectionsL[i] = false;
+		bSortDirectionsR[i] = false;
 	}
     // 16 April 2008 jdp
     // load richedit so the path display can handly mbcs
@@ -975,6 +979,39 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		Item.pszText = "Folder";
 		ListView_SetItem(hWndList, &Item);
 
+		// Proactively check if local folder is accessible
+		if (fLocalSide && strcmp(fd.cFileName, ".."))
+		{
+			char szCurrPath[MAX_PATH];
+			GetDlgItemText(hWnd, IDC_CURR_LOCAL, szCurrPath, sizeof(szCurrPath));
+			if (strlen(szCurrPath) > 0)
+			{
+				char szProbe[MAX_PATH + 4];
+				sprintf_s(szProbe, "%s%s\\*", szCurrPath, fd.cFileName);
+				WIN32_FIND_DATA fdProbe;
+				SetErrorMode(SEM_FAILCRITICALERRORS);
+				HANDLE hProbe = FindFirstFile(szProbe, &fdProbe);
+				SetErrorMode(0);
+				if (hProbe == INVALID_HANDLE_VALUE)
+				{
+					LVITEM flagItem;
+					memset(&flagItem, 0, sizeof(flagItem));
+					flagItem.mask = LVIF_PARAM;
+					flagItem.iItem = nItem;
+					flagItem.iSubItem = 0;
+					if (ListView_GetItem(hWndList, &flagItem))
+						flagItem.lParam |= FT_LPARAM_UNREADABLE;
+					else
+						flagItem.lParam = FT_LPARAM_UNREADABLE;
+					ListView_SetItem(hWndList, &flagItem);
+				}
+				else
+				{
+					FindClose(hProbe);
+				}
+			}
+		}
+
 	}
 	else if (strcmp(fd.cFileName, ".")) // Test actually Not necessary for remote list
 	{
@@ -1211,6 +1248,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				Item.pszText = ofDirT;
 				Item.cchTextMax = MAX_PATH;
 				ListView_GetItem(hWndLocalList, &Item);
+				m_nLastLocalAttemptItem = nSelected;
+				strcpy_s(m_szLastLocalAttemptName, ofDirT);
 				break;
 			}
 		}
@@ -1230,6 +1269,13 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 			szPath[6] = '\0';
 			// szPath always contains a drive letter (X:) or (..)
 			strcpy_s(ofDirT, szPath);
+			// remember which item was attempted so we can mark it on error
+			LVFINDINFO Info;
+			memset(&Info, 0, sizeof(Info));
+			Info.flags = LVFI_STRING;
+			Info.psz = (LPSTR)ofDirT;
+			m_nLastLocalAttemptItem = ListView_FindItem(hWndLocalList, -1, &Info);
+			strcpy_s(m_szLastLocalAttemptName, ofDirT);
 			// In the case of (..) we keep the current path intact
 			char szUpDirMask[16];
 			sprintf_s(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
@@ -1317,6 +1363,21 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	{
 		sprintf_s(szLocalStatus, sz_H9); 
 		SetDlgItemText(hWnd, IDC_LOCAL_STATUS, szLocalStatus);
+		if (m_nLastLocalAttemptItem >= 0)
+		{
+			LVITEM Item;
+			memset(&Item, 0, sizeof(Item));
+			Item.mask = LVIF_PARAM;
+			Item.iItem = m_nLastLocalAttemptItem;
+			Item.iSubItem = 0;
+			if (ListView_GetItem(hWndLocalList, &Item))
+				Item.lParam |= FT_LPARAM_UNREADABLE;
+			else
+				Item.lParam = FT_LPARAM_UNREADABLE;
+			ListView_SetItem(hWndLocalList, &Item);
+			ListView_RedrawItems(hWndLocalList, m_nLastLocalAttemptItem, m_nLastLocalAttemptItem);
+			UpdateWindow(hWndLocalList);
+		}
 		// Restore saved parent path and re-populate it
 		SetDlgItemText(hWnd, IDC_CURR_LOCAL, szSavedParentPath);
 		strcpy_s(ofDir, szSavedParentPath);
@@ -1397,6 +1458,8 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 				Item.pszText = ofDirT;
 				Item.cchTextMax = MAX_PATH;
 				ListView_GetItem(hWndRemoteList, &Item);
+				m_nLastRemoteAttemptItem = nSelected;
+				strcpy_s(m_szLastRemoteAttemptName, ofDirT);
 				break;
 			}
 		}
@@ -1407,6 +1470,13 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 			szPath[6] = '\0';
 		// szPath always contains a drive letter (X:) or (..)
 		strcpy_s(ofDirT, szPath);
+		// remember which item was attempted so we can mark it on error
+		LVFINDINFO Info;
+		memset(&Info, 0, sizeof(Info));
+		Info.flags = LVFI_STRING;
+		Info.psz = (LPSTR)ofDirT;
+		m_nLastRemoteAttemptItem = ListView_FindItem(hWndRemoteList, -1, &Info);
+		strcpy_s(m_szLastRemoteAttemptName, ofDirT);
 		// In the case of (..) we keep the current path intact
 		char szUpDirMask[16];
 		sprintf_s(szUpDirMask, "%s..%s", rfbDirPrefix, rfbDirSuffix);
@@ -1503,6 +1573,22 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
 	{
 		sprintf_s(szRemoteStatus, sz_H10); 
 		SetDlgItemText(hWnd, IDC_REMOTE_STATUS, szRemoteStatus);
+		HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
+		if (m_nLastRemoteAttemptItem >= 0)
+		{
+			LVITEM Item;
+			memset(&Item, 0, sizeof(Item));
+			Item.mask = LVIF_PARAM;
+			Item.iItem = m_nLastRemoteAttemptItem;
+			Item.iSubItem = 0;
+			if (ListView_GetItem(hWndRemoteList, &Item))
+				Item.lParam |= FT_LPARAM_UNREADABLE;
+			else
+				Item.lParam = FT_LPARAM_UNREADABLE;
+			ListView_SetItem(hWndRemoteList, &Item);
+			ListView_RedrawItems(hWndRemoteList, m_nLastRemoteAttemptItem, m_nLastRemoteAttemptItem);
+			UpdateWindow(hWndRemoteList);
+		}
 		// Restore previous path so user can navigate back
 		if (strlen(m_szLastRemotePath) > 0)
 			SetDlgItemText(hWnd, IDC_CURR_REMOTE, m_szLastRemotePath);
@@ -4398,6 +4484,43 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			{
 			case HDN_ITEMCLICK:
 				return TRUE;
+
+			case NM_CUSTOMDRAW:
+				{
+					LPNMLVCUSTOMDRAW lpNmlvcd = (LPNMLVCUSTOMDRAW)lParam;
+					if (lpNmlvcd->nmcd.hdr.hwndFrom != GetDlgItem(hWnd, IDC_LOCAL_FILELIST) &&
+						lpNmlvcd->nmcd.hdr.hwndFrom != GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
+					{
+						break;
+					}
+
+					switch (lpNmlvcd->nmcd.dwDrawStage)
+					{
+					case CDDS_PREPAINT:
+						SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_NOTIFYITEMDRAW);
+						return TRUE;
+					case CDDS_ITEMPREPAINT:
+						{
+							LVITEM Item;
+							memset(&Item, 0, sizeof(Item));
+							Item.mask = LVIF_PARAM;
+							Item.iItem = (int)lpNmlvcd->nmcd.dwItemSpec;
+							Item.iSubItem = 0;
+							if (ListView_GetItem(lpNmlvcd->nmcd.hdr.hwndFrom, &Item))
+							{
+								if ((Item.lParam & FT_LPARAM_UNREADABLE) == FT_LPARAM_UNREADABLE)
+								{
+									lpNmlvcd->clrText = RGB(255, 0, 0);
+									SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_DODEFAULT);
+									return TRUE;
+								}
+							}
+							SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_DODEFAULT);
+							return TRUE;
+						}
+					}
+				}
+				break;
 
 			case NM_SETFOCUS:
 				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
