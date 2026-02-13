@@ -71,6 +71,7 @@ public:
 	bool	m_SavePos;
 	bool	m_SaveSize;
 	bool	m_Directx;
+	bool	m_cmdDirectx;
 	bool    m_ShowToolbar;
 	bool	m_GNOME;
 

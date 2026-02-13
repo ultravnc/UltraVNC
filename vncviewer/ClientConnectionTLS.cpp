@@ -791,6 +791,7 @@ void ClientConnection::AuthVeNCrypt()
 		if (strlen(m_clearPasswd) == 0)
 		{
 			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 			if (!ad.DoDialog(dtUserPass, m_host, m_port))
 				QuietException_helper("Authentication cancelled");
 			strcpy_s(m_cmdlnUser, ad.m_user);

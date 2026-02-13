@@ -19,6 +19,7 @@ public:
 	AuthDialog();
 	virtual ~AuthDialog();
 	int DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, char hex[24] ="", char catchphrase[1024] ="");
+	void SetStatusWindow(HWND hwndStatus, const char* className);
 	TCHAR m_passwd[256];
 	TCHAR m_domain[256];
 	TCHAR m_user[256];
@@ -35,4 +36,9 @@ public:
 	DialogType dialogType;
 	char hex[24]{};
 	char catchphrase[1024]{};
+	
+	// For hiding status window during authentication when classname is used
+	HWND m_hwndStatus;
+	char m_className[255];
+	bool m_statusWasVisible;
 };

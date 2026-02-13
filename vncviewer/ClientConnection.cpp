@@ -1773,6 +1773,7 @@ void ClientConnection::SetDSMPluginStuff()
 			if (strlen(m_clearPasswd) == 0) // Possibly set using -password command line
 			{
 				AuthDialog ad;
+				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 				if (ad.DoDialog(dtPass,m_host,m_port))
 				{
 					strncpy_s(m_clearPasswd, ad.m_passwd,254);
@@ -3421,6 +3422,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 				}
 				else
 				{
+					ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 					if (ad.DoDialog(dtPass, m_host, m_port))
 						{
 							strncpy_s(passwd, ad.m_passwd,254);
@@ -3619,6 +3621,7 @@ void ClientConnection::AuthMsLogonII()
 	else
 	{
 	AuthDialog ad;
+	ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 	// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
 	if (ad.DoDialog(dtUserPass, m_host, m_port)) {
 		strncpy_s(passwd, ad.m_passwd, 64);
@@ -3696,6 +3699,7 @@ void ClientConnection::AuthMsLogonI()
 	else
 	{
 		AuthDialog ad;
+		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
 		if (ad.DoDialog(dtUserPassNotEncryption, m_host, m_port))
 		{
@@ -3784,6 +3788,7 @@ void ClientConnection::AuthVnc()
 	else
 	{
 		AuthDialog ad;
+		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 		if (ad.DoDialog(dtPass, m_host, m_port))
 		{
 			strncpy_s(passwd, ad.m_passwd,254);
@@ -3976,6 +3981,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	bool pos_set = false;
 	bool size_set = false;
+	UINT showFlag = (strlen(m_opts->m_ClassName) > 0) ? 0 : SWP_SHOWWINDOW;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
@@ -4196,12 +4202,12 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		if (m_opts->m_w != 0 && m_opts->m_h != 0)
 		{
 			pos_set = true; size_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, showFlag);
 		}
 		else if (m_opts->m_x != 0 && m_opts->m_y != 0)
 		{
 			pos_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, SWP_SHOWWINDOW | SWP_NOSIZE);
+			SetWindowPos(m_hwndMain, HWND_TOP, m_opts->m_x, m_opts->m_y, m_opts->m_w, m_opts->m_h, showFlag | SWP_NOSIZE);
 		}
 	}
 	else if ((m_opts->m_SavePos || m_opts->m_SaveSize) && !pos_set && !noPosChange)
@@ -4210,17 +4216,17 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 		if (m_opts->m_SavePos && m_opts->m_SaveSize && temp_w != 0 && temp_h != 0)
 		{
 			pos_set = true; size_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW);
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, showFlag);
 		}
 		if (m_opts->m_SavePos && !m_opts->m_SaveSize)
 		{
 			pos_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOSIZE);
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, showFlag | SWP_NOSIZE);
 		}
 		if (!m_opts->m_SavePos && m_opts->m_SaveSize && temp_w != 0 && temp_h != 0)
 		{
 			size_set = true;
-			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, SWP_SHOWWINDOW | SWP_NOMOVE);
+			SetWindowPos(m_hwndMain, HWND_TOP, temp_x, temp_y, temp_w, temp_h, showFlag | SWP_NOMOVE);
 		}
 	}
 
@@ -4233,29 +4239,30 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 	{
 		if (!pos_set && !noPosChange)
 			SetWindowPos(m_hwndMain, HWND_TOP,tdc.monarray[1].wl + ((tdc.monarray[1].wr-tdc.monarray[1].wl)-m_winwidth) / 2,tdc.monarray[1].wt +
-					((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+					((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, showFlag | SWP_NOSIZE);
         if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
             SetWindowPos(m_hwndMain, HWND_TOP, tdc.monarray[1].wl + ((tdc.monarray[1].wr - tdc.monarray[1].wl) - m_winwidth) / 2, tdc.monarray[1].wt +
-                ((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+                ((tdc.monarray[1].wb - tdc.monarray[1].wt) - m_winheight) / 2, m_winwidth, m_winheight, showFlag | SWP_NOMOVE);
         }
 	}
 	else
 	{
         
 		if (!pos_set && !noPosChange)
-			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOSIZE);
+			SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, showFlag | SWP_NOSIZE);
         if (!size_set && !noSizeChange)
         {
             m_winwidth = act_width;
             m_winheight = act_height;
-            SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, SWP_SHOWWINDOW | SWP_NOMOVE);
+            SetWindowPos(m_hwndMain, HWND_TOP, workrect.left + (workwidth - m_winwidth) / 2, workrect.top + (workheight - m_winheight) / 2, m_winwidth, m_winheight, showFlag | SWP_NOMOVE);
         }
 	}
 
-    SetForegroundWindow(m_hwndMain);
+    if (strlen(m_opts->m_ClassName) == 0)
+		SetForegroundWindow(m_hwndMain);
 
 	if (m_opts->m_ShowToolbar)
 		MoveWindow(m_hwndTBwin, 0, 0, workwidth, m_TBr.bottom - m_TBr.top, TRUE);

@@ -27,10 +27,22 @@ AuthDialog::AuthDialog()
 	m_passwd[0]=__T('\0');
 	//adzm 2010-05-12 - passphrase
 	m_bPassphraseMode = false;
+	m_hwndStatus = NULL;
+	m_className[0] = '\0';
+	m_statusWasVisible = false;
 }
 
 AuthDialog::~AuthDialog()
 {
+}
+
+void AuthDialog::SetStatusWindow(HWND hwndStatus, const char* className)
+{
+	m_hwndStatus = hwndStatus;
+	if (className)
+		strcpy_s(m_className, className);
+	else
+		m_className[0] = '\0';
 }
 
 int AuthDialog::DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN], int IN_port, char hex[24], char catchphrase[1024])
@@ -42,25 +54,46 @@ int AuthDialog::DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN]
 	this->dialogType = dialogType;
 	strcpy(this->hex, hex);
 	strcpy(this->catchphrase, catchphrase);
+	
+	// Hide status window during authentication if classname is used
+	m_statusWasVisible = false;
+	if (strlen(m_className) > 0 && m_hwndStatus && IsWindowVisible(m_hwndStatus)) {
+		m_statusWasVisible = true;
+		ShowWindow(m_hwndStatus, SW_HIDE);
+	}
+	
 	extern HINSTANCE m_hInstResDLL;
+	int result = 0;
 	switch (dialogType)
 	{
 	case dtUserPass:
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		break;
 	case dtPass:
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG3), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		break;
 	case  dtUserPassNotEncryption:
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG2), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		break;
 	case dtPassUpgrade:
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG1), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		break;
 	case dtUserPassRSA:
 		m_bPassphraseMode = true;
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG4), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG4), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		break;
 	case dtPassRSA:
 		m_bPassphraseMode = true;
-		return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
+		break;
 	}
-	return 0;
+	
+	// Restore status window after authentication if classname is used
+	if (m_statusWasVisible && m_hwndStatus) {
+		ShowWindow(m_hwndStatus, SW_SHOW);
+	}
+	
+	return result;
 }
 
 BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,  

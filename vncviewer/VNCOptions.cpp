@@ -138,6 +138,7 @@ VNCOptions::VNCOptions()
 	m_SaveSize = false;
 	m_GNOME = false;
 	m_Directx = false;
+	m_cmdDirectx = false;
 	autoDetect = false;
 	m_Use8Bit = rfbPFFullColors; //false;
 	m_ShowToolbar = true;
@@ -334,6 +335,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_SaveSize = s.m_SaveSize;
 	m_GNOME = s.m_GNOME;
 	m_Directx = s.m_Directx;
+	m_cmdDirectx = s.m_cmdDirectx;
 	autoDetect = s.autoDetect;
 	m_Use8Bit = s.m_Use8Bit;
 	m_PreferredEncodings = s.m_PreferredEncodings;
@@ -629,6 +631,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else if (SwitchMatch(args[j], _T("directx"))) {
 			m_Directx = true;
+			m_cmdDirectx = true;
 		}
 		else if (SwitchMatch(args[j], _T("noauto"))) {
 			autoDetect = false;
@@ -782,10 +785,12 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			}
 			else {
 				LoadOptions(m_configFilename);
+				if (m_cmdDirectx) m_Directx = true;
 				m_configSpecified = true;
 			}
 		}
-			else if (SwitchMatch(args[j], _T("InfoMsg"))) {
+
+		else if (SwitchMatch(args[j], _T("InfoMsg"))) {
 			if (++j == i) {
 				ArgError("No InfoMsg");
 				continue;
@@ -1044,6 +1049,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				}
 				else {
 					LoadOptions(m_configFilename);
+					if (m_cmdDirectx) m_Directx = true;
 					m_configSpecified = true;
 				}
 			}
