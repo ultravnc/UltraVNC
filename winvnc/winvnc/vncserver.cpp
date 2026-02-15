@@ -1530,7 +1530,11 @@ vncServer::VerifyHost(const char* hostname) {
 	enum vh_Mode { vh_ExpectDelimiter, vh_ExpectIncludeExclude, vh_ExpectPattern };
 	vh_Mode machineMode = vh_ExpectIncludeExclude;
 
-	vncServer::AcceptQueryReject verifiedHost = vncServer::aqrAccept;
+	// If QuerySetting=4 and authhost is empty, default to query instead of accept
+	vncServer::AcceptQueryReject verifiedHost = 
+		(settings->getQuerySetting() == 4 && (settings->getAuthhosts()[0] == '\0')) 
+		? vncServer::aqrQuery 
+		: vncServer::aqrAccept;
 
 	vncServer::AcceptQueryReject patternType = vncServer::aqrReject;
 	UINT authHostsPos = 0;
@@ -1605,12 +1609,6 @@ vncServer::VerifyHost(const char* hostname) {
 	//QuerySetting == 4 popup, 2 no poup
 
 	switch (verifiedHost) {
-	/*case vncServer::aqrAccept:
-		if (settings->getQuerySetting() >= 3)
-			verifiedHost = autoAccept
-			? vncServer::aqrAccept
-			: vncServer::aqrQuery;
-		break;*/
 	case vncServer::aqrQuery:
 		if (settings->getQuerySetting() == 2)
 			verifiedHost = vncServer::aqrReject;
@@ -1620,12 +1618,6 @@ vncServer::VerifyHost(const char* hostname) {
 				: vncServer::aqrQuery;
 		}
 		break;
-	/*case vncServer::aqrReject:
-		if (settings->getQuerySetting() == 0)
-			verifiedHost = autoAccept
-			? vncServer::aqrAccept
-			: vncServer::aqrQuery;
-		break;*/
 	};
 	return verifiedHost;
 }
