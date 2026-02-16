@@ -6615,12 +6615,26 @@ void ClientConnection::SetDormant(int newstate)
 
 void ClientConnection::ReadServerCutText()
 {
+	// Save encoder buffer state to prevent corruption during clipboard file transfers
+	bool saved_fReadFromNetRectBuf = m_fReadFromNetRectBuf;
+	int saved_nNetRectBufOffset = m_nNetRectBufOffset;
+	int saved_nReadSize = m_nReadSize;
+	
+	// Ensure clipboard reads directly from socket, not from encoder buffers
+	m_fReadFromNetRectBuf = false;
+	m_nNetRectBufOffset = 0;
+	
 	rfbServerCutTextMsg sctm;
 	vnclog.Print(6, _T("Read remote clipboard change\n"));
 	ReadExact(((char *) &sctm)+m_nTO, sz_rfbServerCutTextMsg-m_nTO);
 	int len = Swap32IfLE(sctm.length);
-	if (len > 104857600)
+	if (len > 104857600) {
+		// Restore encoder buffer state before early return
+		m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
+		m_nNetRectBufOffset = saved_nNetRectBufOffset;
+		m_nReadSize = saved_nReadSize;
 		return;
+	}
 	// adzm - 2010-07 - Extended clipboard
 	if (!m_clipboard.settings.m_bSupportsEx && len < 0) {
 		m_clipboard.settings.m_bSupportsEx = true;
@@ -6629,8 +6643,13 @@ void ClientConnection::ReadServerCutText()
 	if (len < 0 && m_clipboard.settings.m_bSupportsEx) {
 		vnclog.Print(6, _T("Read remote extended clipboard change\n"));
 		len = abs(len);
-		if (len > 104857600 || len < 0)
+		if (len > 104857600 || len < 0) {
+			// Restore encoder buffer state before early return
+			m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
+			m_nNetRectBufOffset = saved_nNetRectBufOffset;
+			m_nReadSize = saved_nReadSize;
 			return;
+		}
 		ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 		extendedClipboardDataMessage.EnsureBufferLength(len, false);
@@ -6700,6 +6719,10 @@ void ClientConnection::ReadServerCutText()
 	} else {
 		if (len < 0) {
 			vnclog.Print(6, _T("Invalid clipboard data!\n"));
+			// Restore encoder buffer state before early return
+			m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
+			m_nNetRectBufOffset = saved_nNetRectBufOffset;
+			m_nReadSize = saved_nReadSize;
 			return;
 		}
 		CheckBufferSize(len + 1);
@@ -6710,6 +6733,11 @@ void ClientConnection::ReadServerCutText()
 		}
 		UpdateLocalClipboard(m_netbuf, len);
 	}
+	
+	// Restore encoder buffer state after clipboard processing
+	m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
+	m_nNetRectBufOffset = saved_nNetRectBufOffset;
+	m_nReadSize = saved_nReadSize;
 }
 
 void ClientConnection::ReadBell()

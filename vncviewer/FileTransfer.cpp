@@ -488,6 +488,15 @@ bool PseudoYield(HWND hWnd)
 void FileTransfer::ProcessFileTransferMsg(void)
 {
 //	vnclog.Print(0, _T("ProcessFileTransferMsg\n"));
+	// Save encoder buffer state to prevent corruption during file transfer
+	bool saved_fReadFromNetRectBuf = m_pCC->m_fReadFromNetRectBuf;
+	int saved_nNetRectBufOffset = m_pCC->m_nNetRectBufOffset;
+	int saved_nReadSize = m_pCC->m_nReadSize;
+	
+	// Ensure file transfer reads directly from socket, not from encoder buffers
+	m_pCC->m_fReadFromNetRectBuf = false;
+	m_pCC->m_nNetRectBufOffset = 0;
+	
 	rfbFileTransferMsg ft;
 	m_pCC->ReadExact(((char *) &ft) + m_pCC->m_nTO, sz_rfbFileTransferMsg - m_pCC->m_nTO);
 
@@ -629,9 +638,13 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		break;
 
 	default:
-		return;
 		break;
 	}
+	
+	// Restore encoder buffer state after file transfer processing
+	m_pCC->m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
+	m_pCC->m_nNetRectBufOffset = saved_nNetRectBufOffset;
+	m_pCC->m_nReadSize = saved_nReadSize;
 }
 
 
