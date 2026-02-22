@@ -181,11 +181,11 @@ void replaceFilename(char* path, const char* newFilename) {
 	char* lastSlash = strrchr(path, '\\'); // Find the last '/'
 	if (lastSlash) {
 		*(lastSlash + 1) = '\0'; // Truncate after the last '/'
-		strcat(path, newFilename); // Append the new filename
+		strcat_s(path, MAX_PATH, newFilename); // Append the new filename
 	}
 	else {
 		// No '/' found, replace the whole string
-		strcpy(path, newFilename);
+		strcpy_s(path, MAX_PATH, newFilename);
 	}
 }
 
@@ -285,7 +285,7 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, '"'); // Find the closing quote
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength + 1; // Move i past the closing quote
 					configfileskip += pathLength + 1;
@@ -297,14 +297,14 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, ' '); // Find the next space
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;
 				}
 				else {
 					// Path is the rest of the string
-					strcpy(configFile, &szCmdLine[i]); // Copy the rest of the string into the path
+					strcpy_s(configFile, &szCmdLine[i]); // Copy the rest of the string into the path
 					pathLength = strlen(&szCmdLine[i]);
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;
@@ -400,7 +400,7 @@ void extractConfig(char* szCmdLine)
 		showSettings = true;
 	}
 	char logFile[MAX_PATH];
-	strcpy(logFile, configFile);
+	strcpy_s(logFile, configFile);
 	replaceFilename(logFile, "mslogon.log");
 	settings->setLogFile(logFile);
 	settings->setShowSettings(showSettings);

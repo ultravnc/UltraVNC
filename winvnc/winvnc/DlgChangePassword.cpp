@@ -56,7 +56,7 @@ DlgChangePassword::~DlgChangePassword() {}
 
 int DlgChangePassword::ShowDlg(HWND parentWindow, char* title, int passwordSize)
 {
-	strcpy(this->title, title);
+	strcpy_s(this->title, title);
 	this->passwordSize = passwordSize;
 
 	int a = DialogBoxParam(
@@ -99,7 +99,7 @@ void DlgChangePassword::onOK(HWND hwnd)
 		return;
 	}
 	if (strcmp(passwd, "~~~~~~~~") == 0)
-		strcpy(passwd, "");
+		strcpy_s(passwd, "");
 	EndDialog(hwnd, TRUE);
 }
 
