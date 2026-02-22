@@ -224,3 +224,4 @@ ultravnc_service/x64/
 ultravnc_service/src/.opencppcov/
 vncviewer/vcpkg_installed/
 winvnc/winvnc/vcpkg_installed/
+rdr/vcpkg_installed/

@@ -1,0 +1,47 @@
+<svg width="720" height="1080" viewBox="0 0 720 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="720" height="1080" rx="150" fill="#7590AE"/>
+  <!-- Group: scaled and centered original 1080x1080 design -->
+  <!-- 1080 * 0.666... = 720 wide and high -->
+  <!-- Vertical centering: (1080 - 720) / 2 = 180 -->
+  <g transform="translate(0, 180) scale(0.6666667)">
+    <!-- Eye shape -->
+    <defs>
+      <linearGradient id="eyeGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#E5F4FF"/>
+        <stop offset="100%" stop-color="#C3E4FF"/>
+      </linearGradient>
+    </defs>
+    <!-- Outer eye (almond shape) -->
+    <path
+      d="M 180 540
+         Q 320 320 540 320
+         Q 760 320 900 540
+         Q 760 760 540 760
+         Q 320 760 180 540 Z"
+      fill="url(#eyeGrad)"
+      stroke="#FFFFFF"
+      stroke-width="20"
+      opacity="0.96"/>
+    <!-- Iris -->
+    <circle cx="540" cy="540" r="130" fill="#1E72B8"/>
+    <!-- Pupil -->
+    <circle cx="540" cy="540" r="70" fill="#061727"/>
+    <!-- Eye highlight -->
+    <circle cx="500" cy="505" r="28" fill="#FFFFFF" opacity="0.85"/>
+    <!-- Subtle inner ring -->
+    <circle cx="540" cy="540" r="110" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="18"/>
+    <!-- UltraVNC text -->
+    <g transform="translate(0, 45)">
+      <text x="540" y="840"
+            text-anchor="middle"
+            font-family="Segoe UI, Arial, Helvetica, sans-serif"
+            font-size="130"
+            font-weight="700"
+            fill="#FFFFFF"
+            letter-spacing="6">
+        UltraVNC
+      </text>
+    </g>
+  </g>
+</svg>
