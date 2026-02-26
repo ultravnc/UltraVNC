@@ -305,7 +305,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	}
     // 16 April 2008 jdp
     // load richedit so the path display can handly mbcs
-    m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
+    m_hRichEdit = LoadLibraryEx( "RICHED32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (!m_hRichEdit)
 	{
 		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );

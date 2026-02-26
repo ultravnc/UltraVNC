@@ -641,7 +641,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	GetRealOSVersion(osInfo);
 
 	if (osInfo.dwMajorVersion == 6 && osInfo.dwMinorVersion == 3 || osInfo.dwMajorVersion > 6) {
-		hShcore = LoadLibrary(_T("Shcore.dll"));
+		hShcore = LoadLibraryEx(_T("Shcore.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hShcore)
 			// GetDpiForMonitor, Windows 8.1 [desktop apps only]
 			getDpiForMonitor = (PFN_GetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
@@ -678,7 +678,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_FullScreenNotDone = false;
 
 	// AdjustWindowRectExForDpi   Windows 10, version 1607 [desktop apps only]
-	hUser32 = LoadLibrary(_T("user32.dll"));
+	hUser32 = LoadLibraryEx(_T("user32.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	adjustWindowRectExForDpi = NULL;
 	if (hUser32)
 		adjustWindowRectExForDpi = (PFN_AdjustWindowRectExForDpi) GetProcAddress(hUser32, "AdjustWindowRectExForDpi");

@@ -352,8 +352,8 @@ static BOOL read_reg_string(HKEY key, char* sub_key, char* val_name, LPBYTE data
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR szCmdLine, int iCmdShow)
 {
-	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-	HMODULE shcoreDLL = LoadLibrary("SHCORE.DLL");
+	HMODULE hUser32 = LoadLibraryEx(_T("user32.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	HMODULE shcoreDLL = LoadLibraryEx("SHCORE.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	//Min  Vista
 	typedef BOOL(WINAPI *SetProcessDPIAwareFunc)();
 	SetProcessDPIAwareFunc setDPIAwareF = NULL;

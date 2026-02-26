@@ -43,7 +43,7 @@ CheckUserPasswordSDUniFn CheckUserPasswordSDUni = 0;
 ///////////////////////////////////////////////////////////
 bool CheckAD()
 {
-	HMODULE hModule = LoadLibrary("Activeds.dll");
+	HMODULE hModule = LoadLibraryEx("Activeds.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModule)
 	{
 		FreeLibrary(hModule);
@@ -54,7 +54,7 @@ bool CheckAD()
 
 bool CheckNetapi95()
 {
-	HMODULE hModule = LoadLibrary("netapi32.dll");
+	HMODULE hModule = LoadLibraryEx("netapi32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModule)
 	{
 		FreeLibrary(hModule);
@@ -65,7 +65,7 @@ bool CheckNetapi95()
 
 bool CheckDsGetDcNameW()
 {
-	HMODULE hModule = LoadLibrary("netapi32.dll");
+	HMODULE hModule = LoadLibraryEx("netapi32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModule)
 	{
 		FARPROC test = NULL;
@@ -78,7 +78,7 @@ bool CheckDsGetDcNameW()
 
 bool CheckNetApiNT()
 {
-	HMODULE hModule = LoadLibrary("radmin32.dll");
+	HMODULE hModule = LoadLibraryEx("radmin32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModule)
 	{
 		FreeLibrary(hModule);

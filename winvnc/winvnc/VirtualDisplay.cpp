@@ -112,7 +112,7 @@ VirtualDisplay::VirtualDisplay()
 		dev++;
 	}
 
-	hdll = LoadLibrary("cfgmgr32.dll");
+	hdll = LoadLibraryEx("cfgmgr32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	SwDeviceCreateUVNC = NULL;
 	SwDeviceCloseUVNC = NULL;
 	if (hdll) {
@@ -462,7 +462,7 @@ bool VirtualDisplay::InstallDriver(bool fromCommandline)
 
 		std::unique_ptr<BOOL> restart(new BOOL());
 
-		HMODULE hModule = LoadLibrary("Newdev.dll");
+		HMODULE hModule = LoadLibraryEx("Newdev.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		DiInstallDriverAFn diInstallDriverA = NULL;
 		if (hModule) {
 			diInstallDriverA = (DiInstallDriverAFn)GetProcAddress(hModule, "DiInstallDriverA");

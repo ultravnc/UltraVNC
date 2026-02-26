@@ -150,7 +150,7 @@ TextChat::TextChat(VNCviewerApp *pApp, ClientConnection *pCC)
 	}
 
 	//  Load the Rich Edit control DLL
-	m_hRichEdit = LoadLibrary( "RICHED32.DLL" );
+	m_hRichEdit = LoadLibraryEx( "RICHED32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (!m_hRichEdit)
 	{  
 		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );

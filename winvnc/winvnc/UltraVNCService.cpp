@@ -838,7 +838,7 @@ void UltraVNCService::Restore_after_reboot()
 void UltraVNCService::disconnect_remote_sessions()
 {
 	typedef BOOLEAN(WINAPI* pWinStationConnect) (HANDLE, ULONG, ULONG, PCWSTR, ULONG);
-	HMODULE  hlibwinsta = LoadLibrary("winsta.dll");
+	HMODULE  hlibwinsta = LoadLibraryEx("winsta.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	pWinStationConnect WinStationConnectF = NULL;
 
 	// don't kick rdp off if there's still an active session
@@ -1016,7 +1016,7 @@ void UltraVNCService::monitorSessions() {
 		case WAIT_OBJECT_0 + 1:
 		{
 			typedef VOID(WINAPI* SendSas)(BOOL asUser);
-			HINSTANCE Inst = LoadLibrary("sas.dll");
+			HINSTANCE Inst = LoadLibraryEx("sas.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 			SendSas sendSas = (SendSas)GetProcAddress(Inst, "SendSAS");
 			if (sendSas)
 				sendSas(FALSE);
@@ -1226,7 +1226,7 @@ BOOL UltraVNCService::LaunchProcessWin(DWORD dwSessionId, bool preconnect, bool 
 					counter++;
 					if (counter > 3) {
 						typedef BOOLEAN(WINAPI* pWinStationConnect) (HANDLE, ULONG, ULONG, PCWSTR, ULONG);
-						HMODULE  hlibwinsta = LoadLibrary("winsta.dll");
+						HMODULE  hlibwinsta = LoadLibraryEx("winsta.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 						pWinStationConnect WinStationConnectF = NULL;
 						if (hlibwinsta)
 							WinStationConnectF = (pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW");
@@ -1277,7 +1277,7 @@ BOOL UltraVNCService::LaunchProcessWin(DWORD dwSessionId, bool preconnect, bool 
 					counter++;
 					if (counter > 3) {
 						typedef BOOLEAN(WINAPI* pWinStationConnect) (HANDLE, ULONG, ULONG, PCWSTR, ULONG);
-						HMODULE  hlibwinsta = LoadLibrary("winsta.dll");
+						HMODULE  hlibwinsta = LoadLibraryEx("winsta.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 						pWinStationConnect WinStationConnectF = NULL;
 						if (hlibwinsta)
 							WinStationConnectF = (pWinStationConnect)GetProcAddress(hlibwinsta, "WinStationConnectW");

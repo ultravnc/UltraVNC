@@ -486,7 +486,7 @@ vncDesktop::vncDesktop()
 
 	On_Off_hookdll = false;
 	g_Desktop_running = true;
-	hUser32 = LoadLibrary("USER32");
+	hUser32 = LoadLibraryEx("USER32", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hUser32) pbi = (pBlockInput)GetProcAddress(hUser32, "BlockInput");
 	no_default_desktop = false;	
 	can_be_hooked = false;
@@ -1559,7 +1559,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 		strcpy_s(sesmsg[0].name, 32, "Console");
 		memset(sesmsg[aantal_session].username, 0, 32);
 		strcpy_s(sesmsg[aantal_session].username, 32, "Current Console");
-		HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+		HMODULE handle = LoadLibraryEx("WTSAPI32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		_WTSQUERYSESSIONINFORMATION pFunc;
 		LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
 		if (handle)
@@ -1588,7 +1588,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 						memset(sesmsg[aantal_session].name, 0, 32);
 						strcpy_s(sesmsg[aantal_session].type, 32, "Active");
 						strcpy_s(sesmsg[aantal_session].name, 32, pSessions[i].pWinStationName);
-						HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+						HMODULE handle = LoadLibraryEx("WTSAPI32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 						_WTSQUERYSESSIONINFORMATION pFunc;
 						LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
 						if (handle)
@@ -1626,7 +1626,7 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 						memset(sesmsg[aantal_session].name, 0, 32);
 						strcpy_s(sesmsg[aantal_session].type, 32, "Active");
 						strcpy_s(sesmsg[aantal_session].name, 32, pSessions[i].pWinStationName);
-						HMODULE handle = LoadLibrary("WTSAPI32.DLL");
+						HMODULE handle = LoadLibraryEx("WTSAPI32.DLL", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 						_WTSQUERYSESSIONINFORMATION pFunc;
 						LPTSTR  ppBuffer = NULL;    DWORD   pBytesReturned = 0;
 						if (handle)

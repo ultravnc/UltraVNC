@@ -113,7 +113,7 @@ CheckVideoDriver(bool Box)
 		devmode.dmDriverExtra = 0;
 		EnumDisplaySettings(NULL,ENUM_CURRENT_SETTINGS,&devmode);
 		devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		HMODULE hUser32=LoadLibrary("USER32");
+		HMODULE hUser32=LoadLibraryEx("USER32", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		if (hUser32) pd = (pEnumDisplayDevices)GetProcAddress( hUser32, "EnumDisplayDevicesA");
 		if (pd)
 			{

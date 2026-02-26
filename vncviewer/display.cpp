@@ -165,7 +165,7 @@ tempdisplayclass::~tempdisplayclass()
 void
 tempdisplayclass::Init()
 {
-	hUser32= LoadLibrary("user32.dll");
+	hUser32= LoadLibraryEx("user32.dll",NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	checkmonitors();
 }
 

@@ -40,7 +40,7 @@ class vncDesktopThread : public omni_thread
 public:
 	vncDesktopThread() {
 		m_returnsig = NULL;
-		hUser32 = LoadLibrary("user32.dll");
+		hUser32 = LoadLibraryEx("user32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 		MyGetCursorInfo=NULL;
 		if (hUser32) MyGetCursorInfo=(_GetCursorInfo )GetProcAddress(hUser32, "GetCursorInfo");
 		g_DesktopThread_running=true;

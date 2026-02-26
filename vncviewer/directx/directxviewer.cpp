@@ -40,7 +40,7 @@ ViewerDirectxClass::ViewerDirectxClass()
 	devicelost=true;
 	D3DLibrary = NULL;
 	d3dCreate=NULL;
-	D3DLibrary = LoadLibrary("d3d9");
+	D3DLibrary = LoadLibraryEx("d3d9", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (!D3DLibrary) 
 	{
 		return;
