@@ -852,6 +852,12 @@ namespace processHelper {
 
 		// Original code does not work if running as a service... apparently no access to the desktop.
 		// Alternative is to check for a running LogonUI.exe (if present, system is either not logged in or locked)
+		// Only check LogonUI.exe in the same session as the current process to avoid false positives from:
+		// - other RDP sessions showing their login screen
+		// - Hyper-V Enhanced Session which keeps LogonUI.exe alive in the VM session
+		DWORD mySessionId = 0;
+		ProcessIdToSessionId(GetCurrentProcessId(), &mySessionId);
+
 		HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 		PROCESSENTRY32W procentry{};
@@ -860,11 +866,16 @@ namespace processHelper {
 		if (Process32FirstW(hSnap, &procentry)) {
 			do {
 				if (!_wcsicmp(procentry.szExeFile, L"LogonUI.exe")) {
-					bLocked = true;
-					break;
+					DWORD loguiSessionId = 0;
+					if (ProcessIdToSessionId(procentry.th32ProcessID, &loguiSessionId)
+						&& loguiSessionId == mySessionId) {
+						bLocked = true;
+						break;
+					}
 				}
 			} while (Process32NextW(hSnap, &procentry));
 		}
+		CloseHandle(hSnap);
 		return bLocked;
 	}
 }
