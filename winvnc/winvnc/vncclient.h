@@ -70,6 +70,7 @@ class vncClientUpdateThread;
 #define FT_PROTO_VERSION_OLD 1  // <= RC18 UltraVNC Server "fOldFTPRotocole" version
 #define FT_PROTO_VERSION_2   2  // base File Transfer Protocol
 #define FT_PROTO_VERSION_3   3  // new File Transfer Protocol session messages
+#define FT_PROTO_VERSION_4   4  // Adds: rfbADirInaccessible, rfbRDirContentUnicode/rfbADirUnicode
 
 #ifdef _Gii
 struct MyTouchINfo

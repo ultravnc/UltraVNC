@@ -25,6 +25,7 @@
 #define FT_PROTO_VERSION_OLD 1  // <= RC18 UltraVNC Server "fOldFTPRotocole" version
 #define FT_PROTO_VERSION_2   2  // base File Transfer Protocol
 #define FT_PROTO_VERSION_3   3  // new File Transfer Protocol session messages
+#define FT_PROTO_VERSION_4   4  // Adds: rfbADirInaccessible, rfbRDirContentUnicode/rfbADirUnicode
 
 typedef std::list<int> FilesList; // List of files indexes to be sent or received
 
@@ -119,7 +120,8 @@ public:
 	bool				m_fFileDownloadError;
 	char				m_szIncomingFileTime[18];
 
-    int                 m_ServerFTProtocolVersion; // 8/6/2008 jdp 
+    int                 m_ServerFTProtocolVersion;
+    bool                m_fServerSupportsUnicode; // true when server sent FT_PROTO_VERSION_4+
 	UINT					m_nBlockSize;
 
 	int					m_nNotSent;
@@ -176,8 +178,8 @@ public:
 	bool RequestNextFile();
 	bool ReceiveDestinationFileChecksums(int nSize, UINT nLen);
 	void HighlightTransferedFiles(HWND hSrcList, HWND hDstList);
-	void PopulateRemoteListBox(HWND hWnd, UINT nLen);
-	void ReceiveDirectoryItem(HWND hWnd, UINT nLen);
+	void PopulateRemoteListBox(HWND hWnd, UINT nLen, bool fUnicodeEntry = false);
+	void ReceiveDirectoryItem(HWND hWnd, UINT nLen, bool fUnicodeEntry = false);
 	void FinishDirectoryReception();
 	bool IsShortcutFolder(LPSTR szPath);
 	bool ResolvePossibleShortcutFolder(HWND hWnd, LPSTR szFolder);

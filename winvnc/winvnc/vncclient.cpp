@@ -4164,6 +4164,9 @@ vncClientThread::run(void* arg)
 						// Case of media not accessible
 						if (ff == INVALID_HANDLE_VALUE || fShortError)
 						{
+							// Send rfbADirInaccessible so new viewers can mark the folder red.
+							// Old viewers see an unrecognised contentParam with length=0 and treat it as end-of-dir.
+							ft.contentParam = rfbADirInaccessible;
 							ft.length = Swap32IfLE(0);
 							m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 							break;
@@ -4192,6 +4195,22 @@ vncClientThread::run(void* arg)
 								||
 								(!strcmp(fd.cFileName, "..")))
 							{
+								// Probe subfolder accessibility; flag it so viewer can show red before clicking
+								if (strcmp(fd.cFileName, ".."))
+								{
+									char szProbe[MAX_PATH + 4];
+									char szBase[MAX_PATH];
+									strcpy_s(szBase, szDir);
+									szBase[strlen(szBase) - 1] = '\0'; // strip trailing '*'
+									sprintf_s(szProbe, "%s%s\\*", szBase, fd.cFileName);
+									WIN32_FIND_DATA fdProbe;
+									HANDLE hProbe = FindFirstFile(szProbe, &fdProbe);
+									if (hProbe == INVALID_HANDLE_VALUE)
+										fd.dwReserved0 = rfbFD_INACCESSIBLE;
+									else
+									{ fd.dwReserved0 = 0; FindClose(hProbe); }
+								}
+
 								// Serialize the interesting part of WIN32_FIND_DATA
 								char szFileSpec[sizeof(WIN32_FIND_DATA)];
 								int nOptLen = sizeof(WIN32_FIND_DATA) - MAX_PATH - 14 + lstrlen(fd.cFileName);
@@ -6658,7 +6677,7 @@ void vncClient::SendFTProtocolMsg()
 	memset(&ft, 0, sizeof ft);
 	ft.type = rfbFileTransfer;
 	ft.contentType = rfbFileTransferProtocolVersion;
-	ft.contentParam = FT_PROTO_VERSION_3;
+	ft.contentParam = FT_PROTO_VERSION_4;
 	ft.size = Swap32IfLE(sz_rfbBlockSize);
 	m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 }

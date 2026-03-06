@@ -1154,6 +1154,9 @@ typedef struct _rfbFileTransferMsg {
 #define rfbADirRename			9 // Response to a rename dir command 
 #define rfbADirRecursiveListItem	10 
 #define rfbADirRecursiveSize		11 
+#define rfbADirInaccessible		18 // Folder exists but cannot be read (permission denied etc.)
+                                   // Old viewers receive contentParam=18 with length=0 and treat it as end-of-dir (graceful degradation)
+#define rfbFD_INACCESSIBLE		0xFFFFFFFE // Sentinel set in WIN32_FIND_DATA.dwReserved0 to flag a subfolder as inaccessible in the listing
 
 								// rfbCommand Command - content params
 #define rfbCDirCreate			1 // Request the server to create the given directory

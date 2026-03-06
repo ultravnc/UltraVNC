@@ -247,6 +247,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	memset(m_szNewFolderButtonLabel, 0, sizeof(m_szNewFolderButtonLabel));
 	memset(m_szRenameButtonLabel, 0, sizeof(m_szRenameButtonLabel));
     m_ServerFTProtocolVersion = FT_PROTO_VERSION_2;
+    m_fServerSupportsUnicode = false;
 	m_nBlockSize = 8192;
 	m_dwCurrentValue = 0;
 	m_dwCurrentPercent = 0;
@@ -507,8 +508,9 @@ void FileTransfer::ProcessFileTransferMsg(void)
     case rfbFileTransferProtocolVersion:
         {
             int proto_ver = ft.contentParam;
-            if ((proto_ver >= FT_PROTO_VERSION_OLD) && (proto_ver <= FT_PROTO_VERSION_3))
+            if ((proto_ver >= FT_PROTO_VERSION_OLD) && (proto_ver <= FT_PROTO_VERSION_4))
                 m_ServerFTProtocolVersion = proto_ver;
+            m_fServerSupportsUnicode = (m_ServerFTProtocolVersion >= FT_PROTO_VERSION_4);
 
 			if (m_ServerFTProtocolVersion >= FT_PROTO_VERSION_3)
 			{
@@ -526,6 +528,17 @@ void FileTransfer::ProcessFileTransferMsg(void)
 		case rfbADrivesList:
 			ListRemoteDrives(hWnd, Swap32IfLE(ft.length));
 			m_fFileCommandPending = false;
+			break;
+
+		// Server signals the folder cannot be read (permission denied, media error, etc.)
+		// Old servers never send this value; old viewers treat it as end-of-dir (graceful degradation).
+		case rfbADirInaccessible:
+			if (m_fDirectoryReceptionRunning)
+			{
+				FinishDirectoryReception();
+				m_fFileCommandPending = false;
+			}
+			PopulateRemoteListBox(hWnd, 0); // nLen=0 triggers the "inaccessible" UI path
 			break;
 
 		// Response to a rfbRDirContent request 
@@ -991,6 +1004,21 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		Item.iSubItem = 1;
 		Item.pszText = "Folder";
 		ListView_SetItem(hWndList, &Item);
+
+		// For remote items: server sets dwReserved0=rfbFD_INACCESSIBLE when subfolder can't be read
+		if (!fLocalSide && strcmp(fd.cFileName, "..") && fd.dwReserved0 == rfbFD_INACCESSIBLE)
+		{
+			LVITEM flagItem;
+			memset(&flagItem, 0, sizeof(flagItem));
+			flagItem.mask = LVIF_PARAM;
+			flagItem.iItem = nItem;
+			flagItem.iSubItem = 0;
+			if (ListView_GetItem(hWndList, &flagItem))
+				flagItem.lParam |= FT_LPARAM_UNREADABLE;
+			else
+				flagItem.lParam = FT_LPARAM_UNREADABLE;
+			ListView_SetItem(hWndList, &flagItem);
+		}
 
 		// Proactively check if local folder is accessible
 		if (fLocalSide && strcmp(fd.cFileName, ".."))
@@ -1576,7 +1604,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath)
 //
 // Populate the remote machine listbox with files received from server
 //
-void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
+void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen, bool fUnicodeEntry)
 {
 //	vnclog.Print(0, _T("PopulateRemoteListBox\n"));
 	char szRemoteStatus[128];
@@ -1648,7 +1676,7 @@ void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen)
 //
 //
 //
-void FileTransfer::ReceiveDirectoryItem(HWND hWnd, UINT nLen)
+void FileTransfer::ReceiveDirectoryItem(HWND hWnd, UINT nLen, bool fUnicodeEntry)
 {
 //	vnclog.Print(0, _T("ReceiveDirectoryItem\n"));
 	if (!m_fDirectoryReceptionRunning) return;
