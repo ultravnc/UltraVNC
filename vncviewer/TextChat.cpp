@@ -336,12 +336,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 
 		// [v1.0.2-jp1 fix-->]
 		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
-		if(!m_hInstResDLL){
-			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor);
-		}
-		else{
-			SetTextFormat(false, false, 0xb4, "ＭＳ ゴシック", dwColor);
-		}
+		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor);
 		// [<--v1.0.2-jp1 fix]
 
 		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE - 1, _TRUNCATE, "<%s>: ", szSender);
@@ -361,12 +356,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		/***/
 		// [v1.0.2-jp1 fix-->]
 		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
-		if(!m_hInstResDLL){
-			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
-		}
-		else{
-			SetTextFormat(false, false, 0xb4, "ＭＳ ゴシック", dwColor != GREY ? BLACK : GREY);
-		}
+		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor != GREY ? BLACK : GREY);
 		// [<--v1.0.2-jp1 fix]
 
 		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE - 1, _TRUNCATE, "%s", szMessage);

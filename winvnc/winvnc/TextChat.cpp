@@ -374,13 +374,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 
 		//	[v1.0.2-jp1 fix]
-		//SetTextFormat(false,false,0x75,"MS Sans Serif",dwColor);
-		if(!hInstResDLL){
-			SetTextFormat(false,false,0x75,"MS Sans Serif",dwColor);
-		}
-		else{
-			SetTextFormat(false, false, 0xb4, "ＭＳ ゴシック", dwColor);
-		}
+		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor);
 
 		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, MAXNAMESIZE-1 + 4, "<%s>: ", szSender);		
 		SETTEXTEX st;
@@ -398,13 +392,7 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 
 		//	[v1.0.2-jp1 fix]
-		//SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);	
-		if(!hInstResDLL){
-			SetTextFormat(false, false, 0x75, "MS Sans Serif", dwColor != GREY ? BLACK : GREY);
-		}
-		else{
-			SetTextFormat(false, false, 0xb4, "ＭＳ ゴシック", dwColor != GREY ? BLACK : GREY);
-		}
+		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor != GREY ? BLACK : GREY);
 
 		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, TEXTMAXSIZE-1, "%s", szMessage);		
 		SETTEXTEX st;
