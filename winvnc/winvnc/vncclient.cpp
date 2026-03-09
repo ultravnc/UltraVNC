@@ -113,21 +113,21 @@ std::string get_real_filename(std::string name)
 }
 
 // #include "rfb.h"
-bool DeleteFileOrDirectory(TCHAR* srcpath)
+bool DeleteFileOrDirectory(WCHAR* srcpath)
 {
-	TCHAR path[MAX_PATH + 1]; // room for extra null; SHFileOperation requires double null terminator
+	WCHAR path[MAX_PATH + 2]; // room for double null terminator required by SHFileOperationW
 	memset(path, 0, sizeof path);
 
-	_tcsncpy_s(path, srcpath, MAX_PATH);
-	path[_tcslen(srcpath) + 1] = 0;
+	wcsncpy_s(path, srcpath, MAX_PATH);
+	path[wcslen(srcpath) + 1] = 0;
 
-	SHFILEOPSTRUCT op;
-	memset(&op, 0, sizeof(SHFILEOPSTRUCT));
+	SHFILEOPSTRUCTW op;
+	memset(&op, 0, sizeof(SHFILEOPSTRUCTW));
 	op.wFunc = FO_DELETE;
 	op.pFrom = path;
 	op.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
 
-	int result = SHFileOperation(&op);
+	int result = SHFileOperationW(&op);
 	// MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
 	// Do not use GetLastError with the return values of this function.
 
@@ -136,20 +136,25 @@ bool DeleteFileOrDirectory(TCHAR* srcpath)
 
 bool replaceFile(const char* src, const char* dst)
 {
+	// src and dst are UTF-8 paths - use Unicode APIs to handle Chinese filenames
+	WCHAR srcW[MAX_PATH + 64], dstW[MAX_PATH + 64];
+	MultiByteToWideChar(CP_UTF8, 0, src, -1, srcW, MAX_PATH + 64);
+	MultiByteToWideChar(CP_UTF8, 0, dst, -1, dstW, MAX_PATH + 64);
+
 	DWORD dwFileAttribs;
 	bool status;
 
-	dwFileAttribs = GetFileAttributes(dst);
+	dwFileAttribs = GetFileAttributesW(dstW);
 	// make the file read/write if it's read only.
 	if (dwFileAttribs != INVALID_FILE_ATTRIBUTES && dwFileAttribs & FILE_ATTRIBUTE_READONLY)
-		SetFileAttributes(dst, dwFileAttribs & ~FILE_ATTRIBUTE_READONLY);
+		SetFileAttributesW(dstW, dwFileAttribs & ~FILE_ATTRIBUTE_READONLY);
 
-	status = ::MoveFileEx(src, dst, MOVEFILE_REPLACE_EXISTING) ? true : false;
+	status = ::MoveFileExW(srcW, dstW, MOVEFILE_REPLACE_EXISTING) ? true : false;
 
 	// restore orginal file attributes, if we have them. We won't have them if
 	// the destination file didn't exist prior to the copy/move.
 	if (dwFileAttribs != INVALID_FILE_ATTRIBUTES)
-		SetFileAttributes(dst, dwFileAttribs);
+		SetFileAttributesW(dstW, dwFileAttribs);
 
 	return status;
 }
@@ -179,8 +184,10 @@ std::string AddDirPrefixAndSuffix(const char* name)
 bool isDirectory(const char* name)
 {
 	struct _stat statbuf;
-
-	_stat(name, &statbuf);
+	// Convert UTF-8 to Unicode for Chinese character support
+	WCHAR nameW[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, name, -1, nameW, MAX_PATH);
+	_wstat(nameW, &statbuf);
 	return (statbuf.st_mode & _S_IFDIR) == _S_IFDIR;
 }
 bool isDirectoryTransfer(const char* szFileName)
@@ -3827,7 +3834,10 @@ vncClientThread::run(void* arg)
 							ImpersonateLoggedOnUser(m_client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
 
 						// Create Local Dest file
-						m_client->m_hDestFile = CreateFile(m_client->m_szFullDestName,
+						// Convert UTF-8 filename to Unicode for Chinese character support
+						WCHAR szFullDestNameW[MAX_PATH + 64];
+						MultiByteToWideChar(CP_UTF8, 0, m_client->m_szFullDestName, -1, szFullDestNameW, MAX_PATH + 64);
+						m_client->m_hDestFile = CreateFileW(szFullDestNameW,
 							GENERIC_WRITE | GENERIC_READ,
 							FILE_SHARE_READ | FILE_SHARE_WRITE,
 							NULL,
@@ -3836,7 +3846,9 @@ vncClientThread::run(void* arg)
 							NULL);
 						fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
 						if (m_client->m_hDestFile == INVALID_HANDLE_VALUE)
+						{
 							dwDstSize = 0xFFFFFFFF;
+						}
 						else
 							dwDstSize = 0x00;
 					}
@@ -3889,7 +3901,6 @@ vncClientThread::run(void* arg)
 							m_client->m_pBuff = NULL;
 						}
 
-						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Wrong Dest File size. Abort!\n"));
 						m_client->FTDownloadFailureHook();
 						break;
 					}
@@ -3928,7 +3939,6 @@ vncClientThread::run(void* arg)
 					{
 						helper::close_handle(m_client->m_hSrcFile);
 						m_client->FTUploadFailureHook();
-						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: File not created on client side. Abort!\n"));
 						break;
 					}
 
@@ -3937,7 +3947,6 @@ vncClientThread::run(void* arg)
 					if (m_client->m_pBuff == NULL)
 					{
 						helper::close_handle(m_client->m_hSrcFile);
-						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: rfbFileHeader - Unable to allocate buffer. Abort!\n"));
 						m_client->FTUploadFailureHook();
 						break;
 					}
@@ -3952,7 +3961,6 @@ vncClientThread::run(void* arg)
 							delete[] m_client->m_pBuff;
 							m_client->m_pBuff = NULL;
 						}
-						//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: rfbFileHeader - Unable to allocate comp. buffer. Abort!\n"));
 						m_client->FTUploadFailureHook();
 						break;
 					}
@@ -4056,7 +4064,7 @@ vncClientThread::run(void* arg)
 
 					// The client requests the content of a directory or Drives List
 				case rfbDirContentRequest:
-					switch (msg.ft.contentParam)
+					switch (msg.ft.contentParam & ~(CARD16)rfbRDirContentUnicode)
 					{
 						// Client requests the List of Local Drives
 					case rfbRDrivesList:
@@ -4113,8 +4121,11 @@ vncClientThread::run(void* arg)
 					{
 						//omni_mutex_lock l(m_client->GetUpdateLock());
 
+						// Check if client advertises unicode support (high bit of contentParam)
+						const bool fClientWantsUnicode = (msg.ft.contentParam & rfbRDirContentUnicode) != 0;
+
 						const UINT length = Swap32IfLE(msg.ft.length);
-						char szDir[MAX_PATH + 2];
+						char szDir[MAX_PATH * 3 + 2];
 						if (length > sizeof(szDir) - 1) break;
 
 						// Read in the Name of Dir to explore
@@ -4125,32 +4136,65 @@ vncClientThread::run(void* arg)
 						if (!settings->getEnableFileTransfer() || !fUserOk) break;
 						// sf@2004 - Shortcuts Case
 						// Todo: Cultures translation?
+						// The viewer sends shortcut names wrapped in rfbDirPrefix/rfbDirSuffix: "[ My Documents ]"
+						// Strip those brackets to get the bare name for comparison.
 						int nFolder = -1;
 						char szP[MAX_PATH + 2];
 						bool fShortError = false;
-						if (!_strnicmp(szDir, "My Documents", 11))
-							nFolder = CSIDL_PERSONAL;
-						if (!_strnicmp(szDir, "Desktop", 7))
-							nFolder = CSIDL_DESKTOP;
-						if (!_strnicmp(szDir, "Network Favorites", 17))
-							nFolder = CSIDL_NETHOOD;
+						{
+							const char* pCmp = szDir;
+							// Viewer sends the inner content of rfbDirPrefix/Suffix brackets,
+							// e.g. rfbDirPrefix="[ " rfbDirSuffix=" ]" so inner = " My Documents \"
+							// Skip leading '[' and spaces before comparing.
+							if (*pCmp == '[') pCmp++;
+							while (*pCmp == ' ') pCmp++;
+							if (!_strnicmp(pCmp, "My Documents", 12))
+								nFolder = CSIDL_PERSONAL;
+							if (!_strnicmp(pCmp, "Desktop", 7))
+								nFolder = CSIDL_DESKTOP;
+							if (!_strnicmp(pCmp, "Network Favorites", 17))
+								nFolder = CSIDL_NETHOOD;
+						}
 
-						if (nFolder != -1)
-							// if (SHGetSpecialFolderPath(NULL, szP, nFolder, FALSE))
+						wchar_t szDirW[MAX_PATH + 2] = {};
+						bool fSpecialFolderResolvedW = false;
+						if (nFolder != -1 && fClientWantsUnicode)
+						{
+							LPITEMIDLIST pidl = nullptr;
+							LPMALLOC pMalloc = nullptr;
+							HRESULT hrMalloc = SHGetMalloc(&pMalloc);
+							HRESULT hrLoc = (SUCCEEDED(hrMalloc) && pMalloc) ? SHGetSpecialFolderLocation(0, nFolder, &pidl) : E_FAIL;
+							if (SUCCEEDED(hrMalloc) && hrLoc == NOERROR && pidl)
+							{
+								BOOL bPath = SHGetPathFromIDListW(pidl, szDirW);
+								if (bPath)
+								{
+									if (szDirW[wcslen(szDirW) - 1] != L'\\') wcscat_s(szDirW, L"\\");
+									fSpecialFolderResolvedW = true;
+								}
+								else
+									fShortError = true;
+								pMalloc->Free(pidl);
+							}
+							else
+								fShortError = true;
+							if (pMalloc) pMalloc->Release();
+						}
+						else if (nFolder != -1)
+						{
+							// ANSI branch: original behaviour
 							if (m_client->GetSpecialFolderPath(nFolder, szP))
 							{
 								if (szP[strlen(szP) - 1] != '\\') strcat_s(szP, "\\");
 								strcpy_s(szDir, szP);
 							}
-							else {
+							else
 								fShortError = true;
-							}
+						}
 
 						strcat_s(szDir, "*");
-
-						WIN32_FIND_DATA fd;
-						HANDLE ff;
-						BOOL fRet = TRUE;
+						if (fSpecialFolderResolvedW)
+							wcscat_s(szDirW, L"*");
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -4158,44 +4202,129 @@ vncClientThread::run(void* arg)
 						ft.contentParam = rfbADirectory; // or rfbAFile...
 
 						DWORD errmode = SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
-						ff = FindFirstFile(szDir, &fd);
-						SetErrorMode(errmode);
 
-						// Case of media not accessible
-						if (ff == INVALID_HANDLE_VALUE || fShortError)
+						if (fClientWantsUnicode)
 						{
-							// Send rfbADirInaccessible so new viewers can mark the folder red.
-							// Old viewers see an unrecognised contentParam with length=0 and treat it as end-of-dir.
-							ft.contentParam = rfbADirInaccessible;
-							ft.length = Swap32IfLE(0);
-							m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-							break;
-						}
+							// Unicode path: client sent UTF-8 (or special folder resolved directly to wchar_t above)
+							if (!fSpecialFolderResolvedW)
+								MultiByteToWideChar(CP_UTF8, 0, szDir, -1, szDirW, MAX_PATH + 2);
 
-						ft.length = Swap32IfLE(strlen(szDir) - 1);
-						//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-						m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-						// sf@2004 - Also send back the full directory path to the viewer (necessary for Shorcuts)
-						m_socket->SendExactQueue((char*)szDir, (const VCard)(strlen(szDir) - 1));
+							WIN32_FIND_DATAW fdW;
+							HANDLE ff = FindFirstFileW(szDirW, &fdW);
+							SetErrorMode(errmode);
 
-						while (fRet)
-						{
-							// sf@2003 - Convert file time to local time
-							// We've made the choice off displaying all the files
-							// off client AND server sides converted in clients local
-							// time only. So we don't convert server's files times.
-							/*
-							FILETIME LocalFileTime;
-							FileTimeToLocalFileTime(&fd.ftLastWriteTime, &LocalFileTime);
-							fd.ftLastWriteTime.dwLowDateTime = LocalFileTime.dwLowDateTime;
-							fd.ftLastWriteTime.dwHighDateTime = LocalFileTime.dwHighDateTime;
-							*/
-
-							if (((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY && strcmp(fd.cFileName, "."))
-								||
-								(!strcmp(fd.cFileName, "..")))
+							// Case of media not accessible
+							if (ff == INVALID_HANDLE_VALUE || fShortError)
 							{
-								// Probe subfolder accessibility; flag it so viewer can show red before clicking
+								// Send rfbADirInaccessible so new viewers can mark the folder red.
+								// Old viewers see an unrecognised contentParam with length=0 and treat it as end-of-dir.
+								ft.contentParam = rfbADirInaccessible;
+								ft.length = Swap32IfLE(0);
+								m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+								break;
+							}
+
+							// Send back the full directory path as UTF-8 (strip trailing '*')
+							char szDirNoStar[MAX_PATH * 3 + 2];
+							if (fSpecialFolderResolvedW)
+							{
+								// Convert resolved Unicode path to UTF-8 for the wire
+								wchar_t szDirWNoStar[MAX_PATH + 2];
+								wcscpy_s(szDirWNoStar, szDirW);
+								szDirWNoStar[wcslen(szDirWNoStar) - 1] = L'\0'; // strip '*'
+								WideCharToMultiByte(CP_UTF8, 0, szDirWNoStar, -1, szDirNoStar, MAX_PATH * 3, NULL, NULL);
+							}
+							else
+							{
+								strcpy_s(szDirNoStar, szDir);
+								szDirNoStar[strlen(szDirNoStar) - 1] = '\0'; // strip '*'
+							}
+							ft.contentParam = (CARD16)(rfbADirectory | rfbADirUnicode);
+							ft.length = Swap32IfLE((CARD32)strlen(szDirNoStar));
+							m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+							m_socket->SendExactQueue(szDirNoStar, (const VCard)strlen(szDirNoStar));
+
+							BOOL fRet = TRUE;
+							while (fRet)
+							{
+								if (((fdW.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY && wcscmp(fdW.cFileName, L"."))
+									||
+									(!wcscmp(fdW.cFileName, L"..")))
+								{
+									// Probe subfolder accessibility; flag it so viewer can show red before clicking
+									if (wcscmp(fdW.cFileName, L".."))
+									{
+										wchar_t szProbeW[MAX_PATH + 4];
+										wchar_t szBaseW[MAX_PATH];
+										wcscpy_s(szBaseW, szDirW);
+										szBaseW[wcslen(szBaseW) - 1] = L'\0'; // strip trailing '*'
+										swprintf_s(szProbeW, MAX_PATH + 4, L"%s%s\\*", szBaseW, fdW.cFileName);
+										WIN32_FIND_DATAW fdProbeW;
+										HANDLE hProbe = FindFirstFileW(szProbeW, &fdProbeW);
+										if (hProbe == INVALID_HANDLE_VALUE)
+											fdW.dwReserved0 = rfbFD_INACCESSIBLE;
+										else
+										{ fdW.dwReserved0 = 0; FindClose(hProbe); }
+									}
+									// Serialize the interesting part of WIN32_FIND_DATAW:
+									// send everything up to and including the actual filename (null-terminated),
+									// omitting the unused trailing chars of cFileName and cAlternateFileName.
+									static_assert(offsetof(WIN32_FIND_DATAW, cAlternateFileName) == offsetof(WIN32_FIND_DATAW, cFileName) + MAX_PATH * sizeof(wchar_t), "WIN32_FIND_DATAW: cAlternateFileName must immediately follow cFileName");
+									char szFileSpec[sizeof(WIN32_FIND_DATAW)];
+									int nOptLen = (int)(offsetof(WIN32_FIND_DATAW, cFileName) + (lstrlenW(fdW.cFileName) + 1) * sizeof(wchar_t));
+									if (nOptLen < 0 || nOptLen > (int)sizeof(WIN32_FIND_DATAW)) nOptLen = sizeof(WIN32_FIND_DATAW);
+									memcpy(szFileSpec, &fdW, nOptLen);
+
+									ft.contentParam = (CARD16)(rfbADirectory | rfbADirUnicode);
+									ft.length = Swap32IfLE(nOptLen);
+									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									m_socket->SendExactQueue(szFileSpec, nOptLen);
+								}
+								else if (wcscmp(fdW.cFileName, L"."))
+								{
+									char szFileSpec[sizeof(WIN32_FIND_DATAW)];
+									int nOptLen = (int)(offsetof(WIN32_FIND_DATAW, cFileName) + lstrlenW(fdW.cFileName) * sizeof(wchar_t) + sizeof(wchar_t));
+									if (nOptLen < 0 || nOptLen > (int)sizeof(WIN32_FIND_DATAW)) nOptLen = sizeof(WIN32_FIND_DATAW);
+									memcpy(szFileSpec, &fdW, nOptLen);
+
+									ft.contentParam = (CARD16)(rfbAFile | rfbADirUnicode);
+									ft.length = Swap32IfLE(nOptLen);
+									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									m_socket->SendExactQueue(szFileSpec, nOptLen);
+								}
+								fRet = FindNextFileW(ff, &fdW);
+							}
+							FindClose(ff);
+						}
+						else
+						{
+							// ANSI path: original behaviour
+							WIN32_FIND_DATA fd;
+							HANDLE ff = FindFirstFile(szDir, &fd);
+							SetErrorMode(errmode);
+
+							// Case of media not accessible
+							if (ff == INVALID_HANDLE_VALUE || fShortError)
+							{
+							ft.contentParam = rfbADirInaccessible;
+								ft.length = Swap32IfLE(0);
+								m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+								break;
+							}
+
+							ft.length = Swap32IfLE(strlen(szDir) - 1);
+							//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+							m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+							// sf@2004 - Also send back the full directory path to the viewer (necessary for Shorcuts)
+							m_socket->SendExactQueue((char*)szDir, (const VCard)(strlen(szDir) - 1));
+
+							BOOL fRet = TRUE;
+							while (fRet)
+							{
+								if (((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY && strcmp(fd.cFileName, "."))
+									||
+									(!strcmp(fd.cFileName, "..")))
+								{
 								if (strcmp(fd.cFileName, ".."))
 								{
 									char szProbe[MAX_PATH + 4];
@@ -4211,45 +4340,45 @@ vncClientThread::run(void* arg)
 									{ fd.dwReserved0 = 0; FindClose(hProbe); }
 								}
 
-								// Serialize the interesting part of WIN32_FIND_DATA
-								char szFileSpec[sizeof(WIN32_FIND_DATA)];
-								int nOptLen = sizeof(WIN32_FIND_DATA) - MAX_PATH - 14 + lstrlen(fd.cFileName);
-								memcpy(szFileSpec, &fd, nOptLen);
+									// Serialize the interesting part of WIN32_FIND_DATA
+									char szFileSpec[sizeof(WIN32_FIND_DATA)];
+									int nOptLen = sizeof(WIN32_FIND_DATA) - MAX_PATH - 14 + lstrlen(fd.cFileName);
+									memcpy(szFileSpec, &fd, nOptLen);
 
-								ft.length = Swap32IfLE(nOptLen);
-								//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-								m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-								m_socket->SendExactQueue((char*)szFileSpec, nOptLen);
-							}
-							else if (strcmp(fd.cFileName, "."))
-							{
-								// Serialize the interesting part of WIN32_FIND_DATA
-								// Get rid of the trailing blanck chars. It makes a BIG
-								// difference when there's a lot of files in the dir.
-								char szFileSpec[sizeof(WIN32_FIND_DATA)];
-								int nOptLen = sizeof(WIN32_FIND_DATA) - MAX_PATH - 14 + lstrlen(fd.cFileName);
-								memcpy(szFileSpec, &fd, nOptLen);
+									ft.length = Swap32IfLE(nOptLen);
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									m_socket->SendExactQueue((char*)szFileSpec, nOptLen);
+								}
+								else if (strcmp(fd.cFileName, "."))
+								{
+									// Serialize the interesting part of WIN32_FIND_DATA
+									// Get rid of the trailing blank chars. It makes a BIG
+									// difference when there's a lot of files in the dir.
+									char szFileSpec[sizeof(WIN32_FIND_DATA)];
+									int nOptLen = sizeof(WIN32_FIND_DATA) - MAX_PATH - 14 + lstrlen(fd.cFileName);
+									memcpy(szFileSpec, &fd, nOptLen);
 
-								ft.length = Swap32IfLE(nOptLen);
-								//adzm 2010-09 - minimize packets. SendExact flushes the queue.
-								m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-								m_socket->SendExactQueue((char*)szFileSpec, nOptLen);
+									ft.length = Swap32IfLE(nOptLen);
+									//adzm 2010-09 - minimize packets. SendExact flushes the queue.
+									m_socket->SendExactQueue((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+									m_socket->SendExactQueue((char*)szFileSpec, nOptLen);
+								}
+								fRet = FindNextFile(ff, &fd);
 							}
-							fRet = FindNextFile(ff, &fd);
+							FindClose(ff);
 						}
-						FindClose(ff);
 
 						// End of the transfer
 						ft.contentParam = 0;
 						ft.length = Swap32IfLE(0);
 						m_socket->SendExact((char*)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
 					}
-					break;
-					}
-					break;
+				}  // end inner switch (rfbDirContentRequest)
+				break;
 
-					// The client sends a command
-				case rfbCommand:
+			// The client sends a command
+			case rfbCommand:
 					switch (msg.ft.contentParam)
 					{
 						// Client requests the creation of a directory
@@ -4270,7 +4399,10 @@ vncClientThread::run(void* arg)
 						// moved jdp 8/5/08 -- have to read whole packet to keep protocol in sync
 						if (!settings->getEnableFileTransfer() || !fUserOk) break;
 						// Create the Dir
-						BOOL fRet = CreateDirectory(szDir, NULL);
+						// Convert UTF-8 to Unicode for Chinese character support
+						WCHAR szDirW[MAX_PATH];
+						MultiByteToWideChar(CP_UTF8, 0, szDir, -1, szDirW, MAX_PATH);
+						BOOL fRet = CreateDirectoryW(szDirW, NULL);
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -4314,7 +4446,10 @@ vncClientThread::run(void* arg)
 							newname = AddDirPrefixAndSuffix(szFile);
 
 						length = (UINT)(newname.length() + 1);
-						BOOL fRet = DeleteFileOrDirectory(szFile);
+						// Convert UTF-8 to Unicode for Chinese character support
+						WCHAR szFileW[MAX_PATH + 1];
+						MultiByteToWideChar(CP_UTF8, 0, szFile, -1, szFileW, MAX_PATH + 1);
+						BOOL fRet = DeleteFileOrDirectory(szFileW);
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -4359,7 +4494,12 @@ vncClientThread::run(void* arg)
 						*p = '*';
 
 						// Rename
-						BOOL fRet = MoveFile(szCurrentName, szNewName);
+						// Convert UTF-8 to Unicode for Chinese character support
+						WCHAR szCurrentNameW[MAX_PATH];
+						WCHAR szNewNameW[MAX_PATH];
+						MultiByteToWideChar(CP_UTF8, 0, szCurrentName, -1, szCurrentNameW, MAX_PATH);
+						MultiByteToWideChar(CP_UTF8, 0, szNewName, -1, szNewNameW, MAX_PATH);
+						BOOL fRet = MoveFileW(szCurrentNameW, szNewNameW);
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -6507,11 +6647,15 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 //
 bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize)
 {
-	WIN32_FIND_DATA fd;
+	WIN32_FIND_DATAW fdW;
 	HANDLE ff;
 
+	// Convert UTF-8 to Unicode for Chinese character support
+	WCHAR szFilePathW[MAX_PATH + 64];
+	MultiByteToWideChar(CP_UTF8, 0, szFilePath, -1, szFilePathW, MAX_PATH + 64);
+
 	DWORD errmode = SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
-	ff = FindFirstFile(szFilePath, &fd);
+	ff = FindFirstFileW(szFilePathW, &fdW);
 	SetErrorMode(errmode);
 
 	if (ff == INVALID_HANDLE_VALUE)
@@ -6521,9 +6665,9 @@ bool vncClient::MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize)
 
 	FindClose(ff);
 
-	(*n2FileSize).LowPart = fd.nFileSizeLow;
-	(*n2FileSize).HighPart = fd.nFileSizeHigh;
-	(*n2FileSize).QuadPart = (((__int64)fd.nFileSizeHigh) << 32) + fd.nFileSizeLow;
+	(*n2FileSize).LowPart = fdW.nFileSizeLow;
+	(*n2FileSize).HighPart = fdW.nFileSizeHigh;
+	(*n2FileSize).QuadPart = (((__int64)fdW.nFileSizeHigh) << 32) + fdW.nFileSizeLow;
 
 	return true;
 }
@@ -6777,8 +6921,11 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::filetransferrequestPart2 - thread = %d\n"), GetCurrentThreadId());
 
 	// Open source file
-	m_hSrcFile = CreateFile(
-		m_szSrcFileName,
+	// Convert UTF-8 filename to Unicode for Chinese character support
+	WCHAR szSrcFileNameW[MAX_PATH + 64];
+	MultiByteToWideChar(CP_UTF8, 0, m_szSrcFileName, -1, szSrcFileNameW, MAX_PATH + 64);
+	m_hSrcFile = CreateFileW(
+		szSrcFileNameW,
 		GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		NULL,

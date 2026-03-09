@@ -12,5 +12,5 @@
 #define APS_MAJORNUMBER          1
 #define APS_MINORNUMBER          7
 #define APS_BUILDNUMBER          1
-#define APS_MODIFICATIONNUMBER   6
+#define APS_MODIFICATIONNUMBER   9
 #define APS_DATEYEAR          2025

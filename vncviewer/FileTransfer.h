@@ -62,6 +62,7 @@ public:
 	char                m_szFTParamTitle[128];
 	char                m_szFTParamComment[64];
 	char                m_szFTParam[256];
+	WCHAR               m_szFTParamW[256];
 	char                m_szFTConfirmTitle[128];
 	char                m_szFTConfirmComment[364];
 	int					m_nConfirmAnswer;
@@ -75,6 +76,7 @@ public:
 	// adzm 2009-08-02
 	char				m_szLastLocalPath[_MAX_PATH];
 	char				m_szLastRemotePath[_MAX_PATH];
+	WCHAR				m_szLastRemotePathW[_MAX_PATH];
 	int                 m_nLastLocalAttemptItem;
 	char                m_szLastLocalAttemptName[MAX_PATH + 2];
 	int                 m_nLastRemoteAttemptItem;
@@ -105,10 +107,11 @@ public:
 	int					m_nFileCount;
 	bool				m_fDirectoryReceptionRunning;
 	char				m_szFileSpec[MAX_PATH + 64];
-
-
+	
 	// File reception (download)
+	WCHAR				m_szSrcFileNameW[MAX_PATH + 32];    // Unicode local src path for upload
 	char				m_szDestFileName[MAX_PATH + 32];
+	WCHAR				m_szDestFileNameW[MAX_PATH + 32]; // Unicode version for correct rename on all locales
 	HANDLE				m_hDestFile;
 	DWORD				m_dwNbReceivedPackets;
 	DWORD				m_dwNbBytesWritten;
@@ -164,7 +167,7 @@ public:
 	void ProcessFileTransferMsg(void);
 	void RequestPermission();
 	bool TestPermission(long lSize, int nVersion);
-	void AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd, bool fLocalSide);
+	void AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd, bool fLocalSide, const WCHAR* pszUnicodeFileName = NULL);
 	void RequestRemoteDirectoryContent(HWND hWnd, LPSTR szPath);
 	void RequestRemoteDrives();
 	void RequestRemoteFile(LPSTR szRemoteFileName);
@@ -203,7 +206,7 @@ public:
 	void GetFriendlyFileSizeString(__int64 Size, char* szText, int size);
 	bool MyGetFileSize(char* szFilePath, ULARGE_INTEGER* n2FileSize);
 	void InitListViewImagesList(HWND hListView);
-    bool DeleteFileOrDirectory(TCHAR *srcpath); // 14 April 2008 jdp
+    bool DeleteFileOrDirectory(WCHAR *srcpath); // Unicode path support
 	bool FileOrFolderExists(HWND fileListWnd, std::string fileOrFolder);
     bool UsingOldProtocol() { return m_ServerFTProtocolVersion == FT_PROTO_VERSION_OLD; }
     void StartFTSession();

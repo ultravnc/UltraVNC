@@ -1141,6 +1141,8 @@ typedef struct _rfbFileTransferMsg {
 #define rfbRDrivesList			2 // Request the server's drives list
 #define rfbRDirRecursiveList	3 // Request a server directory content recursive sorted list
 #define rfbRDirRecursiveSize	4 // Request a server directory content recursive size
+// Extension flags ORed into contentParam of rfbDirContentRequest (backward compatible: old servers ignore high bits)
+#define rfbRDirContentUnicode	0x8000 // Client supports unicode WIN32_FIND_DATAW entries in rfbDirPacket
 
 								// rfbDirPacket & rfbCommandReturn  server Answer - content params
 #define rfbADirectory			1 // Reception of a directory name
@@ -1157,6 +1159,8 @@ typedef struct _rfbFileTransferMsg {
 #define rfbADirInaccessible		18 // Folder exists but cannot be read (permission denied etc.)
                                    // Old viewers receive contentParam=18 with length=0 and treat it as end-of-dir (graceful degradation)
 #define rfbFD_INACCESSIBLE		0xFFFFFFFE // Sentinel set in WIN32_FIND_DATA.dwReserved0 to flag a subfolder as inaccessible in the listing
+// Extension flag ORed into contentParam of rfbDirPacket directory/file entries when server sends unicode data
+#define rfbADirUnicode			0x8000 // WIN32_FIND_DATAW used instead of WIN32_FIND_DATA
 
 								// rfbCommand Command - content params
 #define rfbCDirCreate			1 // Request the server to create the given directory
