@@ -502,6 +502,7 @@
       <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -552,6 +553,7 @@
       <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -603,6 +605,7 @@
       <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -652,6 +655,7 @@
       <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -705,6 +709,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -769,6 +774,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -830,6 +836,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -889,6 +896,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -947,6 +955,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -1008,6 +1017,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
@@ -1071,6 +1081,7 @@
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
@@ -1134,6 +1145,7 @@
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
@@ -1192,6 +1204,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
@@ -1250,6 +1263,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
@@ -1308,6 +1322,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
@@ -1368,6 +1383,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>

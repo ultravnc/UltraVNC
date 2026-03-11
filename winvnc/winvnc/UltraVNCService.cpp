@@ -126,6 +126,7 @@ UltraVNCService::UltraVNCService()
 
 ////////////////////////////////////////////////////////////////////////////////
 void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
+    SetDllDirectory(TEXT(""));
     /* initialise service status */
     serviceStatus.dwServiceType=SERVICE_WIN32;
     serviceStatus.dwCurrentState=SERVICE_STOPPED;

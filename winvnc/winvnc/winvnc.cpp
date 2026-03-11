@@ -411,6 +411,7 @@ void extractConfig(char* szCmdLine)
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
+	SetDllDirectory(TEXT(""));
 	if (GetModuleFileName(NULL, winvncFolder, MAX_PATH))
 	{
 		char* p = strrchr(winvncFolder, '\\');

@@ -377,6 +377,7 @@
       <Command>cl /nologo /MTd /FoDebug\ /FdDebug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>../librats/Win32/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -425,6 +426,7 @@
       <Command>cl /nologo /MTd /Fo.\x64\Debug\ /Fd.\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -482,6 +484,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -544,6 +547,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -602,6 +606,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -660,6 +665,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -717,6 +723,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -774,6 +781,7 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -836,6 +844,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\x64\Release\;..\zlib\contrib\vstudio\vc15\x64\ZlibStatrelease_viewer;.\Release\x64\liblzma\;.\omnithread\x64\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -890,6 +899,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\x64\Release\;..\zlib\contrib\vstudio\vc15\x64\ZlibStatrelease_viewer;.\Release\x64\liblzma\;.\omnithread\x64\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -941,6 +951,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\x64\Release\;..\zlib\contrib\vstudio\vc15\x64\ZlibStatrelease_viewer;.\Release\x64\liblzma\;.\omnithread\x64\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -992,6 +1003,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;rdr.lib;libjpeg-turbo-win.lib;zlibstat.lib;liblzma.lib;omnithread.lib;zip32.lib;unz32lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\vncviewer\x64\Release;..\winvnc\Release\x64\liblzma;..\winvnc\x64\Release;..\zlib\contrib\vstudio\vc15\x64\ZlibStatRelease;..\zipunzip_src\zip20\windll\visualc\lib\x64\Release;..\zipunzip_src\unzip\windll\vc6\lib\x64\Release;..\vncviewer\omnithread\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -1043,6 +1055,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -1094,6 +1107,7 @@
       <Command>cl /nologo /MT /Fo.\x64\Release\ /Fd.\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
+      <DependentLoadFlag>0x800</DependentLoadFlag>
       <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
