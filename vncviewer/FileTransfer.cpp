@@ -4657,7 +4657,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					char szSelA[MAX_PATH];
 					WideCharToMultiByte(CP_ACP, 0, szSelW, -1, szSelA, MAX_PATH, NULL, NULL);
 					_this->IsDirectoryGetIt(szSelA, MAX_PATH);
-					strcpy_s(_this->m_szFTParam, szSelA);
+					WideCharToMultiByte(CP_UTF8, 0, szSelW, -1, _this->m_szFTParam, 256, NULL, NULL);
 					_this->m_szFTParamW[0] = L'\0';
 					_this->DoFTParamDialog(sz_M3, sz_M4);
 					if (_this->m_szFTParamW[0] == L'\0' || (wcslen(szCurrLocalW) + wcslen(_this->m_szFTParamW)) > 248)
@@ -4724,7 +4724,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					char szSelA[MAX_PATH];
 					WideCharToMultiByte(CP_ACP, 0, szSelW, -1, szSelA, MAX_PATH, NULL, NULL);
 					_this->IsDirectoryGetIt(szSelA, MAX_PATH);
-					strcpy_s(_this->m_szFTParam, szSelA);
+					WideCharToMultiByte(CP_UTF8, 0, szSelW, -1, _this->m_szFTParam, 256, NULL, NULL);
 					_this->m_szFTParamW[0] = L'\0';
 					_this->DoFTParamDialog(sz_M3, sz_M4);
 					if (_this->m_szFTParamW[0] == L'\0'
@@ -5196,7 +5196,7 @@ BOOL CALLBACK FileTransfer::FTParamDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPara
 		case IDOK:
 			{
 				GetDlgItemTextW(hwnd, IDC_FTPARAM_EDIT, _this->m_szFTParamW, 256);
-				WideCharToMultiByte(CP_ACP, 0, _this->m_szFTParamW, -1, _this->m_szFTParam, 256, NULL, NULL);
+				WideCharToMultiByte(CP_UTF8, 0, _this->m_szFTParamW, -1, _this->m_szFTParam, 256, NULL, NULL);
 				EndDialog(hwnd, TRUE);
 				return TRUE;
 			}
