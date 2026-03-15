@@ -581,8 +581,14 @@ vncClientUpdateThread::run_undetached(void* arg)
 					else {
 						rfbServerCutTextMsg message;
 						memset(&message, 0, sizeof(rfbServerCutTextMsg));
-						const char* cliptext = m_client->m_clipboard.m_strLastCutText.c_str();
-						char* unixtext = new char[m_client->m_clipboard.m_strLastCutText.length() + 1];
+
+						// Convert wstring to ANSI for wire transmission
+						const wchar_t* cliptext_w = m_client->m_clipboard.m_strLastCutText.c_str();
+						int ansiLen = WideCharToMultiByte(CP_ACP, 0, cliptext_w, -1, NULL, 0, NULL, NULL);
+						char* cliptext = new char[ansiLen];
+						WideCharToMultiByte(CP_ACP, 0, cliptext_w, -1, cliptext, ansiLen, NULL, NULL);
+
+						char* unixtext = new char[ansiLen];
 
 						// Replace CR-LF with LF - never send CR-LF on the wire,
 						// since Unix won't like it
@@ -595,6 +601,7 @@ vncClientUpdateThread::run_undetached(void* arg)
 							}
 						}
 						unixtext[unixpos] = 0;
+						delete[] cliptext;
 
 						message.length = Swap32IfLE(strlen(unixtext));
 
@@ -1116,8 +1123,21 @@ vncClientThread::InitAuthenticate()
 			return FALSE;
 		if (msg.textLength < 0 || msg.textLength > 254)
 			return FALSE;
-		if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
-			return FALSE;
+		
+		if (client_ini.flags & clientInitExtraMsgUnicode) {
+			// Client sends UTF-16LE Unicode directly
+			wchar_t infoMsgW[128];
+			if (!m_socket->ReadExact((char*)infoMsgW, msg.textLength))
+				return FALSE;
+			infoMsgW[msg.textLength / sizeof(wchar_t)] = L'\0';
+			// Convert to UTF-8 for storage in m_client->infoMsg
+			WideCharToMultiByte(CP_UTF8, 0, infoMsgW, -1, m_client->infoMsg, 255, NULL, NULL);
+		} else {
+			// Legacy: client sends UTF-8 (or CP_ACP for very old clients)
+			if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
+				return FALSE;
+			m_client->infoMsg[msg.textLength] = '\0';
+		}
 	}
 
 #ifndef SC_20
@@ -3529,7 +3549,14 @@ vncClientThread::run(void* arg)
 					}
 
 					if (winStr != NULL) {
-						m_client->m_clipboard.m_strLastCutText = winStr;
+						// Convert ANSI to Unicode for m_strLastCutText (now std::wstring)
+						int nWideLen = MultiByteToWideChar(CP_ACP, 0, winStr, -1, NULL, 0);
+						if (nWideLen > 0) {
+							wchar_t* wideStr = new wchar_t[nWideLen];
+							MultiByteToWideChar(CP_ACP, 0, winStr, -1, wideStr, nWideLen);
+							m_client->m_clipboard.m_strLastCutText = wideStr;
+							delete[] wideStr;
+						}
 						// Get the server to update the local clipboard
 						m_server->UpdateLocalClipText(winStr);
 

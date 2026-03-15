@@ -17,7 +17,7 @@
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #include "Exception.h"
-extern char sz_L70[64];
+extern wchar_t sz_L70[64];
 
 void ClientConnection::ReadCoRRERect(rfbFramebufferUpdateRectHeader *pfburh)
 {

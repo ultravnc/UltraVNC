@@ -143,7 +143,7 @@ struct Clipboard {
 
 	ClipboardSettings settings;
 	DWORD m_crc;
-	std::string m_strLastCutText; // for non-extended clipboards
+	std::wstring m_strLastCutText; // for non-extended clipboards (Unicode)
 
 	bool m_bNeedToProvide;
 	bool m_bNeedToNotify;

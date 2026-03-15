@@ -40,7 +40,7 @@ ViewerDirectxClass::ViewerDirectxClass()
 	devicelost=true;
 	D3DLibrary = NULL;
 	d3dCreate=NULL;
-	D3DLibrary = LoadLibraryEx("d3d9", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	D3DLibrary = LoadLibraryExW(L"d3d9", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (!D3DLibrary) 
 	{
 		return;
@@ -457,9 +457,9 @@ ViewerDirectxClass:: paintdevice()
 	if (SUCCEEDED(pD3DDevice9->BeginScene()))
 	{
 #ifdef _DEBUG
-	char			szText[256];
-	_snprintf_s(szText, 256, " ++++++++++BeginScene \n");
-	OutputDebugString(szText);		
+	wchar_t			szText[256];
+	swprintf_s(szText, 256, L" ++++++++++BeginScene \n");
+	OutputDebugStringW(szText);		
 #endif
 	pD3DDevice9->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
 
@@ -471,8 +471,8 @@ ViewerDirectxClass:: paintdevice()
 	backBuffer->Release();
 	pD3DDevice9->EndScene();
 #ifdef _DEBUG
-	_snprintf_s(szText, 256, " ++++++++++ENdScene \n");
-	OutputDebugString(szText);		
+	swprintf_s(szText, 256, L" ++++++++++ENdScene \n");
+	OutputDebugStringW(szText);		
 #endif
 	}
 
@@ -482,15 +482,15 @@ ViewerDirectxClass:: paintdevice()
 
 	// present back buffer to display
 #ifdef _DEBUG
-	char			szText[256];
-	_snprintf_s(szText, 256, " ++++++++++Present \n");
-	OutputDebugString(szText);		
+	wchar_t			szText[256];
+	swprintf_s(szText, 256, L" ++++++++++Present \n");
+	OutputDebugStringW(szText);		
 #endif
 	if (pD3DDevice9->Present(NULL, NULL, NULL, NULL)!= D3D_OK)
 		return false;
 #ifdef _DEBUG
-	_snprintf_s(szText, 256, " ++++++++++Present2 \n");
-	OutputDebugString(szText);		
+	swprintf_s(szText, 256, L" ++++++++++Present2 \n");
+	OutputDebugStringW(szText);		
 #endif
 	// tell windows that we dont need to repaint anything
 
@@ -547,9 +547,9 @@ ViewerDirectxClass:: Preupdate(unsigned char * bits)
 	if (directxlocked == true) 
 		return bits;
 #ifdef _DEBUG
-	char			szText[256];
-				_snprintf_s(szText, 256, "Preupdate 2\n");
-				OutputDebugString(szText);
+	wchar_t			szText[256];
+				swprintf_s(szText, 256, L"Preupdate 2\n");
+				OutputDebugStringW(szText);
 #endif
 
 	int counter=0;
@@ -624,17 +624,17 @@ ViewerDirectxClass:: Afterupdate()
 {
 
 #ifdef _DEBUG
-	char			szText[256];
-				_snprintf_s(szText, 256, "After update1 2\n");
-				OutputDebugString(szText);
+	wchar_t			szText[256];
+				swprintf_s(szText, 256, L"After update1 2\n");
+				OutputDebugStringW(szText);
 #endif
 	if (devicelost==true) return true;
 	if (directxlocked==false) return true;
 	if (!surface) return false;
 #ifdef _DEBUG
-//	char			szText[256];
-				_snprintf_s(szText, 256, "After update2 2\n");
-				OutputDebugString(szText);
+//	wchar_t			szText[256];
+				swprintf_s(szText, 256, L"After update2 2\n");
+				OutputDebugStringW(szText);
 #endif
 	    ///copy pixels
 		surface->UnlockRect();

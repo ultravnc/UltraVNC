@@ -14,7 +14,7 @@
 
 class VNCviewerApp32 : public VNCviewerApp {
 public:
-	VNCviewerApp32(HINSTANCE hInstance, PSTR szCmdLine);
+	VNCviewerApp32(HINSTANCE hInstance, LPTSTR szCmdLine);
 
 	void NewConnection(bool Is_Listening);
 	void NewConnection(bool Is_Listening,TCHAR *host, int port);

@@ -44,7 +44,7 @@
 #define ctbButtonSpace		1
 
 //Color and layout
-#define tbFont				"Arial"
+#define tbFont				L"Arial"
 #define tbFontSize			10
 #define tbTextColor			RGB(220,220,220)
 #define tbStartColor		RGB(64,64,64)

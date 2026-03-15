@@ -52,7 +52,7 @@ void CentreWindow(HWND hwnd);
 bool ParseDisplay(LPTSTR display, LPTSTR phost, int hostlen, int *port);
 
 // Reload language DLL and all strings
-void ReloadLanguage(const char* langCode);
+void ReloadLanguage(const wchar_t* langCode);
 
 // Macro DIALOG_MAKEINTRESOURCE is used to allow both normal windows dialogs
 // and the selectable aspect ratio dialogs under WinCE (PalmPC vs HPC).

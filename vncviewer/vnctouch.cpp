@@ -377,16 +377,6 @@ void vnctouch::Activate_touch(HWND hWnd)
 	if (IsTouchActivated) return;
 	int value = GetSystemMetrics(SM_DIGITIZER);
 	if ((value  & NID_MULTI_INPUT) && (value & NID_READY)) MAXPOINTS = GetSystemMetrics(SM_MAXIMUMTOUCHES);
-#ifdef _DEBUG
-	char			szText[256];
-
-	if ((value  & NID_MULTI_INPUT) && (value & NID_READY))
-	{
-		sprintf(szText, " Multitouch found and ready \n");
-		if (value & NID_INTEGRATED_TOUCH){ sprintf(szText, "Multitouch found and ready, Integrated touch with maxtouches=%i \n", MAXPOINTS); }
-	}
-	OutputDebugString(szText);
-#endif
 	//RegisterTouchWindow(m_hwndcn, 0);
 	//The registering need to be in the same thread as the window.
 	//We use a timer function to trigger the activation in the wndproc.	
@@ -715,12 +705,7 @@ void vnctouch::OnTouch(HWND hWnd, WPARAM wParam, LPARAM lParam)
 					{
 						pMyTouchInfo[index].pointerflag |= POINTER_FLAG_UP;
 						point_down[index] = false;
-					}
-#ifdef _DEBUG
-					char			szText[256];
-					sprintf(szText, "cInputs %i index %i %i %i\n", cInputs, index, pMyTouchInfo[index].pointerflag, ti.dwID);
-					OutputDebugString(szText);
-#endif					
+					}				
 				}
 			}
 			rfb_send_gii_mt_event();

@@ -47,7 +47,7 @@ public:
     //               existing log.
 	Log(int mode = ToDebug, int level = 1, LPTSTR filename = NULL, bool append = false);
 
-    inline void Print(int level, LPTSTR format, ...) {
+    inline void Print(int level, LPCTSTR format, ...) {
         if (level > m_level) return;
         va_list ap;
         va_start(ap, format);
@@ -68,7 +68,7 @@ public:
 	virtual ~Log();
 
 private:
-    void ReallyPrint(LPTSTR format, va_list ap);
+    void ReallyPrint(LPCTSTR format, va_list ap);
     void CloseFile();
     bool m_tofile, m_todebug, m_toconsole;
     int m_level;

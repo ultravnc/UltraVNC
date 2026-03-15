@@ -31,12 +31,12 @@ public:
 	HWND				m_hDlg;
 	bool				m_fTextChatRunning;
 	bool				m_fVisible;
-	char*				m_szLocalText;
-	char*				m_szLastLocalText;
-	char*				m_szRemoteText;
-	char*				m_szRemoteName;
-	char*				m_szLocalName;
-	char*				m_szTextBoxBuffer;
+	wchar_t*			m_szLocalText;
+	wchar_t*			m_szLastLocalText;
+	wchar_t*			m_szRemoteText;
+	wchar_t*			m_szRemoteName;
+	wchar_t*			m_szLocalName;
+	wchar_t*			m_szTextBoxBuffer;
 	bool				m_fPersistentTexts;
 	HMODULE				m_hRichEdit;
 
@@ -49,8 +49,8 @@ public:
 	void SendTextChatRequest(int nMsg);
 	void SendLocalText(void);
 	void ProcessTextChatMsg();
-	void PrintMessage(const char* szMessage,const char* szSender, DWORD color = BLACK);
-	void SetTextFormat(bool bBold = false, bool bItalic = false, long nSize = 0x75, const char* szFaceName = "MS Sans Serif", DWORD dwColor = BLACK);
+	void PrintMessage(const wchar_t* szMessage, const wchar_t* szSender, DWORD color = BLACK);
+	void SetTextFormat(bool bBold = false, bool bItalic = false, long nSize = 0x75, const wchar_t* szFaceName = L"MS Shell Dlg 2", DWORD dwColor = BLACK);
 	void ShowChatWindow(bool fVisible);
 
 };

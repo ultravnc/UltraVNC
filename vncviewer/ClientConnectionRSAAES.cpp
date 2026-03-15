@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -23,7 +23,7 @@ const int secTypeRA2None = 0;
 const int secTypeRA2UserPass = 1;
 const int secTypeRA2Pass = 2;
 
-static char	lastError[1024];
+static wchar_t	lastError[1024];
 char hex[24];
 char catchphrase[1024];
 
@@ -75,7 +75,7 @@ struct AESCipher
 	{
 		if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 		{
-			sprintf_s(lastError, "CryptAcquireContext failed (%d)", GetLastError());
+			swprintf_s(lastError, L"CryptAcquireContext failed (%d)", GetLastError());
 			return SetLastError(lastError);
 		}
 		SymKeyBlob keyBlob = { 0 };
@@ -86,13 +86,13 @@ struct AESCipher
 		memcpy(keyBlob.key, key, keyBlob.cbKeySize);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(SymKeyBlob, key) + keyBlob.cbKeySize, NULL, 0, &hKey))
 		{
-			sprintf_s(lastError, "CryptImportKey failed (%d)", GetLastError());
+			swprintf_s(lastError, L"CryptImportKey failed (%d)", GetLastError());
 			return SetLastError(lastError);
 		}
 		DWORD mode = CRYPT_MODE_ECB;
 		if (!CryptSetKeyParam(hKey, KP_MODE, (BYTE *)&mode, 0))
 		{
-			sprintf_s(lastError, "CryptSetKeyParam(KP_MODE) failed (%d)", GetLastError());
+			swprintf_s(lastError, L"CryptSetKeyParam(KP_MODE) failed (%d)", GetLastError());
 			return SetLastError(lastError);
 		}
 		return true;
@@ -102,16 +102,16 @@ struct AESCipher
 	{
 		if (!CryptEncrypt(hKey, NULL, FALSE, 0, (BYTE *)buf, &size, size))
 		{
-			sprintf_s(lastError, "CryptEncrypt failed (%d)", GetLastError());
+			swprintf_s(lastError, L"CryptEncrypt failed (%d)", GetLastError());
 			return SetLastError(lastError);
 		}
 		return true;
 	}
 
 private:
-	static bool SetLastError(char *error)
+	static bool SetLastError(const wchar_t *error)
 	{
-		vnclog.Print(0, _T("AESCipher: %s\n"), error);
+		vnclog.Print(0, _T("AESCipher: %S\n"), error);
 		throw WarningException(error);
 		return false;
 	}
@@ -164,7 +164,7 @@ struct CMACAuth
 	{
 		if (size < 4 || size > BlockSize)
 		{
-			sprintf_s(lastError, "Invalid tag size for CMAC (%d)", size);
+			swprintf_s(lastError, L"Invalid tag size for CMAC (%d)", size);
 			return SetLastError(lastError);
 		}
 		if (pos < BlockSize)
@@ -192,9 +192,9 @@ private:
 		out[BlockSize - 1] ^= c * 0x87;
 	}
 
-	static bool SetLastError(char *error)
+	static bool SetLastError(const wchar_t *error)
 	{
-		vnclog.Print(0, _T("CMACAuth: %s\n"), error);
+		vnclog.Print(0, _T("CMACAuth: %S\n"), error);
 		throw WarningException(error);
 		return false;
 	}
@@ -369,9 +369,9 @@ struct AESEAXPlugin : IPlugin
 		encAead.SetNonce(encMsg++);
 		encAead.SetAad(dst, AadSize);
 		if (!encAead.Process(dst + AadSize, nDataLen))
-			SetLastError("Encryption failed");
+			SetLastError(L"Encryption failed");
 		if (!encAead.Finalize(dst + AadSize + nDataLen, MacSize))
-			SetLastError("Tag failed on encryption");
+			SetLastError(L"Tag failed on encryption");
 		return dst;
 	}
 
@@ -403,12 +403,12 @@ struct AESEAXPlugin : IPlugin
 			decAead.SetAad(decBuffer.GetHead(), AadSize);
 			memcpy(dst, decBuffer.GetHead() + AadSize, size);
 			if (!decAead.Process(dst, size, false))
-				SetLastError("Decryption failed");
+				SetLastError(L"Decryption failed");
 			BYTE tag[MacSize];
 			if (!decAead.Finalize(tag, MacSize))
-				SetLastError("Tag failed on decryption");
+				SetLastError(L"Tag failed on decryption");
 			if (!ArrayEqual(tag, decBuffer.GetHead() + AadSize + size, MacSize))
-				SetLastError("Decryption tag does not match");
+				SetLastError(L"Decryption tag does not match");
 			decPlain.size += size;
 			decBuffer.pos += AadSize + size + MacSize;
 		}
@@ -424,9 +424,9 @@ struct AESEAXPlugin : IPlugin
 	}
 
 private:
-	static bool SetLastError(char *error)
+	static bool SetLastError(const wchar_t *error)
 	{
-		vnclog.Print(0, _T("AESEAXPlugin: %s\n"), error);
+		vnclog.Print(0, _T("AESEAXPlugin: %S\n"), error);
 		throw WarningException(error);
 		return false;
 	}
@@ -472,7 +472,7 @@ struct RSAKEX
 	HCRYPTHASH	hHash;
 	BYTE		serverRandom[MaxSymKeyBytes], clientRandom[MaxSymKeyBytes];
 	int			subtype;
-	char		lastError[1024];
+	wchar_t		lastError[1024];
 
 	RSAKEX(IConnection &c, DWORD keysz) : conn(c), keySize(keysz),
 			hProv(0), hServerKey(0), hClientKey(0), hHash(0)
@@ -504,12 +504,12 @@ struct RSAKEX
 		serverKey.length = Swap32IfLE(serverKey.length);
 		if (serverKey.length < MinRsaKeyLength)
 		{
-			sprintf_s(lastError, "Server RSA key is too small (%d)", serverKey.length);
+			swprintf_s(lastError, L"Server RSA key is too small (%d)", serverKey.length);
 			return false;
 		}
 		if (serverKey.length > MaxRsaKeyLength)
 		{
-			sprintf_s(lastError, "Server RSA key is too big (%d)", serverKey.length);
+			swprintf_s(lastError, L"Server RSA key is too big (%d)", serverKey.length);
 			return false;
 		}
 		serverKey.bytes = (serverKey.length + 7) / 8;
@@ -519,13 +519,13 @@ struct RSAKEX
 		{
 			if (serverKey.exp[i] != 0)
 			{
-				sprintf_s(lastError, "Server RSA exponent is too big (%d)", i);
+				swprintf_s(lastError, L"Server RSA exponent is too big (%d)", i);
 				return false;
 			}
 		}
 		if (!hProv && !CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 		{
-			sprintf_s(lastError, "CryptAcquireContext failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptAcquireContext failed (%u)", GetLastError());
 			return false;
 		}
 		keyBlob.hdr.bType = PUBLICKEYBLOB;
@@ -539,7 +539,7 @@ struct RSAKEX
 		ArraySwap(keyBlob.modulus, serverKey.bytes);
 		if (!CryptImportKey(hProv, (BYTE *)&keyBlob, offsetof(PubKeyBlob, modulus) + serverKey.bytes, 0, 0, &hServerKey))
 		{
-			sprintf_s(lastError, "Invalid server RSA key (%u)", GetLastError());
+			swprintf_s(lastError, L"Invalid server RSA key (%u)", GetLastError());
 			return false;
 		}
 		return true;
@@ -579,7 +579,7 @@ struct RSAKEX
 		tc.pszVerificationText = L"Don't ask anymore";
 		TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
 		if (nButtonPressed != IDOK)
-			throw QuietException("Authentication cancelled");
+			throw QuietException(L"Authentication cancelled");
 		if (bPersist)
 			conn.SaveFingerprint(hex);
 		return true;
@@ -590,20 +590,20 @@ struct RSAKEX
 		#define RSA2048BIT_KEY (RSA1024BIT_KEY << 1)
 		if (!CryptGenKey(hProv, AT_KEYEXCHANGE, RSA2048BIT_KEY | CRYPT_EXPORTABLE, &hClientKey))
 		{
-			sprintf_s(lastError, "CryptGenKey failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptGenKey failed (%u)", GetLastError());
 			return false;
 		}
 		BYTE keyData[2048];
 		DWORD size = sizeof(keyData);
 		if (!CryptExportKey(hClientKey, NULL, PUBLICKEYBLOB, 0, keyData, &size))
 		{
-			sprintf_s(lastError, "CryptExportKey failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptExportKey failed (%u)", GetLastError());
 			return false;
 		}
 		PubKeyBlob *keyBlob = (PubKeyBlob *)keyData;
 		if (keyBlob->hdr.aiKeyAlg != CALG_RSA_KEYX || keyBlob->key.magic != BCRYPT_RSAPUBLIC_MAGIC)
 		{
-			sprintf_s(lastError, "Invalid client key generated");
+			swprintf_s(lastError, L"Invalid client key generated");
 			return false;
 		}
 		clientKey.length = keyBlob->key.bitlen;
@@ -626,18 +626,18 @@ struct RSAKEX
 
 		if (!CryptGenRandom(hProv, size, (BYTE *)clientRandom))
 		{
-			sprintf_s(lastError, "CryptGenRandom failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptGenRandom failed (%u)", GetLastError());
 			return false;
 		}
 		memcpy(buffer, clientRandom, size);
 		if (!CryptEncrypt(hServerKey, NULL, TRUE, 0, buffer, &size, sizeof(buffer)))
 		{
-			sprintf_s(lastError, "CryptEncrypt failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptEncrypt failed (%u)", GetLastError());
 			return false;
 		}
 		if (size != serverKey.bytes)
 		{
-			sprintf_s(lastError, "Server key size doesn't match (%u vs %u)", size, serverKey.bytes);
+			swprintf_s(lastError, L"Server key size doesn't match (%u vs %u)", size, serverKey.bytes);
 			return false;
 		}
 		DWORD bufSize = Swap16IfLE(size);
@@ -656,19 +656,19 @@ struct RSAKEX
 		size = Swap16IfLE(size);
 		if (size != clientKey.bytes)
 		{
-			sprintf_s(lastError, "Client key size doesn't match (%u vs %u)", size, clientKey.bytes);
+			swprintf_s(lastError, L"Client key size doesn't match (%u vs %u)", size, clientKey.bytes);
 			return false;
 		}
 		conn.ReadExact((char *)buffer, size);
 		ArraySwap(buffer, size);
 		if (!CryptDecrypt(hClientKey, NULL, TRUE, 0, (BYTE *)buffer, &size))
 		{
-			sprintf_s(lastError, "Cannot decrypt server random (%u)", GetLastError());
+			swprintf_s(lastError, L"Cannot decrypt server random (%u)", GetLastError());
 			return false;
 		}
 		if (size != keySize / 8)
 		{
-			sprintf_s(lastError, "Server random size doesn't match (%u vs %u)", size, keySize / 8);
+			swprintf_s(lastError, L"Server random size doesn't match (%u vs %u)", size, keySize / 8);
 			return false;
 		}
 		memcpy(serverRandom, buffer, size);
@@ -726,7 +726,7 @@ struct RSAKEX
 		conn.ReadExact((char *)hash, size);
 		if (!ArrayEqual(hash, calcHash, size))
 		{
-			sprintf_s(lastError, "Hash does not match");
+			swprintf_s(lastError, L"Hash does not match");
 			return false;
 		}
 		return true;
@@ -738,7 +738,7 @@ struct RSAKEX
 		conn.ReadExact((char *)&subtype, 1);
 		if (subtype != secTypeRA2UserPass && subtype != secTypeRA2Pass && subtype != secTypeRA2None)
 		{
-			sprintf_s(lastError, "Invalid subtype (%d)", subtype);
+			swprintf_s(lastError, L"Invalid subtype (%d)", subtype);
 			return false;
 		}
 		return true;
@@ -756,11 +756,11 @@ struct RSAKEX
 			AuthDialog ad;
 			if (!ad.DoDialog((subtype == secTypeRA2UserPass) ? dtUserPassRSA  : dtPassRSA, host, port, hex, catchphrase))
 			{
-				throw QuietException("Authentication cancelled");
+				throw QuietException(L"Authentication cancelled");
 			}
 			if (subtype == secTypeRA2UserPass)
-				strcpy(cmdlnUser, ad.m_user);
-			strcpy(clearPasswd, ad.m_passwd);
+				strcpy_s(cmdlnUser, 256, ad.m_user);
+			strcpy_s(clearPasswd, 256, ad.m_passwd);
 		}
 		size = (subtype == secTypeRA2UserPass ? (DWORD)strlen(cmdlnUser) : 0);
 		conn.WriteExact((char *)&size, 1);
@@ -781,7 +781,7 @@ private:
 
 		if (hashSize > size)
 		{
-			sprintf_s(lastError, "Keys hash buffer too small (%u vs %u)", size, hashSize);
+			swprintf_s(lastError, L"Keys hash buffer too small (%u vs %u)", size, hashSize);
 			return false;
 		}
 		if (!HashUpdate(algId, &clientLength, 4)
@@ -802,12 +802,12 @@ private:
 	{
 		if (!hHash && !CryptCreateHash(hProv, algId, 0, 0, &hHash))
 		{
-			sprintf_s(lastError, "CryptCreateHash failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptCreateHash failed (%u)", GetLastError());
 			return false;
 		}
 		if (!CryptHashData(hHash, (BYTE *)data, size, 0))
 		{
-			sprintf_s(lastError, "CryptHashData failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptHashData failed (%u)", GetLastError());
 			return false;
 		}
 		return true;
@@ -820,7 +820,7 @@ private:
 
 		if (!CryptGetHashParam(hHash, HP_HASHVAL, (BYTE *)buffer, &bufSize, 0))
 		{
-			sprintf_s(lastError, "CryptGetHashParam failed (%u)", GetLastError());
+			swprintf_s(lastError, L"CryptGetHashParam failed (%u)", GetLastError());
 			return false;
 		}
 		CryptDestroyHash(hHash);
@@ -848,18 +848,21 @@ struct KEXHost : public RSAKEX::IConnection
 	{ 
 		TCHAR buf[32] = { 0 };
 		GetPrivateProfileString(FingerprintSection, key, NULL, buf, sizeof(buf), fname);
-		return _tcscmp(hex, buf) == 0;
+		return _tcscmp((LPCTSTR)hex, buf) == 0;
 	}
 	
-	virtual void SaveFingerprint(char *hex) { WritePrivateProfileString(FingerprintSection, key, hex, fname); }
+	virtual void SaveFingerprint(char *hex) { WritePrivateProfileString(FingerprintSection, key, (LPCTSTR)hex, fname); }
 };
 
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 {
 	TCHAR key[MAX_HOST_NAME_LEN];
-	sprintf_s(key, "%s:%d", m_host, m_port);
+	_stprintf_s(key, MAX_HOST_NAME_LEN, _T("%s:%d"), m_host, m_port);
 	KEXHost host(this, key, m_opts->getDefaultOptionsFileName());
 	RSAKEX st(host, (DWORD)keySize);
+	char _rsa_user[256]={0}, _rsa_passwd[256]={0};
+	strcpy_s(_rsa_user, 256, m_cmdlnUser);
+	strcpy_s(_rsa_passwd, 256, m_clearPasswd);
 	if (!st.ReadPublicKey()
 		|| !st.VerifyServer() 
 		|| !st.WritePublicKey()
@@ -869,10 +872,10 @@ void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 		|| !st.WriteHash()
 		|| !st.ReadHash()
 		|| !st.ReadSubtype()
-		|| !st.WriteCredentials(m_host, m_port, m_cmdlnUser, m_clearPasswd)) {
-		if (strlen(st.lastError))
+		|| !st.WriteCredentials(m_host, m_port, _rsa_user, _rsa_passwd)) {
+		if (wcslen(st.lastError))
 		{
-			vnclog.Print(0, _T("AuthRSAAES: %s\n"), st.lastError);
+			vnclog.Print(0, _T("AuthRSAAES: %S\n"), st.lastError);
 			throw WarningException(st.lastError);
 		}
 	}

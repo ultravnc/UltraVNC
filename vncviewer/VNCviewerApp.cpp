@@ -16,10 +16,10 @@
 #include "UltraVNCHelperFunctions.h"
 #include "common/win32_helpers.h"
 using namespace helper;
-extern char sz_A2[64];
-extern char sz_B1[64];
-extern char sz_B2[64];
-extern char sz_B3[64];
+extern wchar_t sz_A2[64];
+extern wchar_t sz_B1[64];
+extern wchar_t sz_B2[64];
+extern wchar_t sz_B3[64];
 extern HINSTANCE m_hInstResDLL;
 
 // For WinCE Palm, you might want to use this for debugging, since it

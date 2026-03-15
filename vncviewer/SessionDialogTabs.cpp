@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -28,11 +28,11 @@ BOOL CALLBACK DlgProcQuickOptions(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 BOOL CALLBACK DlgProcListen(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcConfig(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 extern bool g_disable_sponsor;
-extern char sz_F1[64];
-extern char sz_F3[64];
-extern char sz_F4[64];
-extern char sz_D1[64];
-extern char sz_D2[64];
+extern wchar_t sz_F1[64];
+extern wchar_t sz_F3[64];
+extern wchar_t sz_F4[64];
+extern wchar_t sz_D1[64];
+extern wchar_t sz_D2[64];
 
 static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData);
 TCHAR* BrowseFolder(TCHAR* saved_path, HWND hwnd);
@@ -47,37 +47,37 @@ void SessionDialog::InitTab(HWND hwnd)
 	m_hTab = GetDlgItem(hwnd, IDC_TAB);
 	TCITEM item;
 	item.mask = TCIF_TEXT;
-	char szTabName[64];
+	wchar_t szTabName[64];
 
-	LoadString(m_hInstResDLL, IDS_TAB_ENCODERS, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_ENCODERS, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 0, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_INPUT, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_INPUT, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 1, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_DISPLAY, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_DISPLAY, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 2, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_MISC, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_MISC, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 3, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_SECURITY, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_SECURITY, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 4, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_QUICKENC, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_QUICKENC, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 5, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_LISTEN, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_LISTEN, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 6, &item);
 
-	LoadString(m_hInstResDLL, IDS_TAB_CONF, szTabName, sizeof(szTabName));
+	LoadStringW(m_hInstResDLL, IDS_TAB_CONF, szTabName, 64);
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 7, &item);
 	// Use m_hInstResDLL for dialog resources (translated dialogs)
@@ -389,8 +389,8 @@ BOOL CALLBACK DlgProcDisplay(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				int it = 0;
 				for (itr = _this->resolutionMap.begin(); itr != _this->resolutionMap.end(); itr++) {
 					if (it == pos) {
-						CHAR temp[250];
-						sprintf_s(temp, "%d x %d", (itr->first).first, (itr->first).second);
+						TCHAR temp[250];
+						_stprintf_s(temp, _T("%d x %d"), (itr->first).first, (itr->first).second);
 						SetDlgItemText(hwnd, IDC_RES, temp);
 						_this->requestedWidth = (itr->first).first;
 						_this->requestedHeight = (itr->first).second;
@@ -506,7 +506,7 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			HWND hplugin = GetDlgItem(hwnd, IDC_PLUGINS_COMBO);
 			EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), enable);
 
-			if (strcmp(_this->szDSMPluginFilename, "") != 0 && enable)
+			if (_tcscmp(_this->szDSMPluginFilename, _T("")) != 0 && enable)
 			{
 				int pos = SendMessage(hplugin, CB_FINDSTRINGEXACT, -1,
 					(LPARAM) & (_this->szDSMPluginFilename[0]));
@@ -536,12 +536,12 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				// different selected plugins...
 				bool fLoadIt = true;
 				char szParams[64];
-				strcpy_s(szParams, sz_F4);
+				WideCharToMultiByte(CP_ACP, 0, sz_F4, -1, szParams, 64, NULL, NULL);
 				// If a plugin is already loaded, check if it is the same that the one
 				// we want to load.
 				if (_this->m_pDSMPlugin->IsLoaded()) {
 					_this->m_pDSMPlugin->DescribePlugin();
-					if (!_stricmp(_this->m_pDSMPlugin->GetPluginFileName(), szPlugin)) {
+					if (!_tcsicmp((LPCTSTR)_this->m_pDSMPlugin->GetPluginFileName(), szPlugin)) {
 						fLoadIt = false;
 						_this->m_pDSMPlugin->SetPluginParams(hwnd, szParams);
 					}
@@ -554,7 +554,7 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 				if (!fLoadIt) return TRUE;
 
-				if (_this->m_pDSMPlugin->LoadPlugin(szPlugin, _this->listening))
+				if (_this->m_pDSMPlugin->LoadPlugin((char*)szPlugin, _this->listening))
 				{
 					// We don't know the password yet... no matter the plugin requires
 					// it or not, we will provide it later (at plugin "real" startup)
@@ -697,11 +697,11 @@ BOOL CALLBACK DlgProcConfig(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_CHECKCONFIG:
 			_this->ReadDlgProcConfig();
 			if (_this->fUseOnlyDefaultConfigFile) {
-				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), "");
+				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), _T(""));
 				_this->LoadFromFile(_this->m_pOpt->getDefaultOptionsFileName());
 			}
 			else {
-				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), _this->customConfigFile);
+				SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), (LPCTSTR)_this->customConfigFile);
 				_this->LoadFromFile(_this->customConfigFile);
 			}
 			return TRUE;
@@ -932,8 +932,8 @@ void SessionDialog::setDisplays()
 		it++;
 	}
 	SendMessage(slider, TBM_SETPOS, true, pos);
-	CHAR temp[250];
-	sprintf_s(temp, "%d x %d", (itr->first).first, (itr->first).second);
+	TCHAR temp[250];
+	_stprintf_s(temp, _T("%d x %d"), (itr->first).first, (itr->first).second);
 	SetDlgItemText(DisplayHwnd, IDC_RES, temp);
 }
 
@@ -1027,13 +1027,13 @@ void SessionDialog::InitDlgProcMisc()
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".png");
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".gif");
 	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".bmp");
-	if (strcmp(imageFormat, ".jpeg") == 0)
+	if (_tcscmp(imageFormat, _T(".jpeg")) == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 0, 0);
-	if (strcmp(imageFormat, ".png") == 0)
+	if (_tcscmp(imageFormat, _T(".png")) == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 1, 0);
-	if (strcmp(imageFormat, ".gif") == 0)
+	if (_tcscmp(imageFormat, _T(".gif")) == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 2, 0);
-	if (strcmp(imageFormat, ".bmp") == 0)
+	if (_tcscmp(imageFormat, _T(".bmp")) == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 3, 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -1043,9 +1043,9 @@ void SessionDialog::InitDlgProcConfig()
 	SetWindowText(GetDlgItem(hwnd, IDC_DEFAULTCONFIG),
 			m_pOpt->getDefaultOptionsFileName());
 	if (fUseOnlyDefaultConfigFile)
-		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), "");
+		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), _T(""));
 	else
-		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), customConfigFile);
+		SetWindowText(GetDlgItem(hwnd, IDC_CUSTOMCONFIG), (LPCTSTR)customConfigFile);
 	HWND hfUseOnlyDefaultConfigFile = GetDlgItem(hwnd, IDC_CHECKCONFIG);
 	SendMessage(hfUseOnlyDefaultConfigFile, BM_SETCHECK, fUseOnlyDefaultConfigFile, 0);
 }
@@ -1074,7 +1074,7 @@ void SessionDialog::InitDlgProcSecurity()
 	HWND hfUseEncryption = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 	SendMessage(hfUseEncryption, BM_SETCHECK, fUseDSMPlugin, 0);
 	SendDlgItemMessage(hwnd, IDC_EDITCUSTOMMESSAGE, EM_SETLIMITTEXT, 244, 0);
-	SetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg);
+	SetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, (LPCTSTR)InfoMsg); 
 	HWND hipv6 = GetDlgItem(hwnd, IDC_IPV6);
 	SendMessage(hipv6, BM_SETCHECK, ipv6, 0);
 }
@@ -1317,7 +1317,7 @@ void SessionDialog::ReadDlgProcSecurity()
 		TCHAR szPlugin[MAX_PATH];
 		GetDlgItemText(hwnd, IDC_PLUGINS_COMBO, szPlugin, MAX_PATH);
 		fUseDSMPlugin = true;
-		strcpy_s(szDSMPluginFilename, szPlugin);
+		_tcscpy_s(szDSMPluginFilename, szPlugin);
 	}
 	else
 		fUseDSMPlugin = false;
@@ -1327,7 +1327,7 @@ void SessionDialog::ReadDlgProcSecurity()
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	restricted = (SendMessage(GetDlgItem(hwnd, IDC_HIDEMENU), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	ipv6 = (SendMessage(GetDlgItem(hwnd, IDC_IPV6), BM_GETCHECK, 0, 0) == BST_CHECKED);
-	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, InfoMsg, 255);
+	GetDlgItemText(hwnd, IDC_EDITCUSTOMMESSAGE, (LPTSTR)InfoMsg, 255);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SessionDialog::ReadDlgProcConfig()
@@ -1343,11 +1343,11 @@ void SessionDialog::ReadDlgProc()
 	HWND hwnd = SessHwnd;
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, MAX_HOST_NAME_LEN);
 	if (ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &m_port)) {
-		for (size_t i = 0, len = strlen(tmphost); i < len; i++)
-			tmphost[i] = toupper(tmphost[i]);
+		for (size_t i = 0, len = _tcslen(tmphost); i < len; i++)
+			tmphost[i] = _totupper(tmphost[i]);
 		_tcscpy_s(m_host_dialog, tmphost);
 	}
-	_tcscpy_s(m_proxyhost, "");
+	_tcscpy_s(m_proxyhost, _T(""));
 	GetDlgItemText(hwnd, IDC_PROXY_EDIT, hostname, MAX_HOST_NAME_LEN);
 	
 	if (SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -1357,27 +1357,27 @@ void SessionDialog::ReadDlgProc()
 	else if (SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_GETCHECK, 0, 0) == BST_CHECKED)
 		m_connectionType = DIRECT_TCP;
 	//adzm 2010-02-15
-	if (strlen(hostname) > 0) {
+	if (_tcslen(hostname) > 0) {
 		TCHAR actualProxy[256];
-		strcpy_s(actualProxy, hostname);
-		if (strncmp(tmphost, "ID", 2) == 0) {
+		_tcscpy_s(actualProxy, hostname);
+		if (_tcsncmp(tmphost, _T("ID"), 2) == 0) {
 			int numericId = m_port;
 			int numberOfHosts = 1;
-			for (int i = 0; i < (int)strlen(hostname); i++) {
+			for (int i = 0; i < (int)_tcslen(hostname); i++) {
 				if (hostname[i] == ';') {
 					numberOfHosts++;
 				}
 			}
 			if (numberOfHosts > 1) {
 				int modulo = numericId % numberOfHosts;
-				char* szToken = strtok(hostname, ";");
-				while (szToken) {
-					if (modulo == 0) {
-						strcpy_s(actualProxy, szToken);
-						break;
-					}
-					modulo--;
-					szToken = strtok(NULL, ";");
+					TCHAR* szToken = _tcstok(hostname, _T(";"));
+					while (szToken) {
+						if (modulo == 0) {
+							_tcscpy_s(actualProxy, szToken);
+							break;
+						}
+						modulo--;
+							szToken = _tcstok(NULL, _T(";"));
 				}
 			}
 		}
@@ -1659,12 +1659,12 @@ void SessionDialog::StartListener()
 	m_pOpt->m_SaveSize = SaveSize;
 	m_pOpt->m_GNOME = GNOME;
 	m_pOpt->m_fUseDSMPlugin = fUseDSMPlugin;
-	strcpy_s(m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
+	_tcscpy_s(m_pOpt->m_szDSMPluginFilename, szDSMPluginFilename);
 	m_pOpt->m_listening = listening;
 	m_pOpt->m_oldplugin = oldplugin;
-	strcpy_s(m_pOpt->m_document_folder, folder);
-	strcpy_s(m_pOpt->m_prefix, prefix);
-	strcpy_s(m_pOpt->m_imageFormat, imageFormat);
+	_tcscpy_s(m_pOpt->m_document_folder, folder);
+	_tcscpy_s(m_pOpt->m_prefix, prefix);
+	_tcscpy_s(m_pOpt->m_imageFormat, imageFormat);
 	m_pOpt->m_scaling = scaling;
 	m_pOpt->m_keepAliveInterval = keepAliveInterval;
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
@@ -1681,18 +1681,18 @@ void SessionDialog::StartListener()
 	m_pOpt->m_giiEnable = giiEnable;
 #endif
 	m_pCC->Save_Latest_Connection();
-	char exePath[255];
+	TCHAR exePath[255];
 	GetModuleFileName(NULL, exePath, 255);
-	size_t exePathLen = strlen(exePath);
+	size_t exePathLen = _tcslen(exePath);
 	for (size_t x = exePathLen; x > 0; x--)
 	{
-		if (exePath[x] == '\\')
+		if (exePath[x] == _T('\\'))
 			break;
 		else
-			exePath[x] = '\0';
+			exePath[x] = _T('\0');
 	}
-	char name[255];
+	TCHAR name[255];
 	GetModuleFileName(NULL, name, 255);
-	ShellExecute(NULL, "open", name, "-listen", exePath, SW_SHOW);
+	ShellExecute(NULL, _T("open"), name, _T("-listen"), exePath, SW_SHOW);
 	exit(1);
 }

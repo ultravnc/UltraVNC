@@ -137,6 +137,6 @@ private:
 	HFONT Font;
 	int MonitorTop;
 
-	void CreateToolTipForRect(HWND hwndParent, HWND hwndTip,char * text);
+	void CreateToolTipForRect(HWND hwndParent, HWND hwndTip, LPTSTR text);
 	VNCOptions* m_opts;
 };

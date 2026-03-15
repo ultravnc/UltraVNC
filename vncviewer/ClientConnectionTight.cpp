@@ -534,7 +534,9 @@ cinfo->src = &jpegSrcManager;
 void JpegErrorHeader(j_common_ptr cinfo) {
     char msg[JMSG_LENGTH_MAX];
     (*cinfo->err->format_message)(cinfo, msg);
-    throw QuietException(msg); 
+    wchar_t wmsg[JMSG_LENGTH_MAX];
+    MultiByteToWideChar(CP_UTF8, 0, msg, -1, wmsg, JMSG_LENGTH_MAX);
+    throw QuietException(wmsg); 
 }
 void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
 {

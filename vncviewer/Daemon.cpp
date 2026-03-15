@@ -25,10 +25,10 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-#define DAEMON_CLASS_NAME "VNCviewer Daemon"
-extern char sz_I1[64];
-extern char sz_I2[64];
-extern char sz_I3[64];
+#define DAEMON_CLASS_NAME _T("VNCviewer Daemon")
+extern wchar_t sz_I1[64];
+extern wchar_t sz_I2[64];
+extern wchar_t sz_I3[64];
 
 Daemon::Daemon(int port, bool ipv6)
 {
@@ -45,7 +45,7 @@ Daemon::Daemon(int port, bool ipv6)
 	wndclass.hIcon			= LoadIcon(NULL, IDI_APPLICATION);
 	wndclass.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(WHITE_BRUSH);
-	wndclass.lpszMenuName	= (const char *) NULL;
+	wndclass.lpszMenuName	= (const TCHAR *) NULL;
 	wndclass.lpszClassName	= DAEMON_CLASS_NAME;
 	wndclass.hIconSm		= LoadIcon(NULL, IDI_APPLICATION);
 
@@ -93,12 +93,10 @@ Daemon::Daemon(int port, bool ipv6)
 			try {
 			int res4 = 0;
 			res4 = bind(m_deamon_sock4, (struct sockaddr*)&addr4, sizeof(addr4));
-			if (res4 == SOCKET_ERROR)
-				throw WarningException(sz_I2);
+			if (res4 == SOCKET_ERROR) throw WarningException(sz_I2);
 
 			res4 = listen(m_deamon_sock4, 5);
-			if (res4 == SOCKET_ERROR)
-				throw WarningException(sz_I3);
+			if (res4 == SOCKET_ERROR) throw WarningException(sz_I3);
 		}
 		catch (...) {
 			closesocket(m_deamon_sock4);
@@ -111,13 +109,11 @@ Daemon::Daemon(int port, bool ipv6)
 			int res6 = 0;
 			res4 = bind(m_deamon_sock4, (struct sockaddr*)&addr4, sizeof(addr4));
 			res6 = bind(m_deamon_sock6, (struct sockaddr*)&addr6, sizeof(addr6));
-			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
-				throw WarningException(sz_I2);
+			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR) throw WarningException(sz_I2);
 
 			res4 = listen(m_deamon_sock4, 5);
 			res6 = listen(m_deamon_sock6, 5);
-			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR)
-				throw WarningException(sz_I3);
+			if (res4 == SOCKET_ERROR && res6 == SOCKET_ERROR) throw WarningException(sz_I3);
 			if (res4 == SOCKET_ERROR)
 			{
 				closesocket(m_deamon_sock4);
@@ -158,12 +154,10 @@ Daemon::Daemon(int port, bool ipv6)
 		try {
 			int res = 0;
 			res = bind(m_deamon_sock, (struct sockaddr*)&addr, sizeof(addr));
-			if (res == SOCKET_ERROR)
-				throw WarningException(sz_I2);
+			if (res == SOCKET_ERROR) throw WarningException(sz_I2);
 
 			res = listen(m_deamon_sock, 5);
-			if (res == SOCKET_ERROR)
-				throw WarningException(sz_I3);
+			if (res == SOCKET_ERROR) throw WarningException(sz_I3);
 		}
 		catch (...) {
 			closesocket(m_deamon_sock);
@@ -226,9 +220,9 @@ if (GetListenMode()){
 	}
 
 	// sf@2003 - Add the port number to the tip
-	char szTmp[16];
-	sprintf_s(szTmp, " - Port:%ld", m_nPort);
-	strcat_s(m_nid.szTip, szTmp);
+	TCHAR szTmp[16];
+	_sntprintf_s(szTmp, _countof(szTmp), _TRUNCATE, _T(" - Port:%ld"), m_nPort);
+	_tcscat_s(m_nid.szTip, _countof(m_nid.szTip), szTmp);
 
 	return (bool) (Shell_NotifyIcon(msg, &m_nid) != 0);
 }

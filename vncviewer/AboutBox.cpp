@@ -118,14 +118,14 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
             extern char buildtime[];
             char isoTime[20];  // Buffer for ISO output
             convertToISO8601(buildtime, isoTime, sizeof(isoTime));
-            SetDlgItemText(hwnd, IDC_BUILDTIME, isoTime);
+            { wchar_t _wt[20]; MultiByteToWideChar(CP_UTF8,0,isoTime,-1,_wt,20); SetDlgItemTextW(hwnd, IDC_BUILDTIME, _wt); }
 
             ConvertStaticToHyperlink(hwnd, IDC_UVNCCOM);
             char version[50]{};
             char title[256]{};
             strcpy_s(title, "UltraVNC Viewer - ");
             strcat_s(title, GetVersionFromResource(version));
-            SetDlgItemText(hwnd, IDC_UVVERSION, title);
+            { wchar_t _wtitle[256]; MultiByteToWideChar(CP_UTF8,0,title,-1,_wtitle,256); SetDlgItemTextW(hwnd, IDC_UVVERSION, _wtitle); }
 
             HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
             SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
@@ -141,7 +141,7 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
 			EndDialog(hwnd, TRUE);
 		}
         if (LOWORD(wParam) == IDC_UVNCCOM) {
-            ShellExecute(GetDesktopWindow(), "open", "https://uvnc.com/", "", 0, SW_SHOWNORMAL);
+            ShellExecute(GetDesktopWindow(), _T("open"), _T("https://uvnc.com/"), _T(""), 0, SW_SHOWNORMAL);
         }
 
 	}

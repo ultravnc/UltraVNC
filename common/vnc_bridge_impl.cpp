@@ -94,14 +94,14 @@ std::string VncBridge::get_machine_id() {
     machine_id += cpu_id;
     
     // Get disk serial number from C: drive
-    char volume_name[MAX_PATH];
-    char file_system[MAX_PATH];
+    wchar_t volume_name[MAX_PATH];
+    wchar_t file_system[MAX_PATH];
     DWORD serial_number = 0;
     DWORD max_component_len = 0;
     DWORD file_system_flags = 0;
     
-    if (GetVolumeInformation(
-        "C:\\",
+    if (GetVolumeInformationW(
+        L"C:\\",
         volume_name, MAX_PATH,
         &serial_number,
         &max_component_len,

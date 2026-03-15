@@ -126,7 +126,7 @@ void CTitleBar::Init()
 	//Create font
 	Font = CreateFont(-MulDiv(tbFontSize, dpi, 72), 0, 0, 0, 0, FALSE, 0, 0, 0, 0, 0, 0, 0, tbFont);
 
-	Text=""; //No text at startup...
+	Text = _T(""); //No text at startup...
 
 	m_hWnd=nullptr;
 
@@ -232,8 +232,8 @@ void CTitleBar::CreateDisplay()
 	::SetWindowRgn(m_hWnd, Range, TRUE); // Added Jef Fix
 
 	//Close button
-	Close=CreateWindow("STATIC",
-				"Close",
+	Close=CreateWindow(_T("STATIC"),
+				_T("Close"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-tbcxPicture, tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_CLOSE,
@@ -241,8 +241,8 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 
 	//Maximize button
-	Maximize=CreateWindow("STATIC",
-				"Maximize",
+	Maximize=CreateWindow(_T("STATIC"),
+				_T("Maximize"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*2)-(tbButtonSpace*1), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MAXIMIZE,
@@ -250,62 +250,62 @@ void CTitleBar::CreateDisplay()
 				nullptr);
 	
 	//Minimize button
-	Minimize=CreateWindow("STATIC",
-				"Minimize",
+	Minimize=CreateWindow(_T("STATIC"),
+				_T("Minimize"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbWidth-tbRightSpace-(tbcxPicture*3)-(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_MINIMIZE,
                 hInstance,
 				nullptr);
 
-	Screen=CreateWindow("STATIC",
-				"Screen",
+	Screen=CreateWindow(_T("STATIC"),
+				_T("Screen"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbLeftSpace + (tbcxPicture*1) +(tbButtonSpace*1), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_SCREEN,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(Screen, ScreenTip, "Scaling: Fit to screen, 1:1");
+	CreateToolTipForRect(Screen, ScreenTip, _T("Scaling: Fit to screen, 1:1"));
 
-	Photo=CreateWindow("BUTTON",
-				"Photo",
+	Photo=CreateWindow(_T("BUTTON"),
+				_T("Photo"),
 				WS_CHILD | WS_VISIBLE | BS_NOTIFY | BS_OWNERDRAW,
                 tbLeftSpace + (tbcxPicture*2) +(tbButtonSpace*2), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_PHOTO,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(Photo, PhotoTip, "Screenshot, double click for settings");
+	CreateToolTipForRect(Photo, PhotoTip, _T("Screenshot, double click for settings"));
 
-	SwitchMonitor=CreateWindow("STATIC",
-				"SwitchMonitor",
+	SwitchMonitor=CreateWindow(_T("STATIC"),
+				_T("SwitchMonitor"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbLeftSpace + (tbcxPicture*3) +(tbButtonSpace*3), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_SWITCHMONITOR,
                 hInstance,
 				nullptr);
-	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, "Switch monitor");
+	CreateToolTipForRect(SwitchMonitor, SwitchMonitorTip, _T("Switch monitor"));
 
-	Chat = CreateWindow("STATIC",
-		"Chat",
+	Chat = CreateWindow(_T("STATIC"),
+		_T("Chat"),
 		WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
 		tbLeftSpace + (tbcxPicture * 4) + (tbButtonSpace * 4), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 		(HMENU)tbIDC_CHAT,
 		hInstance,
 		nullptr);
-	CreateToolTipForRect(Chat, ChatTip, "Start Chat");
+	CreateToolTipForRect(Chat, ChatTip, _T("Start Chat"));
 
-	FT = CreateWindow("STATIC",
-		"FT",
+	FT = CreateWindow(_T("STATIC"),
+		_T("FT"),
 		WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
 		tbLeftSpace + (tbcxPicture * 5) + (tbButtonSpace * 5), tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 		(HMENU)tbIDC_FT,
 		hInstance,
 		nullptr);
-	CreateToolTipForRect(FT, FTTip, "File Transfer");
+	CreateToolTipForRect(FT, FTTip, _T("File Transfer"));
 
 	//Pin button
-	Pin=CreateWindow("STATIC",
-				"Pin",
+	Pin=CreateWindow(_T("STATIC"),
+				_T("Pin"),
 				WS_CHILD | WS_VISIBLE | SS_NOTIFY | SS_OWNERDRAW,
                 tbLeftSpace, tbTopSpace, tbcxPicture, tbcyPicture, m_hWnd,
 				(HMENU)tbIDC_PIN,
@@ -915,7 +915,7 @@ void CTitleBar::MoveToMonitor(HMONITOR hMonitor)
 }
 
 //***************************************************************************************
-void CTitleBar::CreateToolTipForRect(HWND hwndParent, HWND hwndTip, char * text)
+void CTitleBar::CreateToolTipForRect(HWND hwndParent, HWND hwndTip, LPTSTR text)
 {
     hwndTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, 
                                  WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, 

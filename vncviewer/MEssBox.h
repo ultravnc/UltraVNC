@@ -13,4 +13,6 @@
 // Display the about box!
 
 void ShowMessageBox(char *info, int error_nr);
+void ShowMessageBox(const wchar_t *info, int error_nr);
 void ShowMessageBox2(char *info, int error_nr);
+void ShowMessageBox2(const wchar_t *info, int error_nr);

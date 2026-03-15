@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -39,10 +39,10 @@ TCHAR * BrowseFolder(TCHAR * saved_path, HWND hwnd)
 {
     static TCHAR path[MAX_PATH];
 
-    const char * path_param = saved_path;
+    const TCHAR * path_param = saved_path;
 
     BROWSEINFO bi = { 0 };
-    bi.lpszTitle  = ("Browse for folder...");
+    bi.lpszTitle  = _T("Browse for folder...");
     bi.ulFlags    = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
     bi.lpfn       = BrowseCallbackProc;
     bi.lParam     = (LPARAM) path_param;
@@ -73,24 +73,25 @@ std::string datetime()
     TCHAR buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    _tcsftime(buffer,80,"%d-%m-%Y %H-%M-%S",timeinfo);
+    _tcsftime(buffer,80,_T("%d-%m-%Y %H-%M-%S"),timeinfo);
 
 
-
-    return std::string(buffer);
+    char s[80];
+    WideCharToMultiByte(CP_UTF8, 0, buffer, -1, s, sizeof(s), NULL, NULL);
+    return std::string(s);
 }
 
 void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56], TCHAR imageFormat[56])
 {
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
-	if (strlen(m_folder) == 0 || strlen(m_prefix) == 0)
+	if (_tcslen(m_folder) == 0 || _tcslen(m_prefix) == 0)
 		DoDialogSnapshot(m_folder, m_prefix);
 
 	TCHAR filename[MAX_PATH];
 	TCHAR expanded_filename[MAX_PATH];
 	_tcscpy_s(filename, m_folder);
-	_tcscat_s(filename, "\\");
+	_tcscat_s(filename, _T("\\"));
 	_tcscat_s(filename, m_prefix); 
 
 	 time_t rawtime;
@@ -98,8 +99,8 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
     TCHAR buffer[80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    _tcsftime(buffer,80,"%Y%m%d_%H%M%S",timeinfo);
-	_tcscat_s(filename, "_");
+    _tcsftime(buffer,80,_T("%Y%m%d_%H%M%S"),timeinfo);
+	_tcscat_s(filename, _T("_"));
 	_tcscat_s(filename, buffer);
 	_tcscat_s(filename, imageFormat);
 	ExpandEnvironmentStrings(filename, expanded_filename, MAX_PATH);
@@ -111,18 +112,16 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
 	{		
 		Gdiplus::Bitmap bitmap(membit, NULL);
 		CLSID clsid;
-		if (strcmp(imageFormat, ".jpeg") == 0)
+		if (_tcscmp(imageFormat, _T(".jpeg")) == 0)
 			GetEncoderClsid(L"image/jpeg", &clsid);
-		else if (strcmp(imageFormat, ".png") == 0)
+		else if (_tcscmp(imageFormat, _T(".png")) == 0)
 			GetEncoderClsid(L"image/png", &clsid);
-		else if (strcmp(imageFormat, ".gif") == 0)
+		else if (_tcscmp(imageFormat, _T(".gif")) == 0)
 			GetEncoderClsid(L"image/gif", &clsid);
-		else if (strcmp(imageFormat, ".bmp") == 0)
+		else if (_tcscmp(imageFormat, _T(".bmp")) == 0)
 			GetEncoderClsid(L"image/bmp", &clsid);
 
-		WCHAR wc[MAX_PATH];
-		mbstowcs(wc, expanded_filename, MAX_PATH);
-		bitmap.Save(wc, &clsid, NULL);
+		bitmap.Save(expanded_filename, &clsid, NULL);
 	}
 	GdiplusShutdown(gdiplusToken);
 }
@@ -155,8 +154,8 @@ int Snapshot::GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
 Snapshot::Snapshot()
 {
-	_tcscpy_s(m_folder, "");
-	_tcscpy_s(m_prefix, "");
+	_tcscpy_s(m_folder, _T(""));
+	_tcscpy_s(m_prefix, _T(""));
 }
 
 Snapshot::~Snapshot()

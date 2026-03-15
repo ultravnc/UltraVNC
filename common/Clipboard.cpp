@@ -182,8 +182,8 @@ CARD32 ExtendedClipboardDataMessage::GetFlags()
 }
 
 const UINT ClipboardSettings::formatUnicodeText =	CF_UNICODETEXT;
-const UINT ClipboardSettings::formatRTF =			RegisterClipboardFormat("Rich Text Format");
-const UINT ClipboardSettings::formatHTML =			RegisterClipboardFormat("HTML Format");
+const UINT ClipboardSettings::formatRTF =			RegisterClipboardFormatW(L"Rich Text Format");
+const UINT ClipboardSettings::formatHTML =			RegisterClipboardFormatW(L"HTML Format");
 const UINT ClipboardSettings::formatDIB =			CF_DIBV5;
 
 const int ClipboardSettings::defaultLimitText =		((int)0x00A00000); // 10 megabytes uncompressed. Pretty huge, but not a problem for a LAN. Better than the previous no limit, though.
@@ -724,9 +724,9 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 			memStream.clear();
 		}
 
-		m_strLastCutText = "";
+		m_strLastCutText = L"";
 		if (!settings.m_bSupportsEx && clipboardData.m_lengthText > 0 && clipboardData.m_lengthText < settings.m_nLimitText) {			
-			// now we have to translate to UTF-16
+			// Convert UTF-8 to UTF-16 and store directly (no CP_ACP conversion needed)
 			int nConvertedSize = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)clipboardData.m_pDataText, clipboardData.m_lengthText, NULL, 0);
 
 			if (nConvertedSize > 0) {
@@ -735,15 +735,8 @@ bool Clipboard::UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFl
 
 				if (nFinalConvertedSize > 0) {
 					clipStr[nFinalConvertedSize] = L'\0';
-					// Convert UTF-16 to ANSI for legacy clipboard support
-					int nAnsiSize = WideCharToMultiByte(CP_ACP, 0, clipStr, nFinalConvertedSize, NULL, 0, NULL, NULL);
-					if (nAnsiSize > 0) {
-						char* ansiStr = new char[nAnsiSize + 1];
-						WideCharToMultiByte(CP_ACP, 0, clipStr, nFinalConvertedSize, ansiStr, nAnsiSize, NULL, NULL);
-						ansiStr[nAnsiSize] = '\0';
-						m_strLastCutText.assign(ansiStr, nAnsiSize);
-						delete[] ansiStr;
-					}
+					// Store Unicode directly - no CP_ACP conversion, preserves all characters
+					m_strLastCutText.assign(clipStr, nFinalConvertedSize);
 				}
 
 				delete[] clipStr;

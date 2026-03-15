@@ -13,24 +13,25 @@
 #include "Exception.h"
 #include "MEssBox.h"
 
-Exception::Exception(const char *info,int error_nr) : m_error_nr(-1)
+Exception::Exception(const wchar_t *info, int error_nr) : m_error_nr(-1)
 {
 	assert(info != NULL);
-	m_info = new char[strlen(info)+1];
-	strcpy_s(m_info, strlen(info)+1, info);
-    if (error_nr)
-	m_error_nr=error_nr;
+	size_t len = wcslen(info) + 1;
+	m_info = new wchar_t[len];
+	wcscpy_s(m_info, len, info);
+	if (error_nr)
+		m_error_nr = error_nr;
 }
 
 Exception::~Exception()
 {
-	delete [] m_info;
+	delete[] m_info;
 }
 
 // ---------------------------------------
 
 
-QuietException::QuietException(const char *info,int error_nr) : Exception(info,error_nr)
+QuietException::QuietException(const wchar_t *info, int error_nr) : Exception(info, error_nr)
 {
 
 }
@@ -43,13 +44,13 @@ QuietException::~QuietException()
 void QuietException::Report()
 {
 #ifdef _MSC_VER
-	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
+	_RPT1(_CRT_WARN, "Warning : %S\n", GetInfo());
 #endif
 }
 
 // ---------------------------------------
 
-WarningException::WarningException(const char *info,int error_nr, bool close) : Exception(info,error_nr)
+WarningException::WarningException(const wchar_t *info, int error_nr, bool close) : Exception(info, error_nr)
 {
 	m_close = close;
 }
@@ -62,14 +63,14 @@ WarningException::~WarningException()
 void WarningException::Report()
 {
 #ifdef _MSC_VER
-	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
+	_RPT1(_CRT_WARN, "Warning : %S\n", GetInfo());
 #endif
-	ShowMessageBox2(m_info,m_error_nr);
+	ShowMessageBox2(GetInfo(), m_error_nr);
 }
 
 // ---------------------------------------
 
-ErrorException::ErrorException(const char *info,int error_nr) : Exception(info,error_nr)
+ErrorException::ErrorException(const wchar_t *info, int error_nr) : Exception(info, error_nr)
 {
 
 }
@@ -82,7 +83,7 @@ ErrorException::~ErrorException()
 void ErrorException::Report()
 {
 #ifdef _MSC_VER
-	_RPT1(_CRT_WARN, "Warning : %s\n", m_info);
+	_RPT1(_CRT_WARN, "Warning : %S\n", GetInfo());
 #endif
-	ShowMessageBox2(m_info,m_error_nr);
+	ShowMessageBox2(GetInfo(), m_error_nr);
 }

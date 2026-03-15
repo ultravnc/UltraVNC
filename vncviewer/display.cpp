@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -51,7 +51,7 @@ tempdisplayclass::checkmonitors()
 			{
 				EnumDisplayDevices(dd.DeviceName, 0, &ddMon, 0);
 				if (!*ddMon.DeviceString)
-					lstrcpy((char *)ddMon.DeviceString, "Default Monitor");
+					lstrcpyW(ddMon.DeviceString, L"Default Monitor");
 			}
 
 			// get information about the display's position and the current display mode
@@ -59,8 +59,8 @@ tempdisplayclass::checkmonitors()
 			ZeroMemory(&dm, sizeof(dm));
 			dm.dmSize = sizeof(dm);
 			dm.dmDriverExtra=0;
-			if (EnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
-				EnumDisplaySettingsEx((char *)dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
+			if (EnumDisplaySettingsExW((LPCWSTR)dd.DeviceName, ENUM_CURRENT_SETTINGS, &dm, 0) == FALSE)
+				EnumDisplaySettingsExW((LPCWSTR)dd.DeviceName, ENUM_REGISTRY_SETTINGS, &dm, 0);
 			
 
 			// get the monitor handle and workspace
@@ -165,7 +165,7 @@ tempdisplayclass::~tempdisplayclass()
 void
 tempdisplayclass::Init()
 {
-	hUser32= LoadLibraryEx("user32.dll",NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	hUser32= LoadLibraryExW(L"user32.dll",NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	checkmonitors();
 }
 

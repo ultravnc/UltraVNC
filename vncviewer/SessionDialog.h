@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -47,7 +47,7 @@ public:
 	void InitMRU(HWND hwnd);
 	void InitTab(HWND hwnd);
 	void InitLanguage(HWND hwnd);
-	void SwitchLanguage(const char* langCode);
+	void SwitchLanguage(const wchar_t* langCode);
 	int HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam);
 	int HandeleEncodersMessages(HWND hwnd, WPARAM wParam);
 
@@ -145,20 +145,20 @@ public:
 	void SaveConnection(HWND hwnd, bool saveAs);
 	void SettingsFromUI();
 	void SettingsToUI(bool initMruNeeded = true);
-	void SaveToFile(char *fname, bool SaveToFile = false);
-	void saveInt(char *name, int value, char *fname); 
-	void LoadFromFile(char *fname);
+	void SaveToFile(wchar_t *fname, bool SaveToFile = false);
+	void saveInt(wchar_t *name, int value, wchar_t *fname); 
+	void LoadFromFile(wchar_t *fname);
 	void overwriteCommandLine();
-	int readInt(char *name, int defval, char *fname);
-	void getAppData(char * buffer);
-	void IfHostExistLoadSettings(char *filename);
+	int readInt(wchar_t *name, int defval, wchar_t *fname);
+	void getAppData(wchar_t * buffer);
+	void IfHostExistLoadSettings(wchar_t *filename);
 	void SetDefaults();
 	VNCOptions *m_pOpt;
 	void StartListener();
 	void ModeSwitch(HWND hwnd, WPARAM wParam);
 	UINT m_Dpi;
-	char InfoMsg[255]{0};
-	char customConfigFile[_MAX_PATH]{};
+	TCHAR InfoMsg[255]{0};
+	TCHAR customConfigFile[_MAX_PATH]{};
 private:
 	HWND hTabEncoders, hTabKeyboardMouse, hTabDisplay, hTabMisc, hTabSecurity,
 			hTabQuickOptions, hTabListen, hTabConfig;

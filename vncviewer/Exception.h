@@ -16,11 +16,14 @@
 class Exception  
 {
 public:
-	Exception(const char *info, int error_nr = 0);
+	Exception(const wchar_t *info, int error_nr = 0);
 	virtual void Report() = 0;
 	virtual ~Exception();
-	char *m_info;
+	const wchar_t* GetInfo() const { return m_info; }
 	int m_error_nr;
+private:
+	wchar_t* m_info;
+
 };
 
 // This indicates something that the catcher should close 
@@ -28,7 +31,7 @@ public:
 // Report() will display a TRACE message
 class QuietException : public Exception {
 public:
-	QuietException(const char *info, int error_nr = 0);
+	QuietException(const wchar_t *info, int error_nr = 0);
 	virtual void Report();
 	virtual ~QuietException();
 };
@@ -40,7 +43,7 @@ public:
 // Report() will display a message box
 class WarningException : public Exception {
 public:
-	WarningException(const char *info, int error_nr = 0, bool close = true);
+	WarningException(const wchar_t *info, int error_nr = 0, bool close = true);
 	virtual void Report();
 	virtual ~WarningException();
 	bool m_close;
@@ -51,7 +54,7 @@ public:
 // closed.
 class ErrorException : public Exception {
 public:
-	ErrorException(const char *info, int error_nr = 0);
+	ErrorException(const wchar_t *info, int error_nr = 0);
 	virtual void Report();
 	virtual ~ErrorException();
 };

@@ -156,7 +156,7 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 				try {
 					SendClientCutText(unixcontents, strlen(unixcontents));
 				} catch (WarningException &e) {
-					vnclog.Print(0, _T("Exception while sending clipboard text : %s\n"), e.m_info);
+					vnclog.Print(0, _T("Exception while sending clipboard text : %s\n"), e.GetInfo());
 					DestroyWindow(m_hwndcn);
 				}
 				delete [] contents; 
@@ -251,12 +251,12 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
 		ClipboardHolder holder(m_hwndcn);
 
 		if (!holder.m_bIsOpen) {
-			vnclog.Print(2, "UpdateLocalClipboard: Failed to open clipboard! Last error 0x%08x", GetLastError());
+			vnclog.Print(2, _T("UpdateLocalClipboard: Failed to open clipboard! Last error 0x%08x"), GetLastError());
 			delete [] wincontents;
 			return;
         }
         if (! ::EmptyClipboard()) {
-			vnclog.Print(2, "UpdateLocalClipboard: Failed to empty clipboard! Last error 0x%08x", GetLastError());
+			vnclog.Print(2, _T("UpdateLocalClipboard: Failed to empty clipboard! Last error 0x%08x"), GetLastError());
 			delete [] wincontents;
 			return;
         }
@@ -272,7 +272,14 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
 	        lptstrCopy[finalLen - 1] = 0;    // null character 
 	        GlobalUnlock(hglbCopy);          // Place the handle on the clipboard.  
 			
-			m_clipboard.m_strLastCutText = wincontents;
+			// Convert ANSI to Unicode for m_strLastCutText (now std::wstring)
+			int nWideLen = MultiByteToWideChar(CP_ACP, 0, wincontents, -1, NULL, 0);
+			if (nWideLen > 0) {
+				wchar_t* wideStr = new wchar_t[nWideLen];
+				MultiByteToWideChar(CP_ACP, 0, wincontents, -1, wideStr, nWideLen);
+				m_clipboard.m_strLastCutText = wideStr;
+				delete[] wideStr;
+			}
 
 	        SetClipboardData(CF_TEXT, hglbCopy); 
         }
@@ -297,10 +304,9 @@ void ClientConnection::SaveClipboardPreferences()
 			dwClipboardPrefs |= clipHTML;
 		}
 		//ofnInit();
-		vnclog.Print(1, "Saving to %s\n", m_opts->getDefaultOptionsFileName());
 		char buf[32];
 		sprintf_s(buf, "%d", dwClipboardPrefs);
-		WritePrivateProfileString("connection", "ClipboardPrefs", buf, m_opts->getDefaultOptionsFileName());
+		{ char _fn[MAX_PATH]; WideCharToMultiByte(CP_UTF8,0,m_opts->getDefaultOptionsFileName(),-1,_fn,MAX_PATH,NULL,NULL); vnclog.Print(1, _T("Saving to %S\n"), m_opts->getDefaultOptionsFileName()); WritePrivateProfileStringA("connection", "ClipboardPrefs", buf, _fn); }
 	}
 }
 
@@ -309,9 +315,7 @@ bool ClientConnection::LoadClipboardPreferences()
 	omni_mutex_lock l(m_clipMutex);
 	DWORD dwClipboardPrefs = 0;
 //	ofnInit();
-	vnclog.Print(1, "Saving to %s\n", m_opts->getDefaultOptionsFileName());
-	dwClipboardPrefs = clipText | clipRTF | clipHTML;
-	dwClipboardPrefs = GetPrivateProfileInt("connection", "ClipboardPrefs", dwClipboardPrefs, m_opts->getDefaultOptionsFileName());
+	{ char _fn[MAX_PATH]; WideCharToMultiByte(CP_UTF8,0,m_opts->getDefaultOptionsFileName(),-1,_fn,MAX_PATH,NULL,NULL); vnclog.Print(1, _T("Loading from %S\n"), m_opts->getDefaultOptionsFileName()); dwClipboardPrefs = clipText | clipRTF | clipHTML; dwClipboardPrefs = GetPrivateProfileIntA("connection", "ClipboardPrefs", dwClipboardPrefs, _fn); }
 	dwClipboardPrefs |= clipText;
 	if (!(dwClipboardPrefs & clipRTF)) {
 		m_clipboard.settings.m_nLimitRTF = 0;

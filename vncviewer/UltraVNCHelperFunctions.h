@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -26,27 +26,27 @@
 #define UltraVNCHelperFunctions_H__
 #pragma once
 
-extern char str50275[128];
-extern char str50276[128];
-extern char str50277[128];
-extern char str50278[128];
-extern char str50279[128];
-extern char str50280[128];
-extern char str50281[128];
-extern char str50282[128];
-extern char str50283[128];
-extern char str50284[128];
-extern char str50285[128];
-extern char str50286[128];
-extern char str50287[128];
-extern char str50288[128];
-extern char str50289[128];
-extern char str50290[128];
-extern char str50293[128];
-extern char str50294[128];
-extern char str50295[128];
-extern char str50296[128];
-extern char str50297[128];
+extern wchar_t str50275[128];
+extern wchar_t str50276[128];
+extern wchar_t str50277[128];
+extern wchar_t str50278[128];
+extern wchar_t str50279[128];
+extern wchar_t str50280[128];
+extern wchar_t str50281[128];
+extern wchar_t str50282[128];
+extern wchar_t str50283[128];
+extern wchar_t str50284[128];
+extern wchar_t str50285[128];
+extern wchar_t str50286[128];
+extern wchar_t str50287[128];
+extern wchar_t str50288[128];
+extern wchar_t str50289[128];
+extern wchar_t str50290[128];
+extern wchar_t str50293[128];
+extern wchar_t str50294[128];
+extern wchar_t str50295[128];
+extern wchar_t str50296[128];
+extern wchar_t str50297[128];
 
 void loadStrings(HINSTANCE m_hInstResDLL);
 char* GetVersionFromResource(char* version);

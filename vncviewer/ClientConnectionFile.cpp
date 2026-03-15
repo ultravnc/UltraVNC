@@ -25,13 +25,13 @@
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
 
-extern char sz_K1[64];
-extern char sz_K2[64];
-extern char sz_K3[128];
-extern char sz_K4[64];
-extern char sz_K5[64];
-extern char sz_K6[64];
-extern char sz_K7[64];
+extern wchar_t sz_K1[64];
+extern wchar_t sz_K2[64];
+extern wchar_t sz_K3[128];
+extern wchar_t sz_K4[64];
+extern wchar_t sz_K5[64];
+extern wchar_t sz_K6[64];
+extern wchar_t sz_K7[64];
 extern bool config_specified;
 
 // This file contains the code for saving and loading connection info.
@@ -40,8 +40,8 @@ static OPENFILENAME ofn;
 
 void ofnInit()
 {
-	static char filter[] = "VNC files (*.vnc)\0*.vnc\0" \
-						   "All files (*.*)\0*.*\0";
+	static TCHAR filter[] = _T("VNC files (*.vnc)\0*.vnc\0")
+						   _T("All files (*.*)\0*.*\0");
 	memset((void *) &ofn, 0, sizeof(OPENFILENAME));
 
 	// sf@2002 v1.1.1 - OPENFILENAME is Plateforme dependent !
@@ -56,7 +56,7 @@ void ofnInit()
 	ofn.lpstrFilter = filter;
 	ofn.nMaxFile = _MAX_PATH;
 	ofn.nMaxFileTitle = _MAX_FNAME + _MAX_EXT;
-	ofn.lpstrDefExt = "vnc";
+	ofn.lpstrDefExt = _T("vnc");
 }
 
 //
@@ -67,43 +67,42 @@ void ofnInit()
 void ClientConnection::SaveConnection()
 {
 	vnclog.Print(2, _T("Saving connection info\n"));	
-	char fname[_MAX_PATH];
-	char tname[_MAX_FNAME + _MAX_EXT];
+	TCHAR fname[_MAX_PATH];
+	TCHAR tname[_MAX_FNAME + _MAX_EXT];
 	ofnInit();
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf_s(fname, "%.15s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
+	_sntprintf_s(fname, _countof(fname), _TRUNCATE, _T("%.15s-%d.vnc"), m_host, (disp > 0 && disp < 100) ? disp : m_port);
 	ofn.hwndOwner = m_hwndcn;
 	ofn.lpstrFile = fname;
 	ofn.lpstrFileTitle = tname;
 	ofn.Flags = OFN_HIDEREADONLY;
 	if (!GetSaveFileName(&ofn)) {
 		DWORD err = CommDlgExtendedError();
-		char msg[1024]; 
 		switch(err) {
 		case 0:	// user cancelled
 			break;
 		case FNERR_INVALIDFILENAME:
-			strcpy_s(msg, sz_K1);
-			yesUVNCMessageBox(m_hInstResDLL, m_hwndcn, msg, sz_K2, MB_ICONERROR);
+			yesUVNCMessageBox(m_hInstResDLL, m_hwndcn, sz_K1, sz_K2, MB_ICONERROR);
 			break;
 		default:
-			vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
+			vnclog.Print(0, _T("Error %d from GetSaveFileName\n"), err);
 			break;
 		}
 		return;
 	}
-	vnclog.Print(1, "Saving to %s\n", fname);	
+	vnclog.Print(1, _T("Saving to %s\n"), fname);
 
-	int ret = WritePrivateProfileString("connection", "host", m_host, fname);
+	WritePrivateProfileString(_T("connection"), _T("host"), m_host, fname);
 	char buf[32];
-	sprintf_s(buf, "%d", m_port);
-	WritePrivateProfileString("connection", "port", buf, fname);
+	TCHAR bufW[32];
+	_stprintf_s(bufW, _T("%d"), m_port);
+	WritePrivateProfileString(_T("connection"), _T("port"), bufW, fname);
 
-	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
-	sprintf_s(buf, "%d", m_proxyport);
-	WritePrivateProfileString("connection", "proxyport", buf, fname);
+	WritePrivateProfileString(_T("connection"), _T("proxyhost"), m_proxyhost, fname);
+	_stprintf_s(bufW, _T("%d"), m_proxyport);
+	WritePrivateProfileString(_T("connection"), _T("proxyport"), bufW, fname);
 	BOOL bCheckboxChecked;
-	int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndcn, sz_K3, sz_K4, str50287, str50288, "", bCheckboxChecked);
+	int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndcn, sz_K3, sz_K4, str50287, str50288, _T(""), bCheckboxChecked);
 	if (yes)
 	{
 		for (int i = 0; i < MAXPWLEN; i++) {
@@ -111,44 +110,45 @@ void ClientConnection::SaveConnection()
 		}
 	} else
 		buf[0] = '\0';
-	WritePrivateProfileString("connection", "password", buf, fname);
+	// Password uses ANSI API for special encoding
+	char fnameA[_MAX_PATH];
+	WideCharToMultiByte(CP_UTF8, 0, fname, -1, fnameA, _MAX_PATH, NULL, NULL);
+	WritePrivateProfileStringA("connection", "password", buf, fnameA);
 	m_opts->SaveOptions(fname);
 	//m_opts->Register();
 }
 
-void ClientConnection::SaveAllowUntrustedServers()
+	void ClientConnection::SaveAllowUntrustedServers()
 {
-	char buf[10];
-	sprintf_s(buf, "%d", 1);
-	if (m_opts->m_UseOnlyDefaultConfigFile)
-		WritePrivateProfileString("options", "AllowUntrustedServers", buf, m_opts->getDefaultOptionsFileName());
-	else {
-		char fname[_MAX_PATH];
-		char tname[_MAX_FNAME + _MAX_EXT];
+	TCHAR buf[10];
+	_stprintf_s(buf, _T("%d"), 1);
+	if (m_opts->m_UseOnlyDefaultConfigFile) {
+		WritePrivateProfileString(_T("options"), _T("AllowUntrustedServers"), buf, m_opts->getDefaultOptionsFileName());
+	} else {
+		TCHAR fname[_MAX_PATH];
+		TCHAR tname[_MAX_FNAME + _MAX_EXT];
 		ofnInit();
 		int disp = PORT_TO_DISPLAY(m_port);
-		sprintf_s(fname, "%.15s-%d.vnc", m_host, (disp > 0 && disp < 100) ? disp : m_port);
+		_sntprintf_s(fname, _countof(fname), _TRUNCATE, _T("%.15s-%d.vnc"), m_host, (disp > 0 && disp < 100) ? disp : m_port);
 		ofn.hwndOwner = m_hwndcn;
 		ofn.lpstrFile = fname;
 		ofn.lpstrFileTitle = tname;
 		ofn.Flags = OFN_HIDEREADONLY;
 		if (!GetSaveFileName(&ofn)) {
 			DWORD err = CommDlgExtendedError();
-			char msg[1024];
 			switch (err) {
 			case 0:	// user cancelled
 				break;
 			case FNERR_INVALIDFILENAME:
-				strcpy_s(msg, sz_K1);
-				yesUVNCMessageBox(m_hInstResDLL, m_hwndcn, msg, sz_K2, MB_ICONERROR);
+				yesUVNCMessageBox(m_hInstResDLL, m_hwndcn, sz_K1, sz_K2, MB_ICONERROR);
 				break;
 			default:
-				vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
+				vnclog.Print(0, _T("Error %d from GetSaveFileName\n"), err);
 				break;
 			}
 			return;
 		}
-		WritePrivateProfileString("options", "AllowUntrustedServers", buf, fname);
+		WritePrivateProfileString(_T("options"), _T("AllowUntrustedServers"), buf, fname);
 	}
 }
 
@@ -162,36 +162,43 @@ void ClientConnection::Save_Latest_Connection()
 }
 
 // returns zero if successful
-int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool defaultOption)
+int ClientConnection::LoadConnection(const wchar_t *fname, bool fFromDialog, bool defaultOption)
 {
 	// The Connection Profile ".vnc" has been required from Connection Session Dialog Box
 	if (fFromDialog && ! defaultOption) {
-		char tname[_MAX_FNAME + _MAX_EXT];
+		TCHAR tfname[_MAX_PATH];
+		TCHAR tname[_MAX_FNAME + _MAX_EXT];
+		_tcscpy_s(tfname, fname);
 		ofnInit();
 		ofn.hwndOwner = m_hSessionDialog;
-		ofn.lpstrFile = fname;
+		ofn.lpstrFile = tfname;
 		ofn.lpstrFileTitle = tname;
 		ofn.Flags = OFN_HIDEREADONLY;
 		if (GetOpenFileName(&ofn) == 0)
 			return -1;
+		// Update fname pointer to point to tfname for subsequent use
+		fname = tfname;
 	}
 
 	if (!defaultOption) {
-		GetPrivateProfileString("connection", "host", "", m_host, MAX_HOST_NAME_LEN, fname);
-		if ( (m_port = GetPrivateProfileInt("connection", "port", 0, fname)) == 0)
+		GetPrivateProfileString(_T("connection"), _T("host"), _T(""), m_host, MAX_HOST_NAME_LEN, fname);
+		if ( (m_port = GetPrivateProfileInt(_T("connection"), _T("port"), 0, fname)) == 0)
 			return -1;
 	}
 	else {
-		strcpy_s(m_host,"");
+		m_host[0] = _T('\0');
 		m_port = -1;
 	}
-	GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
-	m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
-    m_connectionType = (ConnectionType)GetPrivateProfileInt("options", "UseProxy", DIRECT_TCP, fname);
+	GetPrivateProfileString(_T("connection"), _T("proxyhost"), _T(""), m_proxyhost, MAX_HOST_NAME_LEN, fname);
+	m_proxyport = GetPrivateProfileInt(_T("connection"), _T("proxyport"), 0, fname);
+    m_connectionType = (ConnectionType)GetPrivateProfileInt(_T("options"), _T("UseProxy"), DIRECT_TCP, fname);
 
+	// Password uses ANSI API for special encoding
 	char buf[32];
+	char fnameA[_MAX_PATH];
+	WideCharToMultiByte(CP_UTF8, 0, fname, -1, fnameA, _MAX_PATH, NULL, NULL);
 	m_encPasswd[0] = '\0';
-	if (GetPrivateProfileString("connection", "password", "", buf, 32, fname) > 0) {
+	if (GetPrivateProfileStringA("connection", "password", "", buf, 32, fnameA) > 0) {
 		for (int i = 0; i < MAXPWLEN; i++)	{
 			int x = 0;
 			sscanf_s(buf+i*2, "%2x", &x);
@@ -201,28 +208,30 @@ int ClientConnection::LoadConnection(char *fname, bool fFromDialog, bool default
 	
 	if (fFromDialog)
 		m_opts->LoadOptions(fname);
-	else if (strcmp(m_host, "") == 0 || strcmp(fname, m_opts->getDefaultOptionsFileName())==0 ) {
-		// Load the rest of params 
-		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
-		m_opts->m_proxyport=m_proxyport;
-		m_opts->m_connectionType=m_connectionType;
-		m_opts->LoadOptions(fname);
-		//m_opts->Register();
-		// Then display the session dialog to get missing params again
-		SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
-		if (!sessdlg.DoDialog())
-			QuietException_helper("");
-		_tcsncpy_s(m_host, sessdlg.m_host_dialog, MAX_HOST_NAME_LEN);
-		m_port = sessdlg.m_port;	
-		_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
-		m_proxyport = sessdlg.m_proxyport;
-		m_connectionType = sessdlg.m_connectionType;
-	}
-	else if (config_specified) {
-		strcpy_s(m_opts->m_proxyhost,m_proxyhost);
-		m_opts->m_proxyport=m_proxyport;
-		m_opts->m_connectionType=m_connectionType;
-		m_opts->LoadOptions(fname);
+	else {
+		if (_tcslen(m_host) == 0 || _tcscmp(fname, m_opts->getDefaultOptionsFileName()) == 0) {
+			// Load the rest of params
+			_tcscpy_s(m_opts->m_proxyhost, _countof(m_opts->m_proxyhost), m_proxyhost);
+			m_opts->m_proxyport=m_proxyport;
+			m_opts->m_connectionType=m_connectionType;
+			m_opts->LoadOptions(fname);
+			//m_opts->Register();
+			// Then display the session dialog to get missing params again
+			SessionDialog sessdlg(m_opts, this, m_pDSMPlugin); //sf@2002
+			if (!sessdlg.DoDialog())
+			QuietException_helper(L"");
+			_tcsncpy_s(m_host, MAX_HOST_NAME_LEN, sessdlg.m_host_dialog, _TRUNCATE);
+			m_port = sessdlg.m_port;	
+			_tcsncpy_s(m_proxyhost, MAX_HOST_NAME_LEN, sessdlg.m_proxyhost, _TRUNCATE);
+			m_proxyport = sessdlg.m_proxyport;
+			m_connectionType = sessdlg.m_connectionType;
+		}
+		else if (config_specified) {
+			_tcscpy_s(m_opts->m_proxyhost, _countof(m_opts->m_proxyhost), m_proxyhost);
+			m_opts->m_proxyport=m_proxyport;
+			m_opts->m_connectionType=m_connectionType;
+			m_opts->LoadOptions(fname);
+		}
 	}
 	return 0;
 }

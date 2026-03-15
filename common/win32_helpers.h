@@ -40,6 +40,9 @@ void SafeSetWindowProc(HWND hWnd, LONG_PTR pWndProc);
 
 bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* szHeader, char* body, char* okStr, char* cancelStr, char* checkbox, BOOL& bCheckboxChecked);
 bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader, int icon);
+// Unicode overloads
+bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, wchar_t* szHeader, wchar_t* body, wchar_t* okStr, wchar_t* cancelStr, wchar_t* checkbox, BOOL& bCheckboxChecked);
+bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, wchar_t* body, wchar_t* szHeader, int icon);
 
 void close_handle(HANDLE& h);
 

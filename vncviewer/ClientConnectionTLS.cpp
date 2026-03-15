@@ -88,7 +88,7 @@ struct TLSSession
 	};
 
 	State			state;
-	char			*hostName;
+	wchar_t			*hostName;
 	bool			isServer;
 	PCCERT_CONTEXT	pLocalCert, pRemoteCert;
 	DWORD			contextReq;
@@ -99,7 +99,7 @@ struct TLSSession
 	SecPkgContext_StreamSizes tlsSizes;
 	char			lastError[1024];
 
-	TLSSession() : state(StateNew), hostName(NULL), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
+	TLSSession() : state(StateNew), hostName(nullptr), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
 	{ 
 		SecInvalidateHandle(&hCredentials);
 		SecInvalidateHandle(&hContext);
@@ -135,9 +135,11 @@ struct TLSSession
 			CertFreeCertificateContext(pRemoteCert);
 	}
 
-	void Init(char *_hostName, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
+	void Init(TCHAR *_hostName, bool _isServer = false, PCERT_CONTEXT _pLocalCert = NULL)
 	{
-		hostName = _hostName;
+		static wchar_t wHostName[MAX_HOST_NAME_LEN];
+		if (_hostName) wcsncpy_s(wHostName, _hostName, MAX_HOST_NAME_LEN); else wHostName[0]=0;
+		hostName = wHostName;
 		isServer = _isServer;
 		pLocalCert = _pLocalCert;
 		state = StateHandshakeStart;
@@ -180,15 +182,15 @@ struct TLSSession
 				newCred.pTlsParameters = &params;
 				if (cred.grbitEnabledProtocols)
 					params.grbitDisabledProtocols = ~cred.grbitEnabledProtocols;
-				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
+				hr = AcquireCredentialsHandleW(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
 					&newCred, NULL, NULL, &hCredentials, NULL);
 			}
 			else hr = -1;
 			if (FAILED(hr))
-				hr = AcquireCredentialsHandle(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
+				hr = AcquireCredentialsHandleW(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
 					&cred, NULL, NULL, &hCredentials, NULL);
 			if (FAILED(hr))
-				return SetLastError("AcquireCredentialsHandle failed", hr);
+				return SetLastError("AcquireCredentialsHandleW failed", hr);
 		}
 		bool done = false;
 		while (!done)
@@ -205,7 +207,7 @@ struct TLSSession
 				hr = AcceptSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, pIn, contextReq,
 					SECURITY_NATIVE_DREP, &hContext, &outDesc, &contextAttr, NULL);
 			else
-				hr = InitializeSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, hostName, contextReq, 0,
+				hr = InitializeSecurityContextW(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, hostName, contextReq, 0,
 					SECURITY_NATIVE_DREP, pIn, 0, &hContext, &outDesc, &contextAttr, NULL);
 			if (hr == SEC_E_INCOMPLETE_MESSAGE)
 			{
@@ -214,7 +216,7 @@ struct TLSSession
 			}
 			inbuf.size = 0;
 			if (FAILED(hr))
-				return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContext failed", hr);
+				return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContextW failed", hr);
 			for (DWORD i = 0; i < inDesc.cBuffers; i++)
 			{
 				if (inBuffers[i].cbBuffer > 0 && inBuffers[i].BufferType == SECBUFFER_EXTRA)
@@ -395,10 +397,10 @@ struct TLSSession
 			hr = AcceptSecurityContext(&hCredentials, &hContext, NULL, contextReq,
 					SECURITY_NATIVE_DREP, &hContext, &outDesc, &contextAttr, NULL);
 		else
-			hr = InitializeSecurityContext(&hCredentials, &hContext, hostName, contextReq, 0,
+			hr = InitializeSecurityContextW(&hCredentials, &hContext, hostName, contextReq, 0,
 					SECURITY_NATIVE_DREP, NULL, 0, &hContext, &outDesc, &contextAttr, NULL);
 		if (FAILED(hr))
-			return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContext failed", hr);
+			return SetLastError(isServer ? "AcceptSecurityContext failed" : "InitializeSecurityContextW failed", hr);
 		memset(inBuffers, 0, sizeof(inBuffers));
 		for (DWORD i = 0; i < outDesc.cBuffers; i++)
 		{
@@ -420,7 +422,7 @@ struct TLSSession
 	bool ValidateRemoteCertificate()
 	{
 		bool isvalid = false;
-		std::wstring host = toWide(hostName);
+		std::wstring host = hostName ? hostName : L"";
 		PCCERT_CHAIN_CONTEXT pChainContext = NULL;
 		CERT_CHAIN_PARA chainParams = { 0 };
 		CERT_CHAIN_POLICY_PARA policyPara = { 0 };
@@ -513,11 +515,13 @@ private:
 	{
 		if (hr != S_OK)
 		{
+			wchar_t wmsg[1024];
+			FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, wmsg, _countof(wmsg), NULL);
+			for (int i = (int)wcslen(wmsg) - 1; i >= 0 && !wmsg[i + 1]; i--)
+				if (wmsg[i] == L'\r' || wmsg[i] == L'\n' || wmsg[i] == L'.')
+					wmsg[i] = L'\0';
 			char msg[1024];
-			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, hr, 0, msg, _countof(msg), NULL);
-			for (int i = (int)strlen(msg) - 1; i >= 0 && !msg[i + 1]; i--)
-				if (msg[i] == '\r' || msg[i] == '\n' || msg[i] == '.')
-					msg[i] = '\0';
+			WideCharToMultiByte(CP_ACP, 0, wmsg, -1, msg, sizeof(msg), NULL, NULL);
 			if (error)
 				sprintf_s(lastError, "%s. %s (0x%X)", error, msg, hr);
 			else
@@ -587,7 +591,9 @@ private:
 	static bool SetLastError(char *error)
 	{
 		vnclog.Print(0, _T("TLSPlugin: %s\n"), error);
-		throw WarningException(error);
+		wchar_t werror[256];
+		MultiByteToWideChar(CP_UTF8, 0, error, -1, werror, 256);
+		throw WarningException(werror);
 		return false;
 	}
 };
@@ -611,11 +617,11 @@ struct ThumbHost
 	bool CompareThumbprint(char *hex)
 	{ 
 		TCHAR buf[64] = { 0 };
-		GetPrivateProfileString(ThumbprintSection, key, NULL, buf, sizeof(buf), fname);
-		return _tcscmp(hex, buf) == 0;
+		GetPrivateProfileString(ThumbprintSection, key, NULL, buf, _countof(buf), fname);
+		return _tcscmp((LPCTSTR)hex, buf) == 0;
 	}
 	
-	void SaveThumbprint(char *hex) { WritePrivateProfileString(ThumbprintSection, key, hex, fname); }
+	void SaveThumbprint(char *hex) { WritePrivateProfileString(ThumbprintSection, key, (LPCTSTR)hex, fname); }
 };
 
 static bool GetCertificateThumbprint(PCCERT_CONTEXT pCert, char *hex, int hexsize)
@@ -636,7 +642,9 @@ void ClientConnection::AuthVeNCrypt()
 	auto SetLastError = [](char *error)
 	{
 		vnclog.Print(0, _T("AuthVeNCrypt: %s\n"), error);
-		throw WarningException(error);
+		wchar_t werror[256];
+		MultiByteToWideChar(CP_UTF8, 0, error, -1, werror, 256);
+		throw WarningException(werror);
 	};
 
 	ReadExact((char *)&version, 2);
@@ -713,7 +721,7 @@ void ClientConnection::AuthVeNCrypt()
 		if (!session.ValidateRemoteCertificate())
 		{
 			TCHAR key[MAX_HOST_NAME_LEN];
-			sprintf_s(key, "%s:%d", m_host, m_port);
+			_stprintf_s(key, MAX_HOST_NAME_LEN, _T("%s:%d"), m_host, m_port);
 			ThumbHost host(key, m_opts->getDefaultOptionsFileName());
 			char hex[64];
 			bool done = false;
@@ -761,7 +769,7 @@ void ClientConnection::AuthVeNCrypt()
 						WriteExact((char *)outbuf.GetHead(), size);
 						outbuf.size = 0;
 					}
-					QuietException_helper("Authentication cancelled");
+					QuietException_helper(L"Authentication cancelled");
 					break;
 				default:
 					if (bPersist)
@@ -788,23 +796,29 @@ void ClientConnection::AuthVeNCrypt()
 	case secTypePlain:
 	case secTypeTLSPlain:
 	case secTypeX509Plain:
-		if (strlen(m_clearPasswd) == 0)
 		{
-			AuthDialog ad;
-			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
-			if (!ad.DoDialog(dtUserPass, m_host, m_port))
-				QuietException_helper("Authentication cancelled");
-			strcpy_s(m_cmdlnUser, ad.m_user);
-			strcpy_s(m_clearPasswd, ad.m_passwd);
+			char _tlsUser[256]={0}, _tlsPasswd[256]={0};
+			if (strlen(m_clearPasswd) == 0)
+			{
+				AuthDialog ad;
+				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+				if (!ad.DoDialog(dtUserPass, m_host, m_port))
+					QuietException_helper(L"Authentication cancelled");
+				strcpy_s(_tlsUser, 256, ad.m_user);
+				strcpy_s(_tlsPasswd, 256, ad.m_passwd);
+			} else {
+				strcpy_s(_tlsUser, 256, m_cmdlnUser);
+				strcpy_s(_tlsPasswd, 256, m_clearPasswd);
+			}
+			temp = (int)strlen(_tlsUser);
+			temp = Swap32IfLE(temp);
+			WriteExact((char *)&temp, 4);
+			temp = (int)strlen(_tlsPasswd);
+			temp = Swap32IfLE(temp);
+			WriteExact((char *)&temp, 4);
+			WriteExact(_tlsUser, (int)strlen(_tlsUser));
+			WriteExact(_tlsPasswd, (int)strlen(_tlsPasswd));
 		}
-		temp = (int)strlen(m_cmdlnUser);
-		temp = Swap32IfLE(temp);
-		WriteExact((char *)&temp, 4);
-		temp = (int)strlen(m_clearPasswd);
-		temp = Swap32IfLE(temp);
-		WriteExact((char *)&temp, 4);
-		WriteExact(m_cmdlnUser, (int)strlen(m_cmdlnUser));
-		WriteExact(m_clearPasswd, (int)strlen(m_clearPasswd));
 		break;
 	default:
 		return SetLastError("Cannot complete sub-type authentication");

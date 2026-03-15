@@ -288,13 +288,50 @@ char* CDSMPlugin::GetPluginParams(void)
 int CDSMPlugin::ListPlugins(HWND hComboBox)
 {
 	// TODO: Log events
-	WIN32_FIND_DATA fd;
+#ifdef UNICODE
+	WIN32_FIND_DATAW fd;
+	HANDLE ff;
+	int fRet = 1;
+	int nFiles = 0;
+	wchar_t szCurrentDir[MAX_PATH];
+
+	if (GetModuleFileNameW(NULL, szCurrentDir, MAX_PATH))
+	{
+		wchar_t* p = wcsrchr(szCurrentDir, L'\\');
+		if (p == NULL)
+			return 0;
+		*p = L'\0';
+	}
+	else
+		return 0;
+	if (wcslen(szCurrentDir) < 1)
+		return 0;
+	if (szCurrentDir[wcslen(szCurrentDir) - 1] != L'\\') wcscat_s(szCurrentDir, L"\\");
+	wcscat_s(szCurrentDir, L"*.dsm"); // The DSMplugin dlls must have this extension
+
+	ff = FindFirstFileW(szCurrentDir, &fd);
+	if (ff == INVALID_HANDLE_VALUE)
+	{
+		// Todo: Log error here
+		return 0;
+	}
+
+	while (fRet != 0)
+	{
+		SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM)(fd.cFileName));
+		nFiles++;
+		fRet = FindNextFile(ff, &fd);
+	}
+
+	FindClose(ff);
+#else
+	WIN32_FIND_DATAA fd;
 	HANDLE ff;
 	int fRet = 1;
 	int nFiles = 0;
 	char szCurrentDir[MAX_PATH];
 
-	if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+	if (GetModuleFileNameA(NULL, szCurrentDir, MAX_PATH))
 	{
 		char* p = strrchr(szCurrentDir, '\\');
 		if (p == NULL)
@@ -305,10 +342,10 @@ int CDSMPlugin::ListPlugins(HWND hComboBox)
 		return 0;
 	if (strlen(szCurrentDir) < 1)
 		return 0;
-    if (szCurrentDir[strlen(szCurrentDir) - 1] != '\\') strcat_s(szCurrentDir, "\\");
-	strcat_s(szCurrentDir, "*.dsm"); // The DSMplugin dlls must have this extension
-	
-	ff = FindFirstFile(szCurrentDir, &fd);
+	if (szCurrentDir[strlen(szCurrentDir) - 1] != '\\') strcat_s(szCurrentDir, MAX_PATH, "\\");
+	strcat_s(szCurrentDir, MAX_PATH, "*.dsm"); // The DSMplugin dlls must have this extension
+
+	ff = FindFirstFileA(szCurrentDir, &fd);
 	if (ff == INVALID_HANDLE_VALUE)
 	{
 		// Todo: Log error here
@@ -317,12 +354,13 @@ int CDSMPlugin::ListPlugins(HWND hComboBox)
 
 	while (fRet != 0)
 	{
-		SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM)(fd.cFileName)); 
+		SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM)(fd.cFileName));
 		nFiles++;
-		fRet = FindNextFile(ff, &fd);
+		fRet = FindNextFileA(ff, &fd);
 	}
 
 	FindClose(ff);
+#endif // UNICODE
 
 	return nFiles;
 }
@@ -360,32 +398,55 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 			//DWORD error=GetLastError();
 			//if (error==2)
 			{
-				if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+#ifdef UNICODE
+				wchar_t szCurrentDir2[MAX_PATH];
+				if (GetModuleFileNameW(NULL, szCurrentDir2, MAX_PATH))
 				{
-					char* p = strrchr(szCurrentDir, '\\');
+					wchar_t* p = wcsrchr(szCurrentDir2, L'\\');
+					*p = L'\0';
+				}
+				wchar_t lpPathBuffer[MAX_PATH];
+				DWORD dwBufSize = MAX_PATH;
+				DWORD dwRetVal;
+				dwRetVal = GetTempPathW(dwBufSize, lpPathBuffer);
+				if (dwRetVal > dwBufSize || (dwRetVal == 0))
+					wcscpy_s(lpPathBuffer, szCurrentDir2);
+
+				strcpy_s(szCurrentDir_szPlugin, MAX_PATH, szCurrentDir);
+				strcat_s(szCurrentDir_szPlugin, MAX_PATH, "\\");
+				strcat_s(szCurrentDir_szPlugin, MAX_PATH, szPlugin);
+
+				char lpPathBufferA[MAX_PATH];
+				wcstombs(lpPathBufferA, lpPathBuffer, MAX_PATH);
+				strcpy_s(szCurrentDir_szDllCopyName, MAX_PATH, lpPathBufferA);
+				strcat_s(szCurrentDir_szDllCopyName, MAX_PATH, szDllCopyName);
+				wchar_t szCurrentDir_szPluginW[MAX_PATH];
+				wchar_t szCurrentDir_szDllCopyNameW[MAX_PATH];
+				MultiByteToWideChar(CP_ACP, 0, szCurrentDir_szPlugin, -1, szCurrentDir_szPluginW, MAX_PATH);
+				MultiByteToWideChar(CP_ACP, 0, szCurrentDir_szDllCopyName, -1, szCurrentDir_szDllCopyNameW, MAX_PATH);
+				fDllCopyCreated = (FALSE != CopyFileW(szCurrentDir_szPluginW, szCurrentDir_szDllCopyNameW, false));
+#else
+				char szCurrentDir2[MAX_PATH];
+				if (GetModuleFileNameA(NULL, szCurrentDir2, MAX_PATH))
+				{
+					char* p = strrchr(szCurrentDir2, '\\');
 					*p = '\0';
 				}
 				char lpPathBuffer[MAX_PATH];
 				DWORD dwBufSize = MAX_PATH;
 				DWORD dwRetVal;
-				dwRetVal = GetTempPath(dwBufSize, lpPathBuffer);
+				dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 				if (dwRetVal > dwBufSize || (dwRetVal == 0))
-				{
-					strcpy_s(lpPathBuffer, szCurrentDir);
-				}
-				else
-				{
+					strcpy_s(lpPathBuffer, MAX_PATH, szCurrentDir2);
 
-				}
+				strcpy_s(szCurrentDir_szPlugin, MAX_PATH, szCurrentDir);
+				strcat_s(szCurrentDir_szPlugin, MAX_PATH, "\\");
+				strcat_s(szCurrentDir_szPlugin, MAX_PATH, szPlugin);
 
-				strcpy_s(szCurrentDir_szPlugin, szCurrentDir);
-				strcat_s(szCurrentDir_szPlugin, "\\");
-				strcat_s(szCurrentDir_szPlugin, szPlugin);
-
-				strcpy_s(szCurrentDir_szDllCopyName, lpPathBuffer);
-				//strcat_s(szCurrentDir_szDllCopyName,"\\");
-				strcat_s(szCurrentDir_szDllCopyName, szDllCopyName);
-				fDllCopyCreated = (FALSE != CopyFile(szCurrentDir_szPlugin, szCurrentDir_szDllCopyName, false));
+				strcpy_s(szCurrentDir_szDllCopyName, MAX_PATH, lpPathBuffer);
+				strcat_s(szCurrentDir_szDllCopyName, MAX_PATH, szDllCopyName);
+				fDllCopyCreated = (FALSE != CopyFileA(szCurrentDir_szPlugin, szCurrentDir_szDllCopyName, false));
+#endif // UNICODE
 			}
 			if (i > 99) break; // Just in case...
 		}
@@ -393,7 +454,7 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 #ifdef _X64
 		if (!IsDll64Bit(m_szDllName)) {
 #ifdef _VIEWER
-			MessageBox(NULL, "plugin has wrong arch (x86)", "UltraVNC - Plugin", MB_ICONSTOP);
+			MessageBoxW(NULL, L"plugin has wrong arch (x86)", L"UltraVNC - Plugin", MB_ICONSTOP);
 #else
 			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
 #endif
@@ -402,52 +463,84 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 #else
 		if (IsDll64Bit(m_szDllName)) {
 #ifdef _VIEWER
-			MessageBox(NULL, "plugin has wrong arch (x64)", "UltraVNC - Plugin", MB_ICONSTOP);
+			MessageBoxW(NULL, L"plugin has wrong arch (x64)", L"UltraVNC - Plugin", MB_ICONSTOP);
 #else
 			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
 #endif
 			return false;
 		}
 #endif
-		m_hPDll = LoadLibrary(m_szDllName);
+#ifdef UNICODE
+		wchar_t m_szDllNameW[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, m_szDllName, -1, m_szDllNameW, MAX_PATH);
+		m_hPDll = LoadLibraryW(m_szDllNameW);
+#else
+		m_hPDll = LoadLibraryA(m_szDllName);
+#endif // UNICODE
 	}
 	else // Use the original plugin dll
 	{
 		ZeroMemory(m_szDllName, 260);
-		m_hPDll = LoadLibrary(szPlugin);
+#ifdef UNICODE
+		wchar_t szPluginW[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, szPlugin, -1, szPluginW, MAX_PATH);
+		m_hPDll = LoadLibraryW(szPluginW);
+#else
+		m_hPDll = LoadLibraryA(szPlugin);
+#endif // UNICODE
 		//Try current PATH
 		if (m_hPDll==NULL)
 		{
-			char szCurrentDir[MAX_PATH]="";
-			char szCurrentDir_szPlugin[MAX_PATH]="";
-			if (GetModuleFileName(NULL, szCurrentDir, MAX_PATH))
+#ifdef UNICODE
+			wchar_t szCurrentDirW[MAX_PATH] = L"";
+			wchar_t szCurrentDir_szPluginW[MAX_PATH] = L"";
+			if (GetModuleFileNameW(NULL, szCurrentDirW, MAX_PATH))
 				{
-					char* p = strrchr(szCurrentDir, '\\');
-					*p = '\0';
+					wchar_t* p = wcsrchr(szCurrentDirW, L'\\');
+					*p = L'\0';
 				}
-			strcpy_s(szCurrentDir_szPlugin,szCurrentDir);
-			strcat_s(szCurrentDir_szPlugin,"\\");
-			strcat_s(szCurrentDir_szPlugin,szPlugin);
+			wcscpy_s(szCurrentDir_szPluginW, MAX_PATH, szCurrentDirW);
+			wcscat_s(szCurrentDir_szPluginW, MAX_PATH, L"\\");
+			wchar_t szPluginW2[MAX_PATH];
+			MultiByteToWideChar(CP_ACP, 0, szPlugin, -1, szPluginW2, MAX_PATH);
+			wcscat_s(szCurrentDir_szPluginW, MAX_PATH, szPluginW2);
 #ifdef _X64
-			if (!IsDll64Bit(szCurrentDir_szPlugin)) {
+			char szCurrentDir_szPluginA[MAX_PATH];
+			wcstombs(szCurrentDir_szPluginA, szCurrentDir_szPluginW, MAX_PATH);
+			if (!IsDll64Bit(szCurrentDir_szPluginA)) {
 #ifdef _VIEWER
-				MessageBox(NULL, "The encryption plugin has wrong arch (x86)", "UltraVNC - Plugin", MB_ICONSTOP);
+				MessageBoxW(NULL, L"The encryption plugin has wrong arch (x86)", L"UltraVNC - Plugin", MB_ICONSTOP);
 #else
 				vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
 #endif
 				return false;
 			}
 #else
-			if (IsDll64Bit(szCurrentDir_szPlugin)) {
+			char szCurrentDir_szPluginA2[MAX_PATH];
+			wcstombs(szCurrentDir_szPluginA2, szCurrentDir_szPluginW, MAX_PATH);
+			if (IsDll64Bit(szCurrentDir_szPluginA2)) {
 #ifdef _VIEWER
-				MessageBox(NULL, "The encryption plugin has wrong arch (x64)", "UltraVNC - Plugin", MB_ICONSTOP);
+				MessageBoxW(NULL, L"The encryption plugin has wrong arch (x64)", L"UltraVNC - Plugin", MB_ICONSTOP);
 #else
 			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
 #endif
 				return false;
 			}
 #endif
-			m_hPDll = LoadLibrary(szCurrentDir_szPlugin);
+			m_hPDll = LoadLibraryW(szCurrentDir_szPluginW);
+#else
+			char szCurrentDirA[MAX_PATH] = "";
+			char szCurrentDir_szPluginA[MAX_PATH] = "";
+			if (GetModuleFileNameA(NULL, szCurrentDirA, MAX_PATH))
+				{
+					char* p = strrchr(szCurrentDirA, '\\');
+					*p = '\0';
+				}
+			strcpy_s(szCurrentDir_szPluginA, MAX_PATH, szCurrentDirA);
+			strcat_s(szCurrentDir_szPluginA, MAX_PATH, "\\");
+			strcat_s(szCurrentDir_szPluginA, MAX_PATH, szPlugin);
+			m_hPDll = LoadLibraryA(szCurrentDir_szPluginA);
+#endif // UNICODE
 		}
 	}
 
@@ -481,8 +574,16 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 		m_PConfig == NULL)
 	{
 #ifndef SC_20
-		FreeLibrary(m_hPDll); 
-		if (*m_szDllName) DeleteFile(m_szDllName);
+		FreeLibrary(m_hPDll);
+		if (*m_szDllName) {
+#ifdef UNICODE
+			wchar_t szDllNameW[MAX_PATH];
+			MultiByteToWideChar(CP_ACP, 0, m_szDllName, -1, szDllNameW, MAX_PATH);
+			DeleteFileW(szDllNameW);
+#else
+			DeleteFileA(m_szDllName);
+#endif // UNICODE
+		}
 #endif // SC_20
 		return false;
 	}
@@ -512,7 +613,15 @@ bool CDSMPlugin::UnloadPlugin(void)
 		bool fFreed = false;
 #ifndef SC_20
 		fFreed = (FALSE != FreeLibrary(m_hPDll));
-		if (*m_szDllName) DeleteFile(m_szDllName);
+		if (*m_szDllName) {
+#ifdef UNICODE
+			wchar_t szDllNameW[MAX_PATH];
+			MultiByteToWideChar(CP_ACP, 0, m_szDllName, -1, szDllNameW, MAX_PATH);
+			DeleteFileW(szDllNameW);
+#else
+			DeleteFileA(m_szDllName);
+#endif // UNICODE
+		}
 #endif // SC_20
 		return fFreed;
 	}

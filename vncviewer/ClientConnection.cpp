@@ -78,11 +78,11 @@ extern HINSTANCE m_hInstResDLL;
 #define SESSION_MRU_KEY_NAME _T("Software\\ORL\\VNCviewer\\MRU")
 
 
-const UINT FileTransferSendPacketMessage = RegisterWindowMessage("UltraVNC.Viewer.FileTransferSendPacketMessage");
+const UINT FileTransferSendPacketMessage = RegisterWindowMessage(_T("UltraVNC.Viewer.FileTransferSendPacketMessage"));
 extern bool g_passwordfailed;
 bool havetobekilled=false;
 bool forcedexit=false;
-const UINT RebuildToolbarMessage = RegisterWindowMessage("UltraVNC.Viewer.RebuildToolbar");
+const UINT RebuildToolbarMessage = RegisterWindowMessage(_T("UltraVNC.Viewer.RebuildToolbar"));
 extern bool g_ConnectionLossAlreadyReported;
 extern bool paintbuzy;
 extern HWND hFTWnd;
@@ -123,107 +123,107 @@ const rfbPixelFormat vnc32bitFormat			= {32,24,0,1,255,255,255,0,8,16, 0, 0};
 
 //static LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 extern HWND currentHWND;
-extern char sz_L1[64];
-extern char sz_L2[64];
-extern char sz_L3[64];
-extern char sz_L4[64];
-extern char sz_L5[64];
-extern char sz_L6[64];
-extern char sz_L7[64];
-extern char sz_L8[64];
-extern char sz_L9[64];
-extern char sz_L10[64];
-extern char sz_L11[64];
-extern char sz_L12[64];
-extern char sz_L13[64];
-extern char sz_L14[64];
-extern char sz_L15[64];
-extern char sz_L16[64];
-extern char sz_L17[64];
-extern char sz_L18[64];
-extern char sz_L19[64];
-extern char sz_L20[64];
-extern char sz_L21[64];
-extern char sz_L22[64];
-extern char sz_L23[64];
-extern char sz_L24[64];
-extern char sz_L25[64];
-extern char sz_L26[64];
-extern char sz_L27[64];
-extern char sz_L28[64];
-extern char sz_L29[64];
-extern char sz_L30[64];
-extern char sz_L31[64];
-extern char sz_L32[64];
-extern char sz_L33[64];
-extern char sz_L34[64];
-extern char sz_L35[64];
-extern char sz_L36[64];
-extern char sz_L37[64];
-extern char sz_L38[64];
-extern char sz_L39[64];
-extern char sz_L40[64];
-extern char sz_L41[64];
-extern char sz_L42[64];
-extern char sz_L43[64];
-extern char sz_L44[64];
-extern char sz_L45[64];
-extern char sz_L46[64];
-extern char sz_L47[64];
-extern char sz_L48[64];
-extern char sz_L49[64];
-extern char sz_L50[64];
-extern char sz_L51[128];
-extern char sz_L52[64];
-extern char sz_L53[64];
-extern char sz_L54[64];
-extern char sz_L55[64];
-extern char sz_L56[64];
-extern char sz_L57[64];
-extern char sz_L58[64];
-extern char sz_L59[64];
-extern char sz_L60[64];
-extern char sz_L61[64];
-extern char sz_L62[64];
-extern char sz_L63[64];
-extern char sz_L64[64];
-extern char sz_L65[64];
-extern char sz_L66[64];
-extern char sz_L67[64];
-extern char sz_L68[64];
-extern char sz_L69[64];
-extern char sz_L70[64];
-extern char sz_L71[64];
-extern char sz_L72[64];
-extern char sz_L73[64];
-extern char sz_L74[64];
-extern char sz_L75[64];
-extern char sz_L76[64];
-extern char sz_L77[128];
-extern char sz_L78[64];
-extern char sz_L79[64];
-extern char sz_L80[64];
-extern char sz_L81[128];
-extern char sz_L82[64];
-extern char sz_L83[64];
-extern char sz_L84[64];
-extern char sz_L85[64];
-extern char sz_L86[64];
-extern char sz_L87[64];
-extern char sz_L88[64];
-extern char sz_L89[64];
-extern char sz_L90[64];
-extern char sz_L91[64];
-extern char sz_L92[64];
-extern char sz_L93[64];
-extern char sz_L94[64];
+extern wchar_t sz_L1[64];
+extern wchar_t sz_L2[64];
+extern wchar_t sz_L3[64];
+extern wchar_t sz_L4[64];
+extern wchar_t sz_L5[64];
+extern wchar_t sz_L6[64];
+extern wchar_t sz_L7[64];
+extern wchar_t sz_L8[64];
+extern wchar_t sz_L9[64];
+extern wchar_t sz_L10[64];
+extern wchar_t sz_L11[64];
+extern wchar_t sz_L12[64];
+extern wchar_t sz_L13[64];
+extern wchar_t sz_L14[64];
+extern wchar_t sz_L15[64];
+extern wchar_t sz_L16[64];
+extern wchar_t sz_L17[64];
+extern wchar_t sz_L18[64];
+extern wchar_t sz_L19[64];
+extern wchar_t sz_L20[64];
+extern wchar_t sz_L21[64];
+extern wchar_t sz_L22[64];
+extern wchar_t sz_L23[64];
+extern wchar_t sz_L24[64];
+extern wchar_t sz_L25[64];
+extern wchar_t sz_L26[64];
+extern wchar_t sz_L27[64];
+extern wchar_t sz_L28[64];
+extern wchar_t sz_L29[64];
+extern wchar_t sz_L30[64];
+extern wchar_t sz_L31[64];
+extern wchar_t sz_L32[64];
+extern wchar_t sz_L33[64];
+extern wchar_t sz_L34[64];
+extern wchar_t sz_L35[64];
+extern wchar_t sz_L36[64];
+extern wchar_t sz_L37[64];
+extern wchar_t sz_L38[64];
+extern wchar_t sz_L39[64];
+extern wchar_t sz_L40[64];
+extern wchar_t sz_L41[64];
+extern wchar_t sz_L42[64];
+extern wchar_t sz_L43[64];
+extern wchar_t sz_L44[64];
+extern wchar_t sz_L45[64];
+extern wchar_t sz_L46[64];
+extern wchar_t sz_L47[64];
+extern wchar_t sz_L48[64];
+extern wchar_t sz_L49[64];
+extern wchar_t sz_L50[64];
+extern wchar_t sz_L51[128];
+extern wchar_t sz_L52[64];
+extern wchar_t sz_L53[64];
+extern wchar_t sz_L54[64];
+extern wchar_t sz_L55[64];
+extern wchar_t sz_L56[64];
+extern wchar_t sz_L57[64];
+extern wchar_t sz_L58[64];
+extern wchar_t sz_L59[64];
+extern wchar_t sz_L60[64];
+extern wchar_t sz_L61[64];
+extern wchar_t sz_L62[64];
+extern wchar_t sz_L63[64];
+extern wchar_t sz_L64[64];
+extern wchar_t sz_L65[64];
+extern wchar_t sz_L66[64];
+extern wchar_t sz_L67[64];
+extern wchar_t sz_L68[64];
+extern wchar_t sz_L69[64];
+extern wchar_t sz_L70[64];
+extern wchar_t sz_L71[64];
+extern wchar_t sz_L72[64];
+extern wchar_t sz_L73[64];
+extern wchar_t sz_L74[64];
+extern wchar_t sz_L75[64];
+extern wchar_t sz_L76[64];
+extern wchar_t sz_L77[128];
+extern wchar_t sz_L78[64];
+extern wchar_t sz_L79[64];
+extern wchar_t sz_L80[64];
+extern wchar_t sz_L81[128];
+extern wchar_t sz_L82[64];
+extern wchar_t sz_L83[64];
+extern wchar_t sz_L84[64];
+extern wchar_t sz_L85[64];
+extern wchar_t sz_L86[64];
+extern wchar_t sz_L87[64];
+extern wchar_t sz_L88[64];
+extern wchar_t sz_L89[64];
+extern wchar_t sz_L90[64];
+extern wchar_t sz_L91[64];
+extern wchar_t sz_L92[64];
+extern wchar_t sz_L93[64];
+extern wchar_t sz_L94[64];
 
-extern char sz_F1[64];
-extern char sz_F5[128];
-extern char sz_F6[64];
+extern wchar_t sz_F1[64];
+extern wchar_t sz_F5[128];
+extern wchar_t sz_F6[64];
 extern bool command_line;
 
-void ClientConnection::QuietException_helper(const char* info)
+void ClientConnection::QuietException_helper(const wchar_t* info)
 {
 	// Stop the viewer-side bridge thread if it's running
 	if (m_bridge_running && m_bridge) {
@@ -293,7 +293,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 			if (svraddr.ss_family == AF_INET) {
 				struct sockaddr_in* s = (struct sockaddr_in*)&svraddr;
 				m_port = ntohs(s->sin_port);
-				_snprintf_s(m_host, 250, _T("%u.%u.%u.%u"),
+				_sntprintf_s(m_host, _countof(m_host), _TRUNCATE, _T("%u.%u.%u.%u"),
 					(unsigned int)s->sin_addr.S_un.S_un_b.s_b1,
 					(unsigned int)s->sin_addr.S_un.S_un_b.s_b2,
 					(unsigned int)s->sin_addr.S_un.S_un_b.s_b3,
@@ -304,7 +304,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 #undef Byte
 				struct sockaddr_in6* s = (struct sockaddr_in6*)&svraddr;
 				m_port = ntohs(s->sin6_port);
-				_snprintf_s(m_host, 250, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
+				_sntprintf_s(m_host, _countof(m_host), _TRUNCATE, _T("%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x"),
 					s->sin6_addr.u.Byte[0],
 					s->sin6_addr.u.Byte[1],
 					s->sin6_addr.u.Byte[2],
@@ -333,7 +333,7 @@ ClientConnection::ClientConnection(VNCviewerApp *pApp, SOCKET sock)
 		int sasize = sizeof(svraddr);
 		if (getpeername(sock, (struct sockaddr*)&svraddr,
 			&sasize) != SOCKET_ERROR) {
-			_snprintf_s(m_host, 250, _T("%u.%u.%u.%u"),
+			_sntprintf_s(m_host, _countof(m_host), _TRUNCATE, _T("%u.%u.%u.%u"),
 				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b1,
 				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b2,
 				(unsigned int)svraddr.sin_addr.S_un.S_un_b.s_b3,
@@ -563,7 +563,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_DIBbitsCache=NULL;
 	m_membitmap=NULL;
 	m_BigToolbar=false;
-	strcpy_s(m_proxyhost,"");
+	m_proxyhost[0] = _T('\0');
 	KillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	KillUpdateThreadEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
 	newtick=0;
@@ -587,10 +587,10 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_SavedAreaBIB=NULL;
     m_bClosedByUser = false;
     m_server_wants_keepalives = false;
-	hbmToolbig = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarbig.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolsmall = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarsmall.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolbigX = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarbigx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-	hbmToolsmallX = (HBITMAP)LoadImage(m_hInstResDLL, "tlbarsmallx.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolbig = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarbig.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmall = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarsmall.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolbigX = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarbigx.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+	hbmToolsmallX = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarsmallx.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	rcth=NULL;
 
 	// adzm - 2010-07 - Extended clipboard
@@ -730,12 +730,12 @@ void ClientConnection::Run()
 	}
 
 	// add user option on command line
-	if ( (strlen(	m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
-		strcpy_s(m_cmdlnUser, m_pApp->m_options.m_cmdlnUser);
+	if ( (strlen(m_pApp->m_options.m_cmdlnUser) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword) // Fix by Act
+		strncpy_s(m_cmdlnUser, _countof(m_cmdlnUser), m_pApp->m_options.m_cmdlnUser, _TRUNCATE);
 
 	// Modif sf@2002 - bit of a hack...and unsafe
-	if ( (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
-		strcpy_s(m_clearPasswd, m_pApp->m_options.m_clearPassword);
+	if ( (strlen(m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), m_pApp->m_options.m_clearPassword, _TRUNCATE);
 
 	if (saved_set)
 	{
@@ -786,14 +786,14 @@ void ClientConnection::DoConnection(bool reconnect)
 			if (somethingwrong_counter > 50) break;
 		}
 		if (m_hwndStatus)
-			SetDlgItemText(m_hwndStatus, IDC_PLUGIN_STATUS, "Encryption**");
+			SetDlgItemText(m_hwndStatus, IDC_PLUGIN_STATUS, _T("Encryption**"));
 		if (m_hwndStatus) 
 			UpdateWindow(m_hwndStatus);
 	}
 	havetobekilled=true;
 	// Connect if we're not already connected
 	if (m_sock == INVALID_SOCKET) {
-		if (strcmp(m_proxyhost, "") != 0 && m_connectionType == REPEATER_SERVER)
+		if (_tcslen(m_proxyhost) > 0 && m_connectionType == REPEATER_SERVER)
 			ConnectProxy();
 		else if (m_connectionType == UDP_BRIDGE)
 			ConnectBridge();
@@ -806,7 +806,7 @@ void ClientConnection::DoConnection(bool reconnect)
 	SetDSMPluginStuff(); // The Plugin is now activated BEFORE the protocol negociation
 						 // so ALL the communication data travel through the DSMPlugin
 
-	if (strcmp(m_proxyhost,"")!=0 && m_connectionType == REPEATER_SERVER)
+	if (_tcscmp(m_proxyhost,_T(""))!=0 && m_connectionType == REPEATER_SERVER)
 		NegotiateProxy();
 
 	NegotiateProtocolVersion();
@@ -918,7 +918,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{12,ID_BUTTON_DESKTOP,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,12},
 			{13,ID_BUTTON_TEXTCHAT,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,13},
 		};
-		static char *szTips[14] =
+		static wchar_t*szTips[14] =
 		{
 				sz_L2,
 				sz_L3,
@@ -1097,9 +1097,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		GetClientRect(m_hwndTB,&tbrect);
 		GetClientRect(m_hwndTBwin,&wrect);
 
-		m_hwndTT = CreateWindow(
-			TOOLTIPS_CLASS,
-			(LPSTR)NULL,
+		m_hwndTT = CreateWindowW(
+			TOOLTIPS_CLASSW,
+			NULL,
 			TTS_ALWAYSTIP,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -1122,7 +1122,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				ti.hwnd = m_hwndTB;
 				ti.hinst = m_hInstResDLL;
 				ti.uId = (UINT) id;
-				ti.lpszText = (LPSTR) szTips[id++];
+				ti.lpszText = (LPTSTR) szTips[id++];
 				ti.rect.left = col * buttonWidth;
 				ti.rect.top = row * buttonHeight;
 				ti.rect.right = ti.rect.left + buttonWidth;
@@ -1155,7 +1155,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{7,ID_BUTTON_END,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,7},
 			{8,ID_BUTTON_DBUTTON,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,8},
 		};
-		static char *szTips[9] =
+		static wchar_t *szTips[9] =
 		{
 			sz_L2,
 				sz_L3,
@@ -1227,9 +1227,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 		GetClientRect(m_hwndTB,&tbrect);
 		GetClientRect(m_hwndTBwin,&wrect);
 
-		m_hwndTT = CreateWindow(
-			TOOLTIPS_CLASS,
-			(LPSTR)NULL,
+		m_hwndTT = CreateWindowW(
+			TOOLTIPS_CLASSW,
+			NULL,
 			TTS_ALWAYSTIP,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -1253,7 +1253,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				ti.hwnd = m_hwndTB;
 				ti.hinst = m_hInstResDLL;
 				ti.uId = (UINT) id;
-				ti.lpszText = (LPSTR) szTips[id++];
+				ti.lpszText = (LPTSTR) szTips[id++];
 				ti.rect.left = col * buttonWidth;
 				ti.rect.top = row * buttonHeight;
 				ti.rect.right = ti.rect.left + buttonWidth;
@@ -1386,36 +1386,36 @@ void ClientConnection::GTGBS_CreateToolbar()
 
 	///////////////////////////////////////////////////
 	m_logo_wnd = CreateWindow(
-									"combobox",
-									"",
-									WS_CHILD | WS_VISIBLE | WS_TABSTOP|CBS_SIMPLE | CBS_AUTOHSCROLL | WS_VSCROLL,
-									clr.right - clr.left-45-70,
-									4,
-									70,
-									28,
-									m_hwndTBwin,
-									(HMENU)9999,
-									m_hInstResDLL,
-									NULL);
+								_T("combobox"),
+								_T(""),
+								WS_CHILD | WS_VISIBLE | WS_TABSTOP|CBS_SIMPLE | CBS_AUTOHSCROLL | WS_VSCROLL,
+								clr.right - clr.left-45-70,
+								4,
+								70,
+								28,
+								m_hwndTBwin,
+								(HMENU)9999,
+								m_hInstResDLL,
+								NULL);
 	m_button_wnd = CreateWindow(
-									"button",
-									"",
-									WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
-									clr.right - clr.left-45-70-200,
-									4,
-									20,
-									20,
-									m_hwndTBwin,
-									(HMENU)9998,
-									m_hInstResDLL,
-									NULL);
+								_T("button"),
+								_T(""),
+								WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP,
+								clr.right - clr.left-45-70-200,
+								4,
+								20,
+								20,
+								m_hwndTBwin,
+								(HMENU)9998,
+								m_hInstResDLL,
+								NULL);
 	TCHAR valname[256];
 	MRU *m_pMRU;
 	m_pMRU = new MRU(SESSION_MRU_KEY_NAME,98);
 	//adzm 2009-06-21 - show the proxy in the 'recent' box
-	if (m_connectionType == REPEATER_SERVER && strlen(m_proxyhost) > 0) {
+	if (m_connectionType == REPEATER_SERVER && _tcslen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
-		_snprintf_s(proxyname, MAX_HOST_NAME_LEN-1, "%s:%li (%s:%li)", m_host, m_port, m_proxyhost, m_proxyport);
+		_sntprintf_s(proxyname, MAX_HOST_NAME_LEN, _TRUNCATE, _T("%s:%li (%s:%li)"), m_host, m_port, m_proxyhost, m_proxyport);
 		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
 	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
@@ -1523,7 +1523,7 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_DBUTTON,	sz_L18);
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_SW, "Take Snapshot  \tCtrl+Alt+Shift+S");
+		AppendMenu(hsysmenu, MF_STRING, ID_SW, L"Take Snapshot  \tCtrl+Alt+Shift+S");
 		// AppendMenu(hsysmenu, MF_STRING, ID_BUTTON,	_T("Show Toolbar Buttons"));
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		AppendMenu(hsysmenu, MF_STRING, ID_DINPUT,	sz_L19); // disable remote input
@@ -1539,66 +1539,66 @@ void ClientConnection::CreateDisplay()
 
 		m_hPopupMenuClipboard = CreatePopupMenu();
 		{
-			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_ENABLE_CLIPBOARD,		"Enable Automatic Synchronization");
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_ENABLE_CLIPBOARD,		_T("Enable Automatic Synchronization"));
 			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
 
 			m_hPopupMenuClipboardFormats = CreatePopupMenu();
 			{
-				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_TEXT,		"Text (Unicode)");
-				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_RTF,		"Rich Text (RTF)");
-				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_HTML,		"HTML");
-				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_DIB,		"Image (Send or Request only)");
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_TEXT,		_T("Text (Unicode)"));
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_RTF,		_T("Rich Text (RTF)"));
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_HTML,		_T("HTML"));
+				AppendMenu(m_hPopupMenuClipboardFormats, MF_STRING, ID_CLIPBOARD_DIB,		_T("Image (Send or Request only)"));
 			}
-			AppendMenu(m_hPopupMenuClipboard, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboardFormats, "Automatically Synchronized Formats");
+			AppendMenu(m_hPopupMenuClipboard, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboardFormats, _T("Automatically Synchronized Formats"));
 			AppendMenu(m_hPopupMenuClipboard, MF_SEPARATOR, NULL, NULL);
-			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_SEND,		"Send All Formats Now...");
-			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_RECV,		"Request All Formats Now...");
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_SEND,		_T("Send All Formats Now..."));
+			AppendMenu(m_hPopupMenuClipboard, MF_STRING, ID_CLIPBOARD_RECV,		_T("Request All Formats Now..."));
 		}
-		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboard, "Clipboard");
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuClipboard, _T("Clipboard"));
 
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		m_hPopupMenuDisplay = CreatePopupMenu();
 		{
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FULLSCREEN,		sz_L24);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FULLSCREEN,		_T("Full Screen"));
 			AppendMenu(m_hPopupMenuDisplay, MF_SEPARATOR, NULL, NULL);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_AUTOSCALING,		sz_L25);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_AUTOSCALING,		_T("Auto Scaling"));
 			// Modif sf@2002
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_HALFSCREEN,		sz_L26);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FUZZYSCREEN,		sz_L27);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_NORMALSCREEN2,	sz_L28);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_HALFSCREEN,		_T("Half Screen"));
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_FUZZYSCREEN,		_T("Fuzzy Screen"));
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_NORMALSCREEN2,	_T("Normal Screen"));
 			AppendMenu(m_hPopupMenuDisplay, MF_SEPARATOR, NULL, NULL);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_MAXCOLORS,		sz_L29);
-			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_256COLORS,		sz_L30);
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_MAXCOLORS,		_T("Max Colors"));
+			AppendMenu(m_hPopupMenuDisplay, MF_STRING, ID_256COLORS,		_T("256 Colors"));
 		}
-		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuDisplay, "Display");
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuDisplay, _T("Display"));
 
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 		m_hPopupMenuKeyboard = CreatePopupMenu();
 		{
- 			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLALTDEL,	sz_L31);
-			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLESC,		sz_L32);
-			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLDOWN,	sz_L33);
-			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLUP,		sz_L34);
-			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTDOWN,	sz_L35);
-			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTUP,		sz_L36);
+ 			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLALTDEL,	_T("Ctrl+Alt+Del"));
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLESC,		_T("Ctrl+Esc"));
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLDOWN,	_T("Ctrl+Down"));
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_CTLUP,		_T("Ctrl+Up"));
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTDOWN,	_T("Alt+Down"));
+			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTUP,		_T("Alt+Up"));
 		}
-		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuKeyboard, "Keyboard");
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuKeyboard, _T("Keyboard"));
 
 		// group connection options together
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, IDC_OPTIONBUTTON,	sz_L21);
-		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ABOUT,		sz_L22);
-		AppendMenu(hsysmenu, MF_STRING, ID_REQUEST_REFRESH,	sz_L23);
+		AppendMenu(hsysmenu, MF_STRING, IDC_OPTIONBUTTON,	_T("Options"));
+		AppendMenu(hsysmenu, MF_STRING, ID_CONN_ABOUT,		_T("About"));
+		AppendMenu(hsysmenu, MF_STRING, ID_REQUEST_REFRESH,	_T("Request Refresh"));
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_NEWCONN,			sz_L37);
+		AppendMenu(hsysmenu, MF_STRING, ID_NEWCONN,			_T("New Connection"));
 		AppendMenu(hsysmenu, MF_STRING | (m_serverInitiated ? MF_GRAYED : 0),
-			ID_CONN_SAVE_AS,	sz_L38);
+			ID_CONN_SAVE_AS,	_T("Save As"));
 	}
     AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-	AppendMenu(hsysmenu, MF_STRING, IDD_APP_ABOUT,		sz_L39);
+	AppendMenu(hsysmenu, MF_STRING, IDD_APP_ABOUT,		_T("About"));
 	if (m_opts->m_listening) {
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
-		AppendMenu(hsysmenu, MF_STRING, ID_CLOSEDAEMON, sz_L40);
+		AppendMenu(hsysmenu, MF_STRING, ID_CLOSEDAEMON, _T("Close Daemon"));
 	}
 	DrawMenuBar(m_hwndMain);
 	TheAccelKeys.SetWindowHandle(m_opts->m_NoHotKeys ? 0 : m_hwndMain);
@@ -1626,7 +1626,7 @@ void ClientConnection::WatchClipboard()
 	//m_initialClipboardSeen = false;
 	m_settingClipboardViewer = true;
 	m_hwndNextViewer = SetClipboardViewer(m_hwndcn);
-	vnclog.Print(6, "SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x", m_hwndcn, m_hwndNextViewer, GetLastError());
+	vnclog.Print(6, _T("SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x"), m_hwndcn, m_hwndNextViewer, GetLastError());
 	m_settingClipboardViewer = false;
 
 }
@@ -1715,7 +1715,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 
 		if (!m_pDSMPlugin->IsLoaded())
 		{
-			m_pDSMPlugin->LoadPlugin(m_opts->m_szDSMPluginFilename, m_opts->m_listening);
+			{ char _plug[MAX_PATH]; WideCharToMultiByte(CP_UTF8,0,m_opts->m_szDSMPluginFilename,-1,_plug,MAX_PATH,NULL,NULL); m_pDSMPlugin->LoadPlugin(_plug, m_opts->m_listening); }
 			if (m_pDSMPlugin->IsLoaded())
 			{
 				if (m_pDSMPlugin->InitPlugin())
@@ -1776,10 +1776,10 @@ void ClientConnection::SetDSMPluginStuff()
 				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 				if (ad.DoDialog(dtPass,m_host,m_port))
 				{
-					strncpy_s(m_clearPasswd, ad.m_passwd,254);
+					strncpy_s(m_clearPasswd, _countof(m_clearPasswd), ad.m_passwd, 254);
 				}
 			}
-			strcpy_s(szParams, m_clearPasswd);
+			strcpy_s(szParams, sizeof(szParams), m_clearPasswd);
 		}
 		else
 			strcpy_s(szParams, "NoPassword");
@@ -1973,14 +1973,18 @@ void ClientConnection::ConnectBridge()
 	if (!m_opts->m_NoStatus && !m_hwndStatus)
 		GTGBS_ShowConnectWindow();
 
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Validating discovery code..."); Sleep(100); }
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Validating discovery code...")); Sleep(100); }
 	
-	std::string discovery_code = m_host;
+	char _mhostA[250]; WideCharToMultiByte(CP_UTF8,0,m_host,-1,_mhostA,250,NULL,NULL);
+	std::string discovery_code = _mhostA;
 	
 	// Use VncBridge validation functions
 	if (!VncBridge::validate_discovery_code(discovery_code)) {
 		std::string error = VncBridge::get_validation_error(discovery_code);
-		std::string full_error = "Invalid Discovery Code\n" + error;
+		std::wstring full_error = L"Invalid Discovery Code\n";
+		wchar_t error_wide[256];
+		MultiByteToWideChar(CP_UTF8, 0, error.c_str(), -1, error_wide, 256);
+		full_error += error_wide;
 		throw WarningException(full_error.c_str());
 	}
 	
@@ -1988,28 +1992,28 @@ void ClientConnection::ConnectBridge()
 	discovery_code = VncBridge::normalize_discovery_code(discovery_code);
 
 	
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Discovery code validated successfully"); Sleep(100); }
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Discovery code validated successfully")); Sleep(100); }
 
 	
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Starting embedded bridge..."); Sleep(100); }
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Starting embedded bridge...")); Sleep(100); }
 	
 	try {
 		// Create VNC Bridge instance
 		m_bridge = std::make_unique<VncBridge>("client", discovery_code);
 		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge created, starting client thread..."); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Bridge created, starting client thread...")); Sleep(100); }
 		
 		// Start bridge thread
 		m_bridge_running = true;
 		m_bridge_thread = std::make_unique<std::thread>([this]() {
 			try {
 				m_bridge->run_client_mode();
-			} catch (const std::exception& e) {
+			} catch (const std::exception&) {
 				m_bridge_running = false;
 			}
 		});
 		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Bridge thread started, waiting for UDP tunnel..."); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Bridge thread started, waiting for UDP tunnel...")); Sleep(100); }
 		
 		// Wait for bridge to establish UDP tunnel (up to 30 seconds)
 		int wait_count = 0;
@@ -2018,8 +2022,8 @@ void ClientConnection::ConnectBridge()
 			Sleep(500);
 			wait_count++;
 			if (m_hwndStatus && (wait_count % 4 == 0)) {
-				char status[128];
-				sprintf_s(status, "Waiting for UDP tunnel... (%d/%d sec)", wait_count / 2, max_wait / 2);
+				wchar_t status[128];
+				_snwprintf_s(status, 128, _TRUNCATE, L"Waiting for UDP tunnel... (%d/%d sec)", wait_count / 2, max_wait / 2);
 				SetDlgItemText(m_hwndStatus, IDC_STATUS, status);
 			}
 		}
@@ -2033,15 +2037,15 @@ void ClientConnection::ConnectBridge()
 			throw std::runtime_error("UDP tunnel connection timed out after 30 seconds");
 		}
 		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "UDP tunnel established! Connecting to bridge..."); Sleep(500); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("UDP tunnel established! Connecting to bridge...")); Sleep(500); }
 		
 		// Give the TCP server a moment to start after connection
 		Sleep(1000);
 		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, "Connecting to bridge on localhost:5901..."); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Connecting to bridge on localhost:5901...")); Sleep(100); }
 		
 		// Connect to the bridge's TCP port
-		strcpy_s(m_host, "127.0.0.1");
+		_tcscpy_s(m_host, _countof(m_host), _T("127.0.0.1"));
 		m_port = 5901;
 		
 		// Call the regular Connect method to connect to the bridge
@@ -2066,14 +2070,22 @@ void ClientConnection::ConnectBridge()
 		
 		// If user cancelled, throw quietly
 		if (Pressed_Cancel) {
-			throw QuietException("Connection cancelled");
+			throw QuietException(L"Connection cancelled");
 		}
 		
-		std::string error_msg = "Failed to start embedded bridge:\n\n";
-		error_msg += e.what();
-		error_msg += "\n\nPlease use the external bridge client:\n";
-		error_msg += "vnc_bridge client \"" + discovery_code + "\"\n\n";
-		error_msg += "Then connect VNC viewer to localhost:5901";
+		std::wstring error_msg = L"Failed to start embedded bridge:\n\n";
+		char what_buf[512];
+		strncpy_s(what_buf, e.what(), _TRUNCATE);
+		wchar_t what_wide[512];
+		MultiByteToWideChar(CP_UTF8, 0, what_buf, -1, what_wide, 512);
+		error_msg += what_wide;
+		error_msg += L"\n\nPlease use the external bridge client:\n";
+		error_msg += L"vnc_bridge client \"";
+		wchar_t dc_wide[256];
+		MultiByteToWideChar(CP_UTF8, 0, discovery_code.c_str(), -1, dc_wide, 256);
+		error_msg += dc_wide;
+		error_msg += L"\"\n\n";
+		error_msg += L"Then connect VNC viewer to localhost:5901";
 		throw WarningException(error_msg.c_str());
 	}
 }
@@ -2086,50 +2098,52 @@ void ClientConnection::Connect()
 		struct sockaddr_in Ipv4Addr;
 		memset(&Ipv6Addr, 0, sizeof(Ipv6Addr));
 		memset(&Ipv4Addr, 0, sizeof(Ipv4Addr));
-		struct addrinfo hint, * info = 0;
-		memset(&hint, 0, sizeof(hint));
 
 		LPSOCKADDR sockaddr_ip;
 		char ipstringbuffer[46];
 		DWORD ipbufferlength = 46;
 
+		// Unicode variables for GetAddrInfoW
+		ADDRINFOW hintW, *infoW = NULL;
+		memset(&hintW, 0, sizeof(hintW));
 
-		//test if m_host is a IPv4 or IPv6 ip address
-		hint.ai_family = AF_UNSPEC;
-		hint.ai_flags = AI_NUMERICHOST;
-		if (getaddrinfo(m_host, 0, &hint, &info) == 0)
+		//test if m_host is a IPv4 or IPv6 ip address - using Unicode APIs
+		hintW.ai_family = AF_UNSPEC;
+		hintW.ai_flags = AI_NUMERICHOST;
+		
+		if (GetAddrInfoW(m_host, NULL, &hintW, &infoW) == 0)
 		{
-			if (info->ai_family == AF_INET6)
+			if (infoW->ai_family == AF_INET6)
 			{
 				IsIpv6 = true;
-				inet_pton(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
+				InetPtonW(AF_INET6, m_host, &(Ipv6Addr.sin6_addr));
 				Ipv6Addr.sin6_family = AF_INET6;
 				Ipv6Addr.sin6_port = htons(m_port);
 			}
-			if (info->ai_family == AF_INET)
+			if (infoW->ai_family == AF_INET)
 			{
 				IsIpv4 = true;
-				inet_pton(AF_INET, m_host, &(Ipv4Addr.sin_addr));
+				InetPtonW(AF_INET, m_host, &(Ipv4Addr.sin_addr));
 				Ipv4Addr.sin_family = AF_INET;
 				Ipv4Addr.sin_port = htons(m_port);
 			}
+			FreeAddrInfoW(infoW);
 		}
-		freeaddrinfo(info);
 		// Use dns to find the corresponding ip address
 		// It can be IPv4 IPv6 or both
 		if (!IsIpv4 && !IsIpv6)
 		{
-			struct addrinfo* serverinfo = 0;
-			memset(&hint, 0, sizeof(hint));
-			hint.ai_family = AF_UNSPEC;
-			hint.ai_socktype = SOCK_STREAM;
-			hint.ai_protocol = IPPROTO_TCP;
+			ADDRINFOW *serverinfoW = NULL;
+			memset(&hintW, 0, sizeof(hintW));
+			hintW.ai_family = AF_UNSPEC;
+			hintW.ai_socktype = SOCK_STREAM;
+			hintW.ai_protocol = IPPROTO_TCP;
 			struct sockaddr_in6* pIpv6Addr;
 			struct sockaddr_in* pIpv4Addr;
-			if (getaddrinfo(m_host, 0, &hint, &serverinfo) == 0)
+			if (GetAddrInfoW(m_host, NULL, &hintW, &serverinfoW) == 0)
 			{
-				struct addrinfo* p;
-				for (p = serverinfo; p != NULL; p = p->ai_next) {
+				ADDRINFOW* p;
+				for (p = serverinfoW; p != NULL; p = p->ai_next) {
 					switch (p->ai_family) {
 					case AF_INET:
 						IsIpv4 = true;
@@ -2148,18 +2162,15 @@ void ClientConnection::Connect()
 						sockaddr_ip = (LPSOCKADDR)p->ai_addr;
 						ipbufferlength = 46;
 						memset(ipstringbuffer, 0, 46);
-						WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
+							WSAAddressToStringA(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 
 						break;
 					default:
 						break;
 					}
-
-
 				}
-
+				FreeAddrInfoW(serverinfoW);
 			}
-			freeaddrinfo(serverinfo);
 		}
 
 		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
@@ -2170,33 +2181,33 @@ void ClientConnection::Connect()
 			escapecounter++;
 			if (escapecounter > 50) break;
 		}
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
 		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
 
 		if (!IsIpv4 && !IsIpv6)
 		{
 			SetEvent(KillEvent);
-			if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+			if (m_hwndStatus) SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L46);
 			throw WarningException(sz_L46, IDS_L46);
 		}
 		if (IsIpv6 && IsIpv4)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %hs\nIPv6: %hs \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv6)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %hs \n", ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv4)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %hs \n", inet_ntoa(Ipv4Addr.sin_addr));
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 
 		if (IsIpv6)
@@ -2204,15 +2215,15 @@ void ClientConnection::Connect()
 			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
 			m_sock = socket(PF_INET6, SOCK_STREAM, 0);
 			if (m_sock == INVALID_SOCKET && !IsIpv4) {
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44);
 				throw WarningException(sz_L44);
 			}
 			if (m_sock != INVALID_SOCKET)
 			{
 				int res;
-				char			szText[256];
-				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L47);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+				wchar_t			szText[256];
+				_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %s \n", sz_L47);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
 				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
@@ -2233,23 +2244,21 @@ void ClientConnection::Connect()
 					vnclog.Print(0, _T("socket error %i\n"), a);
 					if (a == 6)
 						Sleep(5000);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48);
 					SetEvent(KillEvent);
-					if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-					else QuietException_helper(sz_L48);
+					if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48); else QuietException_helper(sz_L48);
 				}
 				if (res != SOCKET_ERROR)
 				{
 					vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_host);
 					if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 					if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 					return;
 				}
-				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
-				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
-
+				_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %s \n", sz_L48);
+				if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 			}
 		}
 		if (IsIpv4)
@@ -2258,16 +2267,14 @@ void ClientConnection::Connect()
 			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
 			m_sock = socket(PF_INET, SOCK_STREAM, 0);
 			if (m_sock == INVALID_SOCKET) {
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44);
 				throw WarningException(sz_L44);
 			}
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s \n", sz_L47);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %s \n", sz_L47);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
-			if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
-
 			DWORD				  threadID;
 			if (ThreadSocketTimeout)
 			{
@@ -2285,14 +2292,13 @@ void ClientConnection::Connect()
 				vnclog.Print(0, _T("socket error %i\n"), a);
 				if (a == 6)
 					Sleep(5000);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48);
 				SetEvent(KillEvent);
-				if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48);
-				else QuietException_helper(sz_L48);
+				if (!Pressed_Cancel) throw WarningException(sz_L48, IDS_L48); else QuietException_helper(sz_L48);
 			}
 			vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_host);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		}
@@ -2300,53 +2306,44 @@ void ClientConnection::Connect()
 	else {
 		struct sockaddr_in thataddr;
 		int res;
-		if (!m_opts->m_NoStatus && !m_hwndStatus)
-			GTGBS_ShowConnectWindow();
-		if (m_sock != 0 && m_sock != INVALID_SOCKET)
-			closesocket(m_sock);
+		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
+
 		m_sock = socket(PF_INET, SOCK_STREAM, 0);
-		if (m_hwndStatus)
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
-		if (m_sock == INVALID_SOCKET) {
-			if (m_hwndStatus)
-				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
-			throw WarningException(sz_L44);
-		}
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L43);
+		if (m_sock == INVALID_SOCKET) { 
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44); 
+			throw WarningException(sz_L44); }
 
 
-		if (m_hwndStatus) {
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
-			UpdateWindow(m_hwndStatus);
-		}
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L45);
+		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 
 		// The host may be specified as a dotted address "a.b.c.d"
 		// Try that first
-		thataddr.sin_addr.s_addr = inet_addr(m_host);
+		char _mhost2[250]; WideCharToMultiByte(CP_UTF8,0,m_host,-1,_mhost2,250,NULL,NULL);
+		thataddr.sin_addr.s_addr = inet_addr(_mhost2);
 
 		// If it wasn't one of those, do gethostbyname
 		if (thataddr.sin_addr.s_addr == INADDR_NONE) {
 			LPHOSTENT lphost;
-			lphost = gethostbyname(m_host);
+			lphost = gethostbyname(_mhost2);
 
-			if (lphost == NULL)
-			{
+			if (lphost == NULL) {
+				//if(myDialog!=0)DestroyWindow(myDialog);
 				SetEvent(KillEvent);
-				if (m_hwndStatus)
-					SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
-				throw WarningException(sz_L46, IDS_L46);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L46);
+				throw WarningException(sz_L46);
 			};
 			thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
 		};
 
-		if (m_hwndStatus) {
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
-			ShowWindow(m_hwndStatus, SW_SHOW);
-			UpdateWindow(m_hwndStatus);
-			SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
-		}
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L47);
+		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
+		if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_port, FALSE);
 		thataddr.sin_family = AF_INET;
 		thataddr.sin_port = htons(m_port);
-		///Force break after timeout
+
 		DWORD				  threadID;
 		if (ThreadSocketTimeout)
 		{
@@ -2356,28 +2353,17 @@ void ClientConnection::Connect()
 			ThreadSocketTimeout = NULL;
 		}
 		ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
-		res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
 
-		if (res == SOCKET_ERROR) {
-			int a = WSAGetLastError();
-			vnclog.Print(0, _T("socket error %i\n"), a);
-			if (a == 6)
-				Sleep(5000);
-			if (m_hwndStatus)
-				SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
-			SetEvent(KillEvent);
-			if (!Pressed_Cancel)
-				throw WarningException(sz_L48, IDS_L48);
-			else
-				QuietException_helper(sz_L48);
+		res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
+		if (res == SOCKET_ERROR) { 
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48); 
+			throw WarningException(sz_L48, IDS_L48); 
 		}
 		vnclog.Print(0, _T("Connected to %s port %d\n"), m_host, m_port);
-		if (m_hwndStatus) {
-			SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-			SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_host);
-			ShowWindow(m_hwndStatus, SW_SHOW);
-			UpdateWindow(m_hwndStatus);
-		}
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_host);
+		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
+		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 	}
 }
 
@@ -2398,42 +2384,46 @@ void ClientConnection::ConnectProxy()
 		DWORD ipbufferlength = 46;
 
 
-		//test if m_host is a IPv4 or IPv6 ip address
-		hint.ai_family = AF_UNSPEC;
-		hint.ai_flags = AI_NUMERICHOST;
-		if (getaddrinfo(m_proxyhost, 0, &hint, &info) == 0)
+		// Unicode variables for GetAddrInfoW
+		ADDRINFOW hintW, *infoW = NULL;
+		memset(&hintW, 0, sizeof(hintW));
+
+		//test if m_proxyhost is a IPv4 or IPv6 ip address - using Unicode APIs
+		hintW.ai_family = AF_UNSPEC;
+		hintW.ai_flags = AI_NUMERICHOST;
+		if (GetAddrInfoW(m_proxyhost, NULL, &hintW, &infoW) == 0)
 		{
-			if (info->ai_family == AF_INET6)
+			if (infoW->ai_family == AF_INET6)
 			{
 				IsIpv6 = true;
-				inet_pton(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
+				InetPtonW(AF_INET6, m_proxyhost, &(Ipv6Addr.sin6_addr));
 				Ipv6Addr.sin6_family = AF_INET6;
 				Ipv6Addr.sin6_port = htons(m_proxyport);
 			}
-			if (info->ai_family == AF_INET)
+			if (infoW->ai_family == AF_INET)
 			{
 				IsIpv4 = true;
-				inet_pton(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
+				InetPtonW(AF_INET, m_proxyhost, &(Ipv4Addr.sin_addr));
 				Ipv4Addr.sin_family = AF_INET;
 				Ipv4Addr.sin_port = htons(m_proxyport);
 			}
+			FreeAddrInfoW(infoW);
 		}
-		freeaddrinfo(info);
 		// Use dns to find the corresponding ip address
 		// It can be IPv4 IPv6 or both
 		if (!IsIpv4 && !IsIpv6)
 		{
-			struct addrinfo* serverinfo = 0;
-			memset(&hint, 0, sizeof(hint));
-			hint.ai_family = AF_UNSPEC;
-			hint.ai_socktype = SOCK_STREAM;
-			hint.ai_protocol = IPPROTO_TCP;
+			ADDRINFOW *serverinfoW = NULL;
+			memset(&hintW, 0, sizeof(hintW));
+			hintW.ai_family = AF_UNSPEC;
+			hintW.ai_socktype = SOCK_STREAM;
+			hintW.ai_protocol = IPPROTO_TCP;
 			struct sockaddr_in6* pIpv6Addr;
 			struct sockaddr_in* pIpv4Addr;
-			if (getaddrinfo(m_proxyhost, 0, &hint, &serverinfo) == 0)
+			if (GetAddrInfoW(m_proxyhost, NULL, &hintW, &serverinfoW) == 0)
 			{
-				struct addrinfo* p;
-				for (p = serverinfo; p != NULL; p = p->ai_next) {
+				ADDRINFOW* p;
+				for (p = serverinfoW; p != NULL; p = p->ai_next) {
 					switch (p->ai_family) {
 					case AF_INET:
 						IsIpv4 = true;
@@ -2452,18 +2442,15 @@ void ClientConnection::ConnectProxy()
 						sockaddr_ip = (LPSOCKADDR)p->ai_addr;
 						ipbufferlength = 46;
 						memset(ipstringbuffer, 0, 46);
-						WSAAddressToString(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
+						WSAAddressToStringA(sockaddr_ip, (DWORD)p->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength);
 
 						break;
 					default:
 						break;
 					}
-
-
 				}
-
+				FreeAddrInfoW(serverinfoW);
 			}
-			freeaddrinfo(serverinfo);
 		}
 
 		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
@@ -2474,33 +2461,33 @@ void ClientConnection::ConnectProxy()
 			escapecounter++;
 			if (escapecounter > 50) break;
 		}
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L43); Sleep(100); }
+		if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L45); Sleep(100); }
 		if (m_hwndStatus) UpdateWindow(m_hwndStatus);
 
 		if (!IsIpv4 && !IsIpv6)
 		{
 			SetEvent(KillEvent);
-			if (m_hwndStatus) SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
-			throw WarningException(sz_L46, IDS_L46);
+			if (m_hwndStatus) SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L46);
+			throw WarningException(sz_L46);
 		}
 		if (IsIpv6 && IsIpv4)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s\nIPv6: %s \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %hs\nIPv6: %hs \n", inet_ntoa(Ipv4Addr.sin_addr), ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv6)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv6: %s \n", ipstringbuffer);
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %hs \n", ipstringbuffer);
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 		else if (IsIpv4)
 		{
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s \n", inet_ntoa(Ipv4Addr.sin_addr));
-			if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %hs \n", inet_ntoa(Ipv4Addr.sin_addr));
+			if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 		}
 
 		if (IsIpv6)
@@ -2508,15 +2495,15 @@ void ClientConnection::ConnectProxy()
 			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
 			m_sock = socket(PF_INET6, SOCK_STREAM, 0);
 			if (m_sock == INVALID_SOCKET && !IsIpv4) {
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44);
 				throw WarningException(sz_L44);
 			}
 			if (m_sock != INVALID_SOCKET)
 			{
 				int res;
-				char			szText[256];
-				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L47);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+				wchar_t			szText[256];
+				_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %s \n", sz_L47);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
 				if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 				if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 				if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_proxyport, FALSE);
@@ -2533,20 +2520,20 @@ void ClientConnection::ConnectProxy()
 				res = connect(m_sock, (LPSOCKADDR)&Ipv6Addr, sizeof(Ipv6Addr));
 				if (res == SOCKET_ERROR && !IsIpv4)
 				{
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48);
 					throw WarningException(sz_L48, IDS_L48);
 				}
 				if (res != SOCKET_ERROR)
 				{
 					vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
 					if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 					if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 					return;
 				}
-				_snprintf_s(szText, 256, "IPv6: %s \n", sz_L48);
-				if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
+				_snwprintf_s(szText, 256, _TRUNCATE, L"IPv6: %s \n", sz_L48);
+				if (m_hwndStatus) { SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText); Sleep(100); }
 
 			}
 		}
@@ -2556,12 +2543,12 @@ void ClientConnection::ConnectProxy()
 			if (m_sock != NULL && m_sock != INVALID_SOCKET) closesocket(m_sock);
 			m_sock = socket(PF_INET, SOCK_STREAM, 0);
 			if (m_sock == INVALID_SOCKET) {
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44);
 				throw WarningException(sz_L44);
 			}
-			char			szText[256];
-			_snprintf_s(szText, 256, "IPv4: %s \n", sz_L47);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, szText);
+			wchar_t			szText[256];
+			_snwprintf_s(szText, 256, _TRUNCATE, L"IPv4: %s \n", sz_L47);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 			if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_proxyport, FALSE);
@@ -2579,13 +2566,13 @@ void ClientConnection::ConnectProxy()
 
 			if (res == SOCKET_ERROR)
 			{
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48);
 				throw WarningException(sz_L48, IDS_L48);
 			}
 
 			vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
 			if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 			if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		}
@@ -2596,32 +2583,35 @@ void ClientConnection::ConnectProxy()
 		if (!m_opts->m_NoStatus && !m_hwndStatus) GTGBS_ShowConnectWindow();
 
 		m_sock = socket(PF_INET, SOCK_STREAM, 0);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L43);
-		if (m_sock == INVALID_SOCKET) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L44); throw WarningException(sz_L44); }
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L43);
+		if (m_sock == INVALID_SOCKET) { 
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L44); 
+			throw WarningException(sz_L44); }
 
 
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L45);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L45);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 
 		// The host may be specified as a dotted address "a.b.c.d"
 		// Try that first
-		thataddr.sin_addr.s_addr = inet_addr(m_proxyhost);
+		char _mproxyA[250]; WideCharToMultiByte(CP_UTF8,0,m_proxyhost,-1,_mproxyA,250,NULL,NULL);
+		thataddr.sin_addr.s_addr = inet_addr(_mproxyA);
 
 		// If it wasn't one of those, do gethostbyname
 		if (thataddr.sin_addr.s_addr == INADDR_NONE) {
 			LPHOSTENT lphost;
-			lphost = gethostbyname(m_proxyhost);
+			lphost = gethostbyname(_mproxyA);
 
 			if (lphost == NULL) {
 				//if(myDialog!=0)DestroyWindow(myDialog);
 				SetEvent(KillEvent);
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L46);
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L46);
 				throw WarningException(sz_L46);
 			};
 			thataddr.sin_addr.s_addr = ((LPIN_ADDR)lphost->h_addr)->s_addr;
 		};
 
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L47);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L47);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 		if (m_hwndStatus)SetDlgItemInt(m_hwndStatus, IDC_PORT, m_proxyport, FALSE);
@@ -2639,10 +2629,13 @@ void ClientConnection::ConnectProxy()
 		ThreadSocketTimeout = CreateThread(NULL, 0, SocketTimeout, (LPVOID)&m_sock, 0, &threadID);
 
 		res = connect(m_sock, (LPSOCKADDR)&thataddr, sizeof(thataddr));
-		if (res == SOCKET_ERROR) { if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L48); throw WarningException(sz_L48, IDS_L48); }
+		if (res == SOCKET_ERROR) { 
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L48); 
+			throw WarningException(sz_L48, IDS_L48); 
+		}
 		vnclog.Print(0, _T("Connected to %s port %d\n"), m_proxyhost, m_proxyport);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_STATUS, sz_L49);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_STATUS, sz_L49);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus, IDC_VNCSERVER, m_proxyhost);
 		if (m_hwndStatus)ShowWindow(m_hwndStatus, SW_SHOW);
 		if (m_hwndStatus)UpdateWindow(m_hwndStatus);
 	}
@@ -2672,7 +2665,7 @@ void ClientConnection::NegotiateProtocolVersion()
        that pmw's monitor can make test connections */
 
 	bool fNotEncrypted = false;
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L89);
+	if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L89);
 	if (m_hwndStatus)UpdateWindow(m_hwndStatus);
     try
 	{
@@ -2689,51 +2682,53 @@ void ClientConnection::NegotiateProtocolVersion()
 		if (!Pressed_Cancel)
 		{
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
-			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
-									"Possible causes:\r\n"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
-									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
-									"- The password you've possibly entered is incorrect\r\n"
-									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+			throw WarningException(L"Connection failed - Error reading Protocol Version\r\n\r\n"
+									L"Possible causes:\r\n"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									L"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									L"- The password you've possibly entered is incorrect\r\n"
+									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									,1003
 									);
-		else if (!m_pApp->m_options.m_HideEndOfStreamError)
-			throw WarningException("Connection failed - End of Stream\r\n\r\n"
-									"Possible causes:\r\r"
-									"- Another user is already listening on this ID\r\n"
-									"- Bad connection\r\n",1004
+		else if (!m_opts->m_fAutoAcceptNoDSM)
+			throw WarningException(L"Connection failed - End of Stream\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- Another user is already listening on this ID\r\n"
+									L"- Bad connection\r\n",1004
 									);
 		}
-		QuietException_helper(c.str());
+		wchar_t c_str_wide[256];
+		MultiByteToWideChar(CP_UTF8, 0, c.str(), -1, c_str_wide, 256);
+		QuietException_helper(c_str_wide);
 	}
 	catch (Exception &c)
 	{
 		SetEvent(KillEvent);
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
-                          c.m_info);
+                          c.GetInfo());
 		if (!Pressed_Cancel)
 		{
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
-			throw WarningException("Connection failed - Error reading Protocol Version\r\n\n\r"
-									"Possible causes:\r\n"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
-									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
-									"- The password you've possibly entered is incorrect\r\n"
-									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
-									,1003
+			throw WarningException(L"Connection failed - Error reading Protocol Version\r\n\n\r"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									L"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									L"- The password you've possibly entered is incorrect\r\n"
+									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+
 									);
 		else
-			throw WarningException("Connection failed - Error reading Protocol Version\r\n\r\n"
-									"Possible causes:\r\n"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
-									"- Bad connection\r\n",1004
+			throw WarningException(L"Connection failed - Error reading Protocol Version\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
+									L"- Bad connection\r\n",1004
 									);
 		}
 
-		QuietException_helper(c.m_info);
+		QuietException_helper(c.GetInfo());
 	}
 
     pv[sz_rfbProtocolVersionMsg] = 0;
@@ -2744,7 +2739,7 @@ void ClientConnection::NegotiateProtocolVersion()
 	if (m_fUsePlugin && fNotEncrypted && !m_pIntegratedPluginInterface) {
 		//adzm 2010-05-12
 		if (m_opts->m_fRequireEncryption) {
-			throw WarningException("The insecure connection was refused.");
+			throw WarningException(L"The insecure connection was refused.");
 		}
 		else
 		{
@@ -2758,16 +2753,16 @@ void ClientConnection::NegotiateProtocolVersion()
 				delete m_pPluginInterface;
 				m_pPluginInterface = NULL;
 				//adzm 2010-05-10
-				m_pIntegratedPluginInterface = NULL;
+				m_pIntegratedPluginInterface = NULL;		
 			}
-			if (!m_opts->m_fAutoAcceptNoDSM)
-			{
-				//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
+
+			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
+			if (!m_opts->m_fAutoAcceptNoDSM) {
 				BOOL bCheckboxChecked;
 				bool  yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
-					throw WarningException("You refused the insecure connection.");
+					throw WarningException(L"You refused the insecure connection.");
 				}
 			}
 		}
@@ -2788,20 +2783,19 @@ void ClientConnection::NegotiateProtocolVersion()
 	{
 		SetEvent(KillEvent);
 		if (m_fUsePlugin && m_pIntegratedPluginInterface == NULL)
-			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
-									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
-									"- The password you've possibly entered is incorrect\r\n"
-									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
-
+			throw WarningException(L"Connection failed - Invalid protocol !\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									L"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									L"- The password you've possibly entered is incorrect\r\n"
+									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
-			throw WarningException("Connection failed - Invalid protocol !\r\n\r\n"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
+			throw WarningException(L"Connection failed - Invalid protocol !\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									);
     }
 
@@ -2863,15 +2857,15 @@ void ClientConnection::NegotiateProtocolVersion()
     sprintf_s(pv,rfbProtocolVersionFormat, m_majorVersion, m_minorVersion);
 	if (m_Is_Listening)
 		{
-			char szFileName[MAX_PATH];
-			if (GetModuleFileName(NULL, szFileName, MAX_PATH))
+			wchar_t szFileName[MAX_PATH];
+			if (GetModuleFileNameW(NULL, szFileName, MAX_PATH))
 				{
-				char* p = strrchr(szFileName, '\\');
+				wchar_t* p = wcsrchr(szFileName, L'\\');
 				if (p != NULL) { 
-					*p = '\0';
-					strcat_s(szFileName,"\\sound.wav");
-					if (GetFileAttributes(szFileName) != INVALID_FILE_ATTRIBUTES) {
-						PlaySound(szFileName, NULL, SND_ASYNC);
+					*p = L'\0';
+					wcscat_s(szFileName,L"\\sound.wav");
+					if (GetFileAttributesW(szFileName) != INVALID_FILE_ATTRIBUTES) {
+						PlaySoundW(szFileName, NULL, SND_ASYNC);
 					}
 				}
 			}
@@ -2886,7 +2880,7 @@ void ClientConnection::NegotiateProtocolVersion()
 		//block
 		if (size<0 || size >1024)
 		{
-			throw WarningException("Buffer too big, ");
+			throw WarningException(L"Buffer too big, ");
 
 		}		
 
@@ -2896,17 +2890,21 @@ void ClientConnection::NegotiateProtocolVersion()
 		//adzm 2009-06-21 - auto-accept if specified
 		if (!m_opts->m_fAutoAcceptIncoming) {
 			BOOL bCheckboxChecked;
-			int yes= yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
-			if (!yes)
-			{
-				int nummer=0;
-				WriteExact((char *)&nummer,sizeof(int));
-				throw WarningException("You refused the connection");
-			}
-			else
-			{
-				int nummer=1;
-				WriteExact((char *)&nummer,sizeof(int));
+			{ 
+				wchar_t _mytextW[256]; 
+				MultiByteToWideChar(CP_UTF8,0,mytext,-1,_mytextW,256); 
+				int yes= yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, _mytextW, str50280, str50281, L"", bCheckboxChecked);
+				if (!yes)
+				{
+					int nummer=0;
+					WriteExact((char *)&nummer,sizeof(int));
+					throw WarningException(L"You refused the connection");
+				}
+				else
+				{
+					int nummer=1;
+					WriteExact((char *)&nummer,sizeof(int));
+				}
 			}
 		} else {
 			int nummer=1;
@@ -2932,7 +2930,7 @@ void ClientConnection::NegotiateProxy()
    /* if the connection is immediately closed, don't report anything, so
        that pmw's monitor can make test connections */
 
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L89);
+	if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L89);
     try
 	{
 		ReadExactProxy(pv, sz_rfbProtocolVersionMsg);
@@ -2940,22 +2938,22 @@ void ClientConnection::NegotiateProxy()
 	catch (Exception &c)
 	{
 		vnclog.Print(0, _T("Error reading protocol version: %s\n"),
-                          c.m_info);
+                          c.GetInfo());
 		if (m_fUsePlugin)
-			throw WarningException("Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
-									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
-									"- The password you've possibly entered is incorrect\r\n"
-									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+			throw WarningException(L"Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									L"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									L"- The password you've possibly entered is incorrect\r\n"
+									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
-			throw WarningException("Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
-									"- Bad connection\r\n"
+			throw WarningException(L"Proxy Connection failed - Error reading Protocol Version\r\n\n\r"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
+									L"- Bad connection\r\n"
 									);
 
 
@@ -2977,19 +2975,19 @@ void ClientConnection::NegotiateProxy()
 	if (sscanf_s(pv,rfbProtocolVersionFormat,&m_majorVersion,&m_minorVersion) != 2)
 	{
 		if (m_fUsePlugin)
-			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
-									"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
-									"- The password you've possibly entered is incorrect\r\n"
-									"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
+			throw WarningException(L"Proxy Connection failed - Invalid protocol !\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- The selected DSMPlugin is not compatible with the one running on the Server\r\n"
+									L"- The selected DSMPlugin is not correctly configured (also possibly on the Server)\r\n"
+									L"- The password you've possibly entered is incorrect\r\n"
+									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									);
 		else
-			throw WarningException("Proxy Connection failed - Invalid protocol !\r\n\r\n"
-									"Possible causes:\r\r"
-									"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
-									"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
+			throw WarningException(L"Proxy Connection failed - Invalid protocol !\r\n\r\n"
+									L"Possible causes:\r\r"
+									L"- You've forgotten to select a DSMPlugin and the Server uses a DSMPlugin\r\n"
+									L"- Viewer and Server are not compatible (they use different RFB protocols)\r\n"
 									);
     }
 
@@ -3004,12 +3002,12 @@ void ClientConnection::NegotiateProxy()
 	::ZeroMemory(tmphost, sizeof(tmphost));
 	::ZeroMemory(tmphost2, sizeof(tmphost2));
 	_tcscpy_s(tmphost,m_host);
-	if (strcmp(tmphost,"")!=0)
+	if (_tcscmp(tmphost,_T(""))!=0)
 	{
-	_tcscat_s(tmphost,":");
-	_tcscat_s(tmphost, MAX_HOST_NAME_LEN, _itoa(m_port,tmphost2, 10));
+	_tcscat_s(tmphost,_T(":"));
+	_tcscat_s(tmphost, MAX_HOST_NAME_LEN, _itow(m_port,tmphost2, 10));
 	}
-    WriteExactProxy(tmphost,MAX_HOST_NAME_LEN);
+	{ char _tmpA[MAX_HOST_NAME_LEN]; WideCharToMultiByte(CP_UTF8,0,tmphost,-1,_tmpA,MAX_HOST_NAME_LEN,NULL,NULL); WriteExactProxy(_tmpA,MAX_HOST_NAME_LEN); }
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
 		rfbProtocolMajorVersion, m_minorVersion);
@@ -3018,7 +3016,14 @@ void ClientConnection::NegotiateProxy()
 
 void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 {
+	if (current_auth.size() > 5) {
+		vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"));
+		throw ErrorException(L"Cannot layer more than two authentication schemes\n");
+	}
+
 	CARD32 authScheme = rfbInvalidAuth;
+	CARD32 authResult = 0;
+	CARD32 reasonLen = 0;
 
 	// adzm 2010-09
 	if (m_minorVersion < 7) {
@@ -3099,52 +3104,44 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			}
 
 			if (authScheme == rfbInvalidAuth) {
-				throw WarningException("No supported authentication methods!");
+				throw WarningException(L"No supported authentication methods!");
 			}
 			CARD8 authSchemeMsg = (CARD8)authScheme;
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 			if (authScheme == rfbClientInitExtraMsgSupport) {
 				rfbClientInitExtraMsg msg;
-				msg.textLength = (CARD8)strlen(m_opts->m_InfoMsg);
-				WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-				if (strlen(m_opts->m_InfoMsg) > 0) {					
-					WriteExact(m_opts->m_InfoMsg, msg.textLength);
+				size_t wlen = wcslen(m_opts->m_InfoMsg);
+				if (wlen > 0 && wlen <= 127) {  // Max 127 wchars = 254 bytes (textLength is CARD8)
+					msg.textLength = (CARD8)(wlen * sizeof(wchar_t));
+					WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
+					WriteExact((char*)m_opts->m_InfoMsg, msg.textLength);
+				} else {
+					msg.textLength = 0;
+					WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
 				}
 			}
 		}
 	}
 
-	AuthenticateServer(authScheme, current_auth);
-}
+	current_auth.push_back(authScheme);
 
-void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>& current_auth)
-{
-	if (current_auth.size() > 5) {
-		vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"), authScheme);
-		throw ErrorException("Cannot layer more than two authentication schemes\n");
-	}
-
-	CARD32 reasonLen;
-	CARD32 authResult;
-
-	if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L90);
-
+	// Check if SecureVNC plugin is already active
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	if (!bSecureVNCPluginActive) bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
 
+	if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L90);
+
+	// If plugin is configured but server doesn't use it, handle unencrypted connection
 	if (!bSecureVNCPluginActive && m_fUsePlugin && m_pIntegratedPluginInterface && authScheme != rfbConnFailed &&
 		authScheme != rfbUltraVNC_SecureVNCPluginAuth  && authScheme != rfbUltraVNC_SecureVNCPluginAuth_new && authScheme != rfbUltraVNC && authScheme != rfbClientInitExtraMsgSupport)
 	{
 		//adzm 2010-05-12
 		if (m_opts->m_fRequireEncryption) {
-			throw WarningException("The insecure connection was refused.");
+			throw WarningException(L"The insecure connection was refused.");
 		}
 		else
 		{
-			//SetSocketOptions / fDSMMode?
 			m_fUsePlugin = false;
-
-			//adzm - 2009-06-21 - I don't set the plugin to be disabled here, just rely on m_fUsePlugin.
 
 			//adzm - 2009-06-21
 			if (m_pPluginInterface) {
@@ -3157,103 +3154,101 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			//adzm 2009-07-19 - Auto-accept the connection if it is unencrypted if that option is specified
 			if (!m_opts->m_fAutoAcceptNoDSM) {
 				BOOL bCheckboxChecked;
-				bool  yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
+				bool yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50275, str50276, str50277, str50278, str50279, bCheckboxChecked);
 				if (!yes)
 				{
-					throw WarningException("You refused the insecure connection.");
+					throw WarningException(L"You refused the insecure connection.");
 				}
 			}
 		}
 	}
 
-	switch(authScheme)
-	{
-	case rfbUltraVNC:
-		new_ultra_server=true;
-		m_fServerKnowsFileTransfer = true;
+	// Perform the actual authentication exchange based on the selected scheme
+	switch (authScheme) {
+	case rfbConnFailed:
+		ReadExact((char *)&reasonLen, 4);
+		reasonLen = Swap32IfLE(reasonLen);
+		CheckBufferSize(reasonLen+1);
+		ReadString(m_netbuf, reasonLen);
+		vnclog.Print(0, _T("Connection failed: %s\n"), m_netbuf);
+		{ wchar_t _wnetbuf2[256]; MultiByteToWideChar(CP_UTF8,0,m_netbuf,-1,_wnetbuf2,256); throw WarningException(_wnetbuf2); }
 		break;
-	case rfbUltraVNC_SecureVNCPluginAuth_new:
-		if (bSecureVNCPluginActive) {
-			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
-			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
-		}
-		AuthSecureVNCPlugin();
-		break;
-	case rfbUltraVNC_SecureVNCPluginAuth:
-		if (bSecureVNCPluginActive) {
-			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
-			throw WarningException("Cannot layer multiple SecureVNC plugin authentication schemes\n");
-		}
-		AuthSecureVNCPlugin_old();
-		break;
-	case rfbUltraVNC_MsLogonIIAuth:
-		AuthMsLogonII();
-		break;
-	case rfbUltraVNC_MsLogonIAuth:
-		m_ms_logon_I_legacy = true;
-	case rfbVncAuth:
-		if (m_ms_logon_I_legacy) {
-			AuthMsLogonI();
-		} else {
-			AuthVnc();
-		}
-		break;
-	case rfbVeNCypt:
-		AuthVeNCrypt();
-		break;
-	case rfbRSAAES:
-	case rfbRSAAESne:
-		AuthRSAAES(128, authScheme == rfbRSAAES);
-		break;
-	case rfbRSAAES_256:
-	case rfbRSAAESne_256:
-		AuthRSAAES(256, authScheme == rfbRSAAES_256);
-		break;
-	case rfbUltraVNC_SCPrompt:
-		AuthSCPrompt();
-		break;
-	case rfbClientInitExtraMsgSupport:
-		break;
-	case rfbUltraVNC_SessionSelect:
-		AuthSessionSelect();
-		break;
-	case rfbNoAuth:				
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L92);
+	case rfbNoAuth:
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L92);
 		vnclog.Print(0, _T("No authentication needed\n"));
-		BOOL bCheckboxChecked;
-		if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  && 
-			yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false)
 		{
-			throw WarningException("You refused a untrusted server.");
-		}
-		if (bCheckboxChecked)
-			SaveAllowUntrustedServers();
-		
+			BOOL bCheckboxChecked;
+			if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  &&
+				yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false)
+			{
+				throw WarningException(L"You refused a untrusted server.");
+			}
+			if (bCheckboxChecked)
+				SaveAllowUntrustedServers();
 
-		if (m_minorVersion < 8)
+			if (m_minorVersion < 8)
 			{
 				current_auth.push_back(authScheme);
 				return;
 			}
+		}
 		break;
-	case rfbConnFailed:
-		ReadExact((char *)&reasonLen, 4);
-		reasonLen = Swap32IfLE(reasonLen);
-
-		CheckBufferSize(reasonLen+1);
-		ReadString(m_netbuf, reasonLen);
-
-		vnclog.Print(0, _T("RFB connection failed, reason: %s\n"), m_netbuf);
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L91);
-		throw WarningException(m_netbuf);
+	case rfbUltraVNC:
+		new_ultra_server = true;
+		m_fServerKnowsFileTransfer = true;
+		break;
+	case rfbClientInitExtraMsgSupport:
+		break;
+	case rfbVncAuth:
+		AuthVnc();
+		break;
+	case rfbUltraVNC_MsLogonIAuth:
+		m_ms_logon_I_legacy = true;
+		AuthMsLogonI();
+		break;
+	case rfbUltraVNC_MsLogonIIAuth:
+		AuthMsLogonII();
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth:
+		if (bSecureVNCPluginActive) {
+			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
+			throw WarningException(L"Cannot layer multiple SecureVNC plugin authentication schemes\n");
+		}
+		AuthSecureVNCPlugin_old();
+		break;
+	case rfbUltraVNC_SecureVNCPluginAuth_new:
+		if (bSecureVNCPluginActive) {
+			vnclog.Print(0, _T("Cannot layer multiple SecureVNC plugin authentication schemes\n"), authScheme);
+			throw WarningException(L"Cannot layer multiple SecureVNC plugin authentication schemes\n");
+		}
+		AuthSecureVNCPlugin();
+		break;
+	case rfbUltraVNC_SCPrompt:
+		AuthSCPrompt();
+		break;
+	case rfbUltraVNC_SessionSelect:
+		AuthSessionSelect();
+		break;
+	case rfbRSAAES:
+		AuthRSAAES(128, true);
+		break;
+	case rfbRSAAES_256:
+		AuthRSAAES(256, true);
+		break;
+	case rfbRSAAESne:
+		AuthRSAAES(128, false);
+		break;
+	case rfbRSAAESne_256:
+		AuthRSAAES(256, false);
+		break;
+	case rfbVeNCypt:
+		AuthVeNCrypt();
 		break;
 	default:
-		vnclog.Print(0, _T("RFB connection failed, unknown authentication method: %lu\n"), authScheme);
-		throw ErrorException("Unknown authentication method!");
+		vnclog.Print(0, _T("Unknown authentication scheme: %d\n"), (int)authScheme);
+		throw ErrorException(L"Unknown authentication scheme");
 		break;
 	}
-
-	current_auth.push_back(authScheme);
 
 	// Read the authentication response
 	ReadExact((char *)&authResult, sizeof(authResult));
@@ -3261,21 +3256,21 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 
 	if (m_pIntegratedPluginInterface && authScheme == rfbUltraVNC_SecureVNCPluginAuth) {
 		m_pIntegratedPluginInterface->SetHandshakeComplete();
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
+		{ wchar_t _wdcs[256]; MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->DescribeCurrentSettings(),-1,_wdcs,256); if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_PLUGIN_STATUS,_wdcs); }
 	}	
 
 	switch (authResult)
 	{
 	case rfbVncAuthOK:
 		if (m_hwndStatus)vnclog.Print(0, _T("VNC authentication succeeded\n"));
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L55);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L55);
 
 		g_passwordfailed=false;
 		break;
 	case rfbVncAuthFailed:
 	case rfbVncAuthFailedEx:
 		vnclog.Print(0, _T("VNC authentication failed!"));
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L56);
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L56);
 		if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
 			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));
 			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
@@ -3286,8 +3281,10 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 			ReadString(m_netbuf, reasonLen);
 
 			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
-			if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_netbuf);
-			throw WarningException(m_netbuf);
+			wchar_t _wnetbuf[256]; 
+			MultiByteToWideChar(CP_UTF8,0,m_netbuf,-1,_wnetbuf,256); 
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,_wnetbuf);
+			throw WarningException(_wnetbuf);
 		} else {
 			vnclog.Print(0, _T("VNC authentication failed!"));
 			SetEvent(KillEvent);
@@ -3296,17 +3293,16 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 		break;
 	case rfbVncAuthTooMany:
 		SetEvent(KillEvent);
-		throw WarningException(
-			sz_L58);
+		throw WarningException(sz_L58);
 		break;
 	case rfbLegacy_MsLogon:
 		if (m_minorVersion >= 7) {
 			vnclog.Print(0, _T("Invalid auth response for protocol version.\n"));
-			throw ErrorException("Invalid auth response");
+			throw ErrorException(L"Invalid auth response");
 		}
 		if ((authScheme != rfbUltraVNC_SecureVNCPluginAuth) || !m_pIntegratedPluginInterface) {
-			vnclog.Print(0, _T("Invalid auth response response\n"));
-			throw ErrorException("Invalid auth response");
+			vnclog.Print(0, _T("Invalid auth continue response for auth scheme.\n"));
+			throw ErrorException(L"Invalid auth continue response for auth scheme");
 		}
 		//adzm 2010-05-10
 		AuthMsLogonII();
@@ -3314,11 +3310,11 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 	case rfbVncAuthContinue:
 		if (m_minorVersion < 7) {
 			vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
-			throw ErrorException("Invalid auth continue response");
+			throw ErrorException(L"Invalid auth continue response");
 		}
 		if (current_auth.size() > 5) { // arbitrary
 			vnclog.Print(0, _T("Cannot layer more than six authentication schemes\n"), authScheme);
-			throw ErrorException("Cannot layer more than six authentication schemes\n");
+			throw ErrorException(L"Cannot layer more than six authentication schemes\n");
 		}
 		Authenticate(current_auth);
 		break;
@@ -3336,9 +3332,9 @@ void ClientConnection::AuthenticateServer(CARD32 authScheme, std::vector<CARD32>
 void ClientConnection::AuthSecureVNCPlugin()
 {
 	if (m_pIntegratedPluginInterface==NULL) {
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
 		SetEvent(KillEvent);
-		throw ErrorException("SecureVNC Plugin authentication failed (no plugin interface available)");
+		throw ErrorException(L"SecureVNC Plugin authentication failed (no plugin interface available)");
 	}
 
 	char passwd[256];
@@ -3346,7 +3342,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy_s(passwd, m_clearPasswd);
+		strcpy_s(passwd, 256, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
@@ -3404,7 +3400,7 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 			if (m_pIntegratedPluginInterface) {
 				m_pIntegratedPluginInterface->SetHandshakeComplete();
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,m_pIntegratedPluginInterface->DescribeCurrentSettings());
+				{ wchar_t _wdcs3[256]; MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->DescribeCurrentSettings(),-1,_wdcs3,256); if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_PLUGIN_STATUS,_wdcs3); }
 				}
 
 			if (passphraseused!=2)
@@ -3425,11 +3421,11 @@ void ClientConnection::AuthSecureVNCPlugin()
 					ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 					if (ad.DoDialog(dtPass, m_host, m_port))
 						{
-							strncpy_s(passwd, ad.m_passwd,254);
+							strncpy_s(passwd, 256, ad.m_passwd, 254);
 							if (!bPassphraseRequired && strlen(passwd) > 8) {
 								passwd[8] = '\0';
 							}
-							lengt=(WORD)strlen(passwd);												
+							lengt=(WORD)strlen(passwd);											
 						}
 					else
 						{
@@ -3451,14 +3447,16 @@ void ClientConnection::AuthSecureVNCPlugin()
 
 	if (bCancel) {
 		// cancelled
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"Authentication cancelled");
 		SetEvent(KillEvent);
-		throw ErrorException("Authentication cancelled");
+		throw ErrorException(L"Authentication cancelled");
 	} else if (!bSuccess) {
 		// other failure
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
+		wchar_t _wles3[256]; 
+		MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->GetLastErrorString(),-1,_wles3,256); 
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,_wles3);
 		SetEvent(KillEvent);
-		throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
+		throw ErrorException(_wles3);
 	}
 }
 
@@ -3466,9 +3464,9 @@ void ClientConnection::AuthSecureVNCPlugin()
 void ClientConnection::AuthSecureVNCPlugin_old()
 {
 	if (!m_pIntegratedPluginInterface) {
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"SecureVNC Plugin authentication failed (SecureVNC Plugin interface available)");
 		SetEvent(KillEvent);
-		throw ErrorException("SecureVNC Plugin authentication failed (no plugin interface available)");
+		throw ErrorException(L"SecureVNC Plugin authentication failed (no plugin interface available)");
 	}
 
 	char passwd[256];
@@ -3476,7 +3474,7 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy_s(passwd, m_clearPasswd);
+		strcpy_s(passwd, 256, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
@@ -3512,18 +3510,18 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 				} 
 				else {
 					bTriedNoPassword = true;
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"WARNING: Server should be upgraded");
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"WARNING: Server should be upgraded");
 					Sleep(3000);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Using the vncpasswd as encryption key");
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"Using the vncpasswd as encryption key");
 					Sleep(3000);
-					if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"is not save. Password can be hacked!");
+					if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"is not save. Password can be hacked!");
 					AuthDialog ad;
 					//adzm 2010-05-12 - passphrase
 					ad.m_bPassphraseMode = bPassphraseRequired;
 
 					if (ad.DoDialog(dtPassUpgrade, m_host, m_port))
 					{
-						strncpy_s(passwd, ad.m_passwd,254);
+						strncpy_s(passwd, 256, ad.m_passwd, 254);
 						if (!bPassphraseRequired && strlen(passwd) > 8) {
 							passwd[8] = '\0';
 						}
@@ -3553,7 +3551,7 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 			WriteExact((char*)pResponseData, nResponseLength);
 
 			if (m_pIntegratedPluginInterface) {
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_PLUGIN_STATUS,"Encryption initialized.");
+				if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_PLUGIN_STATUS,L"Encryption initialized.");
 			}
 
 			m_pIntegratedPluginInterface->FreeMemory(pResponseData);
@@ -3564,14 +3562,16 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 
 	if (bCancel) {
 		// cancelled
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,"Authentication cancelled");
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"Authentication cancelled");
 		SetEvent(KillEvent);
-		throw ErrorException("Authentication cancelled");
+		throw ErrorException(L"Authentication cancelled");
 	} else if (!bSuccess) {
 		// other failure
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,m_pIntegratedPluginInterface->GetLastErrorString());
+		wchar_t _wles2[256]; 
+		MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->GetLastErrorString(),-1,_wles2,256); 
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_PLUGIN_STATUS,_wles2);
 		SetEvent(KillEvent);
-		throw ErrorException(m_pIntegratedPluginInterface->GetLastErrorString());
+		throw ErrorException(_wles2);
 	}
 }
 
@@ -3603,12 +3603,12 @@ void ClientConnection::AuthMsLogonII()
 	// m_clearPasswd is not from commandline only, but also filled by dsm
 	// Need to be both &&
 
-	if ((strlen(m_cmdlnUser)>0)&& (strlen(	m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
+	if ((strlen(m_cmdlnUser)>0)&& (strlen(m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
     {
 		vnclog.Print(0, _T("Command line MS-Logon.\n"));
-		strcpy_s(m_clearPasswd, m_pApp->m_options.m_clearPassword);
-		strncpy_s(passwd, m_clearPasswd, 64);
-		strncpy_s(user, m_cmdlnUser, 254);
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), m_pApp->m_options.m_clearPassword, _TRUNCATE);
+		strncpy_s(passwd, 64, m_clearPasswd, _TRUNCATE);
+		strncpy_s(user, 254, m_cmdlnUser, _TRUNCATE);
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
 		strcpy_s(m_ms_user, user);
 	}
@@ -3624,8 +3624,8 @@ void ClientConnection::AuthMsLogonII()
 	ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 	// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
 	if (ad.DoDialog(dtUserPass, m_host, m_port)) {
-		strncpy_s(passwd, ad.m_passwd, 64);
-		strncpy_s(user, ad.m_user, 254);
+		strncpy_s(passwd, 256, ad.m_passwd, 63); passwd[63]='\0';
+		strncpy_s(user, 256, ad.m_user, 254);
 		vncEncryptPasswdMs(m_encPasswdMs, passwd);
 		strcpy_s(m_ms_user, user);
 	} else {
@@ -3644,7 +3644,7 @@ void ClientConnection::AuthMsLogonI()
 {
 	if (!m_ms_logon_I_legacy) {
 		vnclog.Print(0, _T("AuthMsLogonI should not be called!\n"));
-		throw WarningException("AuthMsLogonI should not be called!\n");
+		throw WarningException(L"AuthMsLogonI should not be called!\n");
 	}
 
     CARD8 challenge[CHALLENGESIZE];
@@ -3669,8 +3669,8 @@ void ClientConnection::AuthMsLogonI()
 		if (strlen(m_cmdlnUser)>0)
 		{	if (strlen(m_clearPasswd)>0)
 			{  //user and password are not empty
-			    strcpy_s(user, m_cmdlnUser);
-				strcpy_s(passwd, m_clearPasswd);
+			    strcpy_s(user, 256, m_cmdlnUser);
+				strcpy_s(passwd, 256, m_clearPasswd);
 			}
 			else memset(m_cmdlnUser, 0, sizeof(m_cmdlnUser)); // user without password
 		}
@@ -3682,8 +3682,8 @@ void ClientConnection::AuthMsLogonI()
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy_s(passwd, m_clearPasswd);
-	    if (m_ms_logon_I_legacy) strcpy_s(user, m_cmdlnUser);
+		strcpy_s(passwd, 256, m_clearPasswd);
+	    if (m_ms_logon_I_legacy) strcpy_s(user, 256, m_cmdlnUser);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{  char * pw = vncDecryptPasswd(m_encPasswd);
@@ -3704,9 +3704,9 @@ void ClientConnection::AuthMsLogonI()
 		if (ad.DoDialog(dtUserPassNotEncryption, m_host, m_port))
 		{
 //					flash = new BmpFlasher;
-			strncpy_s(passwd, ad.m_passwd,254);
-			strncpy_s(user, ad.m_user,254);
-			strncpy_s(domain, ad.m_domain,254);
+			strncpy_s(passwd, 256, ad.m_passwd, 254);
+			strncpy_s(user, 256, ad.m_user, 254);
+			strncpy_s(domain, 256, ad.m_domain, 254);
 			if (strlen(user)==0 ||!m_ms_logon_I_legacy)//need longer passwd for ms
 				{
 					if (strlen(passwd) == 0) {
@@ -3768,7 +3768,7 @@ void ClientConnection::AuthVnc()
 		/* if server is 3.2 we can't use the new authentication */
 		vnclog.Print(0, _T("Can't use IDEA authentication\n"));
 		yesUVNCMessageBox(m_hInstResDLL, m_hwndMain,sz_L51, sz_L52, MB_ICONSTOP);
-		throw WarningException("Can't use IDEA authentication any more!");
+		throw WarningException(L"Can't use IDEA authentication any more!");
 	}
 	// rdv@2002 - v1.1.x
 	char passwd[256];
@@ -3777,7 +3777,7 @@ void ClientConnection::AuthVnc()
 	// Modif sf@2002 - A clear password can be transmitted via the UltraVNC Viewer command line
 	if (strlen(m_clearPasswd)>0)
 	{
-		strcpy_s(passwd, m_clearPasswd);
+		strcpy_s(passwd, 256, m_clearPasswd);
 	}
 	else if (strlen((const char *) m_encPasswd)>0)
 	{
@@ -3791,7 +3791,7 @@ void ClientConnection::AuthVnc()
 		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 		if (ad.DoDialog(dtPass, m_host, m_port))
 		{
-			strncpy_s(passwd, ad.m_passwd,254);
+			strcpy_s(passwd, 256, ad.m_passwd);
 			if (strlen(passwd) == 0)
 			{
 				vnclog.Print(0, _T("Password had zero length\n"));
@@ -3823,7 +3823,7 @@ void ClientConnection::AuthSCPrompt()
 {
 	if (m_minorVersion < 7) {
 		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
-		throw ErrorException("Invalid auth continue response");
+		throw ErrorException(L"Invalid auth continue response");
 	}
 	/// SHOW Messagebox
 	int size;
@@ -3832,7 +3832,7 @@ void ClientConnection::AuthSCPrompt()
 	//block
 	if (size<0 || size >1024)
 	{
-		throw WarningException("Buffer too big, ");
+		throw WarningException(L"Buffer too big, ");
 
 	}
 
@@ -3843,10 +3843,11 @@ void ClientConnection::AuthSCPrompt()
 	int accepted = 0;
 	BOOL bCheckboxChecked;
 	if (!m_opts->m_fAutoAcceptIncoming) {
-		int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, mytext, str50280, str50281, "", bCheckboxChecked);
+		{ wchar_t _mytextW2[256]; MultiByteToWideChar(CP_UTF8,0,mytext,-1,_mytextW2,256); int yes = yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50282, _mytextW2, str50280, str50281, L"", bCheckboxChecked);
 		if (yes)
 		{
 			accepted = 1;
+		}
 		}
 	} else {
 		accepted = 1;
@@ -3859,7 +3860,7 @@ void ClientConnection::AuthSessionSelect()
 {
 	if (m_minorVersion < 7) {
 		vnclog.Print(0, _T("Invalid auth continue response for protocol version.\n"));
-		throw ErrorException("Invalid auth continue response");
+		throw ErrorException(L"Invalid auth continue response");
 	}
 
 	INITCOMMONCONTROLSEX InitCtrls;
@@ -3881,16 +3882,22 @@ void ClientConnection::SendClientInit()
 	}
 	if (brfbClientInitExtraMsgSupportNew) {
 		ci.flags |= clientInitExtraMsgSupport;
+		ci.flags |= clientInitExtraMsgUnicode;  // Signal Unicode support
 	}
 
     WriteExact((char *)&ci, sz_rfbClientInitMsg); // sf@2002 - RSM Plugin
 	if (brfbClientInitExtraMsgSupportNew) {
 		brfbClientInitExtraMsgSupportNew = false;
 		rfbClientInitExtraMsg msg;
-		msg.textLength = (CARD8)strlen(m_opts->m_InfoMsg);
-		WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-		if (strlen(m_opts->m_InfoMsg) > 0) {
-			WriteExact(m_opts->m_InfoMsg, msg.textLength);
+		// Send Unicode (UTF-16LE) directly - no lossy CP_UTF8 conversion
+		size_t wlen = wcslen(m_opts->m_InfoMsg);
+		if (wlen > 0 && wlen <= 127) {  // Max 127 wchars = 254 bytes
+			msg.textLength = (CARD8)(wlen * sizeof(wchar_t));
+			WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
+			WriteExact((char*)m_opts->m_InfoMsg, msg.textLength);
+		} else {
+			msg.textLength = 0;
+			WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
 		}
 	}
 }
@@ -3921,17 +3928,17 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	m_desktopName_viewonly = new TCHAR[2024];
 	if (m_si.nameLength > 2024) {
 		BOOL bCheckboxChecked;
-		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50289, str50290, str50293, str50294, "", bCheckboxChecked);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50289, str50290, str50293, str50294, L"", bCheckboxChecked);
 		if (!yes)
 			exit(0);
 		m_si.nameLength = 2024;
 	}
-    ReadString(m_desktopName, m_si.nameLength);
+    { char _dn[2024]={0}; ReadString(_dn, m_si.nameLength); _dn[m_si.nameLength<2023?m_si.nameLength:2023]=0; MultiByteToWideChar(CP_UTF8,0,_dn,-1,m_desktopName,2024); }
 	m_desktopName[256] = '\0';
-	strcat_s(m_desktopName, 2024, " ");
+	_tcscat_s(m_desktopName, 2024, _T(" "));
 
-	strcpy_s(m_desktopName_viewonly, 2024, m_desktopName);
-	strcat_s(m_desktopName_viewonly, 2024, "viewonly");
+	_tcscpy_s(m_desktopName_viewonly, 2024, m_desktopName);
+	_tcscat_s(m_desktopName_viewonly, 2024, _T("viewonly"));
 
 	if (m_opts->m_ViewOnly) SetWindowText(m_hwndMain, m_desktopName_viewonly);
 	else SetWindowText(m_hwndMain, m_desktopName);
@@ -3944,16 +3951,10 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	//adzm 2009-06-21 - if we decide to connect even though it is unencrypted, do not show the plugin info
 	if (m_pDSMPlugin->IsEnabled() && m_fUsePlugin)
 	{
-			char szMess[255];
-			memset(szMess, 0, 255);
-			sprintf_s(szMess, "--- %s-v%s ",
-					m_pDSMPlugin->GetPluginName(),
-					m_pDSMPlugin->GetPluginVersion()
-					);
-			strcat_s(m_desktopName, 2024, szMess);
+			{ wchar_t _szMess[255]; _snwprintf_s(_szMess,255,_TRUNCATE,L"--- %hs-v%hs ",m_pDSMPlugin->GetPluginName(),m_pDSMPlugin->GetPluginVersion()); _tcscat_s(m_desktopName, 2024, _szMess); }
 	}
-	strcpy_s(m_desktopName_viewonly, 2024, m_desktopName);
-	strcat_s(m_desktopName_viewonly, 2024, "viewonly");
+	_tcscpy_s(m_desktopName_viewonly, 2024, m_desktopName);
+	_tcscat_s(m_desktopName_viewonly, 2024, _T("viewonly"));
 }
 
 void  ClientConnection::setTitle(){
@@ -3981,7 +3982,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	bool pos_set = false;
 	bool size_set = false;
-	UINT showFlag = (strlen(m_opts->m_ClassName) > 0) ? 0 : SWP_SHOWWINDOW;
+	UINT showFlag = (wcslen(m_opts->m_ClassName) > 0) ? 0 : SWP_SHOWWINDOW;
 	// Find how large the desktop work area is
 	RECT workrect;
 	tempdisplayclass tdc;
@@ -4147,10 +4148,10 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
 
 	//SetWindowPos(m_hwnd, HWND_TOP,
 	if (m_opts->m_ShowToolbar)
-		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, m_TBr.bottom, m_winwidth, m_winheight, showFlag);
 	else
 	{
-		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, SWP_SHOWWINDOW);
+		SetWindowPos(m_hwndcn, m_hwndTBwin, 0, 0, m_winwidth, m_winheight, showFlag | SWP_NOSIZE);
 		SetWindowPos(m_hwndTBwin, NULL ,0, 0, 0, 0, SWP_HIDEWINDOW);
 	}
 
@@ -4261,7 +4262,7 @@ void ClientConnection::SizeWindow(bool noPosChange, bool noSizeChange)
         }
 	}
 
-    if (strlen(m_opts->m_ClassName) == 0)
+    if (wcslen(m_opts->m_ClassName) == 0)
 		SetForegroundWindow(m_hwndMain);
 
 	if (m_opts->m_ShowToolbar)
@@ -4489,7 +4490,7 @@ void ClientConnection::SetFormatAndEncodings()
 											 m_opts->m_jpegQualityLevel );
 	}
 
-    // Modif rdv@2002
+    // Modif sf@2002
 	//Tell the server that we support the special Zlibencoding
 	//removed old Xor, rfbEncodingQueueEnable just combine small updates
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingQueueEnable);
@@ -4568,7 +4569,7 @@ void ClientConnection::Createdib()
 	m_membitmap = CreateDIBSection(m_hmemdc, (BITMAPINFO*)&bi.bmiHeader, iUsage, &m_DIBbits, NULL, 0);
     if (!m_DIBbits) {
         vnclog.Print(0, _T("CreateDIBSection failed\n"));
-        throw ErrorException(_T("CreateDIBSection failed"));
+        throw ErrorException(L"CreateDIBSection failed");
     }
 	memset((char*)m_DIBbits,128,bi.bmiHeader.biSizeImage);
 
@@ -5318,18 +5319,26 @@ void ClientConnection::SendClientCutText(char *str, int len)
 
 	omni_mutex_lock l(m_clipMutex);
 
-	std::string strStr(str);
+	// Convert ANSI to Unicode for comparison with m_strLastCutText (now std::wstring)
+	int nWideLen = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+	std::wstring strStrW;
+	if (nWideLen > 0) {
+		wchar_t* wideStr = new wchar_t[nWideLen];
+		MultiByteToWideChar(CP_ACP, 0, str, -1, wideStr, nWideLen);
+		strStrW = wideStr;
+		delete[] wideStr;
+	}
 
 	if (!m_clipboard.m_strLastCutText.empty()) {
-		if (m_clipboard.m_strLastCutText.compare(strStr) == 0) {
+		if (m_clipboard.m_strLastCutText.compare(strStrW) == 0) {
 			vnclog.Print(6, _T("Ignoring SendClientCutText due to identical data\n"));
 			return;
 		}
 
-		m_clipboard.m_strLastCutText = "";
+		m_clipboard.m_strLastCutText = L"";
 	}
 
-	m_clipboard.m_strLastCutText = strStr;
+	m_clipboard.m_strLastCutText = strStrW;
 
 	rfbClientCutTextMsg cct;
 	memset(&cct, 0, sizeof(cct));
@@ -5465,25 +5474,26 @@ inline void ClientConnection::DoBlit()
 void ClientConnection::ShowConnInfo()
 {
 	TCHAR buf[2048];
-	char kbdname[9];
-	GetKeyboardLayoutName(kbdname);
+	wchar_t kbdname[9];
+	GetKeyboardLayoutNameW(kbdname);
 	TCHAR num[16];
-	_snprintf_s(
+	_snwprintf_s(
 		buf,
 		2048,
-		_T("Connected to: %s\n\r\n\r")
-		_T("Host: %s  Port: %d\n\r")
-		_T("%s %s  %s\n\r\n\r")
-		_T("Desktop geometry: %u x %u x %u\n\r")
-		_T("Using depth: %u\n\r")
-		_T("Line speed estimate: %u kbit/s\n")
-		_T("Current protocol version: %d.%d\n\r\n\r")
-		_T("Current keyboard name: %s\n\r\n\r")
-		_T("Using Plugin : %s - %s\n\r\n\r"), // sf@2002 - v1.1.2
+		_TRUNCATE,
+		L"Connected to: %s\n\r\n\r"
+		L"Host: %s  Port: %d\n\r"
+		L"%s %s  %s\n\r\n\r"
+		L"Desktop geometry: %u x %u x %u\n\r"
+		L"Using depth: %u\n\r"
+		L"Line speed estimate: %u kbit/s\n"
+		L"Current protocol version: %d.%d\n\r\n\r"
+		L"Current keyboard name: %s\n\r\n\r"
+		L"Using Plugin : %hs - %hs\n\r\n\r",
 		m_desktopName, m_host, m_port,
-		strcmp(m_proxyhost,"") ? m_proxyhost : "",
-		strcmp(m_proxyhost,"") ? "Port" : "",
-		strcmp(m_proxyhost,"") ? _itoa(m_proxyport, num, 10) : "",
+		_tcscmp(m_proxyhost,_T("")) ? m_proxyhost : _T(""),
+		_tcscmp(m_proxyhost,_T("")) ? L"Port" : L"",
+		_tcscmp(m_proxyhost,_T("")) ? _itow(m_proxyport, num, 10) : L"",
 		m_si.framebufferWidth, m_si.framebufferHeight,
                 m_si.format.depth,
 		m_myFormat.depth, kbitsPerSecond,
@@ -5491,7 +5501,7 @@ void ClientConnection::ShowConnInfo()
 		kbdname,
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginName() : "",
 		m_pDSMPlugin->IsEnabled() ? m_pDSMPlugin->GetPluginVersion() : "");
-	yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, buf, _T("UltraVNC Viewer - Connection Informations"), MB_ICONINFORMATION);
+	yesUVNCMessageBox(m_hInstResDLL, m_hwndMain, buf, L"UltraVNC Viewer - Connection Informations", MB_ICONINFORMATION);
 }
 
 // ********************************************************************
@@ -5578,9 +5588,9 @@ void* ClientConnection::run_undetached(void* arg) {
                         time_t now = time(&now);
                         time_t delta = now - lastrecv;
                         lastrecv = now;
-                        char msg[255];
-                        sprintf_s(msg, "keepalive received %I64i seconds since last one\n", delta);
-                        OutputDebugString(msg);
+                        wchar_t msg[255];
+                        _snwprintf_s(msg, 255, _TRUNCATE, L"keepalive received %I64i seconds since last one\n", delta);
+                        OutputDebugStringW(msg);
                     }
 #endif
                     break;
@@ -5717,13 +5727,13 @@ void* ClientConnection::run_undetached(void* arg) {
 		}
 		catch (rdr::Exception& e)
 		{
-			vnclog.Print(0,"rdr::Exception (1): %s\n",e.str());
+			vnclog.Print(0,_T("rdr::Exception (1): %hs\n"),(const char*)e.str());
 			// m_pFileTransfer->m_fFileTransferRunning = false;
 			// m_pTextChat->m_fTextChatRunning = false;
 			// throw QuietException(e.str());
 			if ((strcmp(e.str(),"rdr::EndOfStream: read")==0) && !m_bClosedByUser)
 			{
-				WarningException w(sz_L94,200);
+				WarningException w2(sz_L94,200);
                // w.Report();
 			}
 			else if ((strcmp(e.str(),"rdr::SystemException: read: Unknown error (10054)")==0) && !m_bClosedByUser)
@@ -5748,8 +5758,7 @@ void* ClientConnection::run_undetached(void* arg) {
 			}
             else if (!(/*m_pFileTransfer->m_fFileTransferRunning || m_pTextChat->m_fTextChatRunning ||*/ m_bClosedByUser))
             {
-                WarningException w(sz_L69);
-                w.Report();
+                throw WarningException(sz_L65);
                 g_ConnectionLossAlreadyReported = true;
             }
 			m_bKillThread = true;
@@ -6454,7 +6463,7 @@ inline void ClientConnection::ReadScreenUpdate()
 		}
 
 		//Todo: surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW &&
-		if (surh.encoding != rfbEncodingExtViewSize && surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding != rfbEncodingUltraZip)
+		if (surh.encoding != rfbEncodingExtViewSize && surh.encoding !=rfbEncodingNewFBSize && surh.encoding != rfbEncodingCacheZip && surh.encoding != rfbEncodingQueueZip && surh.encoding !=rfbEncodingUltraZip)
 		{
 			RECT rect;
 			rect.left   = surh.r.x;
@@ -6744,7 +6753,7 @@ void ClientConnection::ReadBell()
 {
 	rfbBellMsg bm;
 	ReadExact(((char *) &bm)+m_nTO, sz_rfbBellMsg-m_nTO);
-	if (! ::PlaySound("VNCViewerBell", NULL,
+	if (! ::PlaySoundA("VNCViewerBell", NULL,
 		SND_APPLICATION | SND_ALIAS | SND_NODEFAULT | SND_ASYNC) ) {
 		::Beep(440, 125);
 	}
@@ -6910,8 +6919,8 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
+		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw ErrorException(sz_L69);
 	}
 }
@@ -6923,7 +6932,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 	//omni_mutex_lock l(m_readMutex);
 	// Status window and connection activity updates
 	// We comment this because it just takes too much time to the viewer thread
-	/*
+/*
 	HDC hdcX,hdcBits;
 	if (m_TrafficMonitor)
 	{
@@ -6934,14 +6943,14 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 		DeleteDC(hdcBits);
 		ReleaseDC(m_TrafficMonitor,hdcX);
 	}
-	*/
+*/
 
 	// m_BytesRead += wanted;
-	/*
+/*
 	m_BytesRead = fis->GetBytesRead();
 	SetDlgItemInt(m_hwndStatus, IDC_RECEIVED, m_BytesRead, false);
 	SetDlgItemInt(m_hwndStatus, IDC_SPEED, kbitsPerSecond, false);
-	*/
+*/
 	try
 	{
 		// sf@2002 - DSM Plugin
@@ -7048,13 +7057,13 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
+		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw ErrorException(sz_L69);
 	}
 
 	// Too slow !
-	/*
+/*
 	if (m_TrafficMonitor)
 	{
 		hdcX = GetDC(m_TrafficMonitor);
@@ -7064,7 +7073,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 		DeleteDC(hdcBits);
 		ReleaseDC(m_TrafficMonitor,hdcX);
 	}
-	*/
+*/
 }
 
 void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
@@ -7084,9 +7093,11 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, "rdr::Exception (2): %s\n",e.str());
-		if (m_hwndStatus)SetDlgItemText(m_hwndStatus,IDC_STATUS,sz_L67);
-		QuietException_helper(e.str());
+		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
+		wchar_t e_str_wide[256];
+		MultiByteToWideChar(CP_UTF8, 0, e.str(), -1, e_str_wide, 256);
+		QuietException_helper(e_str_wide);
 	}
 }
 
@@ -7183,7 +7194,6 @@ void ClientConnection::WriteExact_timeout(char *buf, int bytes, CARD8 msgType,in
 }
 
 //adzm 2010-09
-// Sends the number of bytes specified from the buffer
 bool ClientConnection::Write(char *buf, int bytes, bool bQueue, bool bTimeout, int timeout)
 {
 	omni_mutex_lock l(m_writeMutex);
@@ -7420,8 +7430,6 @@ void ClientConnection::CheckBufferSize(UINT bufsize)
 		throw ErrorException(sz_L70);
 	}
 
-	if (m_netbufsize > bufsize) return;
-
 	omni_mutex_lock l(m_bufferMutex);
 
 	char *newbuf = new char[bufsize+256];
@@ -7536,7 +7544,7 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
 		BOOL somebool;
-		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, "",somebool);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, L"",somebool);
 		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;
@@ -7760,12 +7768,12 @@ void ClientConnection::UpdateStatusFields()
 	GetFriendlySizeString(m_BytesRead, szText);
 	// SetDlgItemInt(m_hwndStatus, IDC_RECEIVED, m_BytesRead, false);
 	if (m_hwndStatus)
-		SetDlgItemText(m_hwndStatus, IDC_RECEIVED, szText);
+		SetDlgItemTextA(m_hwndStatus, IDC_RECEIVED, szText);
 
 	// Bytes Sent
 	GetFriendlySizeString(m_BytesSend, szText);
 	if (m_hwndStatus) {
-		SetDlgItemText(m_hwndStatus,IDC_SEND, szText);
+		SetDlgItemTextA(m_hwndStatus,IDC_SEND, szText);
 		SetDlgItemInt(m_hwndStatus, IDC_SPEED, avg_kbitsPerSecond, false);
 		SetDlgItemInt(m_hwndStatus, IDC_FPS, fps.get(), false);
 	}
@@ -7779,60 +7787,60 @@ void ClientConnection::UpdateStatusFields()
 			switch (EncodingStatusWindow)
 			{
 			case rfbEncodingRaw:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Raw, Cache" : "Raw");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Raw, Cache" : "Raw");
 				break;
 			case rfbEncodingRRE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "RRE, Cache" : "RRE");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "RRE, Cache" : "RRE");
 				break;
 			case rfbEncodingCoRRE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "CoRRE, Cache" : "CoRRE");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "CoRRE, Cache" : "CoRRE");
 				break;
 			case rfbEncodingHextile:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Hextile, Cache" : "Hextile");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Hextile, Cache" : "Hextile");
 				break;
 			case rfbEncodingUltra:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra, Cache" : "Ultra");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra, Cache" : "Ultra");
 				break;
 			case rfbEncodingUltra2:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Ultra2, Cache" : "Ultra2");
 				break;
 			case rfbEncodingZlib:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Zlib, Cache" : "Zlib");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Zlib, Cache" : "Zlib");
 				break;
 			case rfbEncodingZstd:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTD, Cache" : "ZSTD");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTD, Cache" : "ZSTD");
 				break;
-  			case rfbEncodingZRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
+  			case rfbEncodingZRLE:			
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZRLE, Cache" :"ZRLE");
   				break;
   			case rfbEncodingZYWRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZYWRLE, Cache" :"ZYWRLE");
   				break;
 			case rfbEncodingZSTDRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDRLE, Cache" : "ZSTDRLE");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDRLE, Cache" : "ZSTDRLE");
 				break;
 			case rfbEncodingZSTDYWRLE:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDYWRLE, Cache" : "ZSTDYWRLE");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZSTDYWRLE, Cache" : "ZSTDYWRLE");
 				break;
 #ifdef _XZ
   			case rfbEncodingXZ:		
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZ, Cache" :"XZ");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZ, Cache" :"XZ");
   				break;
   			case rfbEncodingXZYW:		
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZYW, Cache" :"XZYW");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "XZYW, Cache" :"XZYW");
   				break;
 #endif
 			case rfbEncodingTight:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Tight, Cache" : "Tight");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "Tight, Cache" : "Tight");
 				break;
 			case rfbEncodingZlibHex:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZlibHex, Cache" : "ZlibHex");
 				break;
 			case rfbEncodingTightZstd:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "TightZstd, Cache" : "TightZstd");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "TightZstd, Cache" : "TightZstd");
 				break;
 			case rfbEncodingZstdHex:
-				if (m_hwndStatus)SetDlgItemText(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZstdHex, Cache" : "ZstdHex");
+				if (m_hwndStatus)SetDlgItemTextA(m_hwndStatus, IDC_ENCODER, m_opts->m_fEnableCache ? "ZstdHex, Cache" : "ZstdHex");
 				break;
 			}
 		}
@@ -7847,12 +7855,12 @@ void ClientConnection::UpdateStatusFields()
 
 void ClientConnection::GTGBS_CreateDisplay()
 {
-	char ClassName[256]{};
-	if (strlen(m_opts->m_ClassName) > 0) {
-		strcpy(ClassName, m_opts->m_ClassName);
+	TCHAR ClassName[256]{};
+	if (wcslen(m_opts->m_ClassName) > 0) {
+		_tcscpy_s(ClassName, 256, m_opts->m_ClassName);
 	}
 	else {
-		strcpy(ClassName, _T("VNCMDI_Window"));
+		_tcscpy_s(ClassName, 256, _T("VNCMDI_Window"));
 	}
 
 	// Das eigendliche HauptFenster erstellen,
@@ -7881,11 +7889,11 @@ void ClientConnection::GTGBS_CreateDisplay()
 	wndclass.hbrBackground	= (HBRUSH) GetStockObject(BLACK_BRUSH);
     wndclass.lpszMenuName	= (const TCHAR *) NULL;
 	wndclass.lpszClassName	= ClassName;
-	RegisterClass(&wndclass);
+	RegisterClassW(&wndclass);
 	const DWORD winstyle = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
 	  WS_MINIMIZEBOX |WS_MAXIMIZEBOX | WS_THICKFRAME | WS_VSCROLL | WS_HSCROLL;
-	m_hwndMain = CreateWindow(ClassName,
-			  _T("VNCviewer"),
+	m_hwndMain = CreateWindowW(ClassName,
+			  L"VNCviewer",
 			  winstyle,
 			  CW_USEDEFAULT,
 			  CW_USEDEFAULT,
@@ -7944,24 +7952,24 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 			char title[256]{};
 			strcpy_s(title, "UltraVNC Viewer - ");
 			strcat_s(title, GetVersionFromResource(version));
-			SetDlgItemText(hwnd, IDC_UVVERSION, title);
+			SetDlgItemTextA(hwnd, IDC_UVVERSION, title);
 
 			SetDlgItemInt(hwnd,IDC_RECEIVED,(UINT)_this->m_BytesRead,false);
 			SetDlgItemInt(hwnd,IDC_SEND,(UINT)_this->m_BytesSend,false);
 
 			if (_this->m_host != NULL) {
-				SetDlgItemText(hwnd,IDC_VNCSERVER,_this->m_host);
-				sprintf_s(wt,"%s %s",sz_L72,_this->m_host);
-				SetWindowText(hwnd,wt);
+				SetDlgItemTextW(hwnd,IDC_VNCSERVER,_this->m_host);
+				_snwprintf_s((wchar_t*)wt,MAX_PATH,_TRUNCATE,L"%s %s",sz_L72,_this->m_host);
+				SetWindowTextW(hwnd,(LPCWSTR)wt);
 			} else {
-				SetDlgItemText(hwnd,IDC_VNCSERVER,_T(""));
-				SetWindowText(hwnd,sz_L73);
+				SetDlgItemTextW(hwnd,IDC_VNCSERVER,L"");
+				SetWindowTextW(hwnd,sz_L73);
 			}
 
 			if(_this->m_port != 0)
 				SetDlgItemInt(hwnd,IDC_PORT,_this->m_port,FALSE);
 			else
-				SetDlgItemText(hwnd,IDC_PORT,_T(""));
+				SetDlgItemTextW(hwnd,IDC_PORT,L"");
 
 			if(_this->m_sock != 0 )
 			{
@@ -7969,38 +7977,33 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				{
 					char szMess[255];
 					memset(szMess, 0, 255);
-					sprintf_s(szMess, "%s (%s-v%s)",
-							sz_L49,
-							_this->m_pDSMPlugin->GetPluginName(),
-							_this->m_pDSMPlugin->GetPluginVersion()
-							);
-					SetDlgItemText(hwnd,IDC_STATUS, szMess);
+					{ wchar_t _wm[255]; _snwprintf_s(_wm,255,_TRUNCATE,L"%s (%hs-v%hs)",sz_L49,_this->m_pDSMPlugin->GetPluginName(),_this->m_pDSMPlugin->GetPluginVersion()); SetDlgItemTextW(hwnd,IDC_STATUS,_wm); }
 
 					//adzm 2010-05-10
 					if (_this->m_pIntegratedPluginInterface) {
-						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,_this->m_pIntegratedPluginInterface->DescribeCurrentSettings());
+						{ wchar_t _wdcs[256]; MultiByteToWideChar(CP_UTF8,0,_this->m_pIntegratedPluginInterface->DescribeCurrentSettings(),-1,_wdcs,256); SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,_wdcs); }
 					} else if (_this->m_pPluginInterface) {
-						SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(plugin default encryption)");
+						SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(plugin default encryption)");
 					} else {
 						if (_this->m_opts->m_oldplugin)
 						{
 							if (_stricmp(_this->m_pDSMPlugin->GetPluginParams(), "NoPassword")==0)
-								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, rc4.key, encryption)");
+								SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(old plugin, rc4.key, encryption)");
 							else
-								SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(old plugin, encryption)");
+								SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(old plugin, encryption)");
 						}
-						else SetDlgItemText(hwnd,IDC_PLUGIN_STATUS,"(no encryption)");
+						else SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(no encryption)");
 					}
 
 					//Problem, old plugins don't have xxPluginInterface
 					// they always say no encryption
 				}
 				else
-					SetDlgItemText(hwnd,IDC_STATUS,sz_L49);
+					SetDlgItemTextW(hwnd,IDC_STATUS,sz_L49);
 			}
 			else
 			{
-				SetDlgItemText(hwnd,IDC_STATUS,sz_L74);
+				SetDlgItemTextW(hwnd,IDC_STATUS,sz_L74);
 			}
 
 			//CentreWindow(hwnd);
@@ -8017,7 +8020,7 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 				//Verbindungsaufbau status
 				ShowWindow(GetDlgItem(hwnd,IDQUIT),SW_SHOW);
 				ShowWindow(GetDlgItem(hwnd,IDCLOSE),SW_HIDE);
-				SetDlgItemText(hwnd,IDC_STATUS,sz_L43);
+				SetDlgItemTextW(hwnd,IDC_STATUS,sz_L43);
 				HMENU hMenu = GetSystemMenu(hwnd,0);
 				EnableMenuItem(hMenu,SC_CLOSE,MF_BYCOMMAND | MF_GRAYED);
 			}
@@ -8884,12 +8887,10 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						else // Autoreconnect allowed - We only suspend the working thread then reconnect a few seconds later
 						{
 							char temp[10];
-							char wtext[150];
+							wchar_t wtext[150];
 							_itoa(wParam,temp,10);
-							strcpy_s(wtext,"UltraVNC Viewer - Connection dropped, trying to reconnect (");
-							strcat_s(wtext,temp);
-							strcat_s(wtext,")");
-							SetWindowText(_this->m_hwndMain, wtext);
+							_snwprintf_s(wtext,150,_TRUNCATE,L"UltraVNC Viewer - Connection dropped, trying to reconnect (%hs)",temp);
+							SetWindowTextW(_this->m_hwndMain, wtext);
 							_this->m_opts->m_NoStatus = true;
 							_this->SuspendThread();
 							//_this->Reconnect()
@@ -9279,7 +9280,7 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 								_tcscpy_s(fulldisplay, display);
 								vnclog.Print(0,_T("CLICKK %s\n"),fulldisplay);
 								ParseDisplay(fulldisplay, display, 256, &port);
-								if (strcmp(display, "ID") == 0) {
+								if (_tcscmp(display, _T("ID")) == 0) {
 									return TRUE;
 								}
 								_this->m_pApp->NewConnection(false,display,port);
@@ -9514,16 +9515,16 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 						bool ret = RegisterTouchWindow(hwnd, 0);
 						DWORD err = GetLastError();
 #ifdef _DEBUG
-						char			szText[256];
+						wchar_t			szText[256];
 						if (ret != 0)
 						{
-							_snprintf_s(szText, 256,  "RegisterTouchWindow Success \n");
+							_snwprintf_s(szText, 256, _TRUNCATE, L"RegisterTouchWindow Success \n");
 						}
 						else
 						{
-							_snprintf_s(szText, 256,  "RegisterTouchWindow Failed with error code = %lu \n", err);
+							_snwprintf_s(szText, 256, _TRUNCATE, L"RegisterTouchWindow Failed with error code = %lu \n", err);
 						}
-						OutputDebugString(szText);
+						OutputDebugStringW(szText);
 #endif
 						Sleep(10);
 						KillTimer(hwnd, TOUCH_REGISTER_TIMER);
@@ -10231,9 +10232,9 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
 		}
 
 #if defined(_DEBUG)
-        char msg[255];
-        sprintf_s(msg, "keepalive requested %u ms since last one\n", nTicksSinceLastSent);
-        OutputDebugString(msg);
+        wchar_t msg[255];
+        _snwprintf_s(msg, 255, _TRUNCATE, L"keepalive requested %u ms since last one\n", nTicksSinceLastSent);
+        OutputDebugStringW(msg);
 
 #endif
         rfbKeepAliveMsg kp;
@@ -10272,8 +10273,8 @@ void ClientConnection::NotifyPluginStreamingSupport()
 }
 
 static HWND hList=NULL;  // List View identifier
-LVCOLUMN LvCol; // Make Coluom struct for ListView
-LVITEM LvItem;  // ListView Item struct
+LVCOLUMNW LvCol; // Make Coluom struct for ListView
+LVITEMW LvItem;  // ListView Item struct
 int iSelect=0;
 int flag=0;
 HWND hEdit=NULL;
@@ -10296,10 +10297,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 			    case IDC_LIST1:
                 if(((LPNMHDR)lParam)->code == NM_DBLCLK)
 				{
-				  char Text[255]={0};
-
 				  int iSlected=0;
-
 
 				  iSlected=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
 
@@ -10309,13 +10307,15 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 					break;
 				  }
 
-				  memset(&LvItem,0,sizeof(LvItem));
-                  LvItem.mask=LVIF_TEXT;
-				  LvItem.iSubItem=0;
-				  LvItem.pszText=Text;
-				  LvItem.cchTextMax=256;
-				  LvItem.iItem=iSlected;
-				  SendMessage(hList,LVM_GETITEMTEXT, iSlected, (LPARAM)&LvItem);
+				  WCHAR Text[256];
+				  LVITEMW LvItemW;
+				  memset(&LvItemW,0,sizeof(LvItemW));
+                  LvItemW.mask=LVIF_TEXT;
+				  LvItemW.iSubItem=0;
+				  LvItemW.pszText=Text;
+				  LvItemW.cchTextMax=256;
+				  LvItemW.iItem=iSlected;
+				  SendMessageW(hList,LVM_GETITEMTEXTW, iSlected, (LPARAM)&LvItemW);
 				  EndDialog(hWnd,iSlected+1);
 				}
 				if(((LPNMHDR)lParam)->code == NM_CLICK)
@@ -10324,7 +10324,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 					if(iSelect==-1)
 					{
-                      yesUVNCMessageBox(m_hInstResDLL, hWnd,"No VNC Server selected","Error",MB_ICONINFORMATION);
+                      yesUVNCMessageBox(m_hInstResDLL, hWnd,L"No VNC Server selected",L"Error",MB_ICONINFORMATION);
 					  break;
 					}
 					flag=1;
@@ -10338,12 +10338,14 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				if(((LPNMHDR)lParam)->code == LVN_ENDLABELEDIT)
 				{
 					int iIndex;
-					char text[255]="";
+					wchar_t text[255]=L"";
 					iIndex=SendMessage(hList,LVM_GETNEXTITEM,-1,LVNI_FOCUSED);
-				    LvItem.iSubItem=0;
-                    LvItem.pszText=text;
-                    GetWindowText(hEdit, text, sizeof(text));
-					SendMessage(hList,LVM_SETITEMTEXT,(WPARAM)iIndex,(LPARAM)&LvItem);
+					LVITEMW LvItemW2;
+					memset(&LvItemW2,0,sizeof(LvItemW2));
+				    LvItemW2.iSubItem=0;
+                    LvItemW2.pszText=text;
+                    GetWindowTextW(hEdit, text, 255);
+					SendMessageW(hList,LVM_SETITEMTEXTW,(WPARAM)iIndex,(LPARAM)&LvItemW2);
 				}
 				break;
 			}
@@ -10376,11 +10378,11 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
                 memset(&LvCol,0,sizeof(LvCol)); // Reset Coluom
 				LvCol.mask=LVCF_TEXT|LVCF_WIDTH|LVCF_SUBITEM; // Type of mask
 				LvCol.cx=0x100;                                // width between each coloum
-				LvCol.pszText="Select Helpdesk to connect to .......";                     // First Header
+				LvCol.pszText=L"Select Helpdesk to connect to .......";                     // First Header
 // 				LvCol.cx=0x60;
 
 				// Inserting Couloms as much as we want
-				SendMessage(hList,LVM_INSERTCOLUMN,0,(LPARAM)&LvCol); // Insert/Show the coloum
+				SendMessageW(hList,LVM_INSERTCOLUMNW,0,(LPARAM)&LvCol); // Insert/Show the coloum
                 memset(&LvItem,0,sizeof(LvItem)); // Reset Item Struct
 
 				//  Setting properties Of Items:
@@ -10390,7 +10392,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
 				LvItem.iItem=0;          // choose item
 				LvItem.iSubItem=0;       // Put in first coluom
-				LvItem.pszText="Item 0"; // Text to display (can be from a char variable) (Items)
+				LvItem.pszText=L"Item 0"; // Text to display (can be from a char variable) (Items)
 
 				int iItem=0;
 				CARD8 nr_lines;
@@ -10400,11 +10402,11 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 				{
 					memset(line,0,128);
 					cc->ReadExact((char *)line, 128);
-					iItem=SendMessage(hList,LVM_GETITEMCOUNT,0,0);
+					iItem=SendMessageW(hList,LVM_GETITEMCOUNT,0,0);
 					LvItem.iItem=iItem;            // choose item
 					LvItem.iSubItem=0;         // Put in first coluom
-					LvItem.pszText=line;
-					SendMessage(hList,LVM_INSERTITEM,0,(LPARAM)&LvItem);
+					wchar_t _lw[128]; MultiByteToWideChar(CP_UTF8,0,line,-1,_lw,128); LvItem.pszText=_lw;
+					SendMessageW(hList,LVM_INSERTITEMW,0,(LPARAM)&LvItem);
 					iItem++;
 				}
 				return TRUE; // Always True
@@ -10414,6 +10416,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
      // This Window Message will control the dialog  //
 	//==============================================//
         case WM_COMMAND:
+		{
 			switch (LOWORD(wParam))
 				{
 					case IDOK:
@@ -10433,6 +10436,7 @@ BOOL CALLBACK DialogProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 						break;
 					}
 			break;
+		}
 
 	    default:return FALSE;
     }
@@ -10624,10 +10628,11 @@ void ClientConnection::checkParemeters()
 {
 	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
 		BOOL somebool;
-		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, "", somebool);
+		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, L"", somebool);
 		if (!yes)
 			exit(0);
 		m_si.framebufferWidth = 1024;
 		m_si.framebufferHeight = 800;
 	}
 }
+

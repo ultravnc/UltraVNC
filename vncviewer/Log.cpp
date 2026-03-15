@@ -114,10 +114,10 @@ void Log::CloseFile() {
     }
 }
 
-void Log::ReallyPrint(LPTSTR format, va_list ap) 
+void Log::ReallyPrint(LPCTSTR format, va_list ap) 
 {
     TCHAR line[LINE_BUFFER_SIZE];
-	_vsnprintf_s(line, LINE_BUFFER_SIZE-1, format, ap); // sf@2006 - Prevents buffer overflow
+	_vsnwprintf_s(line, LINE_BUFFER_SIZE, _TRUNCATE, format, ap); // sf@2006 - Prevents buffer overflow
     if (m_todebug) OutputDebugString(line);
 
     if (m_toconsole) {

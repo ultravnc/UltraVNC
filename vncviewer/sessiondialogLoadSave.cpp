@@ -1,4 +1,4 @@
-// This file is part of UltraVNC
+﻿// This file is part of UltraVNC
 // https://github.com/ultravnc/UltraVNC
 // https://uvnc.com/
 //
@@ -20,51 +20,50 @@
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
 
-extern char sz_K1[64];
-extern char sz_K2[64];
+extern wchar_t sz_K1[64];
+extern wchar_t sz_K2[64];
 extern bool g_disable_sponsor;
-static OPENFILENAME ofn;
+// OPENFILENAMEW declared locally in SaveConnection
 
-extern int EncodingFromString(const char* szEncoding);
+extern int EncodingFromString(const wchar_t* szEncoding);
 void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 {
 	SettingsFromUI();
-	char fname[_MAX_PATH];
+	wchar_t fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(m_port);
-	sprintf_s(fname, "%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
-	char buffer[_MAX_PATH];
+	swprintf_s(fname, _MAX_PATH, L"%.15s-%d.vnc", m_host_dialog, (disp > 0 && disp < 100) ? disp : m_port);
+	wchar_t buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat_s(buffer,"\\UltraVNC");
-	_mkdir(buffer);
+	wcscat_s(buffer, _MAX_PATH, L"\\UltraVNC");
+	_wmkdir(buffer);
 
 	if ( saveAs) {
-		char tname[_MAX_FNAME + _MAX_EXT];
+		wchar_t tname[_MAX_FNAME + _MAX_EXT];
 		
-		static char filter[] = "VNC files (*.vnc)\0*.vnc\0" \
-				"All files (*.*)\0*.*\0";
-		memset((void *) &ofn, 0, sizeof(OPENFILENAME));
-		ofn.lStructSize = OPENFILENAME_SIZE_VERSION_400;
-		ofn.lpstrFilter = filter;
-		ofn.nMaxFile = _MAX_PATH;
-		ofn.nMaxFileTitle = _MAX_FNAME + _MAX_EXT;
-		ofn.lpstrDefExt = "vnc";	
-		ofn.hwndOwner = hwnd;
-		ofn.lpstrFile = fname;
-		ofn.lpstrFileTitle = tname;
-		ofn.lpstrInitialDir = buffer;
-		ofn.Flags = OFN_HIDEREADONLY;
-		if (!GetSaveFileName(&ofn)) {
+		static wchar_t filter[] = L"VNC files (*.vnc)\0*.vnc\0" \
+				L"All files (*.*)\0*.*\0";
+		OPENFILENAMEW ofnW;
+		memset((void *) &ofnW, 0, sizeof(OPENFILENAMEW));
+		ofnW.lStructSize = OPENFILENAME_SIZE_VERSION_400;
+		ofnW.lpstrFilter = filter;
+		ofnW.nMaxFile = _MAX_PATH;
+		ofnW.nMaxFileTitle = _MAX_FNAME + _MAX_EXT;
+		ofnW.lpstrDefExt = L"vnc";	
+		ofnW.hwndOwner = hwnd;
+		ofnW.lpstrFile = fname;
+		ofnW.lpstrFileTitle = tname;
+		ofnW.lpstrInitialDir = buffer;
+		ofnW.Flags = OFN_HIDEREADONLY;
+		if (!GetSaveFileNameW(&ofnW)) {
 			DWORD err = CommDlgExtendedError();
-			char msg[1024]; 
 			switch(err) {
 			case 0:	// user cancelled
 				break;
 			case FNERR_INVALIDFILENAME:
-				strcpy_s(msg, sz_K1);
-				yesUVNCMessageBox(m_hInstResDLL, hwnd, msg, sz_K2, MB_ICONERROR);
+				yesUVNCMessageBox(m_hInstResDLL, hwnd, sz_K1, sz_K2, MB_ICONERROR);
 				break;
 			default:
-				vnclog.Print(0, "Error %d from GetSaveFileName\n", err);
+				vnclog.Print(0, _T("Error %d from GetSaveFileName\n"), err);
 				break;
 			}
 			return;
@@ -72,8 +71,8 @@ void SessionDialog::SaveConnection(HWND hwnd, bool saveAs)
 		SaveToFile(fname);
 	}
 	else {
-		strcat_s(buffer,"\\");
-		strcat_s(buffer,fname);
+		wcscat_s(buffer, _MAX_PATH, L"\\");
+		wcscat_s(buffer, _MAX_PATH, fname);
 		SaveToFile(buffer);
 	}
 	
@@ -107,213 +106,213 @@ void SessionDialog::SettingsToUI(bool initMruNeeded)
 	InitDlgProc(true, initMruNeeded);		
 }
 
-void SessionDialog::saveInt(char *name, int value, char *fname) 
+void SessionDialog::saveInt(wchar_t *name, int value, wchar_t *fname) 
 {
-  char buf[10];
-  sprintf_s(buf, "%d", value); 
-  WritePrivateProfileString("options", name, buf, fname);
+  wchar_t buf[10];
+  swprintf_s(buf, 10, L"%d", value); 
+  WritePrivateProfileStringW(L"options", name, buf, fname);
 }
 
-int SessionDialog::readInt(char *name, int defval, char *fname)
+int SessionDialog::readInt(wchar_t *name, int defval, wchar_t *fname)
 {
-  return GetPrivateProfileInt("options", name, defval, fname);
+  return GetPrivateProfileIntW(L"options", name, defval, fname);
 }
 
-void SessionDialog::SaveToFile(char *fname, bool asDefault)
+void SessionDialog::SaveToFile(wchar_t *fname, bool asDefault)
 {
 	int ret;
-	char buf[32];
+	wchar_t buf[32];
 	if (!asDefault) {
-		ret = WritePrivateProfileString("connection", "host", m_host_dialog, fname);		
-		sprintf_s(buf, "%d", m_port);
-		WritePrivateProfileString("connection", "port", buf, fname);
+		ret = WritePrivateProfileStringW(L"connection", L"host", m_host_dialog, fname);		
+		swprintf_s(buf, 32, L"%d", m_port);
+		WritePrivateProfileStringW(L"connection", L"port", buf, fname);
 	}
 	else
 		SettingsFromUI();
-	ret = WritePrivateProfileString("connection", "proxyhost", m_proxyhost, fname);
-	sprintf_s(buf, "%d", m_proxyport);
-	WritePrivateProfileString("connection", "proxyport", buf, fname);
+	ret = WritePrivateProfileStringW(L"connection", L"proxyhost", m_proxyhost, fname);
+	swprintf_s(buf, 32, L"%d", m_proxyport);
+	WritePrivateProfileStringW(L"connection", L"proxyport", buf, fname);
 	for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
-		char buf[128];
-		sprintf_s(buf, "use_encoding_%d", i);
+		wchar_t buf[128];
+		swprintf_s(buf, 128, L"use_encoding_%d", i);
 		saveInt(buf, UseEnc[i], fname);
 	 }
 	if (!PreferredEncodings.empty()) {
-	  saveInt("preferred_encoding", PreferredEncodings[0], fname);
+	  saveInt(L"preferred_encoding", PreferredEncodings[0], fname);
 	}	
-	saveInt("viewonly",				ViewOnly,			fname);	
-	saveInt("showtoolbar",			ShowToolbar,		fname);
-	saveInt("fullscreen",			FullScreen,		fname);
-	saveInt("SavePos",				SavePos, fname);
-	saveInt("SaveSize",				SaveSize, fname);
-	saveInt("GNOME",				GNOME, fname);
-	saveInt("directx",				Directx,		fname);
-	saveInt("autoDetect",			autoDetect, fname);
-	saveInt("8bit",					Use8Bit,			fname);
-	saveInt("shared",				Shared,			fname);
-	saveInt("swapmouse",			SwapMouse,		fname);
-	saveInt("emulate3",				Emul3Buttons,		fname);
-	saveInt("JapKeyboard",			JapKeyboard,		fname);
-	saveInt("disableclipboard",		DisableClipboard, fname);
-	saveInt("Scaling",				scaling,		fname);
-	saveInt("AutoScaling",			fAutoScaling,		fname);
-	saveInt("AutoScalingEven",      fAutoScalingEven, fname);
-	saveInt("AutoScalingLimit",		fAutoScalingLimit, fname);
-	saveInt("scale_num",			scale_num,		fname);
-	saveInt("scale_den",			scale_den,		fname);
+	saveInt(L"viewonly",				ViewOnly,			fname);	
+	saveInt(L"showtoolbar",			ShowToolbar,		fname);
+	saveInt(L"fullscreen",			FullScreen,		fname);
+	saveInt(L"SavePos",				SavePos, fname);
+	saveInt(L"SaveSize",				SaveSize, fname);
+	saveInt(L"GNOME",				GNOME, fname);
+	saveInt(L"directx",				Directx,		fname);
+	saveInt(L"autoDetect",			autoDetect, fname);
+	saveInt(L"8bit",					Use8Bit,			fname);
+	saveInt(L"shared",				Shared,			fname);
+	saveInt(L"swapmouse",			SwapMouse,		fname);
+	saveInt(L"emulate3",				Emul3Buttons,		fname);
+	saveInt(L"JapKeyboard",			JapKeyboard,		fname);
+	saveInt(L"disableclipboard",		DisableClipboard, fname);
+	saveInt(L"Scaling",				scaling,		fname);
+	saveInt(L"AutoScaling",			fAutoScaling,		fname);
+	saveInt(L"AutoScalingEven",      fAutoScalingEven, fname);
+	saveInt(L"AutoScalingLimit",		fAutoScalingLimit, fname);
+	saveInt(L"scale_num",			scale_num,		fname);
+	saveInt(L"scale_den",			scale_den,		fname);
 	// Tight Specific
-	saveInt("cursorshape",			requestShapeUpdates, fname);
-	saveInt("noremotecursor",		ignoreShapeUpdates, fname);
+	saveInt(L"cursorshape",			requestShapeUpdates, fname);
+	saveInt(L"noremotecursor",		ignoreShapeUpdates, fname);
 	if (useCompressLevel) {
-		saveInt("compresslevel",	compressLevel,	fname);
+		saveInt(L"compresslevel",	compressLevel,	fname);
 	}
 	if (enableJpegCompression) {
-		saveInt("quality",			jpegQualityLevel,	fname);
+		saveInt(L"quality",			jpegQualityLevel,	fname);
 	}
 	// Modif sf@2002
-	saveInt("ServerScale",			nServerScale,		fname);
-	saveInt("Reconnect",			reconnectcounter,		fname);
-	saveInt("EnableCache",			fEnableCache,		fname);
-	saveInt("EnableZstd",			fEnableZstd, fname);
-	saveInt("QuickOption",			quickoption,	fname);
-	saveInt("UseDSMPlugin",			fUseDSMPlugin,	fname);
-	saveInt("UseProxy",				(int)m_connectionType,	fname);
-	saveInt("allowMonitorSpanning", allowMonitorSpanning, fname);
-	saveInt("ChangeServerRes", changeServerRes, fname);
-	saveInt("extendDisplay", extendDisplay, fname);
-	saveInt("showExtend", showExtend, fname);
-	saveInt("use_virt", use_virt, fname);	
-	saveInt("useAllMonitors", useAllMonitors, fname);
-	saveInt("requestedWidth", requestedWidth, fname);
-	saveInt("requestedHeight", requestedHeight, fname);
+	saveInt(L"ServerScale",			nServerScale,		fname);
+	saveInt(L"Reconnect",			reconnectcounter,		fname);
+	saveInt(L"EnableCache",			fEnableCache,		fname);
+	saveInt(L"EnableZstd",			fEnableZstd, fname);
+	saveInt(L"QuickOption",			quickoption,	fname);
+	saveInt(L"UseDSMPlugin",			fUseDSMPlugin,	fname);
+	saveInt(L"UseProxy",				(int)m_connectionType,	fname);
+	saveInt(L"allowMonitorSpanning", allowMonitorSpanning, fname);
+	saveInt(L"ChangeServerRes", changeServerRes, fname);
+	saveInt(L"extendDisplay", extendDisplay, fname);
+	saveInt(L"showExtend", showExtend, fname);
+	saveInt(L"use_virt", use_virt, fname);	
+	saveInt(L"useAllMonitors", useAllMonitors, fname);
+	saveInt(L"requestedWidth", requestedWidth, fname);
+	saveInt(L"requestedHeight", requestedHeight, fname);
 
 
-	WritePrivateProfileString("options", "DSMPlugin",	szDSMPluginFilename, fname);
-	WritePrivateProfileString("options", "folder",		folder, fname);
-	WritePrivateProfileString("options", "prefix",		prefix, fname);
-	WritePrivateProfileString("options", "imageFormat",		imageFormat, fname);
-	WritePrivateProfileString("options", "InfoMsg", InfoMsg, fname);
-	saveInt("AutoReconnect",		autoReconnect,	fname);
-	saveInt("FileTransferTimeout",  FTTimeout,    fname);
-	saveInt("ListenPort", listenport, fname);
-	saveInt("ThrottleMouse",		throttleMouse,    fname); 
-	saveInt("KeepAliveInterval",    keepAliveInterval,    fname);	
-	saveInt("AutoAcceptIncoming",	fAutoAcceptIncoming, fname);  
-	saveInt("AutoAcceptNoDSM",		fAutoAcceptNoDSM, fname);
+	WritePrivateProfileStringW(L"options", L"DSMPlugin",	szDSMPluginFilename, fname);
+	WritePrivateProfileStringW(L"options", L"folder",		folder, fname);
+	WritePrivateProfileStringW(L"options", L"prefix",		prefix, fname);
+	WritePrivateProfileStringW(L"options", L"imageFormat",		imageFormat, fname);
+	WritePrivateProfileStringW(L"options", L"InfoMsg", (LPCWSTR)InfoMsg, fname);
+	saveInt(L"AutoReconnect",		autoReconnect,	fname);
+	saveInt(L"FileTransferTimeout",  FTTimeout,    fname);
+	saveInt(L"ListenPort", listenport, fname);
+	saveInt(L"ThrottleMouse",		throttleMouse,    fname); 
+	saveInt(L"KeepAliveInterval",    keepAliveInterval,    fname);	
+	saveInt(L"AutoAcceptIncoming",	fAutoAcceptIncoming, fname);  
+	saveInt(L"AutoAcceptNoDSM",		fAutoAcceptNoDSM, fname);
 #ifdef _Gii
-	saveInt("GiiEnable", giiEnable, fname);
+	saveInt(L"GiiEnable", giiEnable, fname);
 #endif
-	saveInt("RequireEncryption",	fRequireEncryption, fname);
-	saveInt("UseOnlyDefaultConfigFile", fUseOnlyDefaultConfigFile, fname);
-	saveInt("restricted",			restricted,		fname);  //hide menu
-	saveInt("ipv6",					ipv6, fname);  //hide menu
-	saveInt("AllowUntrustedServers", AllowUntrustedServers, fname);
-	saveInt("nostatus",				NoStatus,			fname); //hide status window
-	saveInt("HideEOStreamError",    HideEndOfStreamError, fname); // hide End of Stream error
-	saveInt("nohotkeys",			NoHotKeys,		fname); //disable hotkeys
-	saveInt("sponsor",				g_disable_sponsor,	fname);
-	saveInt("PreemptiveUpdates",	preemptiveUpdates, fname);
+	saveInt(L"RequireEncryption",	fRequireEncryption, fname);
+	saveInt(L"UseOnlyDefaultConfigFile", fUseOnlyDefaultConfigFile, fname);
+	saveInt(L"restricted",			restricted,		fname);  //hide menu
+	saveInt(L"ipv6",					ipv6, fname);  //hide menu
+	saveInt(L"AllowUntrustedServers", AllowUntrustedServers, fname);
+	saveInt(L"nostatus",				NoStatus,			fname); //hide status window
+	saveInt(L"HideEOStreamError",    HideEndOfStreamError, fname); // hide End of Stream error
+	saveInt(L"nohotkeys",			NoHotKeys,		fname); //disable hotkeys
+	saveInt(L"sponsor",				g_disable_sponsor,	fname);
+	saveInt(L"PreemptiveUpdates",	preemptiveUpdates, fname);
 }
-void SessionDialog::LoadFromFile(char *fname)
+void SessionDialog::LoadFromFile(wchar_t *fname)
 {
   for (int i = rfbEncodingRaw; i<= LASTENCODING; i++) {
-    char buf[128];
-    sprintf_s(buf, "use_encoding_%d", i);
+    wchar_t buf[128];
+    swprintf_s(buf, 128, L"use_encoding_%d", i);
     UseEnc[i] =   readInt(buf, UseEnc[i], fname) != 0;
   }
   int nExistingPreferred = PreferredEncodings.empty() ? rfbEncodingZRLE : PreferredEncodings[0];
-  int nPreferredEncoding =	readInt("preferred_encoding", nExistingPreferred,	fname);
+  int nPreferredEncoding =	readInt(L"preferred_encoding", nExistingPreferred,	fname);
   PreferredEncodings.clear();
   PreferredEncodings.push_back(nPreferredEncoding);
 
-  restricted =			readInt("restricted",		restricted,	fname) != 0 ;
-  ipv6 =				readInt("ipv6",				ipv6, fname) != 0;
-  AllowUntrustedServers = readInt("AllowUntrustedServers", AllowUntrustedServers, fname) != 0;
-  ViewOnly =			readInt("viewonly",			ViewOnly,		fname) != 0;
-  NoStatus =			readInt("nostatus",			NoStatus,		fname) != 0;
-  NoHotKeys =			readInt("nohotkeys",			NoHotKeys,	fname) != 0;
-  ShowToolbar =			readInt("showtoolbar",			ShowToolbar,		fname) != 0;
-  FullScreen =			readInt("fullscreen",		FullScreen,	fname) != 0;
-  SavePos =				readInt("SavePos", SavePos, fname) != 0;
-  SaveSize =			readInt("SaveSize", SaveSize, fname) != 0;
-  GNOME =				readInt("GNOME", GNOME, fname) != 0;
-  Directx =				readInt("directx",		Directx,	fname) != 0;
-  autoDetect =			readInt("autoDetect", autoDetect, fname) != 0;
-  Use8Bit =				readInt("8bit",				Use8Bit,		fname);
-  Shared =				readInt("shared",			Shared,		fname) != 0;
-  SwapMouse =			readInt("swapmouse",		SwapMouse,	fname) != 0;
-  Emul3Buttons =		readInt("emulate3",			Emul3Buttons, fname) != 0;
-  JapKeyboard  =		readInt("JapKeyboard",			JapKeyboard, fname) != 0;
-  DisableClipboard =	readInt("disableclipboard", DisableClipboard, fname) != 0;
-  scaling =				readInt("Scaling", scaling,  fname) != 0;
-  fAutoScaling =		readInt("AutoScaling", fAutoScaling,  fname) != 0;
-  fAutoScalingEven =    readInt("AutoScalingEven", fAutoScalingEven, fname) != 0;
-  fAutoScalingLimit =	readInt("AutoScalingLimit", fAutoScalingLimit, fname) != 0;
-  scale_num =			readInt("scale_num",		scale_num,	fname);
-  scale_den =			readInt("scale_den",		scale_den,	fname);
+  restricted =			readInt(L"restricted",		restricted,	fname) != 0 ;
+  ipv6 =				readInt(L"ipv6",				ipv6, fname) != 0;
+  AllowUntrustedServers = readInt(L"AllowUntrustedServers", AllowUntrustedServers, fname) != 0;
+  ViewOnly =			readInt(L"viewonly",			ViewOnly,		fname) != 0;
+  NoStatus =			readInt(L"nostatus",			NoStatus,		fname) != 0;
+  NoHotKeys =			readInt(L"nohotkeys",			NoHotKeys,	fname) != 0;
+  ShowToolbar =			readInt(L"showtoolbar",			ShowToolbar,		fname) != 0;
+  FullScreen =			readInt(L"fullscreen",		FullScreen,	fname) != 0;
+  SavePos =				readInt(L"SavePos", SavePos, fname) != 0;
+  SaveSize =			readInt(L"SaveSize", SaveSize, fname) != 0;
+  GNOME =				readInt(L"GNOME", GNOME, fname) != 0;
+  Directx =				readInt(L"directx",		Directx,	fname) != 0;
+  autoDetect =			readInt(L"autoDetect", autoDetect, fname) != 0;
+  Use8Bit =				readInt(L"8bit",				Use8Bit,		fname);
+  Shared =				readInt(L"shared",			Shared,		fname) != 0;
+  SwapMouse =			readInt(L"swapmouse",		SwapMouse,	fname) != 0;
+  Emul3Buttons =		readInt(L"emulate3",			Emul3Buttons, fname) != 0;
+  JapKeyboard  =		readInt(L"JapKeyboard",			JapKeyboard, fname) != 0;
+  DisableClipboard =	readInt(L"disableclipboard", DisableClipboard, fname) != 0;
+  scaling =				readInt(L"Scaling", scaling,  fname) != 0;
+  fAutoScaling =		readInt(L"AutoScaling", fAutoScaling,  fname) != 0;
+  fAutoScalingEven =    readInt(L"AutoScalingEven", fAutoScalingEven, fname) != 0;
+  fAutoScalingLimit =	readInt(L"AutoScalingLimit", fAutoScalingLimit, fname) != 0;
+  scale_num =			readInt(L"scale_num",		scale_num,	fname);
+  scale_den =			readInt(L"scale_den",		scale_den,	fname);
   // Tight specific
-  requestShapeUpdates =	readInt("cursorshape",		requestShapeUpdates, fname) != 0;
-  ignoreShapeUpdates =	readInt("noremotecursor",	ignoreShapeUpdates, fname) != 0;
-  int level =			readInt("compresslevel",	-1,				fname);
+  requestShapeUpdates =	readInt(L"cursorshape",		requestShapeUpdates, fname) != 0;
+  ignoreShapeUpdates =	readInt(L"noremotecursor",	ignoreShapeUpdates, fname) != 0;
+  int level =			readInt(L"compresslevel",	-1,				fname);
   if (level != -1) {
 	useCompressLevel = true;
 	compressLevel = level;
   }
-  level =				readInt("quality",			-1,				fname);
+  level =				readInt(L"quality",			-1,				fname);
   if (level != -1) {
 	enableJpegCompression = true;
 	jpegQualityLevel = level;
   }
   // Modif sf@2002
-  nServerScale =		readInt("ServerScale",		nServerScale,	fname);
-  reconnectcounter =	readInt("Reconnect",		reconnectcounter,	fname);
-  fEnableCache =		readInt("EnableCache",		fEnableCache,	fname) != 0;
-  fEnableZstd =			readInt("EnableZstd",		fEnableZstd, fname);
-  quickoption  =		readInt("QuickOption",		quickoption, fname);
-  fUseDSMPlugin =		readInt("UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
-  m_connectionType =			(ConnectionType)readInt("UseProxy",			(int)m_connectionType, fname);
-  allowMonitorSpanning = readInt("allowMonitorSpanning", allowMonitorSpanning, fname);
-  changeServerRes = readInt("ChangeServerRes", changeServerRes, fname);
-  extendDisplay = readInt("extendDisplay", extendDisplay, fname);
-  showExtend = readInt("showExtend", showExtend, fname);
-  use_virt = readInt("use_virt", use_virt, fname);
-  useAllMonitors = readInt("useAllMonitors", useAllMonitors, fname);
+  nServerScale =		readInt(L"ServerScale",		nServerScale,	fname);
+  reconnectcounter =	readInt(L"Reconnect",		reconnectcounter,	fname);
+  fEnableCache =		readInt(L"EnableCache",		fEnableCache,	fname) != 0;
+  fEnableZstd =			readInt(L"EnableZstd",		fEnableZstd, fname);
+  quickoption  =		readInt(L"QuickOption",		quickoption, fname);
+  fUseDSMPlugin =		readInt(L"UseDSMPlugin",		fUseDSMPlugin, fname) != 0;
+  m_connectionType =			(ConnectionType)readInt(L"UseProxy",			(int)m_connectionType, fname);
+  allowMonitorSpanning = readInt(L"allowMonitorSpanning", allowMonitorSpanning, fname);
+  changeServerRes = readInt(L"ChangeServerRes", changeServerRes, fname);
+  extendDisplay = readInt(L"extendDisplay", extendDisplay, fname);
+  showExtend = readInt(L"showExtend", showExtend, fname);
+  use_virt = readInt(L"use_virt", use_virt, fname);
+  useAllMonitors = readInt(L"useAllMonitors", useAllMonitors, fname);
 
-  requestedWidth = readInt("requestedWidth", requestedWidth, fname);
-  requestedHeight = readInt("requestedHeight", requestedHeight, fname);
+  requestedWidth = readInt(L"requestedWidth", requestedWidth, fname);
+  requestedHeight = readInt(L"requestedHeight", requestedHeight, fname);
 
-  GetPrivateProfileString("options", "DSMPlugin", "NoPlugin", szDSMPluginFilename, MAX_PATH, fname);
-  GetPrivateProfileString("options", "folder", folder, folder, MAX_PATH, fname);
-  GetPrivateProfileString("options", "prefix", prefix, prefix, 56, fname);
-  GetPrivateProfileString("options", "imageFormat", imageFormat, imageFormat, 56, fname);  
-  GetPrivateProfileString("options", "InfoMsg", InfoMsg, InfoMsg, 254, fname);
-  if (!g_disable_sponsor) g_disable_sponsor=readInt("sponsor",			g_disable_sponsor, fname) != 0;
-  autoReconnect =		readInt("AutoReconnect",	autoReconnect, fname);
-  FTTimeout  =			readInt("FileTransferTimeout", FTTimeout, fname);
+  GetPrivateProfileStringW(L"options", L"DSMPlugin", L"NoPlugin", szDSMPluginFilename, MAX_PATH, fname);
+  GetPrivateProfileStringW(L"options", L"folder", folder, folder, MAX_PATH, fname);
+  GetPrivateProfileStringW(L"options", L"prefix", prefix, prefix, 56, fname);
+  GetPrivateProfileStringW(L"options", L"imageFormat", imageFormat, imageFormat, 56, fname);  
+  GetPrivateProfileStringW(L"options", L"InfoMsg", (LPCWSTR)InfoMsg, (LPWSTR)InfoMsg, 254, fname);
+  if (!g_disable_sponsor) g_disable_sponsor=readInt(L"sponsor",			g_disable_sponsor, fname) != 0;
+  autoReconnect =		readInt(L"AutoReconnect",	autoReconnect, fname);
+  FTTimeout  =			readInt(L"FileTransferTimeout", FTTimeout, fname);
   if (FTTimeout > 600)
       FTTimeout = 600; // cap at 1 minute
-  listenport = readInt("ListenPort", listenport, fname);
-  keepAliveInterval  =	readInt("KeepAliveInterval", keepAliveInterval, fname);
+  listenport = readInt(L"ListenPort", listenport, fname);
+  keepAliveInterval  =	readInt(L"KeepAliveInterval", keepAliveInterval, fname);
   if (keepAliveInterval >= (FTTimeout - KEEPALIVE_HEADROOM))
       keepAliveInterval = (FTTimeout  - KEEPALIVE_HEADROOM); 
-  throttleMouse = readInt("ThrottleMouse", throttleMouse, fname); // adzm 2010-10
+  throttleMouse = readInt(L"ThrottleMouse", throttleMouse, fname); // adzm 2010-10
 #ifdef _Gii
-  giiEnable = readInt("GiiEnable", (int)giiEnable, fname) ? true : false;
+  giiEnable = readInt(L"GiiEnable", (int)giiEnable, fname) ? true : false;
 #endif
-  fAutoAcceptIncoming = readInt("AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
-  fAutoAcceptNoDSM = readInt("AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
-  fRequireEncryption = readInt("RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
-  preemptiveUpdates = readInt("PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
+  fAutoAcceptIncoming = readInt(L"AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
+  fAutoAcceptNoDSM = readInt(L"AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
+  fRequireEncryption = readInt(L"RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
+  preemptiveUpdates = readInt(L"PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
-  GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, fname);
-  m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, fname);
+  GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, fname);
+  m_proxyport = GetPrivateProfileIntW(L"connection", L"proxyport", 0, fname);
   overwriteCommandLine();
 
 }
 
 void SessionDialog::overwriteCommandLine() 
 {
-	char* szCmdLine = m_pOpt->szCmdLine;
+	TCHAR* szCmdLine = (TCHAR*)m_pOpt->szCmdLine;
 	int cmdlinelen = _tcslen(szCmdLine);
 	if (cmdlinelen == 0) return;
 
@@ -513,7 +512,7 @@ void SessionDialog::overwriteCommandLine()
 			if (++j == i) {
 				continue;
 			}
-			strcpy_s(InfoMsg, args[j]);
+			_tcscpy_s(InfoMsg, _countof(InfoMsg), args[j]);
 		}
 
 		else if (SwitchMatch(args[j], _T("register"))) {
@@ -612,7 +611,7 @@ void SessionDialog::overwriteCommandLine()
 				continue;
 			}
 			fUseDSMPlugin = true;
-			strcpy_s(szDSMPluginFilename, args[j]);
+			_tcscpy_s(szDSMPluginFilename, _countof(szDSMPluginFilename), args[j]);
 		}
 		else if (SwitchMatch(args[j], _T("reconnectcounter")))
 		{
@@ -690,45 +689,45 @@ void SessionDialog::overwriteCommandLine()
 	delete[] args;
 }
 
-void SessionDialog::getAppData(char * buffer)
+void SessionDialog::getAppData(wchar_t * buffer)
 {
-	BOOL result = SHGetSpecialFolderPathA( NULL, buffer, CSIDL_APPDATA, false );
+	BOOL result = SHGetSpecialFolderPathW( NULL, buffer, CSIDL_APPDATA, false );
 }
 
-void SessionDialog::IfHostExistLoadSettings(char *hostname)
+void SessionDialog::IfHostExistLoadSettings(wchar_t *hostname)
 {
 	//SetDefaults();
 	TCHAR tmphost[MAX_HOST_NAME_LEN];
 	int port;
 	ParseDisplay(hostname, tmphost, MAX_HOST_NAME_LEN, &port);
-	char fname[_MAX_PATH];
+	wchar_t fname[_MAX_PATH];
 	int disp = PORT_TO_DISPLAY(port);
-	sprintf_s(fname, "%.15s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
-	char buffer[_MAX_PATH];
+	swprintf_s(fname, _MAX_PATH, L"%.15s-%d.vnc", tmphost, (disp > 0 && disp < 100) ? disp : port);
+	wchar_t buffer[_MAX_PATH];
 	getAppData(buffer);
-	strcat_s(buffer,"\\UltraVNC\\");
-	strcat_s(buffer,fname);
-	FILE *file = fopen(buffer, "r");
+	wcscat_s(buffer, _MAX_PATH, L"\\UltraVNC\\");
+	wcscat_s(buffer, _MAX_PATH, fname);
+	FILE *file = _wfopen(buffer, L"r");
 	bool fileExists = (file != NULL);
 	if (file) fclose(file);
-	strcpy_s(customConfigFile, buffer);
-	if (strlen(hostname) != 0 && fileExists && !m_pOpt->m_UseOnlyDefaultConfigFile) {
+	wcscpy_s(customConfigFile, _countof(customConfigFile), buffer);
+	if (wcslen(hostname) != 0 && fileExists && !m_pOpt->m_UseOnlyDefaultConfigFile) {
 		SetDefaults();
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());;
-		fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
+		fUseOnlyDefaultConfigFile = readInt(L"UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
 		LoadFromFile(buffer);
-		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG),customConfigFile);
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), customConfigFile);
 	}
 	else {
 		LoadFromFile(m_pOpt->getDefaultOptionsFileName());
-		fUseOnlyDefaultConfigFile = readInt("UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
+		fUseOnlyDefaultConfigFile = readInt(L"UseOnlyDefaultConfigFile", (int)fUseOnlyDefaultConfigFile, m_pOpt->getDefaultOptionsFileName()) ? true : false;
 		// Always load connection-specific settings from per-host file
-		if (strlen(hostname) != 0 && fileExists) {
-			m_connectionType = (ConnectionType)GetPrivateProfileInt("options", "UseProxy", (int)m_connectionType, buffer);
-			GetPrivateProfileString("connection", "proxyhost", "", m_proxyhost, MAX_HOST_NAME_LEN, buffer);
-			m_proxyport = GetPrivateProfileInt("connection", "proxyport", 0, buffer);
+		if (wcslen(hostname) != 0 && fileExists) {
+			m_connectionType = (ConnectionType)GetPrivateProfileIntW(L"options", L"UseProxy", (int)m_connectionType, buffer);
+			GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, buffer);
+			m_proxyport = GetPrivateProfileIntW(L"connection", L"proxyport", 0, buffer);
 		}
-		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), "");
+		SetWindowText(GetDlgItem(hTabConfig, IDC_CUSTOMCONFIG), _T(""));
 	}
 	InitDlgProcListen();
 }
@@ -788,8 +787,8 @@ void SessionDialog::SetDefaults()
 	useAllMonitors =0;
 	requestedWidth = 0;
 	requestedHeight = 0;
-	_tcscpy_s(prefix, "ultravnc_");
-	_tcscpy_s(imageFormat, ".jpeg");
+	_tcscpy_s(prefix, _countof(prefix), _T("ultravnc_"));
+	_tcscpy_s(imageFormat, _countof(imageFormat), _T(".jpeg"));
 	fAutoAcceptIncoming = false;
 	fAutoAcceptNoDSM = false;
 	fRequireEncryption = false;

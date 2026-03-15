@@ -191,4 +191,88 @@ bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, char* body, char* szHeader,
     return false;
 }
 
+bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, wchar_t* body, wchar_t* szHeader, int icon)
+{
+    HRESULT hr;
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    int nClickedBtn;
+#ifdef _VIEWER
+    LPCWSTR szTitle = L"UltraVNC Viewer";
+#else
+    LPCWSTR szTitle = L"UltraVNC Server";
+#endif
+
+    tdc.cbSize = sizeof(tdc);
+    tdc.hInstance = hInst;
+    tdc.hwndParent = m_hWnd;
+    tdc.dwCommonButtons = TDCBF_OK_BUTTON;
+    tdc.pszWindowTitle = szTitle;
+    tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION;
+
+    switch (icon) {
+    case MB_ICONEXCLAMATION:
+        tdc.pszMainIcon = TD_WARNING_ICON;
+        break;
+    case MB_ICONINFORMATION:
+        tdc.pszMainIcon = TD_INFORMATION_ICON;
+        break;
+    case MB_ICONERROR:
+        tdc.pszMainIcon = TD_ERROR_ICON;
+        break;
+    default:
+#ifdef _VIEWER
+        tdc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
+#else
+        tdc.pszMainIcon = MAKEINTRESOURCEW(IDI_WINVNC);
+#endif
+        break;
+    }
+    tdc.pszMainInstruction = szHeader;
+    tdc.pszContent = body;
+
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, NULL);
+    if (SUCCEEDED(hr) && TDCBF_OK_BUTTON == nClickedBtn)
+        return true;
+    return false;
+}
+
+bool yesnoUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, wchar_t* szHeader, wchar_t* body, wchar_t* okStr, wchar_t* cancelStr, wchar_t* checkbox, BOOL& bCheckboxChecked)
+{
+    HRESULT hr;
+    TASKDIALOGCONFIG tdc = { sizeof(TASKDIALOGCONFIG) };
+    int nClickedBtn;
+#ifdef _VIEWER
+    LPCWSTR szTitle = L"UltraVNC Viewer";
+#else
+    LPCWSTR szTitle = L"UltraVNC Server";
+#endif
+    TASKDIALOG_BUTTON aCustomButtons[] = {
+        { 1000, okStr },
+        { 1001, cancelStr }
+    };
+    tdc.cbSize = sizeof(tdc);
+    tdc.hInstance = hInst;
+    tdc.hwndParent = m_hWnd;
+    tdc.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | TDF_USE_COMMAND_LINKS;
+    tdc.pButtons = aCustomButtons;
+    tdc.cButtons = _countof(aCustomButtons);
+    tdc.pszWindowTitle = szTitle;
+    tdc.nDefaultButton = 1001;
+#ifdef _VIEWER
+    tdc.pszMainIcon = MAKEINTRESOURCEW(IDR_TRAY);
+#else
+    tdc.pszMainIcon = MAKEINTRESOURCEW(IDI_WINVNC);
+#endif
+    tdc.pszMainInstruction = szHeader;
+    tdc.pszContent = body;
+    if (checkbox && wcslen(checkbox) > 0)
+        tdc.pszVerificationText = checkbox;
+
+    hr = TaskDialogIndirect(&tdc, &nClickedBtn, NULL, &bCheckboxChecked);
+
+    if (SUCCEEDED(hr) && 1000 == nClickedBtn)
+        return true;
+    return false;
+}
+
 } // namespace helper
