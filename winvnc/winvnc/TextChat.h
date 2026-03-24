@@ -29,12 +29,12 @@ public:
 	HWND				m_hWnd;
 	HWND				m_hDlg;
 	bool				m_fTextChatRunning;
-	char*				m_szLocalText;
-	char*				m_szLastLocalText;
-	char*				m_szRemoteText;	
-	char*				m_szRemoteName;
-	char*				m_szLocalName;
-	char*				m_szTextBoxBuffer;
+	char*				m_szLocalText;      // UTF-8 encoded text for local messages
+	char*				m_szLastLocalText;  // UTF-8 encoded text for last local message
+	char*				m_szRemoteText;     // UTF-8 encoded text for remote messages
+	char*				m_szRemoteName;     // UTF-8 encoded remote computer name
+	char*				m_szLocalName;      // UTF-8 encoded local computer name
+	char*				m_szTextBoxBuffer;  // UTF-8 encoded display buffer
 	HMODULE				m_hRichEdit;
 	bool				m_fPersistentTexts;
 	// char				m_szUserID[16];

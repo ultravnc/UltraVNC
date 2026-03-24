@@ -347,12 +347,10 @@ void TextChat::SendTextChatRequest(int nMsg)
 //
 void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwColor /* = BLACK*/)
 {
-	// char szTextBoxBuffer[TEXTMAXSIZE];			
-	// memset(szTextBoxBuffer,0,TEXTMAXSIZE);			
+	// Note: szMessage and szSender are UTF-8 encoded strings
 	CHARRANGE cr;	
 	
 	// sf@2005 - Empty the RichEdit control when it's close to the TEXTMAXSIZE limit
-	// In worst case, the RichEdit can contains 2*TEXTMAXSIZE + NAMEMAXSIZE + 4 - 32 bytes
 	GETTEXTLENGTHEX lpG;
 	lpG.flags = GTL_NUMBYTES;
 	lpG.codepage = CP_UTF8;
@@ -365,40 +363,49 @@ void TextChat::PrintMessage(const char* szMessage,const char* szSender,DWORD dwC
 		SetDlgItemText(m_hDlg, IDC_CHATAREA_EDIT, m_szTextBoxBuffer);
 	}
 
-	// Todo: test if chat text + sender + message > TEXTMAXSIZE -> Modulo display
-	if (szSender != NULL && strlen(szSender) > 0) //print the sender's name
+	// Print sender's name with Unicode support
+	if (szSender != NULL && strlen(szSender) > 0)
 	{
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
-		cr.cpMax = nLen; //strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
+		cr.cpMax = nLen;
 		cr.cpMin  = cr.cpMax;
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 
-		//	[v1.0.2-jp1 fix]
 		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor);
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, MAXNAMESIZE-1 + 4, "<%s>: ", szSender);		
+		// Convert UTF-8 sender name to Unicode for better display
+		wchar_t senderW[MAXNAMESIZE];
+		MultiByteToWideChar(CP_UTF8, 0, szSender, -1, senderW, MAXNAMESIZE);
+		
+		wchar_t bufferW[MAXNAMESIZE + 10];
+		swprintf_s(bufferW, MAXNAMESIZE + 10, L"<%s>: ", senderW);
+		
 		SETTEXTEX st;
 		st.flags = ST_SELECTION;
-		st.codepage = CP_UTF8;
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)m_szTextBoxBuffer);
+		st.codepage = 1200; // Unicode (UTF-16LE)
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)bufferW);
 	}
 
 	nLen = (int)SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_GETTEXTLENGTHEX, (WPARAM)&lpG, 0L);
-	if (szMessage != NULL) //print the sender's message
+	
+	// Print message with Unicode support
+	if (szMessage != NULL)
 	{	
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,WM_GETTEXT, TEXTMAXSIZE-1,(LPARAM)m_szTextBoxBuffer);
-		cr.cpMax = nLen; //strlen(m_szTextBoxBuffer);	 // Select the last caracter to make the text insertion
+		cr.cpMax = nLen;
 		cr.cpMin  = cr.cpMax;
 		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT,EM_EXSETSEL,0,(LPARAM) &cr);
 
-		//	[v1.0.2-jp1 fix]
 		SetTextFormat(false, false, 0x75, "MS Shell Dlg 2", dwColor != GREY ? BLACK : GREY);
 
-		_snprintf_s(m_szTextBoxBuffer, TEXTMAXSIZE, TEXTMAXSIZE-1, "%s", szMessage);		
+		// Convert UTF-8 message to Unicode for better display
+		wchar_t messageW[TEXTMAXSIZE];
+		MultiByteToWideChar(CP_UTF8, 0, szMessage, -1, messageW, TEXTMAXSIZE);
+		
 		SETTEXTEX st;
 		st.flags = ST_SELECTION;
-		st.codepage = CP_UTF8;
-		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)m_szTextBoxBuffer);
+		st.codepage = 1200; // Unicode (UTF-16LE)
+		SendDlgItemMessage(m_hDlg, IDC_CHATAREA_EDIT, EM_SETTEXTEX, (WPARAM)&st, (LPARAM)messageW);
 	}
 
 	// Scroll down the chat window
