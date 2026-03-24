@@ -681,21 +681,76 @@ public:
 		if (unicode) {
 			if (keysym == 65509)
 				return;
-			INPUT inputs[1];
-			char *key, text[32];
-			if (keysym >= 0x0100 && keysym <= 0x10FFFF) {
-				sprintf_s(text, "%d", keysym & 0xFFFF);
+			
+			// Convert X11 keysym to Unicode codepoint
+			// RFB protocol uses X11 keysyms, not Unicode codepoints
+			WORD unicodeChar = 0;
+			
+			// Georgian: X11 keysym 0x15d0-0x15f6 → Unicode U+10D0-U+10F6
+			if (keysym >= 0x15d0 && keysym <= 0x15f6) {
+				unicodeChar = (WORD)(keysym - 0x15d0 + 0x10d0);
+				vnclog.Print(LL_INTINFO, "Georgian keysym 0x%x → Unicode U+%04X\n", keysym, unicodeChar);
+			}
+			// Armenian: X11 keysym 0x14a1-0x14ff → Unicode U+0531-U+058F
+			else if (keysym >= 0x14a1 && keysym <= 0x14ff) {
+				// Armenian punctuation and symbols (0x14a1-0x14b1)
+				static const WORD armenian_punct[] = {
+					0x0587, // 0x14a1 eternity (ligature ew)
+					0x0587, // 0x14a2 ligature_ew
+					0x0589, // 0x14a3 full_stop/verjaket
+					0x0029, // 0x14a4 parenright
+					0x0028, // 0x14a5 parenleft
+					0x00BB, // 0x14a6 guillemotright
+					0x00AB, // 0x14a7 guillemotleft
+					0x2014, // 0x14a8 em_dash
+					0x002E, // 0x14a9 dot/mijaket
+					0x055D, // 0x14aa separation_mark/but
+					0x002C, // 0x14ab comma
+					0x2013, // 0x14ac en_dash
+					0x058A, // 0x14ad hyphen/yentamna
+					0x2026, // 0x14ae ellipsis
+					0x055C, // 0x14af exclam/amanak
+					0x055B, // 0x14b0 accent/shesht
+					0x055E  // 0x14b1 question/paruyk
+				};
+				
+				if (keysym >= 0x14a1 && keysym <= 0x14b1) {
+					unicodeChar = armenian_punct[keysym - 0x14a1];
+				}
+				// Armenian uppercase letters (0x14b2-0x14fa, even) → U+0531-U+0556
+				else if ((keysym >= 0x14b2) && (keysym <= 0x14fa) && ((keysym & 1) == 0)) {
+					unicodeChar = (WORD)(0x0531 + (keysym - 0x14b2) / 2);
+				}
+				// Armenian lowercase letters (0x14b3-0x14fb, odd) → U+0561-U+0586
+				else if ((keysym >= 0x14b3) && (keysym <= 0x14fb) && ((keysym & 1) == 1)) {
+					unicodeChar = (WORD)(0x0561 + (keysym - 0x14b3) / 2);
+				}
+				// Armenian apostrophe and section sign
+				else if (keysym == 0x14fe) {
+					unicodeChar = 0x055A; // apostrophe
+				}
+				else if (keysym == 0x14ff) {
+					unicodeChar = 0x00A7; // section_sign
+				}
+				else {
+					unicodeChar = (WORD)keysym; // Fallback
+				}
+				vnclog.Print(LL_INTINFO, "Armenian keysym 0x%x → Unicode U+%04X\n", keysym, unicodeChar);
+			}
+			// For most other keysyms, assume direct Unicode mapping
+			else if (keysym >= 0x0100 && keysym <= 0xFFFF) {
+				unicodeChar = (WORD)keysym;
 			}
 			else {
-				sprintf_s(text, "%d", keysym);
+				vnclog.Print(LL_INTINFO, "Unhandled keysym 0x%x\n", keysym);
+				return;
 			}
 			
-			key = text;	
-			vnclog.Print(LL_INTINFO, "trying unicode input key \"%s\"\n",key);
+			INPUT inputs[1];
 			if (down) {
 				inputs[0].type= INPUT_KEYBOARD;
 				inputs[0].ki.wVk = 0;
-				inputs[0].ki.wScan = atoi(key);
+				inputs[0].ki.wScan = unicodeChar;
 				inputs[0].ki.time = 0;
 				inputs[0].ki.dwExtraInfo = NULL;
 				inputs[0].ki.dwFlags = KEYEVENTF_UNICODE;
@@ -703,7 +758,7 @@ public:
 			} else {
 				inputs[0].type= INPUT_KEYBOARD;
 				inputs[0].ki.wVk = 0;
-				inputs[0].ki.wScan = atoi(key);
+				inputs[0].ki.wScan = unicodeChar;
 				inputs[0].ki.time = 0;
 				inputs[0].ki.dwExtraInfo = NULL;
 				inputs[0].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
