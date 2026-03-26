@@ -259,7 +259,7 @@ vncAbout::DialogProc(HWND hwnd,
             const long lszConfigFileSize = 256;
             char szConfigFile[lszConfigFileSize];
 
-            _snprintf_s(szConfigFile, lszConfigFileSize - 1, "Config file: %s", configFile);
+            _snprintf_s(szConfigFile, lszConfigFileSize - 1, "Config file: %ls", configFile);
             SetDlgItemText(hwnd, IDC_CONFIG_FILE, szConfigFile);
 			return TRUE;
 		}

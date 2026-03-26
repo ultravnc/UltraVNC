@@ -10,6 +10,7 @@
 // SPDX-FileCopyrightText: Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 // SPDX-FileCopyrightText: Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
+#pragma warning(disable: 4996)
 
 
 // vncDesktop implementation

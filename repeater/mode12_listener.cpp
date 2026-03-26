@@ -241,7 +241,7 @@ DWORD WINAPI mode12listener(LPVOID lpParam)
 						if (saved_refuse2)
 						{
 							found2=FALSE;
-							for (i=0;i<rule3;i++)
+							for (i=0;(int)i<rule3;i++)
 								{
 									if (atoi(temp3[i])==remoteport) found2=1;
 

@@ -13,6 +13,7 @@
 //
 
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 // vncClient.cpp
 
 // The per-client object. This object takes care of all per-client stuff,

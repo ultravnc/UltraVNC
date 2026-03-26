@@ -6,9 +6,10 @@
 //
 // SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
 // SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
-//
 
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include "cadthread.h"
 #include "Localization.h"
 #include "SettingsManager.h"
@@ -247,3 +248,4 @@ gotome:
 		CloseDesktop(desktop);
 	return 0;
 }
+#pragma warning(pop)

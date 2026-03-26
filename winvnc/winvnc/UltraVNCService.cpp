@@ -7,6 +7,7 @@
 // SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
 // SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
 //
+#pragma warning(disable: 4996)
 
 
 #ifndef SC_20
@@ -135,13 +136,13 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
     serviceStatus.dwServiceSpecificExitCode=NO_ERROR;
     serviceStatus.dwCheckPoint=0;
     serviceStatus.dwWaitHint=0;
-	if (strcmp(argv[0], service_name) == NULL) {
-		strcpy_s(configfilename, "ultravnc.ini");
+	if (wcscmp(argv[0], wServiceName) == 0) {
+		wcscpy_s(configfilename, L"ultravnc.ini");
 	}
 	else
 	{
-		strcpy_s(configfilename, argv[0]);
-		strcat_s(configfilename, ".ini");
+		wcscpy_s(configfilename, argv[0]);
+		wcscat_s(configfilename, L".ini");
 	}
 
 	char programdataPath[MAX_PATH]{};

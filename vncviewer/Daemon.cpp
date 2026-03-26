@@ -215,7 +215,7 @@ if (GetListenMode()){
 	m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 	m_nid.szTip[0] = '\0';
 	// Use resource string as tip if there is one
-	if (LoadString(m_hInstResDLL, IDR_TRAY, m_nid.szTip, sizeof(m_nid.szTip))) {
+	if (LoadString(m_hInstResDLL, IDR_TRAY, m_nid.szTip, _countof(m_nid.szTip))) {
 		m_nid.uFlags |= NIF_TIP;
 	}
 

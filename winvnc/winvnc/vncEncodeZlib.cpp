@@ -167,7 +167,7 @@ inline UINT vncEncodeZlib::EncodeOneRect(BYTE *source, BYTE *dest, const RECT &r
 
 	avail_in = rawDataSize;
 	Translate(source, m_buffer, rect);
-	if (rawDataSize < ultraVncZ->minSize())
+	if ((UINT)rawDataSize < ultraVncZ->minSize())
 		return vncEncoder::EncodeRect(source, dest, rect);
 
 	if (rawDataSize < 1000 && m_queueEnable) {

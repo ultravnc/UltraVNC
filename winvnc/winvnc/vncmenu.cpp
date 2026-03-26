@@ -8,10 +8,10 @@
 // SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
 // SPDX-FileCopyrightText: Copyright (C) 2002 RealVNC Ltd. All Rights Reserved.
 // SPDX-FileCopyrightText: Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
 
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+#pragma warning(disable: 4995)
 // vncMenu
 
 // Implementation of a system Tray icon & menu for UltraVNC Server

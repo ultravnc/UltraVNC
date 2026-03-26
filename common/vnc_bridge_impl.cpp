@@ -536,7 +536,7 @@ void VncBridge::run_client_mode() {
                         // Store connection
                         {
                             std::lock_guard<std::mutex> lock(connections_mutex_);
-                            if (connection_counter >= tcp_connections_.size()) {
+                            if ((size_t)connection_counter >= tcp_connections_.size()) {
                                 tcp_connections_.resize(connection_counter + 1, -1);
                             }
                             tcp_connections_[connection_counter] = static_cast<int>(client_socket);
@@ -638,7 +638,7 @@ void VncBridge::handle_tcp_to_udp(int tcp_socket, int connection_id) {
     BRIDGE_LOG_LN("🧹 Cleaning up TCP connection " << connection_id);
     {
         std::lock_guard<std::mutex> lock(connections_mutex_);
-        if (connection_id < tcp_connections_.size()) {
+        if ((size_t)connection_id < tcp_connections_.size()) {
 #ifdef _WIN32
             closesocket(tcp_connections_[connection_id]);
 #else
@@ -772,7 +772,7 @@ void VncBridge::forward_to_udp(const char* data, int size, int connection_id) {
 void VncBridge::forward_to_tcp_binary(const uint8_t* data, int size, int connection_id) {
     std::lock_guard<std::mutex> lock(connections_mutex_);
     
-    if (connection_id < tcp_connections_.size() && tcp_connections_[connection_id] != -1) {
+    if ((size_t)connection_id < tcp_connections_.size() && tcp_connections_[connection_id] != -1) {
         int tcp_socket = tcp_connections_[connection_id];
         
 #ifdef _WIN32
@@ -861,7 +861,7 @@ int VncBridge::connect_to_vnc_server(int connection_id) {
     // Store connection
     {
         std::lock_guard<std::mutex> lock(connections_mutex_);
-        if (connection_id >= tcp_connections_.size()) {
+        if ((size_t)connection_id >= tcp_connections_.size()) {
             tcp_connections_.resize(connection_id + 1, -1);
         }
         tcp_connections_[connection_id] = static_cast<int>(vnc_socket);
@@ -878,7 +878,7 @@ int VncBridge::connect_to_vnc_server(int connection_id) {
 void VncBridge::close_tcp_connection(int connection_id) {
     std::lock_guard<std::mutex> lock(connections_mutex_);
     
-    if (connection_id < tcp_connections_.size() && tcp_connections_[connection_id] != -1) {
+    if ((size_t)connection_id < tcp_connections_.size() && tcp_connections_[connection_id] != -1) {
         int tcp_socket = tcp_connections_[connection_id];
 #ifdef _WIN32
         closesocket(tcp_socket);
