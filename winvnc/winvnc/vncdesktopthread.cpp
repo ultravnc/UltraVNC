@@ -13,6 +13,7 @@
 #include "vncOSVersion.h"
 #include "uvncUiAccess.h"
 #include "SettingsManager.h"
+#include <algorithm>
 
 extern bool G_USE_PIXEL;
 
@@ -814,6 +815,8 @@ vncDesktopThread::run_undetached(void *arg)
 	/////////////////////
 	looping=true;
 	SetEvent(m_desktop->restart_event);
+	bool blit_polling = false;
+	DWORD lastFullFrameTime = GetTimeFunction();
 	
 	rgncache.assign_union(rfb::Region2D(m_desktop->m_Cliprect));
 
@@ -866,6 +869,7 @@ vncDesktopThread::run_undetached(void *arg)
 			if (ThreadHandleCheckCursorUpdates == NULL)
 				ThreadHandleCheckCursorUpdates = CreateThread(NULL, 0, ThreadCheckCursorUpdates, this, 0, &dw);
 			waittime = 33; // possible this need to be higher to lower cpu usage
+			blit_polling = true;
 		}
 			   
 	while (looping && !fShutdownOrdered)
@@ -901,23 +905,36 @@ vncDesktopThread::run_undetached(void *arg)
 						sLastCopy3 = now;
 #endif
 								// MaxCpu() == 100  PowerMode
-								if (settings->getMaxCpu() != 100) {
-									if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)) {
-										cpuUsage = usage.GetUsage();
-										if (cpuUsage > settings->getMaxCpu())
-											MIN_UPDATE_INTERVAL+=10;
-										else MIN_UPDATE_INTERVAL-=10;
-										if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) 
-											MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
-										if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) 
-											MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
+							if (settings->getMaxCpu() != 100) {
+								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)) {
+									cpuUsage = usage.GetUsage();
+									int cpu_diff = (int)cpuUsage - (int)settings->getMaxCpu();
+									if (cpu_diff > 0) {
+										// Over target: step up proportionally (faster reaction, min 5ms)
+										MIN_UPDATE_INTERVAL += (DWORD)std::max(5, cpu_diff / 2);
+									} else {
+										// Under target: step down slowly to avoid oscillation (min 5ms)
+										DWORD step = (DWORD)std::max(5, (-cpu_diff) / 4);
+										MIN_UPDATE_INTERVAL = (MIN_UPDATE_INTERVAL > step + MIN_UPDATE_INTERVAL_MIN)
+											? MIN_UPDATE_INTERVAL - step : MIN_UPDATE_INTERVAL_MIN;
 									}
+									if (MIN_UPDATE_INTERVAL<MIN_UPDATE_INTERVAL_MIN) 
+										MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MIN;
+									if (MIN_UPDATE_INTERVAL>MIN_UPDATE_INTERVAL_MAX) 
+										MIN_UPDATE_INTERVAL=MIN_UPDATE_INTERVAL_MAX;
 								}
-								else
-									MIN_UPDATE_INTERVAL = 25;
+							}
+							else
+								MIN_UPDATE_INTERVAL = 25;
 
 								// MAX 30fps
-								newtick = GetTimeFunction(); 
+							newtick = GetTimeFunction();
+							// In BLIT polling mode, only apply the interval sleep on a pure
+							// timeout (rate-limit polling). When an event fires early
+							// (WAIT_OBJECT_0), process it immediately — adding Sleep here
+							// would otherwise delay the triggered update by up to
+							// (MIN_UPDATE_INTERVAL - elapsed) + next WaitFor(33ms).
+							if (!blit_polling || result == WAIT_TIMEOUT || result == WAIT_OBJECT_0+6)
 								if ((newtick-oldtick)<MIN_UPDATE_INTERVAL)
 									Sleep(MIN_UPDATE_INTERVAL-(newtick-oldtick));
 								
@@ -1181,9 +1198,12 @@ vncDesktopThread::run_undetached(void *arg)
 												m_desktop->m_screenCapture->Lock();
 											bool fullframe = false;
 											if (m_desktop->m_Ultra2Encoder_used) {
-												framecounter++;
-												if (framecounter > 10) {
-													framecounter = 0;
+												// Time-based full-frame: every 2s regardless of frame rate.
+												// Previously frame-count-based (every 10 frames) which
+												// caused CPU spikes at high fps and missed refreshes when throttled.
+												DWORD nowFF = GetTimeFunction();
+												if (nowFF - lastFullFrameTime >= 2000) {
+													lastFullFrameTime = nowFF;
 													checkrgn.assign_union(m_desktop->m_Cliprect);
 													fullframe = true;
 												}

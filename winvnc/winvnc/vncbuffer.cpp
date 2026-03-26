@@ -332,7 +332,8 @@ void vncBuffer::CheckRect(rfb::Region2D &dest, rfb::Region2D &cacheRgn, const rf
 	else if (ScaledRect.br.x - ScaledRect.tl.x < 32)
 		nOptimizedBlockSize = BLOCK_SIZE / 2;
 	else
-		nOptimizedBlockSize = BLOCK_SIZE * 2;
+		nOptimizedBlockSize = BLOCK_SIZE;	// was BLOCK_SIZE*2 (64px): a single changed pixel
+											// dirtied a 4096-pixel block; 32px = 4x less waste
 
 	ptrdiff_t ptrBlockOffset = (ScaledRect.tl.y * m_bytesPerRow) + (ScaledRect.tl.x * bytesPerPixel);
 
@@ -703,63 +704,108 @@ void vncBuffer::ScaleRect(rfb::Rect &rect)
 	}
 	else if ((m_scrinfo.format.trueColour && m_nScale!=1) || m_fGreyPalette)
 	{
-		unsigned long lRed;
-		unsigned long lGreen;
-		unsigned long lBlue;
-		unsigned long lScaledPixel;
-		UINT nBytesPerPixel = (m_scrinfo.format.bitsPerPixel / 8);
+		const UINT nBytesPerPixel = (m_scrinfo.format.bitsPerPixel / 8);
+		const UINT nScaleSq       = m_nScale * m_nScale;
+		// Cache format fields outside the hot loop to avoid repeated struct accesses
+		const UINT redShift   = m_scrinfo.format.redShift;
+		const UINT greenShift = m_scrinfo.format.greenShift;
+		const UINT blueShift  = m_scrinfo.format.blueShift;
+		const UINT redMax     = m_scrinfo.format.redMax;
+		const UINT greenMax   = m_scrinfo.format.greenMax;
+		const UINT blueMax    = m_scrinfo.format.blueMax;
 
-		// For each line of the Destination ScaledRect
-		for (int y = ScaledRect.tl.y; y < ScaledRect.br.y; y++)
+		if (nBytesPerPixel == 4)
 		{
-			// For each Pixel of the line
-			for (int x = 0; x < (ScaledRect.br.x - ScaledRect.tl.x); x++)
+			// 32bpp fast path: replace byte-assembly loops with direct DWORD read/write.
+			// Old code: 4 inner iterations to assemble each pixel + 4 to write it.
+			// New code: single DWORD load/store — same bit pattern, little-endian.
+			const int srcBlockStride = m_nScale * 4; // bytes between block-column starts
+			for (int y = ScaledRect.tl.y; y < ScaledRect.br.y; y++)
 			{
-				lRed   = 0;
-				lGreen = 0;
-				lBlue  = 0;
-				// Take a m_Scale*m_nScale square of pixels in the Main Buffer
-				// and get the global Red, Green, Blue values for this square
-				for (UINT r = 0; r < m_nScale; r++)
+				for (int x = 0; x < (ScaledRect.br.x - ScaledRect.tl.x); x++)
 				{
-					for (UINT c = 0; c < m_nScale; c++)
+					unsigned long lRed = 0, lGreen = 0, lBlue = 0;
+					const BYTE *pBlock = pMain + x * srcBlockStride;
+					for (UINT r = 0; r < m_nScale; r++)
 					{
-						lScaledPixel = 0;
-						for (UINT b = 0; b < nBytesPerPixel; b++)
+						const DWORD *pRow = reinterpret_cast<const DWORD *>(pBlock + r * m_bytesPerRow);
+						for (UINT c = 0; c < m_nScale; c++)
 						{
-							lScaledPixel += (pMain[(((x * m_nScale) + c) * nBytesPerPixel) + (r * m_bytesPerRow) + b]) << (8 * b);
+							DWORD p = pRow[c];
+							lRed   += (p >> redShift)   & redMax;
+							lGreen += (p >> greenShift) & greenMax;
+							lBlue  += (p >> blueShift)  & blueMax;
 						}
-						lRed   += (lScaledPixel >> m_scrinfo.format.redShift) & m_scrinfo.format.redMax;
-						lGreen += (lScaledPixel >> m_scrinfo.format.greenShift) & m_scrinfo.format.greenMax;
-						lBlue  += (lScaledPixel >> m_scrinfo.format.blueShift) & m_scrinfo.format.blueMax;
+					}
+					lRed   /= nScaleSq;
+					lGreen /= nScaleSq;
+					lBlue  /= nScaleSq;
+					DWORD result;
+					// JK 26th Jan, 2005: Reduce possible colors to 8 shades of gray
+					if (fCanReduceColors)
+						result = To8GreyColors(lRed, lGreen, lBlue);
+					else
+						result = (lRed << redShift) | (lGreen << greenShift) | (lBlue << blueShift);
+					*reinterpret_cast<DWORD *>(pScaled + x * 4) = result;
+				}
+				pMain   += (m_bytesPerRow * m_nScale);
+				pScaled += m_bytesPerRow;
+			}
+		}
+		else
+		{
+			// General path for 16bpp / 8bpp
+			unsigned long lRed, lGreen, lBlue, lScaledPixel;
+			// For each line of the Destination ScaledRect
+			for (int y = ScaledRect.tl.y; y < ScaledRect.br.y; y++)
+			{
+				// For each Pixel of the line
+				for (int x = 0; x < (ScaledRect.br.x - ScaledRect.tl.x); x++)
+				{
+					lRed   = 0;
+					lGreen = 0;
+					lBlue  = 0;
+					// Take a m_Scale*m_nScale square of pixels in the Main Buffer
+					// and get the global Red, Green, Blue values for this square
+					for (UINT r = 0; r < m_nScale; r++)
+					{
+						for (UINT c = 0; c < m_nScale; c++)
+						{
+							lScaledPixel = 0;
+							for (UINT b = 0; b < nBytesPerPixel; b++)
+							{
+								lScaledPixel += (pMain[(((x * m_nScale) + c) * nBytesPerPixel) + (r * m_bytesPerRow) + b]) << (8 * b);
+							}
+							lRed   += (lScaledPixel >> redShift) & redMax;
+							lGreen += (lScaledPixel >> greenShift) & greenMax;
+							lBlue  += (lScaledPixel >> blueShift) & blueMax;
+						}
+					}
+					// Get the medium R,G,B values for the square
+					lRed   /= nScaleSq;
+					lGreen /= nScaleSq;
+					lBlue  /= nScaleSq;
+					// JK 26th Jan, 2005: Reduce possible colors to 8 shades of gray
+					if (fCanReduceColors)
+					{
+						lScaledPixel = To8GreyColors(lRed, lGreen, lBlue);
+					}
+					else
+					{
+						// Calculate the resulting "medium" pixel
+						lScaledPixel = (lRed << redShift) + (lGreen << greenShift) + (lBlue << blueShift);
+					}
+
+					// Copy the resulting pixel in the Scaled Buffer
+					for (UINT b = 0; b < nBytesPerPixel; b++)
+					{
+						pScaled[(x * nBytesPerPixel) + b] = (lScaledPixel >> (8 * b)) & 0xFF;
 					}
 				}
-				// Get the medium R,G,B values for the sqare
-				lRed   /= m_nScale * m_nScale;
-				lGreen /= m_nScale * m_nScale;
-				lBlue  /= m_nScale * m_nScale;
-				// Calculate the resulting "medium" pixel
-				// lScaledPixel = (lRed << m_scrinfo.format.redShift) + (lGreen << m_scrinfo.format.greenShift) + (lBlue << m_scrinfo.format.blueShift);
-                // JK 26th Jan, 2005: Reduce possible colors to 8 shades of gray
-				if (fCanReduceColors)
-				{
-					lScaledPixel = To8GreyColors(lRed, lGreen, lBlue);
-				}
-				else
-				{
-					// Calculate the resulting "medium" pixel
-					lScaledPixel = (lRed << m_scrinfo.format.redShift) + (lGreen << m_scrinfo.format.greenShift) + (lBlue << m_scrinfo.format.blueShift);
-				}
-
-				// Copy the resulting pixel in the Scaled Buffer
-				for (UINT b = 0; b < nBytesPerPixel; b++)
-				{
-					pScaled[(x * nBytesPerPixel) + b] = (lScaledPixel >> (8 * b)) & 0xFF;
-				}
+				// Move the buffers' pointers to their next "line"
+				pMain   += (m_bytesPerRow * m_nScale); // Skip m_nScale raws of the mainbuffer's Rect
+				pScaled += m_bytesPerRow;
 			}
-			// Move the buffers' pointers to their next "line"
-			pMain   += (m_bytesPerRow * m_nScale); // Skip m_nScale raws of the mainbuffer's Rect
-			pScaled += m_bytesPerRow;
 		}
 	}
 	// Keep only the topleft pixel of each MainBuffer's m_Scale*m_nScale block

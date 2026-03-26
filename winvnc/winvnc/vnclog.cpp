@@ -51,7 +51,9 @@ void VNCLog::Print(int level, const char* format, ...) {
     if (level == -1 || (settings && settings->getShowAllLogs())) {
         va_list ap;
         va_start(ap, format);
-        ReallyPrintScreen(removeNewlineAndCopy(format), ap);
+        char* cleaned = removeNewlineAndCopy(format);
+        ReallyPrintScreen(cleaned, ap);
+        delete[] cleaned;
         va_end(ap);
         return;
     }

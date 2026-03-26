@@ -440,6 +440,7 @@ vncDesktop::vncDesktop()
 	AviGen = NULL;
 #endif
 	m_Black_window_active = false;
+	m_captureROP = SRCCOPY;
 	m_hwnd = NULL;
 	//m_timerid = 0;
 	// adzm - 2010-07 - Fix clipboard hangs
@@ -703,6 +704,7 @@ vncDesktop::Startup()
 		vnclog.Print(LL_INTINFO, VNCLOG("InitDesktop Failed\n"));
 		return ERROR_DESKTOP_INIT_FAILED;
 	}
+	UpdateCaptureROP();
 
 	// Modif rdv@2002 - v1.1.x - VideoDriver
 	vnclog.Print(LL_INTINFO, VNCLOG("InitVideoDriver Called\n"));
@@ -1720,6 +1722,15 @@ vncDesktop::WriteMessageOnScreenPreConnect(BYTE *scrBuff, UINT scrBuffSize)
 #define CAPTUREBLT  0x40000000
 #endif
 
+void
+vncDesktop::UpdateCaptureROP()
+{
+	bool useCaptureBlt = (VNC_OSVersion::getInstance()->CaptureAlphaBlending()
+		|| settings->getAutocapt() == 2)
+		&& !m_Black_window_active;
+	m_captureROP = useCaptureBlt ? (CAPTUREBLT | SRCCOPY) : SRCCOPY;
+}
+
 // Function to capture an area of the screen immediately prior to sending
 // an update.
 void
@@ -1751,7 +1762,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				m_hrootdc_Desktop,
 				rect.tl.x + m_ScreenOffsetx,
 				rect.tl.y + m_ScreenOffsety,
-				((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || settings->getAutocapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY
+				m_captureROP
 			);
 		}
 		else
@@ -1765,7 +1776,7 @@ vncDesktop::CaptureScreen(const rfb::Rect &rect, BYTE *scrBuff, UINT scrBuffSize
 				rect.tl.y,
 				(rect.br.x - rect.tl.x),
 				(rect.br.y - rect.tl.y),
-				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, ((VNC_OSVersion::getInstance()->CaptureAlphaBlending() || settings->getAutocapt() == 2) && !m_Black_window_active) ? (CAPTUREBLT | SRCCOPY) : SRCCOPY);
+				m_hrootdc_Desktop, rect.tl.x + xoffset, rect.tl.y + yoffset, m_captureROP);
 		}
 		/*#if defined(_DEBUG)
 			DWORD e = GetTimeFunction() - t;
@@ -2505,11 +2516,13 @@ void vncDesktop::SetBlockInputState(bool newstate)
 			if ((blankmonitorstate == newstate) && (newstate == 1))
 			{
 				m_Black_window_active = layeredWindows->SetBlankMonitor(0, settings->getBlankInputsOnly(), m_Black_window_active, m_screen_in_powersave, m_hwnd);
+				UpdateCaptureROP();
 				blankmonitorstate = 0;
 			}
 			else
 			{
 				m_Black_window_active = layeredWindows->SetBlankMonitor(newstate, settings->getEnableBlankMonitor(), m_Black_window_active, m_screen_in_powersave, m_hwnd);
+				UpdateCaptureROP();
 				blankmonitorstate = newstate;
 			}
 		}

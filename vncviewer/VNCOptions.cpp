@@ -233,7 +233,7 @@ VNCOptions::VNCOptions()
 	m_fAutoAcceptNoDSM = false;
 	m_fRequireEncryption = false;
 	m_UseOnlyDefaultConfigFile = true;
-	m_preemptiveUpdates = false;
+	m_preemptiveUpdates = true;
 	m_saved_scale_num = 100;
 	m_saved_scale_den = 100;
 	m_saved_scaling = false;

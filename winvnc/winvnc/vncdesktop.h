@@ -379,6 +379,8 @@ protected:
 	BOOL ddihook;
 	bool m_screen_in_powersave;
 	bool m_Black_window_active;
+	DWORD m_captureROP;			// Cached BitBlt ROP: SRCCOPY or (CAPTUREBLT|SRCCOPY)
+	void UpdateCaptureROP();	// Recompute m_captureROP; call after settings/aero/blank change
 
 	//	[v1.0.2-jp1 fix] Monitor Blanking
 	//BOOL m_grayed;
