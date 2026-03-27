@@ -265,6 +265,9 @@ bool MigrateIniToProgramData(const char* installFolderPath, const char* programD
 
 void extractConfig(char* szCmdLine)
 {
+	// Check if running as service - check for -service in command line
+	bool isServiceMode = strstr(szCmdLine, winvncRunService) != NULL;
+
 	size_t i = 0;
 	while (szCmdLine[i] != '\0') {
 		if (strncmp(&szCmdLine[i], winvncConfig, strlen(winvncConfig)) == 0) {
@@ -332,17 +335,10 @@ void extractConfig(char* szCmdLine)
 			vnclog.Print(LL_LOGSCREEN, "Portable mode: Using config file: %s", configFile);
 		}
 		else {
-			// Hybrid mode: LocalAppData (user-specific) → ProgramData (shared fallback)
+			// Admin mode: Always use ProgramData (system-wide shared config)
+			// Non-admin: Hybrid mode - LocalAppData (user-specific) → ProgramData (shared fallback)
 			
-			// Get LocalAppData path (user-specific)
-			SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
-			strcpy_s(appdataFolder, appdataPath);
-			strcat_s(appdataFolder, CONFIG_SUBFOLDER);
-			strcpy_s(appdataIni, appdataFolder);
-			strcat_s(appdataIni, "\\");
-			strcat_s(appdataIni, INIFILE_NAME);
-			
-			// Get ProgramData path (system-wide)
+			// Get ProgramData path (system-wide) - always needed
 			SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath);
 			strcpy_s(programdataFolder, programdataPath);
 			strcat_s(programdataFolder, CONFIG_SUBFOLDER);
@@ -350,30 +346,24 @@ void extractConfig(char* szCmdLine)
 			strcat_s(programdataIni, "\\");
 			strcat_s(programdataIni, INIFILE_NAME);
 
-			// Attempt to migrate from install folder to ProgramData (one-time)
-			MigrateIniToProgramData(winvncFolder, programdataPath);
-
-			// Priority: LocalAppData → ProgramData
-			// Check for user-specific config first
-			{
-				std::ifstream file(appdataIni);
-				if (file.good()) {
-					// User has personal config in LocalAppData
-					strcpy_s(configFile, appdataIni);
-					showSettings = true;  // Users can always edit their own AppData
-					vnclog.Print(LL_LOGSCREEN, "Using user config: %s", configFile);
-				}
-			}
+			// Check if running as administrator or service
+			bool isAdmin = Credentials::RunningAsAdministrator(false);
 			
-			// If no user config, check for shared ProgramData config
-			if (strlen(configFile) == 0) {
+			if (isAdmin || isServiceMode) {
+				// Admin or service always uses ProgramData, skip LocalAppData entirely
+				if (isServiceMode)
+					vnclog.Print(LL_LOGSCREEN, "Running as service: Using ProgramData config");
+				else
+					vnclog.Print(LL_LOGSCREEN, "Running as admin: Using ProgramData config");
+				
+				// Attempt to migrate from install folder to ProgramData (one-time)
+				MigrateIniToProgramData(winvncFolder, programdataPath);
+				
+				// Check if ProgramData config exists
 				std::ifstream file(programdataIni);
 				if (file.good()) {
-					// Fallback to ProgramData (shared config)
 					strcpy_s(configFile, programdataIni);
-					// Only admins can edit ProgramData
-					showSettings = Credentials::RunningAsAdministrator(false);
-					vnclog.Print(LL_LOGSCREEN, "Using shared config: %s (read-only for non-admins)", configFile);
+					vnclog.Print(LL_LOGSCREEN, "Using shared config: %s", configFile);
 				}
 				else {
 					// No config found, create in ProgramData
@@ -382,8 +372,52 @@ void extractConfig(char* szCmdLine)
 						vnclog.Print(LL_LOGSCREEN, "Warning: Failed to create ProgramData folder: %s (errno: %d)", programdataFolder, errno);
 					}
 					strcpy_s(configFile, programdataIni);
-					// Only admins can edit ProgramData
-					showSettings = Credentials::RunningAsAdministrator(false);
+				}
+				showSettings = true;  // Admin can always edit
+			}
+			else {
+				// Non-admin: Hybrid mode - LocalAppData (user-specific) → ProgramData (shared fallback)
+				
+				// Get LocalAppData path (user-specific)
+				SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, appdataPath);
+				strcpy_s(appdataFolder, appdataPath);
+				strcat_s(appdataFolder, CONFIG_SUBFOLDER);
+				strcpy_s(appdataIni, appdataFolder);
+				strcat_s(appdataIni, "\\");
+				strcat_s(appdataIni, INIFILE_NAME);
+
+				// Attempt to migrate from install folder to ProgramData (one-time)
+				MigrateIniToProgramData(winvncFolder, programdataPath);
+
+				// Priority: LocalAppData → ProgramData
+				// Check for user-specific config first
+				{
+					std::ifstream file(appdataIni);
+					if (file.good()) {
+						// User has personal config in LocalAppData
+						strcpy_s(configFile, appdataIni);
+						showSettings = true;  // Users can always edit their own AppData
+						vnclog.Print(LL_LOGSCREEN, "Using user config: %s", configFile);
+					}
+				}
+				
+				// If no user config, check for shared ProgramData config
+				if (strlen(configFile) == 0) {
+					std::ifstream file(programdataIni);
+					if (file.good()) {
+						// Fallback to ProgramData (shared config)
+						strcpy_s(configFile, programdataIni);
+						// Admins can edit ProgramData, non-admins cannot
+						showSettings = isAdmin;
+						vnclog.Print(LL_LOGSCREEN, "Using shared config: %s (%s)", configFile, isAdmin ? "editable" : "read-only");
+					}
+					else {
+						// No config found - non-admin cannot create in ProgramData
+						// This shouldn't happen as admin should have created it
+						vnclog.Print(LL_LOGSCREEN, "No config found in ProgramData - admin must run winvnc first");
+						strcpy_s(configFile, programdataIni);
+						showSettings = isAdmin;
+					}
 				}
 			}
 		}
