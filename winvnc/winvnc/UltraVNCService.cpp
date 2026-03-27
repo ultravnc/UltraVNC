@@ -136,13 +136,13 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
     serviceStatus.dwServiceSpecificExitCode=NO_ERROR;
     serviceStatus.dwCheckPoint=0;
     serviceStatus.dwWaitHint=0;
-	if (wcscmp(argv[0], wServiceName) == 0) {
-		wcscpy_s(configfilename, L"ultravnc.ini");
+	if (strcmp(argv[0], service_name) == NULL) {
+		strcpy_s(configfilename, "ultravnc.ini");
 	}
 	else
 	{
-		wcscpy_s(configfilename, argv[0]);
-		wcscat_s(configfilename, L".ini");
+		strcpy_s(configfilename, argv[0]);
+		strcat_s(configfilename, ".ini");
 	}
 
 	char programdataPath[MAX_PATH]{};

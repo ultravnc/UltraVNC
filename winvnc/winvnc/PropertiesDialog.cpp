@@ -103,7 +103,7 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	const long lTitleBufSize = 256;
 	char szTitle[lTitleBufSize];
 
-	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - Settings - Config file: %ls", configFile);
+	_snprintf_s(szTitle, lTitleBufSize - 1, "UltraVNC Server - Settings - Config file: %s", configFile);
 	SetWindowText(hwnd, szTitle);
 
 	showAdminPanel = false;

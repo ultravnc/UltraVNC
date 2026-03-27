@@ -172,7 +172,7 @@ VSocket::CreateConnect(const VString address, const VCard port)
 	Hints.ai_family = AF_UNSPEC;
 	Hints.ai_socktype = SOCK_STREAM;
 	char temp [10];
-	_itoa(port, temp, 10);
+	_itoa_s(port, temp, 10, 10);
 	RetVal = getaddrinfo(address, temp, &Hints, &AddrInfo);
 	if (RetVal != 0) return false;
 
@@ -227,7 +227,7 @@ VSocket::CreateBindConnect(const VString address, const VCard port)
 	Hints.ai_family = PF_UNSPEC;
 	Hints.ai_socktype = SOCK_STREAM;
 	char temp[10];
-	_itoa(port, temp, 10);
+	_itoa_s(port, temp, 10, 10);
 	RetVal = getaddrinfo(address, temp, &Hints, &AddrInfo);
 	if (RetVal != 0) return false;
 
@@ -280,7 +280,7 @@ VBool	VSocket::CreateBindListen(const VCard port, const VBool localOnly)
 	int RetVal,i;
 	ADDRINFO Hints, *AddrInfo, *AI;
 	char temp[10];
-	_itoa(port, temp, 10);
+	_itoa_s(port, temp, 10, 10);
 
 	memset(&Hints, 0, sizeof(Hints));
 	Hints.ai_family = PF_UNSPEC;

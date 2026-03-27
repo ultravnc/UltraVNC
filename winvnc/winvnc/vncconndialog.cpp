@@ -216,14 +216,15 @@ BOOL CALLBACK vncConnDialog::vncConnDlgProc(HWND hwnd,
 
 					if (numberOfHosts > 1) {
 						int modulo = numericId % numberOfHosts;
-						char* szToken = strtok(hostname, ";");
+						char* context = NULL;
+						char* szToken = strtok_s(hostname, ";", &context);
 						while (szToken) {
 							if (modulo == 0) {
 								strcpy_s(actualhostname, szToken);
 								break;
 							}
 							modulo--;
-							szToken = strtok(NULL, ";");
+							szToken = strtok_s(NULL, ";", &context);
 						}
 					}
 				}
