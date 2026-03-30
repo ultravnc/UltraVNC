@@ -1715,7 +1715,7 @@ void ClientConnection::LoadDSMPlugin(bool fForceReload)
 
 		if (!m_pDSMPlugin->IsLoaded())
 		{
-			{ char _plug[MAX_PATH]; WideCharToMultiByte(CP_UTF8,0,m_opts->m_szDSMPluginFilename,-1,_plug,MAX_PATH,NULL,NULL); m_pDSMPlugin->LoadPlugin(_plug, m_opts->m_listening); }
+			{ char _plug[MAX_PATH]; WideCharToMultiByte(CP_ACP,0,m_opts->m_szDSMPluginFilename,-1,_plug,MAX_PATH,NULL,NULL); m_pDSMPlugin->LoadPlugin(_plug, m_opts->m_listening); }
 			if (m_pDSMPlugin->IsLoaded())
 			{
 				if (m_pDSMPlugin->InitPlugin())

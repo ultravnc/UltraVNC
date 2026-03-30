@@ -706,7 +706,9 @@ bool SessionDialog::connect(HWND hwnd)
 
 	if (fUseDSMPlugin) {
 		if (!m_pDSMPlugin->IsLoaded()) {
-			m_pDSMPlugin->LoadPlugin((char*)szDSMPluginFilename, listening);
+			char szPluginA[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szDSMPluginFilename, -1, szPluginA, MAX_PATH, NULL, NULL);
+			m_pDSMPlugin->LoadPlugin(szPluginA, listening);
 			if (m_pDSMPlugin->IsLoaded()) {
 				if (m_pDSMPlugin->InitPlugin()) {
 					if (!m_pDSMPlugin->SupportsMultithreaded())
@@ -738,7 +740,9 @@ bool SessionDialog::connect(HWND hwnd)
 				// Unload the previous plugin
 				m_pDSMPlugin->UnloadPlugin();
 				// Load the new selected one
-				m_pDSMPlugin->LoadPlugin((char*)szDSMPluginFilename, listening);
+				char szPluginA[MAX_PATH];
+			WideCharToMultiByte(CP_ACP, 0, szDSMPluginFilename, -1, szPluginA, MAX_PATH, NULL, NULL);
+			m_pDSMPlugin->LoadPlugin(szPluginA, listening);
 			}
 			if (m_pDSMPlugin->IsLoaded()) {
 				if (m_pDSMPlugin->InitPlugin()) {

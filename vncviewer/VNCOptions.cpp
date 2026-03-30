@@ -892,7 +892,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError(sz_D24);
 				continue;
 			}
-			WideCharToMultiByte(CP_UTF8, 0, args[j], -1, m_clearPassword, _countof(m_clearPassword), NULL, NULL);
+			WideCharToMultiByte(CP_ACP, 0, args[j], -1, m_clearPassword, _countof(m_clearPassword), NULL, NULL);
 		} // Modif sf@2002
 		else if (SwitchMatch(args[j], _T("serverscale")))
 		{
