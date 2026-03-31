@@ -554,7 +554,9 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 				if (!fLoadIt) return TRUE;
 
-				if (_this->m_pDSMPlugin->LoadPlugin((char*)szPlugin, _this->listening))
+				char szPluginA[MAX_PATH];
+				WideCharToMultiByte(CP_ACP, 0, szPlugin, -1, szPluginA, MAX_PATH, NULL, NULL);
+				if (_this->m_pDSMPlugin->LoadPlugin(szPluginA, _this->listening))
 				{
 					// We don't know the password yet... no matter the plugin requires
 					// it or not, we will provide it later (at plugin "real" startup)
