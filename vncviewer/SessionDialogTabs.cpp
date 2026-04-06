@@ -981,10 +981,10 @@ void SessionDialog::InitDlgProcDisplay()
 
 	int Scales[13] = { 25, 50, 75, 80, 85, 90, 95, 100, 125, 150, 200, 300, 400 };
 	HWND hViewerScale = GetDlgItem(hwnd, IDC_SCALE_CB);
-	char szPer[4];
+	TCHAR szPer[4];
 	for (int i = 0; i <= 12; i++) {
-		_itoa_s(Scales[i], szPer, 10);
-		SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
+		_itow_s(Scales[i], szPer, 10);
+		SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)szPer);
 	}
 	SetDlgItemInt(hwnd, IDC_SCALE_CB, ((scale_num * 100) / scale_den), FALSE);
 	SetDlgItemInt(hwnd, IDC_SERVER_SCALE, nServerScale, FALSE);

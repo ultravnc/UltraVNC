@@ -412,6 +412,8 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 				if (dwRetVal > dwBufSize || (dwRetVal == 0))
 					wcscpy_s(lpPathBuffer, szCurrentDir2);
 
+				// Initialize szCurrentDir from szCurrentDir2
+				wcstombs(szCurrentDir, szCurrentDir2, MAX_PATH);
 				strcpy_s(szCurrentDir_szPlugin, MAX_PATH, szCurrentDir);
 				strcat_s(szCurrentDir_szPlugin, MAX_PATH, "\\");
 				strcat_s(szCurrentDir_szPlugin, MAX_PATH, szPlugin);

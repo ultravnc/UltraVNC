@@ -1527,11 +1527,11 @@ BOOL CALLBACK VNCOptions::OptDlgProc(HWND hwnd, UINT uMsg,
 		// The combo is still editable for customizable value
 		int Scales[13] = { 25, 50, 75, 80, 85, 90, 95, 100, 125, 150, 200, 300, 400 };
 		HWND hViewerScale = GetDlgItem(hwnd, IDC_SCALE_CB);
-		char szPer[4];
+		TCHAR szPer[4];
 		for (i = 0; i <= 12; i++)
 		{
-			_itoa_s(Scales[i], szPer, 10);
-			SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)(int FAR*)szPer);
+			_itow_s(Scales[i], szPer, 10);
+			SendMessage(hViewerScale, CB_INSERTSTRING, (WPARAM)i, (LPARAM)szPer);
 		}
 		SetDlgItemInt(hwnd,
 			IDC_SCALE_CB,
