@@ -1634,9 +1634,9 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			}
 			if (bPassphrase == false)
 			{
-				if (memcmp(plain, pResponseData, strlen(plain))) 
+				if (strlen(plain) == 0 || memcmp(plain, pResponseData, strlen(plain))) 
 						auth_ok = false;
-				if (auth_ok == false && !memcmp(plainViewOnly, pResponseData, strlen(plainViewOnly))) {
+				if (auth_ok == false && strlen(plainViewOnly) > 0 && !memcmp(plainViewOnly, pResponseData, strlen(plainViewOnly))) {
 					m_client->EnableKeyboard(false); //PGM
 					m_client->EnablePointer(false); //PGM
 					m_client->EnableGii(false);

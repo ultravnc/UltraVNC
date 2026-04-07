@@ -3123,11 +3123,11 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		}
 	}
 
-	current_auth.push_back(authScheme);
-
 	// Check if SecureVNC plugin is already active
 	bool bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth) != current_auth.end();
 	if (!bSecureVNCPluginActive) bSecureVNCPluginActive = std::find(current_auth.begin(), current_auth.end(), rfbUltraVNC_SecureVNCPluginAuth_new) != current_auth.end();
+
+	current_auth.push_back(authScheme);
 
 	if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L90);
 
@@ -3170,8 +3170,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		reasonLen = Swap32IfLE(reasonLen);
 		CheckBufferSize(reasonLen+1);
 		ReadString(m_netbuf, reasonLen);
-		vnclog.Print(0, _T("Connection failed: %s\n"), m_netbuf);
-		{ wchar_t _wnetbuf2[256]; MultiByteToWideChar(CP_UTF8,0,m_netbuf,-1,_wnetbuf2,256); throw WarningException(_wnetbuf2); }
+		vnclog.Print(0, _T("Connection failed: %hs\n"), m_netbuf);
+		{ std::vector<wchar_t> _wnetbuf2(reasonLen+1); MultiByteToWideChar(CP_ACP,0,m_netbuf,-1,_wnetbuf2.data(),(int)_wnetbuf2.size()); throw WarningException(_wnetbuf2.data()); }
 		break;
 	case rfbNoAuth:
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L92);
@@ -3280,11 +3280,11 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			CheckBufferSize(reasonLen+1);
 			ReadString(m_netbuf, reasonLen);
 
-			vnclog.Print(0, _T("VNC authentication failed! Extended information: %s\n"), m_netbuf);
-			wchar_t _wnetbuf[256]; 
-			MultiByteToWideChar(CP_UTF8,0,m_netbuf,-1,_wnetbuf,256); 
-			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,_wnetbuf);
-			throw WarningException(_wnetbuf);
+			vnclog.Print(0, _T("VNC authentication failed! Extended information: %hs\n"), m_netbuf);
+			std::vector<wchar_t> _wnetbuf(reasonLen+1);
+			MultiByteToWideChar(CP_ACP,0,m_netbuf,-1,_wnetbuf.data(),(int)_wnetbuf.size());
+			if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,_wnetbuf.data());
+			throw WarningException(_wnetbuf.data());
 		} else {
 			vnclog.Print(0, _T("VNC authentication failed!"));
 			SetEvent(KillEvent);
@@ -6919,7 +6919,7 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		vnclog.Print(0, _T("rdr::Exception (2): %hs\n"),e.str());
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw ErrorException(sz_L69);
 	}
@@ -7057,7 +7057,7 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		vnclog.Print(0, _T("rdr::Exception (2): %hs\n"),e.str());
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
 		throw ErrorException(sz_L69);
 	}
@@ -7093,7 +7093,7 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 	}
 	catch (rdr::Exception& e)
 	{
-		vnclog.Print(0, _T("rdr::Exception (2): %s\n"),e.str());
+		vnclog.Print(0, _T("rdr::Exception (2): %hs\n"),e.str());
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L67);
 		wchar_t e_str_wide[256];
 		MultiByteToWideChar(CP_UTF8, 0, e.str(), -1, e_str_wide, 256);
