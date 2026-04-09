@@ -56,17 +56,8 @@ void Log::SetMode(int mode) {
     if (mode & ToConsole) {
         if (!m_toconsole) {
             AllocConsole();
-            fclose(stdout);
-            fclose(stderr);
-#ifdef _MSC_VER
-            int fh = _open_osfhandle((long)GetStdHandle(STD_OUTPUT_HANDLE), 0);
-            _dup2(fh, 1);
-            _dup2(fh, 2);
-            _fdopen(1, "wt");
-            _fdopen(2, "wt");
-            printf("fh is %d\n",fh);
-            fflush(stdout);
-#endif
+            freopen("CONOUT$", "w", stdout);
+            freopen("CONOUT$", "w", stderr);
         }
 
         m_toconsole = true;
@@ -114,22 +105,23 @@ void Log::CloseFile() {
     }
 }
 
-void Log::ReallyPrint(LPCTSTR format, va_list ap) 
+void Log::ReallyPrint(LPCTSTR format, va_list ap)
 {
-    TCHAR line[LINE_BUFFER_SIZE];
-	_vsnwprintf_s(line, LINE_BUFFER_SIZE, _TRUNCATE, format, ap); // sf@2006 - Prevents buffer overflow
-    if (m_todebug) OutputDebugString(line);
+    WCHAR line[LINE_BUFFER_SIZE];
+    _vsnwprintf_s(line, LINE_BUFFER_SIZE, _TRUNCATE, format, ap);
+    if (m_todebug) OutputDebugStringW(line);
 
     if (m_toconsole) {
-        DWORD byteswritten;
-        WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), line, _tcslen(line)*sizeof(TCHAR), &byteswritten, NULL); 
+        DWORD charsWritten;
+        WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), line, (DWORD)wcslen(line), &charsWritten, NULL);
     };
 
     if (m_tofile && (hlogfile != NULL)) {
+        char lineA[LINE_BUFFER_SIZE];
+        WideCharToMultiByte(CP_UTF8, 0, line, -1, lineA, LINE_BUFFER_SIZE, NULL, NULL);
         DWORD byteswritten;
-        WriteFile(hlogfile, line, _tcslen(line)*sizeof(TCHAR), &byteswritten, NULL); 
-
-    }	
+        WriteFile(hlogfile, lineA, (DWORD)strlen(lineA), &byteswritten, NULL);
+    }
 }
 
 Log::~Log()
