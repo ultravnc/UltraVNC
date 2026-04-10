@@ -516,13 +516,10 @@ BOOL CALLBACK DlgProcSecurity(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					SendMessage(hplugin, CB_SETCURSEL, pos, 0);
 					HWND hUsePlugin = GetDlgItem(hwnd, IDC_PLUGIN_CHECK);
 					SendMessage(hUsePlugin, BM_SETCHECK, TRUE, 0);
-					EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), TRUE); // sf@2009 - Enable plugin config button
 					EnableWindow(GetDlgItem(hwnd, IDC_PLUGINS_COMBO), TRUE);
 				}
 			}
-			else {
-				EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), false); // sf@2009 - Enable plugin config button
-			}
+			EnableWindow(GetDlgItem(hwnd, IDC_PLUGIN_BUTTON), enable); // sf@2009 - Enable plugin config button
 		}
 		return TRUE;
 
@@ -1025,10 +1022,10 @@ void SessionDialog::InitDlgProcMisc()
 	SendMessage(hHideEndOfStreamError, BM_SETCHECK, HideEndOfStreamError, 0);
 	HWND hcomboscreen = GetDlgItem(hwnd, IDC_IMAGEFORMAT);
 	SendMessage(hcomboscreen, CB_RESETCONTENT, 0, 0);
-	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".jpeg");
-	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".png");
-	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".gif");
-	SendMessage(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)".bmp");
+	SendMessageW(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)L".jpeg");
+	SendMessageW(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)L".png");
+	SendMessageW(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)L".gif");
+	SendMessageW(hcomboscreen, CB_ADDSTRING, 0, (LPARAM)L".bmp");
 	if (_tcscmp(imageFormat, _T(".jpeg")) == 0)
 		SendMessage(hcomboscreen, CB_SETCURSEL, 0, 0);
 	if (_tcscmp(imageFormat, _T(".png")) == 0)

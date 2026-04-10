@@ -27,8 +27,6 @@ static int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg, LPARAM lParam, LPARA
 
     if(uMsg == BFFM_INITIALIZED)
     {
-        std::string tmp = (const char *) lpData;
-        std::cout << "path: " << tmp << std::endl;
         SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
     }
 

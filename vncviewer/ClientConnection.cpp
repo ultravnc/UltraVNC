@@ -1416,11 +1416,11 @@ void ClientConnection::GTGBS_CreateToolbar()
 	if (m_connectionType == REPEATER_SERVER && _tcslen(m_proxyhost) > 0) {
 		TCHAR proxyname[MAX_HOST_NAME_LEN];
 		_sntprintf_s(proxyname, MAX_HOST_NAME_LEN, _TRUNCATE, _T("%s:%li (%s:%li)"), m_host, m_port, m_proxyhost, m_proxyport);
-		SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
+		SendMessageW(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM)proxyname);
 	}
     for (int i = 0; i < m_pMRU->NumItems(); i++) {
         m_pMRU->GetItem(i, valname, 255);
-        int pos = SendMessage(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
+        int pos = SendMessageW(m_logo_wnd, CB_ADDSTRING, 0, (LPARAM) valname);
     }
     SendMessage(m_logo_wnd, CB_SETCURSEL, 0, 0);
 	if (m_pMRU) delete m_pMRU;

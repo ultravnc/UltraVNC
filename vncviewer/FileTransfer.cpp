@@ -2202,7 +2202,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 		_tcscat_s(szTheDrive, 32, _T(" - "));
 		_tcscat_s(szTheDrive, 32, szType);
 
-		SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szTheDrive); 
+		SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szTheDrive); 
 	}
 
 	// List the usual shorcuts
@@ -2217,7 +2217,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("My Documents"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
 	ListView_InsertItem(hWndLocalList, &Item);
-	SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
+	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	// Desktop
 	Item.mask = LVIF_TEXT;
@@ -2226,7 +2226,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Desktop"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
 	ListView_InsertItem(hWndLocalList, &Item);
-	SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
+	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	// Network Favorites
 	Item.mask = LVIF_TEXT;
@@ -2235,7 +2235,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Network Favorites"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
 	ListView_InsertItem(hWndLocalList, &Item);
-	SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
+	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_SETCURSEL, -1, 0);
 }
@@ -2328,8 +2328,8 @@ void FileTransfer::SetStatus(LPWSTR szStatus)
         m_maxHistExtent = maximum(m_maxHistExtent, dx);
         SendDlgItemMessage(hWnd, IDC_HISTORY_CB, CB_SETHORIZONTALEXTENT, m_maxHistExtent, 0L);
     }
-	LRESULT Index = SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_ADDSTRING, 0, (LPARAM)szHist); 
-	SendMessage(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_SETCURSEL, (WPARAM)Index, (LPARAM)0);		
+	LRESULT Index = SendMessageW(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_ADDSTRING, 0, (LPARAM)szHist); 
+	SendMessageW(GetDlgItem(hWnd, IDC_HISTORY_CB), CB_SETCURSEL, (WPARAM)Index, (LPARAM)0);		
 }
 
 

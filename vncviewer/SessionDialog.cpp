@@ -518,7 +518,7 @@ void SessionDialog::InitPlugin(HWND hwnd)
 	int nPlugins = m_pDSMPlugin->ListPlugins(hPlugins);
 	if (!nPlugins)
 	{
-		SendMessage(hPlugins, CB_ADDSTRING, 0, (LPARAM)sz_F11);
+		SendMessageW(hPlugins, CB_ADDSTRING, 0, (LPARAM)sz_F11);
 	}
 
 	SendMessage(hPlugins, CB_SETCURSEL, 0, 0);
@@ -615,7 +615,7 @@ void SessionDialog::InitMRU(HWND hwnd)
 	for (int i = 0; i < m_pMRU->NumItems(); i++) {
 		m_pMRU->GetItem(i, valname, 255);
 		if (_tcslen(valname) != 0)
-			SendMessage(hcombo, CB_ADDSTRING, 0, (LPARAM)valname);
+			SendMessageW(hcombo, CB_ADDSTRING, 0, (LPARAM)valname);
 	}
 	SendMessage(hcombo, CB_SETCURSEL, 0, 0);
 
@@ -833,7 +833,7 @@ void SessionDialog::InitLanguage(HWND hwnd)
 	SendMessage(hLanguageCombo, CB_RESETCONTENT, 0, 0);
 
 	// Add English (default - no DLL needed)
-	int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)_T("English"));
+	int idx = SendMessageW(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)_T("English"));
 	SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(L"en"));
 
 	// Get viewer executable path
@@ -872,13 +872,13 @@ void SessionDialog::InitLanguage(HWND hwnd)
 							// Try to load IDS_LANGUAGE_NAME string resource from DLL
 							if (LoadStringW(hLangDll, IDS_LANGUAGE_NAME, displayName, _countof(displayName)) > 0) {
 								// Successfully loaded language name from DLL
-								int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+								int idx = SendMessageW(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
 								SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCode));
 							}
 							else {
 								// Fallback: use language code if string not found
 								swprintf_s(displayName, _countof(displayName), L"Language (%s)", langCode);
-								int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+								int idx = SendMessageW(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
 								SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCode));
 							}
 							FreeLibrary(hLangDll);
@@ -886,7 +886,7 @@ void SessionDialog::InitLanguage(HWND hwnd)
 						else {
 							// DLL couldn't be loaded, use code as fallback
 							swprintf_s(displayName, _countof(displayName), L"Language (%s)", langCode);
-							int idx = SendMessage(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
+							int idx = SendMessageW(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
 							SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCode));
 						}
 					}
