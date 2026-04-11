@@ -168,12 +168,12 @@ public:
 	//     AND no changed or copied updates intersect it
 	virtual BOOL UpdateWanted() {
 		omni_mutex_lock l(GetUpdateLock(),324);
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 										OutputDevMessage("%i %i %i %i",!m_incr_rgn.is_empty(),
 											m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_cached_region()).is_empty() ,
 											m_incr_rgn.intersect(m_update_tracker.get_copied_region()).is_empty());
-#endif
+#endif*/
 		if (sendingUpdate == true)		
 			return true;
 		BOOL value =!m_incr_rgn.is_empty() && m_incr_rgn.intersect(m_update_tracker.get_changed_region()).is_empty() &&
@@ -347,7 +347,7 @@ public:
 	void NotifyPluginStreamingSupport();
 	bool cl_connected;
 	int filetransferrequestPart2(int nDirZipRet);
-	char m_szSrcFileName[MAX_PATH + 64]; // Path + timestring
+	char m_szSrcFileName[MAX_PATH * 4]; // Path + timestring
 	HANDLE ThreadHandleCompressFolder;
 	// sf@2002 
 	// Update routines
@@ -563,7 +563,7 @@ protected:
 	BOOL m_fFileTransferRunning;
 	CZipUnZip32		*m_pZipUnZip;
 
-	char  m_szFullDestName[MAX_PATH + 64];
+	char  m_szFullDestName[MAX_PATH * 4];
 	char  m_szFileTime[18];
 	char* m_pBuff;
 	char* m_pCompBuff;

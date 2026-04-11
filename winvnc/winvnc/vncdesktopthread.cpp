@@ -58,7 +58,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 		//vnclog.Print(LL_INTINFO, VNCLOG("Driver ************* %i %i %i %i \n"),x,y,w,h);
 
 		if (!ClipRect(&x, &y, &w, &h, 0,0,m_desktop->m_bmrect.br.x, m_desktop->m_bmrect.br.y)) return;
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 		static DWORD sLastCopy = GetTickCount();
 		DWORD now = GetTickCount();
 #if 1
@@ -69,7 +69,7 @@ vncDesktopThread::copy_bitmaps_to_buffer(ULONG i,rfb::Region2D &rgncache,rfb::Up
 					OutputDebugString(szText);		
 #endif
 		sLastCopy = now;
-#endif
+#endif*/
 		rect.tl.x = x;
 		rect.br.x = x+w;
 		rect.tl.y = y;
@@ -898,12 +898,12 @@ vncDesktopThread::run_undetached(void *arg)
 				case WAIT_OBJECT_0: {
 					ResetEvent(m_desktop->trigger_events[0]);
 							{
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 						static DWORD sLastCopy3 = GetTickCount();
 						DWORD now = GetTickCount();
 						OutputDevMessage("WaitForMultipleObjects result . %d last call delta %4d ms", result, now - sLastCopy3);
 						sLastCopy3 = now;
-#endif
+#endif*/
 								// MaxCpu() == 100  PowerMode
 							if (settings->getMaxCpu() != 100) {
 								if ((fullpollcounter==10 || fullpollcounter==0 || fullpollcounter==5)) {

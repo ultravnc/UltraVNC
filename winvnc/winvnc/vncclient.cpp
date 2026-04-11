@@ -116,10 +116,24 @@ std::string get_real_filename(std::string name)
 // #include "rfb.h"
 bool DeleteFileOrDirectory(WCHAR* srcpath)
 {
-	WCHAR path[MAX_PATH + 2]; // room for double null terminator required by SHFileOperationW
-	memset(path, 0, sizeof path);
+	// For files: use DeleteFileW with \\?\ prefix to support long paths (>260 chars).
+	// For directories: use SHFileOperationW (recursive delete); \\?\ not supported there.
+	DWORD attr = GetFileAttributesW(srcpath);
+	if (attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		// It's a file - use DeleteFileW with long path prefix
+		WCHAR longpath[MAX_PATH * 4 + 4];
+		if (srcpath[0] && srcpath[1] == L':')
+			_snwprintf_s(longpath, MAX_PATH * 4 + 4, _TRUNCATE, L"\\\\?\\%s", srcpath);
+		else
+			wcscpy_s(longpath, srcpath);
+		return DeleteFileW(longpath) ? true : false;
+	}
 
-	wcsncpy_s(path, srcpath, MAX_PATH);
+	// It's a directory (or doesn't exist) - use SHFileOperationW for recursive delete
+	WCHAR path[MAX_PATH * 4 + 2]; // double null terminator required by SHFileOperationW
+	memset(path, 0, sizeof path);
+	wcsncpy_s(path, MAX_PATH * 4 + 2, srcpath, MAX_PATH * 4);
 	path[wcslen(srcpath) + 1] = 0;
 
 	SHFILEOPSTRUCTW op;
@@ -130,17 +144,25 @@ bool DeleteFileOrDirectory(WCHAR* srcpath)
 
 	int result = SHFileOperationW(&op);
 	// MSDN says to not look at the error code, just treat 0 as SUCCESS, nonzero is failure.
-	// Do not use GetLastError with the return values of this function.
-
 	return result == 0;
+}
+
+static void MakeLongPath(const char* utf8, WCHAR* outW, int outLen)
+{
+	WCHAR tmp[MAX_PATH * 4];
+	MultiByteToWideChar(CP_UTF8, 0, utf8, -1, tmp, MAX_PATH * 4);
+	if (tmp[0] && tmp[1] == L':')
+		_snwprintf_s(outW, outLen, _TRUNCATE, L"\\\\?\\%s", tmp);
+	else
+		wcscpy_s(outW, outLen, tmp);
 }
 
 bool replaceFile(const char* src, const char* dst)
 {
-	// src and dst are UTF-8 paths - use Unicode APIs to handle Chinese filenames
-	WCHAR srcW[MAX_PATH + 64], dstW[MAX_PATH + 64];
-	MultiByteToWideChar(CP_UTF8, 0, src, -1, srcW, MAX_PATH + 64);
-	MultiByteToWideChar(CP_UTF8, 0, dst, -1, dstW, MAX_PATH + 64);
+	// src and dst are UTF-8 paths - use \\?\ prefix for long path support
+	WCHAR srcW[MAX_PATH * 4], dstW[MAX_PATH * 4];
+	MakeLongPath(src, srcW, MAX_PATH * 4);
+	MakeLongPath(dst, dstW, MAX_PATH * 4);
 
 	DWORD dwFileAttribs;
 	bool status;
@@ -669,12 +691,12 @@ vncClientUpdateThread::run_undetached(void* arg)
 					m_client->sendingUpdate = true;
 				if (m_client->SendUpdate(update)) {
 					clipregion.clear();
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 					static DWORD sNotifyLastCopy1 = GetTickCount();
 					DWORD now = GetTickCount();;
 					OutputDevMessage("==================== SendUpdate %4d =======================", now - sNotifyLastCopy1);
 					sNotifyLastCopy1 = now;
-#endif
+#endif*/
 				}
 				m_client->sendingUpdate = false;
 			}
@@ -3804,47 +3826,54 @@ vncClientThread::run(void* arg)
 
 					DWORD dwDstSize = (DWORD)0; // Dummy size, actually a return value
 
+					// DEBUG: show what the server received
+					{WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_UTF8,0,m_client->m_szFullDestName,-1,_dbg,MAX_PATH*4);
+					 OutputDebugStringW(L"=== SRV FTOffer: m_szFullDestName="); OutputDebugStringW(_dbg); OutputDebugStringW(L"\n");}
+
 					// Also check the free space on destination drive
-					ULARGE_INTEGER lpFreeBytesAvailable;
-					ULARGE_INTEGER lpTotalBytes;
-					ULARGE_INTEGER lpTotalFreeBytes;
+					ULARGE_INTEGER lpFreeBytesAvailable = {};
+					ULARGE_INTEGER lpTotalBytes = {};
+					ULARGE_INTEGER lpTotalFreeBytes = {};
 					unsigned long dwFreeKBytes;
-					char* szDestPath = new char[length + 1 + 64];
-					if (szDestPath == NULL) break;
-					memset(szDestPath, 0, length + 1 + 64);
-					strcpy_s(szDestPath, length + 1 + 64, m_client->m_szFullDestName);
-					*strrchr(szDestPath, '\\') = '\0'; // We don't handle UNCs for now
-
-					// loadlibrary
-					// needed for Windows 95 non-OSR2
-					// Possible this will block File Transfer, but at least server will start
-					PGETDISKFREESPACEEX pGetDiskFreeSpaceEx;
-					pGetDiskFreeSpaceEx = (PGETDISKFREESPACEEX)GetProcAddress(GetModuleHandle("kernel32.dll"), "GetDiskFreeSpaceExA");
-
-					if (pGetDiskFreeSpaceEx)
 					{
-						if (!pGetDiskFreeSpaceEx((LPCTSTR)szDestPath,
+						WCHAR szDestPathW[MAX_PATH * 4];
+						MultiByteToWideChar(CP_UTF8, 0, m_client->m_szFullDestName, -1, szDestPathW, MAX_PATH * 4);
+						WCHAR* pSlash = wcsrchr(szDestPathW, L'\\');
+						if (pSlash) *pSlash = L'\0'; // strip filename, keep directory
+						OutputDebugStringW(L"=== SRV FTOffer: DiskFreeCheck dir="); OutputDebugStringW(szDestPathW); OutputDebugStringW(L"\n");
+						BOOL bFree = GetDiskFreeSpaceExW(szDestPathW,
 							&lpFreeBytesAvailable,
 							&lpTotalBytes,
-							&lpTotalFreeBytes)
-							)
+							&lpTotalFreeBytes);
+						if (!bFree) {
+							DWORD err = GetLastError();
+							WCHAR _e[64]; _snwprintf_s(_e,64,_TRUNCATE,L"=== SRV FTOffer: GetDiskFreeSpaceExW FAILED err=%lu\n",err);
+							OutputDebugStringW(_e);
 							dwDstSize = 0xFFFFFFFF;
+						} else {
+							OutputDebugStringW(L"=== SRV FTOffer: GetDiskFreeSpaceExW OK\n");
+						}
 					}
-
-					delete[] szDestPath;
 					dwFreeKBytes = (unsigned long)(Int64ShraMod32(lpFreeBytesAvailable.QuadPart, 10));
 					__int64 nnFileSize = (((__int64)sizeH) << 32) + sizeL;
-					if ((__int64)dwFreeKBytes < (__int64)(nnFileSize / 1000)) dwDstSize = 0xFFFFFFFF;
+					if ((__int64)dwFreeKBytes < (__int64)(nnFileSize / 1000)) {
+						OutputDebugStringW(L"=== SRV FTOffer: FAIL - insufficient disk space\n");
+						dwDstSize = 0xFFFFFFFF;
+					}
 
 					// Allocate buffer for file packets
 					m_client->m_pBuff = new char[sz_rfbBlockSize + 1024];
-					if (m_client->m_pBuff == NULL)
+					if (m_client->m_pBuff == NULL) {
+						OutputDebugStringW(L"=== SRV FTOffer: FAIL - pBuff alloc failed\n");
 						dwDstSize = 0xFFFFFFFF;
+					}
 
 					// Allocate buffer for DeCompression
 					m_client->m_pCompBuff = new char[sz_rfbBlockSize];
-					if (m_client->m_pCompBuff == NULL)
+					if (m_client->m_pCompBuff == NULL) {
+						OutputDebugStringW(L"=== SRV FTOffer: FAIL - pCompBuff alloc failed\n");
 						dwDstSize = 0xFFFFFFFF;
+					}
 
 					rfbFileTransferMsg ft = { 0 };
 					ft.type = rfbFileTransfer;
@@ -3863,8 +3892,18 @@ vncClientThread::run(void* arg)
 
 						// Create Local Dest file
 						// Convert UTF-8 filename to Unicode for Chinese character support
-						WCHAR szFullDestNameW[MAX_PATH + 64];
-						MultiByteToWideChar(CP_UTF8, 0, m_client->m_szFullDestName, -1, szFullDestNameW, MAX_PATH + 64);
+						// Use \\?\ prefix to support paths longer than MAX_PATH (260 chars)
+						WCHAR szFullDestNameW[MAX_PATH * 4];
+						{
+							WCHAR szTmp[MAX_PATH * 4];
+							MultiByteToWideChar(CP_UTF8, 0, m_client->m_szFullDestName, -1, szTmp, MAX_PATH * 4);
+							// Only add prefix for absolute paths (not UNC) to avoid double-prefix
+							if (szTmp[0] && szTmp[1] == L':')
+								_snwprintf_s(szFullDestNameW, MAX_PATH * 4, _TRUNCATE, L"\\\\?\\%s", szTmp);
+							else
+								wcscpy_s(szFullDestNameW, szTmp);
+						}
+						OutputDebugStringW(L"=== SRV FTOffer: CreateFileW="); OutputDebugStringW(szFullDestNameW); OutputDebugStringW(L"\n");
 						m_client->m_hDestFile = CreateFileW(szFullDestNameW,
 							GENERIC_WRITE | GENERIC_READ,
 							FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -3875,10 +3914,15 @@ vncClientThread::run(void* arg)
 						fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
 						if (m_client->m_hDestFile == INVALID_HANDLE_VALUE)
 						{
+							DWORD err = GetLastError();
+							WCHAR _e2[64]; _snwprintf_s(_e2,64,_TRUNCATE,L"=== SRV FTOffer: CreateFileW FAILED err=%lu\n",err);
+							OutputDebugStringW(_e2);
 							dwDstSize = 0xFFFFFFFF;
 						}
-						else
+						else {
+							OutputDebugStringW(L"=== SRV FTOffer: CreateFileW OK\n");
 							dwDstSize = 0x00;
+						}
 					}
 					if (fAlreadyExists && dwDstSize != 0xFFFFFFFF)
 					{
@@ -4184,7 +4228,7 @@ vncClientThread::run(void* arg)
 								nFolder = CSIDL_NETHOOD;
 						}
 
-						wchar_t szDirW[MAX_PATH + 2] = {};
+						wchar_t szDirW[MAX_PATH * 4] = {};
 						bool fSpecialFolderResolvedW = false;
 						if (nFolder != -1 && fClientWantsUnicode)
 						{
@@ -4257,7 +4301,7 @@ vncClientThread::run(void* arg)
 							if (fSpecialFolderResolvedW)
 							{
 								// Convert resolved Unicode path to UTF-8 for the wire
-								wchar_t szDirWNoStar[MAX_PATH + 2];
+								wchar_t szDirWNoStar[MAX_PATH * 4];
 								wcscpy_s(szDirWNoStar, szDirW);
 								szDirWNoStar[wcslen(szDirWNoStar) - 1] = L'\0'; // strip '*'
 								WideCharToMultiByte(CP_UTF8, 0, szDirWNoStar, -1, szDirNoStar, MAX_PATH * 3, NULL, NULL);
@@ -4282,11 +4326,11 @@ vncClientThread::run(void* arg)
 									// Probe subfolder accessibility; flag it so viewer can show red before clicking
 									if (wcscmp(fdW.cFileName, L".."))
 									{
-										wchar_t szProbeW[MAX_PATH + 4];
-										wchar_t szBaseW[MAX_PATH];
+										wchar_t szProbeW[MAX_PATH * 4];
+										wchar_t szBaseW[MAX_PATH * 4];
 										wcscpy_s(szBaseW, szDirW);
 										szBaseW[wcslen(szBaseW) - 1] = L'\0'; // strip trailing '*'
-										swprintf_s(szProbeW, MAX_PATH + 4, L"%s%s\\*", szBaseW, fdW.cFileName);
+										swprintf_s(szProbeW, MAX_PATH * 4, L"%s%s\\*", szBaseW, fdW.cFileName);
 										WIN32_FIND_DATAW fdProbeW;
 										HANDLE hProbe = FindFirstFileW(szProbeW, &fdProbeW);
 										if (hProbe == INVALID_HANDLE_VALUE)
@@ -4355,11 +4399,11 @@ vncClientThread::run(void* arg)
 								{
 								if (strcmp(fd.cFileName, ".."))
 								{
-									char szProbe[MAX_PATH + 4];
-									char szBase[MAX_PATH];
+									char szProbe[MAX_PATH * 4];
+									char szBase[MAX_PATH * 4];
 									strcpy_s(szBase, szDir);
 									szBase[strlen(szBase) - 1] = '\0'; // strip trailing '*'
-									sprintf_s(szProbe, "%s%s\\*", szBase, fd.cFileName);
+									sprintf_s(szProbe, MAX_PATH * 4, "%s%s\\*", szBase, fd.cFileName);
 									WIN32_FIND_DATA fdProbe;
 									HANDLE hProbe = FindFirstFile(szProbe, &fdProbe);
 									if (hProbe == INVALID_HANDLE_VALUE)
@@ -4428,8 +4472,8 @@ vncClientThread::run(void* arg)
 						if (!settings->getEnableFileTransfer() || !fUserOk) break;
 						// Create the Dir
 						// Convert UTF-8 to Unicode for Chinese character support
-						WCHAR szDirW[MAX_PATH];
-						MultiByteToWideChar(CP_UTF8, 0, szDir, -1, szDirW, MAX_PATH);
+						WCHAR szDirW[MAX_PATH * 4];
+						MultiByteToWideChar(CP_UTF8, 0, szDir, -1, szDirW, MAX_PATH * 4);
 						BOOL fRet = CreateDirectoryW(szDirW, NULL);
 
 						rfbFileTransferMsg ft{};
@@ -4451,7 +4495,7 @@ vncClientThread::run(void* arg)
 					case rfbCFileDelete:
 					{
 						UINT length = Swap32IfLE(msg.ft.length);
-						char szFile[MAX_PATH + 1];
+						char szFile[MAX_PATH * 3 + 1];
 						if (length > sizeof(szFile) - 1) break;
 
 						// Read in the Name of the File
@@ -4475,8 +4519,8 @@ vncClientThread::run(void* arg)
 
 						length = (UINT)(newname.length() + 1);
 						// Convert UTF-8 to Unicode for Chinese character support
-						WCHAR szFileW[MAX_PATH + 1];
-						MultiByteToWideChar(CP_UTF8, 0, szFile, -1, szFileW, MAX_PATH + 1);
+						WCHAR szFileW[MAX_PATH * 4];
+						MultiByteToWideChar(CP_UTF8, 0, szFile, -1, szFileW, MAX_PATH * 4);
 						BOOL fRet = DeleteFileOrDirectory(szFileW);
 
 						rfbFileTransferMsg ft{};
@@ -4498,7 +4542,7 @@ vncClientThread::run(void* arg)
 					case rfbCFileRename:
 					{
 						const UINT length = Swap32IfLE(msg.ft.length);
-						char szNames[(2 * MAX_PATH) + 1];
+						char szNames[(2 * MAX_PATH * 3) + 1];
 						if (length > sizeof(szNames) - 1) break;
 
 						// Read in the Names
@@ -4513,21 +4557,20 @@ vncClientThread::run(void* arg)
 
 						char* p = strrchr(szNames, '*');
 						if (p == NULL) break;
-						char szCurrentName[(2 * MAX_PATH) + 1];
-						char szNewName[(2 * MAX_PATH) + 1];
+						char szCurrentName[MAX_PATH * 3 + 1];
+						char szNewName[MAX_PATH * 3 + 1];
 
 						strcpy_s(szNewName, p + 1);
 						*p = '\0';
 						strcpy_s(szCurrentName, szNames);
 						*p = '*';
 
-						// Rename
-						// Convert UTF-8 to Unicode for Chinese character support
-						WCHAR szCurrentNameW[MAX_PATH];
-						WCHAR szNewNameW[MAX_PATH];
-						MultiByteToWideChar(CP_UTF8, 0, szCurrentName, -1, szCurrentNameW, MAX_PATH);
-						MultiByteToWideChar(CP_UTF8, 0, szNewName, -1, szNewNameW, MAX_PATH);
-						BOOL fRet = MoveFileW(szCurrentNameW, szNewNameW);
+						// Rename - use \\?\ prefix for long path support
+						WCHAR szCurrentNameW[MAX_PATH * 4];
+						WCHAR szNewNameW[MAX_PATH * 4];
+						MakeLongPath(szCurrentName, szCurrentNameW, MAX_PATH * 4);
+						MakeLongPath(szNewName, szNewNameW, MAX_PATH * 4);
+						BOOL fRet = MoveFileExW(szCurrentNameW, szNewNameW, MOVEFILE_REPLACE_EXISTING);
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -5062,21 +5105,21 @@ vncClient::NotifyUpdate(rfbFramebufferUpdateRequestMsg fur)
 				return false;
 		}
 	}
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 	OutputDevMessage("Update Rect %i %i %i %i", update.tl.x, update.tl.y, update.br.x - update.tl.x, update.br.y - update.tl.y);
 	OutputDevMessage("++++++ rfbFramebufferUpdateRequestMsg");
-#endif
+#endif*/
 	m_incr_rgn.assign_union(update_rgn);
 
 	// Kick the update thread (and create it if not there already)
 	TriggerUpdate();
 	TriggerUpdateThread();
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 	static DWORD sNotifyLastCopy = GetTickCount();
 	DWORD now = GetTickCount();;
 	OutputDevMessage("%4d", now - sNotifyLastCopy);
 	sNotifyLastCopy = now;
-#endif
+#endif*/
 	return TRUE;
 }
 
@@ -6295,7 +6338,7 @@ void vncClient::FinishFileReception()
 	if (m_fFileDownloadError && m_fUserAbortedFileTransfer)
 	{
 		SplitTransferredFileNameAndDate(m_szFullDestName, 0);
-		::DeleteFile(m_szFullDestName);
+		{ WCHAR _dp[MAX_PATH*4]; MakeLongPath(m_szFullDestName, _dp, MAX_PATH*4); ::DeleteFileW(_dp); }
 		FTDownloadCancelledHook();
 	}
 	else
@@ -6950,8 +6993,8 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 
 	// Open source file
 	// Convert UTF-8 filename to Unicode for Chinese character support
-	WCHAR szSrcFileNameW[MAX_PATH + 64];
-	MultiByteToWideChar(CP_UTF8, 0, m_szSrcFileName, -1, szSrcFileNameW, MAX_PATH + 64);
+	WCHAR szSrcFileNameW[MAX_PATH * 4];
+	MultiByteToWideChar(CP_UTF8, 0, m_szSrcFileName, -1, szSrcFileNameW, MAX_PATH * 4);
 	m_hSrcFile = CreateFileW(
 		szSrcFileNameW,
 		GENERIC_READ,

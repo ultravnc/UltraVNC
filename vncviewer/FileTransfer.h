@@ -92,7 +92,7 @@ public:
 
 	// File Sending (upload)
 	HANDLE				m_hSrcFile;
-	char				m_szSrcFileName[MAX_PATH + 32];
+	char				m_szSrcFileName[MAX_PATH * 4];
 	DWORD				m_dwNbBytesRead;
 	__int64				m_dwTotalNbBytesRead;
 	bool				m_fEof;
@@ -111,9 +111,9 @@ public:
 	char				m_szFileSpec[MAX_PATH + 64];
 	
 	// File reception (download)
-	WCHAR				m_szSrcFileNameW[MAX_PATH + 32];    // Unicode local src path for upload
-	char				m_szDestFileName[MAX_PATH + 32];
-	WCHAR				m_szDestFileNameW[MAX_PATH + 32]; // Unicode version for correct rename on all locales
+	WCHAR				m_szSrcFileNameW[MAX_PATH * 4];    // Unicode local src path for upload
+	char				m_szDestFileName[MAX_PATH * 4];
+	WCHAR				m_szDestFileNameW[MAX_PATH * 4]; // Unicode version for correct rename on all locales
 	HANDLE				m_hDestFile;
 	DWORD				m_dwNbReceivedPackets;
 	DWORD				m_dwNbBytesWritten;
@@ -235,7 +235,7 @@ private:
 	int nDirZipRet;
 	bool rfbFileHeaderRequested;
 	bool rfbFileTransferOfferRequested;
-	char szRemoteFileNameRequested[MAX_PATH];
+	char szRemoteFileNameRequested[MAX_PATH * 3];
 
 };
 
