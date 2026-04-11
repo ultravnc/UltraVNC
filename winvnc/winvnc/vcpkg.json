@@ -4,12 +4,12 @@
   "version": "1.7.0.0",
   "homepage": "https://github.com/ultravnc/UltraVNC",
   "description": "UltraVNC Server, UltraVNC Viewer, UltraVNC Repeater and UltraVNC SC",
-  "dependencies":
-  [
+  "dependencies": [
     "zlib",
     "zstd",
     "libjpeg-turbo",
     "liblzma",
     "libsodium"
-  ]
+  ],
+  "builtin-baseline": "cb7c686f0eab0656ff903fb4dc14004cd7639401"
 }
