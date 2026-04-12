@@ -6692,8 +6692,8 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 		)
 	{
-		char szPath[MAX_PATH + MAX_PATH];
-		char szDirName[MAX_PATH]; // Todo: improve this (size)
+		char szPath[MAX_PATH * 3];
+		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileName);
 		// Todo: improve all this (p, p2, p3 NULL test or use a standard substring extraction function)
 		char* p = strrchr(szPath, '\\') + 1;
@@ -6702,10 +6702,10 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		char* p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat_s(szPath, szDirName);
+		strcat_s(szPath, MAX_PATH * 3, szDirName);
 		// Create the Directory
 		m_pZipUnZip->UnZipDirectory(szPath, szFileName);
-		DeleteFile(szFileName);
+		{ WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
 		return true;
 	}
 	return false;

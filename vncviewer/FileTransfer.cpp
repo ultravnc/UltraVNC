@@ -2952,7 +2952,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 {
 //	vnclog.Print(0, _T("UnzipPossibleDirectory\n"));
 	// Convert Unicode to ANSI for string operations
-	char szFileNameA[MAX_PATH + 32];
+	char szFileNameA[MAX_PATH * 3];
 	WideCharToMultiByte(CP_ACP, 0, szFileName, -1, szFileNameA, sizeof(szFileNameA), NULL, NULL);
 	
 	if (!m_fFileDownloadError 
@@ -2960,8 +2960,8 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		!strncmp(strrchr(szFileNameA, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 	   )
 	{
-		char szPath[MAX_PATH + MAX_PATH];
-		char szDirName[MAX_PATH];
+		char szPath[MAX_PATH * 3];
+		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileNameA);
 		char *p = strrchr(szPath, '\\') + 1; 
 		char *p2 = strchr(p, '-') + 1;
@@ -2969,15 +2969,15 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		char *p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat_s(szPath, szDirName);
+		strcat_s(szPath, MAX_PATH * 3, szDirName);
 
-		{ wchar_t _wdn4[MAX_PATH]; MultiByteToWideChar(CP_ACP,0,szDirName,-1,_wdn4,MAX_PATH); wchar_t szStatusW6[512]; _snwprintf_s(szStatusW6,512,_TRUNCATE,L" %s < %s > %s",sz_H59,_wdn4,sz_H60); SetStatus(szStatusW6);
+		{ wchar_t _wdn4[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirName,-1,_wdn4,MAX_PATH * 4); wchar_t szStatusW6[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H59,_wdn4,sz_H60); SetStatus(szStatusW6);
 
 		bool fUnzip = m_pZipUnZip->UnZipDirectory(szPath, szFileNameA);
 		if (fUnzip)
-			_snwprintf_s(szStatusW6,512,_TRUNCATE,L" %s < %s > %s",sz_H61,_wdn4,sz_H18);
+			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H61,_wdn4,sz_H18);
 		else
-			_snwprintf_s(szStatusW6,512,_TRUNCATE,L" %s < %s >. %s",sz_H62,_wdn4,sz_H63);
+			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >. %s",sz_H62,_wdn4,sz_H63);
 		SetStatus(szStatusW6); }
 		DeleteFileW(szFileName);
         return true;
@@ -3231,7 +3231,7 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		) //
 	{
 		// sf@2004 - Improving Directory Transfer: Avoids ReadOnly media problem
-		char szDirZipPath[MAX_PATH];
+		char szDirZipPath[MAX_PATH * 3];
 		char szWorkingDir[MAX_PATH];
 		::GetTempPathA(MAX_PATH,szWorkingDir); //PGM Use Windows Temp folder
 		if (szWorkingDir == NULL) //PGM 
@@ -3249,30 +3249,30 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 			}
 		}//PGM
 
-		char szPath[MAX_PATH];
-		char szDirectoryName[MAX_PATH];
+		char szPath[MAX_PATH * 3];
+		char szDirectoryName[MAX_PATH * 3];
 		strcpy_s(szPath, szSrcFileName);
 		p1 = strrchr(szPath, '\\') + 1;
 		strcpy_s(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
 		szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
 		*p1 = '\0';
-		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return false;
+		if ((strlen(szWorkingDir) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH * 3 - 1)) return -1;
 		// sprintf_s(szSrcFileName, "%s%s%s%s", szPath, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
-		sprintf_s(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
-		strcat_s(szPath, szDirectoryName);
+		sprintf_s(szDirZipPath, MAX_PATH * 3, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip"); 
+		strcat_s(szPath, MAX_PATH * 3, szDirectoryName);
 		strcpy_s(szDirectoryName, szPath);
-		if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
-		strcat_s(szDirectoryName, "\\*.*");
+		if (strlen(szDirectoryName) > (MAX_PATH * 3 - 4)) return -1;
+		strcat_s(szDirectoryName, MAX_PATH * 3, "\\*.*");
 		bool fZip;
-		{ wchar_t _wp[MAX_PATH]; MultiByteToWideChar(CP_ACP,0,szPath,-1,_wp,MAX_PATH); wchar_t szStatusW10[512]; _snwprintf_s(szStatusW10,512,_TRUNCATE,L" %s < %s > %s",sz_H64,_wp,sz_H65); SetStatus(szStatusW10);
+		{ wchar_t _wp[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szPath,-1,_wp,MAX_PATH * 4); wchar_t szStatusW10[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H64,_wp,sz_H65); SetStatus(szStatusW10);
 		fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szDirZipPath/*szSrcFileName*/, true);
 		if (fZip)
-			_snwprintf_s(szStatusW10,512,_TRUNCATE,L" %s < %s > %s",sz_H66,_wp,sz_H67);
+			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H66,_wp,sz_H67);
 		else
-			_snwprintf_s(szStatusW10,512,_TRUNCATE,L" %s < %s >. %s",sz_H68,_wp,sz_H69);
+			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >. %s",sz_H68,_wp,sz_H69);
 		SetStatus(szStatusW10); }
 		if (!fZip) return -1;
-		strcpy_s(szSrcFileName, 292, szDirZipPath);
+		strcpy_s(szSrcFileName, MAX_PATH * 3, szDirZipPath);
 		return 1;
 	}
 	else
@@ -3595,18 +3595,18 @@ bool FileTransfer::FinishFileSending()
 	// If the transfered file is a Directory zip, we delete it locally, whatever the result of the transfer
 	if (!strncmp(strrchr(m_szSrcFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
 	{
-		WCHAR szSrcFileNameW[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, m_szSrcFileName, -1, szSrcFileNameW, MAX_PATH);
+		WCHAR szSrcFileNameW[MAX_PATH * 3];
+		MultiByteToWideChar(CP_ACP, 0, m_szSrcFileName, -1, szSrcFileNameW, MAX_PATH * 3);
 		DeleteFileW(szSrcFileNameW);
 		if (!m_fFileUploadError)
 		{
-			char szDirectoryName[MAX_PATH];
+			char szDirectoryName[MAX_PATH * 3];
 			char *p = strrchr(m_szSrcFileName, '\\');
 			char *p1 = strchr(p, '-');
 			strcpy_s(szDirectoryName, p1 + 1);
 			szDirectoryName[strlen(szDirectoryName) - 4] = '\0'; // Remove '.zip'
 			// sprintf_s(szStatus, " %s < %s > %s - Not really sent: %ld", sz_H66, szDirectoryName, sz_H70, m_nNotSent);
-			{ wchar_t _wdn5[MAX_PATH]; MultiByteToWideChar(CP_ACP,0,szDirectoryName,-1,_wdn5,MAX_PATH); wchar_t szStatusW13[512]; _snwprintf_s(szStatusW13,512,_TRUNCATE,L" %s < %s > %s",sz_H66,_wdn5,sz_H70); SetStatus(szStatusW13); }
+			{ wchar_t _wdn5[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirectoryName,-1,_wdn5,MAX_PATH * 4); wchar_t szStatusW13[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW13, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H66,_wdn5,sz_H70); SetStatus(szStatusW13); }
 		}
 	}
 	else
