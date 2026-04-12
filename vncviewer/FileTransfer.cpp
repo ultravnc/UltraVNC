@@ -11,6 +11,8 @@
 
 // FileTransfer.cpp: implementation of the File Transfer class.
 
+#define DEBUG_FT 0
+
 // sf@2002 - sf@2003 - sf@2004 - File Transfer
 // This class handles all the File Transfer messages, events and procs, as well as the
 // DialogBox which allows the user to browse Client ans Server disks-directories,
@@ -1552,11 +1554,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 {
 //	vnclog.Print(0, _T("RequestRemoteDirectoryContent\n"));
 	
-	// DEBUG: Show what szPath we received
-	wchar_t debugMsg2[512];
+#if DEBUG_FT
+	{ wchar_t debugMsg2[512];
 	_snwprintf_s(debugMsg2, 512, _TRUNCATE, L"RequestRemoteDirectoryContent: szPath=[%s] Length=%d\n", 
 		szPath, (int)wcslen(szPath));
-	OutputDebugStringW(debugMsg2);
+	OutputDebugStringW(debugMsg2); }
+#endif
 	
 	if (!m_fFTAllowed)
 	{
@@ -1623,11 +1626,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 					// Strip brackets from Unicode szDispW directly
 					size_t tlenW = wcslen(szDispW);
 					
-					// DEBUG: Show what we received
-					wchar_t debugRoot[256];
+#if DEBUG_FT
+					{ wchar_t debugRoot[256];
 					_snwprintf_s(debugRoot, 256, _TRUNCATE, L"Root/Drive item: szDispW=[%s] Length=%d\n", 
 						szDispW, (int)tlenW);
-					OutputDebugStringW(debugRoot);
+					OutputDebugStringW(debugRoot); }
+#endif
 					
 					if (tlenW >= 4 && szDispW[0] == L'[' && szDispW[1] == L' ')
 					{
@@ -1649,11 +1653,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 						// Convert to UTF-8 for server
 						WideCharToMultiByte(CP_UTF8, 0, ofDirTW, -1, ofDir, MAX_PATH * 3, NULL, NULL);
 						
-						// DEBUG: Show what we're sending
-						wchar_t debugSend[256];
+						#if DEBUG_FT
+						{ wchar_t debugSend[256];
 						_snwprintf_s(debugSend, 256, _TRUNCATE, L"Sending root/drive: ofDirTW=[%s] ofDir=[%hs]\n", 
 							ofDirTW, ofDir);
-						OutputDebugStringW(debugSend);
+						OutputDebugStringW(debugSend); }
+						#endif
 						
 						// Jump directly to send
 						goto send_request;
@@ -1676,10 +1681,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 			SetDlgItemTextW(hWnd, IDC_CURR_REMOTE, ofDirTW);
 			WideCharToMultiByte(CP_UTF8, 0, ofDirTW, -1, ofDir, MAX_PATH * 3, NULL, NULL);
 			
-			wchar_t debugDirect[256];
+#if DEBUG_FT
+			{ wchar_t debugDirect[256];
 			_snwprintf_s(debugDirect, 256, _TRUNCATE, L"Direct path: ofDirTW=[%s] ofDir=[%hs]\n", 
 				ofDirTW, ofDir);
-			OutputDebugStringW(debugDirect);
+			OutputDebugStringW(debugDirect); }
+#endif
 			goto send_request;
 		}
 		
@@ -1689,11 +1696,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 		// szPathW always contains a drive letter (X:) or (..)
 		wcscpy_s(ofDirTW, szPathW);
 		
-		// DEBUG: Show what we have after truncation
-		wchar_t debugTrunc[256];
+#if DEBUG_FT
+		{ wchar_t debugTrunc[256];
 		_snwprintf_s(debugTrunc, 256, _TRUNCATE, L"After truncation: ofDirTW=[%s] Length=%d\n", 
 			ofDirTW, (int)wcslen(ofDirTW));
-		OutputDebugStringW(debugTrunc);
+		OutputDebugStringW(debugTrunc); }
+#endif
 		// remember which item was attempted so we can mark it on error
 		LVFINDINFO Info;
 		memset(&Info, 0, sizeof(Info));
@@ -1743,11 +1751,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 			wcsncpy_s(ofDirStrippedW, ofDirTW + 2, contentLenW);
 			ofDirStrippedW[contentLenW] = L'\0';
 			
-			// DEBUG: Show bracket stripping
-			wchar_t debugStrip[256];
+#if DEBUG_FT
+			{ wchar_t debugStrip[256];
 			_snwprintf_s(debugStrip, 256, _TRUNCATE, L"Bracket strip: ofDirTW=[%s] ofDirStripped=[%s] len=%d\n", 
 				ofDirTW, ofDirStrippedW, (int)wcslen(ofDirTW));
-			OutputDebugStringW(debugStrip);
+			OutputDebugStringW(debugStrip); }
+#endif
 			// Also strip brackets from Unicode: use ofDirW (raw name from lParam) if set,
 			// else strip from ofDirTW
 			if (ofDirW[0] == L'\0')
@@ -1792,11 +1801,12 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 		// Build ofDir as UTF-8 for server
 		WideCharToMultiByte(CP_UTF8, 0, ofDirTW, -1, ofDir, MAX_PATH * 3, NULL, NULL);
 		
-		// DEBUG: Show final path being sent to server
-		wchar_t debugFinal[512];
+#if DEBUG_FT
+		{ wchar_t debugFinal[512];
 		_snwprintf_s(debugFinal, 512, _TRUNCATE, L"Final path: ofDirTW=[%s] ofDir=[%hs] ofDirW=[%s]\n", 
 			ofDirTW, ofDir, ofDirW);
-		OutputDebugStringW(debugFinal);
+		OutputDebugStringW(debugFinal); }
+#endif
 	}
 
 	// Todo: In case of shortcuts dir, do a translation here !
@@ -1839,7 +1849,7 @@ void FileTransfer::RequestRemoteDirectoryContent(HWND hWnd, LPCWSTR szPath)
 void FileTransfer::PopulateRemoteListBox(HWND hWnd, UINT nLen, bool fUnicodeEntry)
 {
 //	vnclog.Print(0, _T("PopulateRemoteListBox\n"));
-
+	
 	// If the distant media is not browsable for some reason
 	if (nLen == 0)
 	{
@@ -1987,6 +1997,7 @@ void FileTransfer::FinishDirectoryReception()
 
 }
 
+
 //
 // request the list of remote drives 
 //
@@ -2079,10 +2090,11 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, UINT nLen)
 		_tcscat_s(szTheDrive, 128, _T(" - "));
 		_tcscat_s(szTheDrive, 128, szType);
 		
-		// DEBUG: Show what we're adding to combo box
-		wchar_t debugCombo[256];
+#if DEBUG_FT
+		{ wchar_t debugCombo[256];
 		_snwprintf_s(debugCombo, 256, _TRUNCATE, L"CB_ADDSTRING: [%s]\n", szTheDrive);
-		OutputDebugStringW(debugCombo);
+		OutputDebugStringW(debugCombo); }
+#endif
 
 		SendMessageW(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szTheDrive); 
 
@@ -2345,12 +2357,13 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 //	vnclog.Print(0, _T("RequestRemoteFile\n"));
 	if (!m_fFTAllowed) return;
 
-	// DEBUG: Trace download request
+#if DEBUG_FT
 	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_UTF8,0,szRemoteFileName,-1,debugMsg,2048);
 	 OutputDebugStringW(L"=== FT_DOWNLOAD: RequestRemoteFile ===\n");
 	 OutputDebugStringW(L"  Requesting file: "); OutputDebugStringW(debugMsg); 
 	 wchar_t debugProto[64]; _snwprintf_s(debugProto,64,_TRUNCATE,L" (UTF-8=%s)\n", m_fServerSupportsUnicode?L"Y":L"N");
 	 OutputDebugStringW(debugProto);}
+#endif
 
 	// Ensure Backward File Transfer compatibility (Directory reception)....
 	if (UsingOldProtocol())
@@ -2399,7 +2412,7 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	ft.size = (m_pCC->kbitsPerSecond > 2048) ? Swap32IfLE(0) : Swap32IfLE(1); // 1 means "Enable compression" 
 	//adzm 2010-09
     m_pCC->WriteExactQueue((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
-    m_pCC->WriteExact((char *)szFileNameToSend, strlen(szFileNameToSend));
+	m_pCC->WriteExact((char *)szFileNameToSend, strlen(szFileNameToSend));
 	strncpy_s(szRemoteFileNameRequested, sizeof(szRemoteFileNameRequested), szFileNameToSend, _TRUNCATE);
 	rfbFileHeaderRequested = true;
 	return;
@@ -2426,9 +2439,11 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 //	vnclog.Print(0, _T("ReceiveFile\n"));
 	if (!m_fFTAllowed) return false;
 
+#if DEBUG_FT
 	OutputDebugStringW(L"=== FT_DOWNLOAD: ReceiveFile START ===\n");
 	{wchar_t debugMsg[128]; _snwprintf_s(debugMsg,128,_TRUNCATE,L"  nLen=%d, lSize=%lu\n", nLen, lSize);
 	 OutputDebugStringW(debugMsg);}
+#endif
 
 	rfbFileTransferMsg ft;
 	ft.type = rfbFileTransfer;
@@ -2530,13 +2545,12 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 
 	if (fErr)
 	{
-		wchar_t szStatusW[512];
+		wchar_t szStatusW4[512];
 		if (!fErrNoFileName)
-			{ wchar_t _wdn[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,displayName,-1,_wdn,MAX_PATH * 4); _snwprintf_s(szStatusW,512,_TRUNCATE,L" %s < %s >",sz_H14,_wdn); }
+			{ wchar_t _wdn[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,displayName,-1,_wdn,MAX_PATH * 4); wchar_t szStatusW4[512]; _snwprintf_s(szStatusW4,512,_TRUNCATE,L" %s < %s >",sz_H14,_wdn); SetStatus(szStatusW4); }
 		else
-			_snwprintf_s(szStatusW,512,_TRUNCATE,L" %s < Invalid remote file name > %s",sz_H14,sz_H13);
+			_snwprintf_s(szStatusW4,512,_TRUNCATE,L" %s < Invalid remote file name >",sz_H14);
 
-		SetStatus(szStatusW);
 		delete [] szRemoteFileName;
 		// Tell the server to cancel the transfer
 		ft.size = Swap32IfLE(-1);
@@ -2571,12 +2585,14 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
         m_nnFileSize = (((__int64)(sizeH)) << 32) + lSize;
         char szFFS[96];
         GetFriendlyFileSizeString(m_nnFileSize, szFFS, 96);
-        { wchar_t _wdn2[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,displayName,-1,_wdn2,MAX_PATH * 4); wchar_t _wffs[96]; MultiByteToWideChar(CP_ACP,0,szFFS,-1,_wffs,96); wchar_t szStatusW2[512]; _snwprintf_s(szStatusW2,512,_TRUNCATE,L" %s < %s > (%s) <<<",sz_H15,_wdn2,_wffs); SetStatus(szStatusW2); }
+        { wchar_t _wdn2[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,displayName,-1,_wdn2,MAX_PATH * 4); wchar_t _wffs[96]; MultiByteToWideChar(CP_ACP,0,szFFS,-1,_wffs,96); wchar_t szStatusW12[512]; _snwprintf_s(szStatusW12,512,_TRUNCATE,L" %s < %s > (%s) <<<",sz_H15,_wdn2,_wffs); SetStatus(szStatusW12); }
         SetTotalSize(hWnd, lSize);
         SetGauge(hWnd, 0);
         UpdateWindow(hWnd);
         // DEBUG: Show destination path
-        OutputDebugStringW(L"  Creating dest file: "); OutputDebugStringW(m_szDestFileNameW); OutputDebugStringW(L"\n");
+        #if DEBUG_FT
+		OutputDebugStringW(L"  Creating dest file: "); OutputDebugStringW(m_szDestFileNameW); OutputDebugStringW(L"\n");
+#endif
         
         // Create the local Destination file using Unicode path with \\?\ prefix for long path support
         WCHAR szDestLongW[MAX_PATH * 4];
@@ -2599,7 +2615,9 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	if (m_hDestFile == INVALID_HANDLE_VALUE)
 	{
 		{ wchar_t _wdn3[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,displayName,-1,_wdn3,MAX_PATH * 4); wchar_t szStatusW3[512]; _snwprintf_s(szStatusW3,512,_TRUNCATE,L" %s < %s > %s",sz_H12,_wdn3,sz_H16); SetStatus(szStatusW3); }
-		OutputDebugStringW(L"  ERROR: CreateFileW failed for destination file\n");
+#if DEBUG_FT
+				OutputDebugStringW(L"  ERROR: CreateFileW failed for destination file\n");
+#endif
 		CloseHandle(m_hDestFile);
 		delete [] szRemoteFileName;
         m_fFileDownloadError =  true;
@@ -2672,9 +2690,11 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	m_fFileDownloadError = false;
 	m_fFileDownloadRunning = true;
 
+#if DEBUG_FT
 	OutputDebugStringW(L"  Dest file opened successfully, download started\n");
-	{wchar_t debugMsg[128]; _snwprintf_s(debugMsg,128,_TRUNCATE,L"  FileSize=%I64d, fAlreadyExists=%d\n", m_nnFileSize, fAlreadyExists);
+	{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  FileSize=%I64d, fAlreadyExists=%d\n", m_nnFileSize, fAlreadyExists);
 	 OutputDebugStringW(debugMsg);}
+#endif
 
 	m_dwStartTick = GetTickCount();
 
@@ -2702,7 +2722,9 @@ bool FileTransfer::ReceiveFileChunk(UINT nLen, int nSize)
 
 	if (m_fFileDownloadError)
 	{
-		OutputDebugStringW(L"  ReceiveFileChunk: m_fFileDownloadError=TRUE, calling FinishFileReception\n");
+#if DEBUG_FT
+			OutputDebugStringW(L"  ReceiveFileChunk: m_fFileDownloadError=TRUE, calling FinishFileReception\n");
+#endif
 		FinishFileReception();
 	}
 
@@ -2712,8 +2734,10 @@ bool FileTransfer::ReceiveFileChunk(UINT nLen, int nSize)
 		DWORD dwElapsed = GetTickCount() - s_debugLastReport;
 		__int64 bytesRecv = m_dwTotalNbBytesWritten - s_debugLastBytes;
 		DWORD kbps = dwElapsed > 0 ? (DWORD)((bytesRecv * 8 / 1024) * 1000 / dwElapsed) : 0;
-		{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  ReceiveFileChunk: TotalBytes=%I64d, Speed=%lu Kbps\n", m_dwTotalNbBytesWritten, kbps);
-		 OutputDebugStringW(debugMsg);}
+#if DEBUG_FT
+			{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  ReceiveFileChunk: TotalBytes=%I64d, Speed=%lu Kbps\n", m_dwTotalNbBytesWritten, kbps);
+			 OutputDebugStringW(debugMsg);}
+#endif
 		s_debugLastReport = GetTickCount();
 		s_debugLastBytes = m_dwTotalNbBytesWritten;
 	}
@@ -2844,9 +2868,11 @@ bool FileTransfer::FinishFileReception()
 //	vnclog.Print(0, _T("FinishFileReception\n"));
 	if (!m_fFileDownloadRunning) return false;
 
+#if DEBUG_FT
 	OutputDebugStringW(L"=== FT_DOWNLOAD: FinishFileReception ===\n");
 	{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  m_fFileDownloadError=%d, TotalBytesWritten=%I64d\n", m_fFileDownloadError, m_dwTotalNbBytesWritten);
 	 OutputDebugStringW(debugMsg);}
+#endif
 
 	m_fFileDownloadRunning = false;
     m_pCC->SetRecvTimeout(0);
@@ -2862,14 +2888,7 @@ bool FileTransfer::FinishFileReception()
     std::string realName = get_real_filename(m_szDestFileName);
     
 	wchar_t szStatusW4[512 + 256];
-	{ wchar_t _wrn[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,realName.c_str(),-1,_wrn,MAX_PATH * 4);
-	if (m_fFileDownloadError)
-		_snwprintf_s(szStatusW4,768,_TRUNCATE,L" %s < %s > %s",sz_H19,_wrn,sz_H20);
-	else
-		_snwprintf_s(szStatusW4,768,_TRUNCATE,L" %s < %s > %s",sz_H17,_wrn,sz_H18);
-
-	SetStatus(szStatusW4); }
-
+	{ wchar_t _wrn[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,realName.c_str(),-1,_wrn,MAX_PATH * 4); wchar_t szStatusW4[512]; _snwprintf_s(szStatusW4,512,_TRUNCATE,L" %s < %s >",sz_H17,_wrn); SetStatus(szStatusW4); }
 	// Set the DestFile Time Stamp
 	if (strlen(m_szIncomingFileTime))
 	{
@@ -2928,7 +2947,7 @@ bool FileTransfer::FinishFileReception()
         if (!::MoveFileExW(srcLongW, dstLongW, MOVEFILE_REPLACE_EXISTING))
        {
             // failure. Updated status
-            { wchar_t _wrn2[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,realName.c_str(),-1,_wrn2,MAX_PATH * 4); wchar_t szStatusW5[512]; _snwprintf_s(szStatusW5,512,_TRUNCATE,L" %s < %s > %s",sz_H12,_wrn2,sz_H16); SetStatus(szStatusW5); }
+            { wchar_t _wrn2[MAX_PATH * 4]; MultiByteToWideChar(CP_UTF8,0,realName.c_str(),-1,_wrn2,MAX_PATH * 4); wchar_t szStatusW5[512]; _snwprintf_s(szStatusW5,512,_TRUNCATE,L" %s < %s >",sz_H12,_wrn2); SetStatus(szStatusW5); }
         }
     }
 
@@ -2971,11 +2990,11 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		if (p != NULL) *p = '\0';
 		strcat_s(szPath, MAX_PATH * 3, szDirName);
 
-		{ wchar_t _wdn4[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirName,-1,_wdn4,MAX_PATH * 4); wchar_t szStatusW6[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H59,_wdn4,sz_H60); SetStatus(szStatusW6);
+		{ wchar_t _wdn4[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirName,-1,_wdn4,MAX_PATH * 4); wchar_t szStatusW6[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >",sz_H59,_wdn4); SetStatus(szStatusW6);
 
 		bool fUnzip = m_pZipUnZip->UnZipDirectory(szPath, szFileNameA);
 		if (fUnzip)
-			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H61,_wdn4,sz_H18);
+			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >",sz_H61,_wdn4);
 		else
 			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >. %s",sz_H62,_wdn4,sz_H63);
 		SetStatus(szStatusW6); }
@@ -2996,7 +3015,7 @@ bool FileTransfer::AbortFileReception()
 	m_fFileDownloadError = true;
 	FlushFileBuffers(m_hDestFile);
 	char szStatus[512 + 256];
-	sprintf_s(szStatus, " %ls < %s > %ls", sz_H19, m_szDestFileName,sz_H20); 
+	sprintf_s(szStatus, " %ls < %s >", sz_H19, m_szDestFileName); 
 
 	m_fFileDownloadRunning = false;
 
@@ -3025,12 +3044,13 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 //	vnclog.Print(0, _T("OfferLocalFile\n"));
 	if (!m_fFTAllowed) return false;
 
-	// DEBUG: Trace upload start
+#if DEBUG_FT
 	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_ACP,0,szSrcFileName,-1,debugMsg,2048);
 	 OutputDebugStringW(L"=== FT_UPLOAD: OfferLocalFile START ===\n");
-	 OutputDebugStringW(L"  szSrcFileName="); OutputDebugStringW(debugMsg); OutputDebugStringW(L"\n");
-	 OutputDebugStringW(L"  m_szSrcFileNameW="); OutputDebugStringW(m_szSrcFileNameW); OutputDebugStringW(L"\n");
+	 OutputDebugStringW(L"  szSrcFileName="); OutputDebugStringW(debugMsg); 
+	 OutputDebugStringW(L"  m_szSrcFileNameW="); OutputDebugStringW(m_szSrcFileNameW); 
 	 OutputDebugStringW(L"  m_fServerSupportsUnicode="); OutputDebugStringW(m_fServerSupportsUnicode?L"TRUE\n":L"FALSE\n");}
+#endif
 
 	strcpy_s(m_szSrcFileName, szSrcFileName);
 
@@ -3056,7 +3076,9 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 		MultiByteToWideChar(CP_ACP, 0, m_szSrcFileName, -1, m_szSrcFileNameW, MAX_PATH * 4);
 	
 	// DEBUG: Show Unicode path being used
-	{OutputDebugStringW(L"  CreateFileW using m_szSrcFileNameW="); OutputDebugStringW(m_szSrcFileNameW); OutputDebugStringW(L"\n");}
+#if DEBUG_FT
+		{OutputDebugStringW(L"  CreateFileW using m_szSrcFileNameW="); OutputDebugStringW(m_szSrcFileNameW); OutputDebugStringW(L"\n");}
+#endif
 	
 	m_hSrcFile = CreateFileW(
 							m_szSrcFileNameW,		
@@ -3072,12 +3094,14 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	{
 		{ wchar_t _wsf[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,m_szSrcFileName,-1,_wsf,MAX_PATH * 4); wchar_t szStatusW7[512]; _snwprintf_s(szStatusW7,512,_TRUNCATE,L" %s < %s >",sz_H21,_wsf); SetStatus(szStatusW7); }
         m_fFileUploadError = true;
-		OutputDebugStringW(L"  ERROR: CreateFileW failed for source file\n");
-
-		return false;
-	}
-
-	OutputDebugStringW(L"  Source file opened successfully\n");
+#if DEBUG_FT
+			OutputDebugStringW(L"  ERROR: CreateFileW failed for source file\n");
+#endif
+			return false;
+		}
+#if DEBUG_FT
+		OutputDebugStringW(L"  Source file opened successfully\n");
+#endif
 
 	// Size of src file - use Unicode path for correct size retrieval
 	ULARGE_INTEGER n2SrcSize;
@@ -3189,10 +3213,12 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	}
 	
 	// DEBUG: Show what we're sending to server
-	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_ACP,0,szDstFileNameToSend,-1,debugMsg,2048);
+#if DEBUG_FT
+	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_UTF8,0,szDstFileNameToSend,-1,debugMsg,2048);
 	 OutputDebugStringW(L"  Sending filename to server: "); OutputDebugStringW(debugMsg); 
 	 wchar_t debugProto[64]; _snwprintf_s(debugProto,64,_TRUNCATE,L" (UTF-8=%s, len=%d)\n", m_fServerSupportsUnicode?L"Y":L"N", (int)strlen(szDstFileNameToSend));
 	 OutputDebugStringW(debugProto);}
+#endif
 	
 	ft.length = Swap32IfLE(strlen(szDstFileNameToSend));
 	//adzm 2010-09
@@ -3264,10 +3290,10 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		if (strlen(szDirectoryName) > (MAX_PATH * 3 - 4)) return -1;
 		strcat_s(szDirectoryName, MAX_PATH * 3, "\\*.*");
 		bool fZip;
-		{ wchar_t _wp[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szPath,-1,_wp,MAX_PATH * 4); wchar_t szStatusW10[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H64,_wp,sz_H65); SetStatus(szStatusW10);
+		{ wchar_t _wp[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szPath,-1,_wp,MAX_PATH * 4); wchar_t szStatusW10[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >",sz_H64,_wp); SetStatus(szStatusW10);
 		fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szDirZipPath/*szSrcFileName*/, true);
 		if (fZip)
-			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H66,_wp,sz_H67);
+			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >",sz_H66,_wp);
 		else
 			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s >. %s",sz_H68,_wp,sz_H69);
 		SetStatus(szStatusW10); }
@@ -3315,9 +3341,11 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 	if (!m_fFTAllowed) return false;
 	if (nLen == 0) return false; // Used when the local file could no be open in OfferLocalFile
 
+#if DEBUG_FT
 	OutputDebugStringW(L"=== FT_UPLOAD: SendFile START (server accepted) ===\n");
-	{wchar_t debugMsg[64]; _snwprintf_s(debugMsg,64,_TRUNCATE,L"  nLen=%d, lSize=%ld\n", nLen, lSize);
+	{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  nLen=%d, lSize=%ld\n", nLen, lSize);
 	 OutputDebugStringW(debugMsg);}
+#endif
 
 	char *szRemoteFileName = new char [nLen+1];
 	if (szRemoteFileName == NULL) return false;
@@ -3332,8 +3360,10 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 		szRemoteFileName[nLen] = '\0';
 
 	// DEBUG: Show what server sent back
-	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_UTF8,0,szRemoteFileName,-1,debugMsg,2048);
-	 OutputDebugStringW(L"  Server returned remote filename: "); OutputDebugStringW(debugMsg); OutputDebugStringW(L"\n");}
+#if DEBUG_FT
+		{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_UTF8,0,szRemoteFileName,-1,debugMsg,2048);
+		 OutputDebugStringW(L"  Server returned remote filename: "); OutputDebugStringW(debugMsg); OutputDebugStringW(L"\n");}
+#endif
 
 	// If lSize = -1 (0xFFFFFFFF) that means that the Dst file on the remote machine
 	// could not be created for some reason (locked..)
@@ -3352,7 +3382,9 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 	if (m_szSrcFileNameW[0] == L'\0')
 		MultiByteToWideChar(CP_ACP, 0, m_szSrcFileName, -1, m_szSrcFileNameW, MAX_PATH + 32);
 	
+#if DEBUG_FT
 	OutputDebugStringW(L"  Opening source file: "); OutputDebugStringW(m_szSrcFileNameW); OutputDebugStringW(L"\n");
+#endif
 	
 	m_hSrcFile = CreateFileW(
 							m_szSrcFileNameW,		
@@ -3367,11 +3399,15 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 	if (m_hSrcFile == INVALID_HANDLE_VALUE)
 	{
 		{ wchar_t _wsf[MAX_PATH]; MultiByteToWideChar(CP_ACP,0,m_szSrcFileName,-1,_wsf,MAX_PATH); wchar_t szStatusW7[512]; _snwprintf_s(szStatusW7,512,_TRUNCATE,L" %s < %s >",sz_H21,_wsf); SetStatus(szStatusW7); }
-		OutputDebugStringW(L"  ERROR: CreateFileW failed for source file\n");
-        m_fFileUploadError = true;
-		return false;
-	}
-	OutputDebugStringW(L"  Source file opened successfully\n");
+#if DEBUG_FT
+			OutputDebugStringW(L"  ERROR: CreateFileW failed for source file\n");
+#endif
+			m_fFileUploadError = true;
+			return false;
+		}
+#if DEBUG_FT
+		OutputDebugStringW(L"  Source file opened successfully\n");
+#endif
 
 	m_fFileUploadError = false;
 	m_dwNbBytesRead = 0;
@@ -3412,14 +3448,18 @@ bool FileTransfer::SendFileChunk()
 
 		if (!m_fFileUploadRunning)
 		{
+#if DEBUG_FT
 			OutputDebugStringW(L"  SendFileChunk: m_fFileUploadRunning=FALSE, returning\n");
+#endif
 			return false;
 		}
 
 		if (m_fEof || m_fFileUploadError)
 		{
-			{wchar_t debugMsg[128]; _snwprintf_s(debugMsg,128,_TRUNCATE,L"  SendFileChunk: EOF=%d, Error=%d, calling FinishFileSending\n", m_fEof, m_fFileUploadError);
-			 OutputDebugStringW(debugMsg);}
+#if DEBUG_FT
+					{wchar_t debugMsg[128]; _snwprintf_s(debugMsg,128,_TRUNCATE,L"  SendFileChunk: EOF=%d, Error=%d, calling FinishFileSending\n", m_fEof, m_fFileUploadError);
+					 OutputDebugStringW(debugMsg);}
+#endif
 			FinishFileSending();
 			return true;
 		}
@@ -3443,7 +3483,9 @@ bool FileTransfer::SendFileChunk()
 		if (nRes && m_dwNbBytesRead == 0)
 		{
 			m_fEof = true;
-			OutputDebugStringW(L"  SendFileChunk: ReadFile returned 0 bytes, EOF reached\n");
+#if DEBUG_FT
+				OutputDebugStringW(L"  SendFileChunk: ReadFile returned 0 bytes, EOF reached\n");
+#endif
 			return true; // Next timer tick will call FinishFileSending
 		}
 
@@ -3453,8 +3495,10 @@ bool FileTransfer::SendFileChunk()
 			DWORD dwElapsed = GetTickCount() - s_debugLastReport;
 			__int64 bytesSent = m_dwTotalNbBytesRead - s_debugLastBytes;
 			DWORD kbps = dwElapsed > 0 ? (DWORD)((bytesSent * 8 / 1024) * 1000 / dwElapsed) : 0;
-			{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  SendFileChunk: TotalBytes=%I64d, Chunk=%lu, Speed=%lu Kbps\n", m_dwTotalNbBytesRead, m_dwNbBytesRead, kbps);
-			 OutputDebugStringW(debugMsg);}
+#if DEBUG_FT
+				{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  SendFileChunk: Read=%lu bytes, Total=%I64d\n",m_dwNbBytesRead,m_dwTotalNbBytesRead);
+				 OutputDebugStringW(debugMsg);}
+#endif
 			s_debugLastReport = GetTickCount();
 			s_debugLastBytes = m_dwTotalNbBytesRead;
 		}
@@ -3554,9 +3598,11 @@ bool FileTransfer::FinishFileSending()
 //	vnclog.Print(0, _T("FinishSendFile\n"));
 	if (!m_fFileUploadRunning) return false;
 
+#if DEBUG_FT
 	OutputDebugStringW(L"=== FT_UPLOAD: FinishFileSending ===\n");
 	{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  m_fFileUploadError=%d, m_fEof=%d, TotalBytes=%I64d\n", m_fFileUploadError, m_fEof, m_dwTotalNbBytesRead);
 	 OutputDebugStringW(debugMsg);}
+#endif
 
 	m_fFileUploadRunning = false;
     m_pCC->SetSendTimeout(0);
@@ -4870,11 +4916,12 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				    ofDirW[3] == L':' && ofDirW[4] == L' ' && ofDirW[5] == L']' && ofDirW[6] == L' ')
 					ofDirW[6] = L'\0';  // Truncate at position 6 to keep "[ D: ]"
 				
-				// DEBUG: Show what we got from combo box
-				wchar_t debugMsg[512];
+#if DEBUG_FT
+				{ wchar_t debugMsg[512];
 				_snwprintf_s(debugMsg, 512, _TRUNCATE, L"Remote CB: Unicode=[%s] Len=%d\n", 
 					ofDirW, (int)wcslen(ofDirW));
-				OutputDebugStringW(debugMsg);
+				OutputDebugStringW(debugMsg); }
+#endif
 				
 				_this->RequestRemoteDirectoryContent(hWnd, ofDirW);					
 				break;

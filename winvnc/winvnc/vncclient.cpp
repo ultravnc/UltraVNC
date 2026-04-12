@@ -14,6 +14,7 @@
 
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+#define DEBUG_FT 0
 // vncClient.cpp
 
 // The per-client object. This object takes care of all per-client stuff,
@@ -3826,9 +3827,10 @@ vncClientThread::run(void* arg)
 
 					DWORD dwDstSize = (DWORD)0; // Dummy size, actually a return value
 
-					// DEBUG: show what the server received
+#if DEBUG_FT
 					{WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_UTF8,0,m_client->m_szFullDestName,-1,_dbg,MAX_PATH*4);
 					 OutputDebugStringW(L"=== SRV FTOffer: m_szFullDestName="); OutputDebugStringW(_dbg); OutputDebugStringW(L"\n");}
+#endif
 
 					// Also check the free space on destination drive
 					ULARGE_INTEGER lpFreeBytesAvailable = {};
@@ -3840,38 +3842,50 @@ vncClientThread::run(void* arg)
 						MultiByteToWideChar(CP_UTF8, 0, m_client->m_szFullDestName, -1, szDestPathW, MAX_PATH * 4);
 						WCHAR* pSlash = wcsrchr(szDestPathW, L'\\');
 						if (pSlash) *pSlash = L'\0'; // strip filename, keep directory
+#if DEBUG_FT
 						OutputDebugStringW(L"=== SRV FTOffer: DiskFreeCheck dir="); OutputDebugStringW(szDestPathW); OutputDebugStringW(L"\n");
+#endif
 						BOOL bFree = GetDiskFreeSpaceExW(szDestPathW,
 							&lpFreeBytesAvailable,
 							&lpTotalBytes,
 							&lpTotalFreeBytes);
 						if (!bFree) {
 							DWORD err = GetLastError();
+#if DEBUG_FT
 							WCHAR _e[64]; _snwprintf_s(_e,64,_TRUNCATE,L"=== SRV FTOffer: GetDiskFreeSpaceExW FAILED err=%lu\n",err);
 							OutputDebugStringW(_e);
+#endif
 							dwDstSize = 0xFFFFFFFF;
 						} else {
+#if DEBUG_FT
 							OutputDebugStringW(L"=== SRV FTOffer: GetDiskFreeSpaceExW OK\n");
+#endif
 						}
 					}
 					dwFreeKBytes = (unsigned long)(Int64ShraMod32(lpFreeBytesAvailable.QuadPart, 10));
 					__int64 nnFileSize = (((__int64)sizeH) << 32) + sizeL;
 					if ((__int64)dwFreeKBytes < (__int64)(nnFileSize / 1000)) {
+#if DEBUG_FT
 						OutputDebugStringW(L"=== SRV FTOffer: FAIL - insufficient disk space\n");
+#endif
 						dwDstSize = 0xFFFFFFFF;
 					}
 
 					// Allocate buffer for file packets
 					m_client->m_pBuff = new char[sz_rfbBlockSize + 1024];
 					if (m_client->m_pBuff == NULL) {
+#if DEBUG_FT
 						OutputDebugStringW(L"=== SRV FTOffer: FAIL - pBuff alloc failed\n");
+#endif
 						dwDstSize = 0xFFFFFFFF;
 					}
 
 					// Allocate buffer for DeCompression
 					m_client->m_pCompBuff = new char[sz_rfbBlockSize];
 					if (m_client->m_pCompBuff == NULL) {
+#if DEBUG_FT
 						OutputDebugStringW(L"=== SRV FTOffer: FAIL - pCompBuff alloc failed\n");
+#endif
 						dwDstSize = 0xFFFFFFFF;
 					}
 
@@ -3903,7 +3917,9 @@ vncClientThread::run(void* arg)
 							else
 								wcscpy_s(szFullDestNameW, szTmp);
 						}
+#if DEBUG_FT
 						OutputDebugStringW(L"=== SRV FTOffer: CreateFileW="); OutputDebugStringW(szFullDestNameW); OutputDebugStringW(L"\n");
+#endif
 						m_client->m_hDestFile = CreateFileW(szFullDestNameW,
 							GENERIC_WRITE | GENERIC_READ,
 							FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -3914,13 +3930,17 @@ vncClientThread::run(void* arg)
 						fAlreadyExists = (GetLastError() == ERROR_ALREADY_EXISTS);
 						if (m_client->m_hDestFile == INVALID_HANDLE_VALUE)
 						{
+#if DEBUG_FT
 							DWORD err = GetLastError();
 							WCHAR _e2[64]; _snwprintf_s(_e2,64,_TRUNCATE,L"=== SRV FTOffer: CreateFileW FAILED err=%lu\n",err);
 							OutputDebugStringW(_e2);
+#endif
 							dwDstSize = 0xFFFFFFFF;
 						}
 						else {
+#if DEBUG_FT
 							OutputDebugStringW(L"=== SRV FTOffer: CreateFileW OK\n");
+#endif
 							dwDstSize = 0x00;
 						}
 					}
