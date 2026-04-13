@@ -1689,6 +1689,10 @@ int mapname(__G__ renamed)
   ---------------------------------------------------------------------------*/
 
     for (; (workch = (uch)*cp) != 0; INCSTR(cp)) {
+        /* UltraVNC: bounds check to prevent overflow on long Unicode paths */
+        if (pp >= pathcomp + FILNAMSIZ - 4) {
+            return MPN_INF_TRUNC;
+        }
 
         switch (workch) {
             case '/':             /* can assume -j flag not given */
@@ -1746,8 +1750,16 @@ int mapname(__G__ renamed)
                 if (isprint(workch) || workch >= 127)
 #ifdef _MBCS
                 {
-                    memcpy(pp, cp, CLEN(cp));
-                    INCSTR(pp);
+                    /* UltraVNC: guard against invalid MBCS sequences (mblen=-1)
+                       and buffer overflow on long Unicode paths */
+                    int _clen = CLEN(cp);
+                    if (_clen < 1) _clen = 1;  /* treat invalid seq as 1 byte */
+                    if (pp + _clen < pathcomp + FILNAMSIZ - 2) {
+                        memcpy(pp, cp, _clen);
+                        pp += _clen;
+                    } else {
+                        return MPN_INF_TRUNC;
+                    }
                 }
 #else
                     *pp++ = (char)workch;
@@ -2264,7 +2276,9 @@ int checkdir(__G__ pathcomp, flag)
         if ((G.buildpathHPFS = (char *)malloc(G.fnlen+G.rootlen+
                                               (uO.acorn_nfs_ext ? 5 : 1)))
 #else
-        if ((G.buildpathHPFS = (char *)malloc(G.fnlen+G.rootlen+1))
+        /* UltraVNC: add FILNAMSIZ safety margin; fnlen+rootlen alone is not enough
+           when map2fat or other transforms slightly expand the path */
+        if ((G.buildpathHPFS = (char *)malloc(G.fnlen+G.rootlen+FILNAMSIZ))
 #endif
             == NULL)
             return MPN_NOMEM;
@@ -2272,7 +2286,7 @@ int checkdir(__G__ pathcomp, flag)
         if ((G.buildpathFAT = (char *)malloc(G.fnlen+G.rootlen+
                                              (uO.acorn_nfs_ext ? 5 : 1)))
 #else
-        if ((G.buildpathFAT = (char *)malloc(G.fnlen+G.rootlen+1))
+        if ((G.buildpathFAT = (char *)malloc(G.fnlen+G.rootlen+FILNAMSIZ))
 #endif
             == NULL) {
             free(G.buildpathHPFS);

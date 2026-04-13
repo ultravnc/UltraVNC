@@ -14,7 +14,7 @@
 
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
-#define DEBUG_FT 0
+#define DEBUG_FT 1
 // vncClient.cpp
 
 // The per-client object. This object takes care of all per-client stuff,
@@ -6620,46 +6620,84 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 	if (
 		p1[0] == rfbDirPrefix[0] && p1[1] == rfbDirPrefix[1]  // Check dir prefix
 		&& p2[1] == rfbDirSuffix[1] && p2 != NULL && p1 < p2  // Check dir suffix
-		) //
+		)
 	{
 		// sf@2004 - Improving Directory Transfer: Avoids ReadOnly media problem
-		char szDirZipPath[MAX_PATH];
-		char szWorkingDir[MAX_PATH];
-		::GetTempPath(MAX_PATH, szWorkingDir); //PGM Use Windows Temp folder
+		// UltraVNC: Use Unicode paths throughout to support non-ASCII (Arabic etc.) dirnames.
+		// szSrcFileName arrives as UTF-8: "C:\parent\[ dirname ]"
+		WCHAR szWorkingDirW[MAX_PATH * 4];
+		::GetTempPathW(MAX_PATH * 4, szWorkingDirW);
 		if (m_fFTUserImpersonatedOk)
-			strcpy_s(szWorkingDir, m_szTempDir);
-		if (szWorkingDir == NULL) //PGM
-		{ //PGM
-			if (GetModuleFileName(NULL, szWorkingDir, MAX_PATH))
+			MultiByteToWideChar(CP_ACP, 0, m_szTempDir, -1, szWorkingDirW, MAX_PATH * 4);
+		if (szWorkingDirW[0] == L'\0')
+		{
+			if (GetModuleFileNameW(NULL, szWorkingDirW, MAX_PATH * 4))
 			{
-				char* p = strrchr(szWorkingDir, '\\');
-				if (p == NULL)
-					return -1;
-				*(p + 1) = '\0';
+				WCHAR* p = wcsrchr(szWorkingDirW, L'\\');
+				if (p == NULL) return -1;
+				*(p + 1) = L'\0';
 			}
-			else
-			{
-				return -1;
-			}
-		}//PGM
+			else return -1;
+		}
 
-		char szPath[MAX_PATH];
-		char szDirectoryName[MAX_PATH];
-		strcpy_s(szPath, szSrcFileName);
-		p1 = strrchr(szPath, '\\') + 1;
-		strcpy_s(szDirectoryName, p1 + 2); // Skip dir prefix (2 chars)
-		szDirectoryName[strlen(szDirectoryName) - 2] = '\0'; // Remove dir suffix (2 chars)
-		*p1 = '\0';
-		m_OrigSourceDirectoryName = std::string(szPath) + szDirectoryName;
-		if ((strlen(szPath) + strlen(rfbZipDirectoryPrefix) + strlen(szDirectoryName) + 4) > (MAX_PATH - 1)) return -1;
-		sprintf_s(szDirZipPath, "%s%s%s%s", szWorkingDir, rfbZipDirectoryPrefix, szDirectoryName, ".zip");
-		strcat_s(szPath, szDirectoryName);
-		strcpy_s(szDirectoryName, szPath);
-		if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
-		strcat_s(szDirectoryName, "\\*.*");
-		bool fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szDirZipPath, true);
+		// Convert UTF-8 input path to Unicode
+		WCHAR szSrcFileNameW[MAX_PATH * 4];
+		MultiByteToWideChar(CP_UTF8, 0, szSrcFileName, -1, szSrcFileNameW, MAX_PATH * 4);
+
+		// Parse: "C:\parent\[ dirname ]" -> szPathW="C:\parent\", szDirNameW="dirname"
+		WCHAR szPathW[MAX_PATH * 4];
+		WCHAR szDirNameW[MAX_PATH * 4];
+		wcscpy_s(szPathW, szSrcFileNameW);
+		WCHAR* pw1 = wcsrchr(szPathW, L'\\') + 1;
+		wcscpy_s(szDirNameW, pw1 + 2); // skip "[ "
+		size_t nDirLen = wcslen(szDirNameW);
+		if (nDirLen >= 2) szDirNameW[nDirLen - 2] = L'\0'; // strip " ]"
+		*pw1 = L'\0'; // szPathW = "C:\parent\"
+
+		// Full source dir path and short path for ANSI zip library
+		WCHAR szSrcDirW[MAX_PATH * 4];
+		_snwprintf_s(szSrcDirW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szPathW, szDirNameW);
+		m_OrigSourceDirectoryName = std::string(szSrcFileName); // keep for reference
+
+		WCHAR szShortSrcW[MAX_PATH * 4];
+		if (!GetShortPathNameW(szSrcDirW, szShortSrcW, MAX_PATH * 4))
+			wcscpy_s(szShortSrcW, szSrcDirW);
+
+		// Build wildcard from short dir path (never call GetShortPathNameW on a wildcard)
+		WCHAR szShortSrcWildW[MAX_PATH * 4];
+		_snwprintf_s(szShortSrcWildW, MAX_PATH * 4, _TRUNCATE, L"%s\\*.*", szShortSrcW);
+
+		// Hex-encode UTF-8 dirname for zip filename so viewer can recover original name
+		char szDirNameUtf8[MAX_PATH * 4];
+		WideCharToMultiByte(CP_UTF8, 0, szDirNameW, -1, szDirNameUtf8, MAX_PATH * 4, NULL, NULL);
+		char szHexName[MAX_PATH * 8];
+		szHexName[0] = '\0';
+		for (int _hi = 0; szDirNameUtf8[_hi] != '\0' && _hi < MAX_PATH * 4 - 1; _hi++)
+		{
+			char _hbuf[3];
+			sprintf_s(_hbuf, "%02X", (unsigned char)szDirNameUtf8[_hi]);
+			strcat_s(szHexName, MAX_PATH * 8, _hbuf);
+		}
+		if (strlen(szHexName) > 200) szHexName[200] = '\0';
+
+		// Build zip output path (ASCII-safe temp dir + hex-encoded name)
+		WCHAR szDirZipPathW[MAX_PATH * 4];
+		_snwprintf_s(szDirZipPathW, MAX_PATH * 4, _TRUNCATE, L"%s%hs%hs%s",
+			szWorkingDirW, rfbZipDirectoryPrefix, szHexName, L".zip");
+
+		// Convert to ANSI for the ANSI zip library (zip path is ASCII-safe, src uses short 8.3)
+		char szSrcDirA[MAX_PATH * 4];
+		char szSrcDirWildA[MAX_PATH * 4];
+		char szDirZipPathA[MAX_PATH * 4];
+		WideCharToMultiByte(CP_ACP, 0, szShortSrcW, -1, szSrcDirA, MAX_PATH * 4, NULL, NULL);
+		WideCharToMultiByte(CP_ACP, 0, szShortSrcWildW, -1, szSrcDirWildA, MAX_PATH * 4, NULL, NULL);
+		WideCharToMultiByte(CP_ACP, 0, szDirZipPathW, -1, szDirZipPathA, MAX_PATH * 4, NULL, NULL);
+
+		bool fZip = m_pZipUnZip->ZipDirectory(szSrcDirA, szSrcDirWildA, szDirZipPathA, true);
 		if (!fZip) return -1;
-		strcpy_s(szSrcFileName, 324, szDirZipPath);
+
+		// Return zip path as UTF-8 in szSrcFileName (filetransferrequestPart2 opens it with CP_UTF8)
+		WideCharToMultiByte(CP_UTF8, 0, szDirZipPathW, -1, szSrcFileName, 324, NULL, NULL);
 		return 1;
 	}
 	else
@@ -6715,17 +6753,86 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileName);
-		// Todo: improve all this (p, p2, p3 NULL test or use a standard substring extraction function)
 		char* p = strrchr(szPath, '\\') + 1;
 		char* p2 = strchr(p, '-') + 1; // rfbZipDirectoryPrefix MUST have a "-" at the end...
 		strcpy_s(szDirName, p2);
 		char* p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		strcat_s(szPath, MAX_PATH * 3, szDirName);
-		// Create the Directory
-		m_pZipUnZip->UnZipDirectory(szPath, szFileName);
+
+		// szDirName now contains either a hex-encoded UTF-8 dirname (new format)
+		// or an 8.3 short dirname (old format). Detect by checking if all chars are hex digits.
+		bool bIsHexEncoded = (strlen(szDirName) > 0 && strlen(szDirName) % 2 == 0);
+		for (int _ci = 0; bIsHexEncoded && szDirName[_ci]; _ci++)
+			if (!isxdigit((unsigned char)szDirName[_ci])) bIsHexEncoded = false;
+
+		// Decode hex -> UTF-8 -> Unicode dirname for the final folder name
+		WCHAR szFinalDirNameW[MAX_PATH * 4] = L"";
+		if (bIsHexEncoded)
+		{
+			char szUtf8[MAX_PATH * 4];
+			int nBytes = 0;
+			for (int _di = 0; szDirName[_di] && szDirName[_di+1]; _di += 2, nBytes++)
+			{
+				char _hx[3] = { szDirName[_di], szDirName[_di+1], '\0' };
+				szUtf8[nBytes] = (char)strtol(_hx, NULL, 16);
+			}
+			szUtf8[nBytes] = '\0';
+			MultiByteToWideChar(CP_UTF8, 0, szUtf8, -1, szFinalDirNameW, MAX_PATH * 4);
+		}
+
+		// Use a short ASCII temp name for extraction, then rename to Unicode
+		char szExtractName[64];
+		sprintf_s(szExtractName, "UVNCTMP%08X", GetTickCount());
+		strcat_s(szPath, MAX_PATH * 3, szExtractName);
+
+		// Create the Directory - wrap in SEH for safety
+		bool bUnzipOk = false;
+		__try
+		{
+			bUnzipOk = m_pZipUnZip->UnZipDirectory(szPath, szFileName);
+		}
+		__except(EXCEPTION_EXECUTE_HANDLER)
+		{
+			bUnzipOk = false;
+		}
 		{ WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
+
+		if (bUnzipOk)
+		{
+			// Rename extracted folder to the original Unicode dirname (or 8.3 name if not hex-encoded)
+			WCHAR szExtractPathW[MAX_PATH * 4];
+			WCHAR szFinalPathW[MAX_PATH * 4];
+			// Parent path (destination dir) from szFileName
+			WCHAR szFileNameW[MAX_PATH * 4];
+			MultiByteToWideChar(CP_ACP, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
+			wcscpy_s(szExtractPathW, szFileNameW);
+			WCHAR* pParent = wcsrchr(szExtractPathW, L'\\');
+			if (pParent) *(pParent + 1) = L'\0';
+			WCHAR szExtractNameW[64];
+			MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, szExtractNameW, 64);
+			wcscat_s(szExtractPathW, MAX_PATH * 4, szExtractNameW);
+
+			// Build final path = parent + Unicode dirname
+			if (pParent)
+			{
+				WCHAR szParentW[MAX_PATH * 4];
+				wcscpy_s(szParentW, szFileNameW);
+				WCHAR* pp2 = wcsrchr(szParentW, L'\\');
+				if (pp2) *(pp2 + 1) = L'\0';
+				if (wcslen(szFinalDirNameW) > 0)
+					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szFinalDirNameW);
+				else
+				{
+					WCHAR szDirNameW2[MAX_PATH * 4];
+					MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
+					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
+				}
+				MoveFileW(szExtractPathW, szFinalPathW);
+			}
+		}
+		else
+			m_fFileDownloadError = true;
 		return true;
 	}
 	return false;

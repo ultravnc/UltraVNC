@@ -2468,6 +2468,7 @@ char *plastchar(ptr, len)
     while(*ptr != '\0' && len > 0){
         oldptr = ptr;
         clen = CLEN(ptr);
+        if (clen < 1) clen = 1;  /* UltraVNC: guard against CLEN=-1 for invalid MBCS */
         ptr += clen;
         len -= clen;
     }

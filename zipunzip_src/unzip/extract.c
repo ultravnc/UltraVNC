@@ -2321,9 +2321,15 @@ char *fnfilter(raw, space)         /* convert name to safely printable form */
             *s++ = '^', *s++ = (uch)(64 + *r++);
         } else {
 #ifdef _MBCS
-            unsigned i;
-            for (i = CLEN(r); i > 0; i--)
-                *s++ = *r++;
+            /* UltraVNC: guard against CLEN returning -1 for invalid MBCS/UTF-8
+               sequences (e.g. Arabic filenames), which caused an infinite loop */
+            int _cl = CLEN(r);
+            if (_cl < 1) _cl = 1;
+            {
+                unsigned i;
+                for (i = (unsigned)_cl; i > 0; i--)
+                    *s++ = *r++;
+            }
 #else
             *s++ = *r++;
 #endif

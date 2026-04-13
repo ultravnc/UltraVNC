@@ -1157,7 +1157,14 @@
 #  endif /* ?MAXPATHLEN */
 #endif /* !PATH_MAX */
 
-#define FILNAMSIZ  PATH_MAX
+/* UltraVNC: increase FILNAMSIZ on Windows to support long Unicode filenames
+   in zip entries without buffer overflow in mapname() */
+#ifdef WIN32
+#  undef  FILNAMSIZ
+#  define FILNAMSIZ  4096
+#else
+#  define FILNAMSIZ  PATH_MAX
+#endif
 
 /* DBCS support for Info-ZIP  (mainly for japanese (-: )
  * by Yoshioka Tsuneo (QWF00133@nifty.ne.jp,tsuneo-y@is.aist-nara.ac.jp)
@@ -1167,7 +1174,10 @@
    /* Multi Byte Character Set */
 #  define ___MBS_TMP_DEF  char *___tmp_ptr;
 #  define ___TMP_PTR      ___tmp_ptr
-#  define CLEN(ptr) mblen((ZCONST char *)(ptr), MB_CUR_MAX)
+/* UltraVNC: wrap mblen to clamp -1 (invalid sequence) to 1, preventing
+   infinite loops and buffer overflows when processing Unicode/Arabic filenames */
+static __inline int _uz_clen(const char *p) { int r = mblen(p, MB_CUR_MAX); return (r < 1) ? 1 : r; }
+#  define CLEN(ptr) _uz_clen((ZCONST char *)(ptr))
 #  ifndef PREINCSTR
 #    define PREINCSTR(ptr) (ptr += CLEN(ptr))
 #  endif
