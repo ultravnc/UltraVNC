@@ -11,36 +11,50 @@
 
 #include "stdafx.h"
 #include "inifile.h"
+#include <shlobj.h>
+#include <direct.h>
+#include <errno.h>
 
 IniFile::IniFile()
 {
-char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
+	char programdataPath[MAX_PATH]{};
+	char programdataFolder[MAX_PATH]{};
+	if (SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath) != S_OK)
+		return;
+	strcpy_s(programdataFolder, programdataPath);
+	strcat_s(programdataFolder, "\\UltraVNC");
+	// Create directory if it doesn't exist
+	if (_mkdir(programdataFolder) != 0 && errno != EEXIST) {
+		// Failed to create directory, fall back to exe folder
+		char WORKDIR[MAX_PATH];
+		if (GetModuleFileName(NULL, WORKDIR, MAX_PATH)) {
+			char* p = strrchr(WORKDIR, '\\');
+			if (p != NULL) *p = '\0';
 		}
-	strcpy_s(myInifile,"");
-	strcat_s(myInifile,WORKDIR);//set the directory
-	strcat_s(myInifile,"\\");
-	strcat_s(myInifile,INIFILE_NAME);
+		strcpy_s(myInifile, WORKDIR);
+		strcat_s(myInifile, "\\");
+		strcat_s(myInifile, INIFILE_NAME);
+		return;
+	}
+	strcpy_s(myInifile, programdataFolder);
+	strcat_s(myInifile, "\\");
+	strcat_s(myInifile, INIFILE_NAME);
 }
 
 void
 IniFile::IniFileSetSecure()
 {
-char WORKDIR[MAX_PATH];
-	if (GetModuleFileName(NULL, WORKDIR, MAX_PATH))
-		{
-		char* p = strrchr(WORKDIR, '\\');
-		if (p == NULL) return;
-		*p = '\0';
-		}
-	strcpy_s(myInifile,"");
-	strcat_s(myInifile,WORKDIR);//set the directory
-	strcat_s(myInifile,"\\");
-	strcat_s(myInifile,INIFILE_NAME);
+	char programdataPath[MAX_PATH]{};
+	char programdataFolder[MAX_PATH]{};
+	if (SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, programdataPath) != S_OK)
+		return;
+	strcpy_s(programdataFolder, programdataPath);
+	strcat_s(programdataFolder, "\\UltraVNC");
+	if (_mkdir(programdataFolder) != 0 && errno != EEXIST)
+		return;
+	strcpy_s(myInifile, programdataFolder);
+	strcat_s(myInifile, "\\");
+	strcat_s(myInifile, INIFILE_NAME);
 }
 
 void

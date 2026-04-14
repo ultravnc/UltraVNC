@@ -407,6 +407,27 @@ void gen_random(char *s, const int len) {
 
 #define VIEWONLY
 
+static void do_random(IniFile &myIniFile)
+{
+	char epasswd[MAXPWLEN+1];
+	if (myIniFile.ReadPassword(passwd, MAXPWLEN))
+		passwd_set = true;
+	else
+		gen_random(passwd, 8);
+	if (myIniFile.ReadPassword2(passwd2, MAXPWLEN))
+		passwd2_set = true;
+	else
+		gen_random(passwd2, 8);
+	if (!passwd_set) {
+		vncEncryptPasswd(passwd, epasswd);
+		myIniFile.WritePassword(epasswd);
+	}
+	if (!passwd2_set) {
+		vncEncryptPasswd(passwd2, epasswd);
+		myIniFile.WritePassword2(epasswd);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	char epasswd[MAXPWLEN+1];
@@ -414,38 +435,50 @@ int main(int argc, char* argv[])
 	IniFile myIniFile;
 	memset(passwd,0,8);
 	memset(passwd2,0,8);
+
+	// No args: show info/usage only
+	if (argc==1)
+	{
+		printf("UltraVNC SetPasswd\n");
+		printf("Config: %s\n", myIniFile.myInifile);
+		printf("\n");
+		printf("Usage:\n");
+		printf("  setpasswd <password>             Set primary password\n");
+		printf("  setpasswd <password> <password2> Set primary and view-only password\n");
+		printf("  setpasswd -random                Generate random passwords (only if not set)\n");
+		printf("\n");
+		printf("Primary password:   %s\n", myIniFile.ReadPassword(passwd, MAXPWLEN) ? "set" : "not set");
+		printf("View-only password: %s\n", myIniFile.ReadPassword2(passwd2, MAXPWLEN) ? "set" : "not set");
+		return 0;
+	}
+
+	// -random or empty string (Inno Setup {param:setpasswd|} with no value)
+	if (argc==2 && (strcmp(argv[1], "-random")==0 || strlen(argv[1])==0))
+	{
+		do_random(myIniFile);
+		return 0;
+	}
+
+	// setpasswd <password>
 	if (argc==2)
 	{
-		strcpy_s(passwd,argv[1]);
-		if (strlen(passwd)==0) return 0;
-		vncEncryptPasswd(passwd,epasswd);
+		strcpy_s(passwd, argv[1]);
+		vncEncryptPasswd(passwd, epasswd);
 		myIniFile.WritePassword(epasswd);
+		return 0;
 	}
 
+	// setpasswd <password> <password2>
 	if (argc==3)
 	{
-		strcpy_s(passwd,argv[1]);
-		vncEncryptPasswd(passwd,epasswd);
+		strcpy_s(passwd, argv[1]);
+		vncEncryptPasswd(passwd, epasswd);
 		myIniFile.WritePassword(epasswd);
-		strcpy(passwd2,argv[2]);
-		vncEncryptPasswd(passwd2,epasswd);
+		strcpy_s(passwd2, argv[2]);
+		vncEncryptPasswd(passwd2, epasswd);
 		myIniFile.WritePassword2(epasswd);
+		return 0;
 	}
 
-	if (myIniFile.ReadPassword(passwd,MAXPWLEN))
-		passwd_set=true;
-	else
-		gen_random(passwd,8);
-	if (myIniFile.ReadPassword2(passwd2,MAXPWLEN))
-		passwd2_set=true;
-	else
-		gen_random(passwd2,8);
-
-	//Generate Random passwd
-
-	if (!passwd_set)
-		myIniFile.WritePassword(passwd);
-	if (!passwd2_set)
-		myIniFile.WritePassword2(passwd2); //PGM
 	return 0;
 }
