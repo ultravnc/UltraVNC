@@ -3388,6 +3388,12 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   <ItemGroup>
     <Manifest Include="winvnc.exe.manifest" />
   </ItemGroup>
+  <ItemDefinitionGroup>
+    <PreBuildEvent>
+      <Command>cd /d "$(SolutionDir).." &amp;&amp; c:\vcpkg\vcpkg.exe x-update-baseline</Command>
+      <Message>Updating vcpkg baseline...</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
