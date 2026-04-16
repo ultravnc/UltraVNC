@@ -534,6 +534,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		settings->setScExit(false);
 		settings->setScPrompt(false);
 	#endif // SC_20
+		// Update mslogon.log path to use path= setting from INI
+		char* debugPath = settings->getDebugPath();
+		if (debugPath && strlen(debugPath) > 0) {
+			char logFile[MAX_PATH];
+			strcpy_s(logFile, debugPath);
+			size_t len = strlen(logFile);
+			if (len > 0 && logFile[len-1] != '\\') {
+				strcat_s(logFile, "\\");
+			}
+			strcat_s(logFile, "mslogon.log");
+			settings->setLogFile(logFile);
+		}
 		setbuf(stderr, 0);
 
 		// Note: Language DLL and localization already loaded early in WinMain
@@ -1414,8 +1426,9 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 
 int WinVNCAppMain()
 {
-	vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetPath(settings->getDebugPath());
+	vnclog.SetFile();
+	vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 
