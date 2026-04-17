@@ -140,10 +140,10 @@ DesktopWndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 #else
 	vncDesktop *_this = (vncDesktop*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 #endif
-	#ifdef _DEBUG
+	/*#ifdef _DEBUG
 										OutputDevMessage("Message %i",iMsg );
 										//vnclog.Print(LL_INTERR, VNCLOG("%i  \n"),iMsg);
-			#endif
+			#endif*/
 	switch (iMsg)
 	{
 	case WM_CREATE:

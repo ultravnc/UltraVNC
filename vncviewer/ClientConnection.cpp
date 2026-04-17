@@ -5582,7 +5582,7 @@ void* ClientConnection::run_undetached(void* arg) {
 #endif
                 case rfbKeepAlive:
                     m_server_wants_keepalives = true;
-#if defined(_DEBUG)
+/*#if defined(_DEBUG)
                     {
                         static time_t lastrecv = 0;
                         time_t now = time(&now);
@@ -5592,7 +5592,7 @@ void* ClientConnection::run_undetached(void* arg) {
                         _snwprintf_s(msg, 255, _TRUNCATE, L"keepalive received %I64i seconds since last one\n", delta);
                         OutputDebugStringW(msg);
                     }
-#endif
+#endif*/
                     break;
 
 				case rfbMonitorInfo:
@@ -10231,12 +10231,12 @@ void ClientConnection::Internal_SendKeepAlive(bool bForce)
 			}
 		}
 
-#if defined(_DEBUG)
+/*#if defined(_DEBUG)
         wchar_t msg[255];
         _snwprintf_s(msg, 255, _TRUNCATE, L"keepalive requested %u ms since last one\n", nTicksSinceLastSent);
         OutputDebugStringW(msg);
 
-#endif
+#endif*/
         rfbKeepAliveMsg kp;
         memset(&kp, 0, sizeof kp);
         kp.type = rfbKeepAlive;

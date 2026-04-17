@@ -15,7 +15,7 @@
 
 #include <list>
 #include <string>
-#include "ZipUnZip32/ZipUnZip32.h"
+#include "ZipUnZip32/MiniZipNG.h"
 
 #define CONFIRM_YES 1
 #define CONFIRM_YESALL 2
@@ -66,7 +66,7 @@ public:
 	wchar_t             m_szFTConfirmTitle[128];
 	wchar_t             m_szFTConfirmComment[364];
 	int					m_nConfirmAnswer;
-	CZipUnZip32			*m_pZipUnZip;
+	CMiniZipNG			*m_pMiniZipNG;     // Unicode-aware zip
 	bool				m_fApplyToAll;
 	bool				m_fShowApplyToAll;
 	wchar_t				m_szDeleteButtonLabel[64];

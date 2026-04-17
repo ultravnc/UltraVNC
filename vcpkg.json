@@ -9,7 +9,8 @@
     "zstd",
     "libjpeg-turbo",
     "liblzma",
-    "libsodium"
+    "libsodium",
+    "minizip-ng"
   ],
   "builtin-baseline": "2f8d9f7d3f041e70643c18954cee799459e7eb75"
 }

@@ -99,6 +99,7 @@
     <ClCompile Include="DlgChangePassword.cpp" />
     <ClCompile Include="..\..\common\inifile.cpp" />
     <ClCompile Include="..\..\common\vnc_bridge_impl.cpp" />
+    <ClCompile Include="..\..\ZipUnZip32\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ZipUnZip32\ZipUnZip32.h">
@@ -326,6 +327,7 @@
     <ClInclude Include="..\..\common\vnc_bridge.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ZipUnZip32\MiniZipNG.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\AuthPanel.class">
@@ -572,5 +574,8 @@
     <Image Include="res\world3a.bmp">
       <Filter>resources</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="winvnc.exe.manifest" />
   </ItemGroup>
 </Project>

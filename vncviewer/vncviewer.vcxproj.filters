@@ -108,9 +108,6 @@
     <ClCompile Include="xz.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ZipUnZip32\ZipUnzip32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="zrle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -195,6 +192,9 @@
     <ClCompile Include="..\common\vnc_bridge_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\ZipUnZip32\MiniZipNG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -266,9 +266,6 @@
     <ClInclude Include="display.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="..\ZipUnZip32\ZipUnZip32.h">
-      <Filter>header</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\win32_helpers.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -327,6 +324,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="..\common\Hyperlinks.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ZipUnZip32\MiniZipNG.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -559,5 +559,8 @@
     <Image Include="res\LedOrange.bmp">
       <Filter>Resources</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="res\vncviewer.exe.manifest" />
   </ItemGroup>
 </Project>

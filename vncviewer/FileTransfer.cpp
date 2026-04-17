@@ -249,7 +249,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	m_fVisible = true;
 	m_fFTAllowed = false;
 	m_timer = 0;
-	m_pZipUnZip = new CZipUnZip32();
+	m_pMiniZipNG = new CMiniZipNG();
 	m_lpCSBuffer = NULL;
 	m_nCSOffset = 0;
 	m_nCSBufferSize = 0;
@@ -341,7 +341,7 @@ FileTransfer::~FileTransfer()
 	m_fFileCommandPending = false;
 	m_fFileTransferRunning = false;
 	m_FilesList.clear();
-	if (m_pZipUnZip) delete m_pZipUnZip;
+	if (m_pMiniZipNG) delete m_pMiniZipNG;
 	if (m_lpCSBuffer != NULL) 
 	{
 		delete [] m_lpCSBuffer;
@@ -1364,20 +1364,72 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		{
 			if(ListView_GetItemState(hWndLocalList, nSelected, LVIS_SELECTED) & LVIS_SELECTED)
 			{
-				// Get display text (e.g. "[subfolder]") from ListView using Unicode message
-				WCHAR szDispW[MAX_PATH] = {0};
+				// Get the full Unicode filename from lParam (not display text which may be truncated)
 				LVITEMW ItemW;
 				memset(&ItemW, 0, sizeof(ItemW));
-				ItemW.mask = LVIF_TEXT;
+				ItemW.mask = LVIF_PARAM;
 				ItemW.iItem = nSelected;
 				ItemW.iSubItem = 0;
-				ItemW.pszText = szDispW;
-				ItemW.cchTextMax = MAX_PATH;
 				SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
-				WideCharToMultiByte(CP_ACP, 0, szDispW, -1, ofDirT, MAX_PATH, NULL, NULL);
+				std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
+				
+				// Work in Unicode - no ANSI conversion needed!
+				WCHAR szFolderNameW[MAX_PATH * 4] = {0};
+				if (pNameW)
+					wcscpy_s(szFolderNameW, pNameW->c_str());
+				else
+				{
+					// Fallback: read display text and strip brackets
+					WCHAR szDispW[MAX_PATH] = {0};
+					ItemW.mask = LVIF_TEXT;
+					ItemW.pszText = szDispW;
+					ItemW.cchTextMax = MAX_PATH;
+					SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
+					// Strip brackets: "[ name ]" -> "name"
+					if (wcslen(szDispW) > 4 && szDispW[0] == L'[' && szDispW[1] == L' ')
+					{
+						wcsncpy_s(szFolderNameW, MAX_PATH * 4, szDispW + 2, wcslen(szDispW) - 4);
+						szFolderNameW[wcslen(szDispW) - 4] = L'\0';
+					}
+					else
+						wcscpy_s(szFolderNameW, szDispW);
+				}
+				
+				// Now navigate to this folder - build full path in Unicode
+				WCHAR szCurrentPathW[MAX_PATH * 4];
+				GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szCurrentPathW, MAX_PATH * 4);
+				
+				WCHAR szNewPathW[MAX_PATH * 4];
+				if (!_wcsicmp(szFolderNameW, L".."))
+				{
+					// Go up one directory
+					if (wcslen(szCurrentPathW) < 1) return;
+					wcscpy_s(szNewPathW, szCurrentPathW);
+					if (szNewPathW[wcslen(szNewPathW) - 1] == L'\\')
+						szNewPathW[wcslen(szNewPathW) - 1] = L'\0';
+					WCHAR* p = wcsrchr(szNewPathW, L'\\');
+					if (p == NULL) return;
+					*(p + 1) = L'\0'; // Keep trailing backslash
+				}
+				else
+				{
+					// Navigate into subfolder
+					_snwprintf_s(szNewPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s\\", szCurrentPathW, szFolderNameW);
+				}
+				
+				SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szNewPathW);
+				
+				// Now populate the folder contents
+				WideCharToMultiByte(CP_ACP, 0, szNewPathW, -1, ofDir, MAX_PATH, NULL, NULL);
+				strcat_s(ofDir, "*");
+				
+				// Legacy tracking
+				WideCharToMultiByte(CP_ACP, 0, szFolderNameW, -1, ofDirT, MAX_PATH, NULL, NULL);
 				m_nLastLocalAttemptItem = nSelected;
 				strcpy_s(m_szLastLocalAttemptName, ofDirT);
-				break;
+				
+				// Skip the rest of the ANSI path building logic
+				goto populate_folder;
 			}
 		}
 		// If no item was selected (including empty list), treat as "no selection"
@@ -1410,15 +1462,16 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 	}
 
-	char szSavedParentPath[MAX_PATH] = {0}; // To restore path if folder is unreadable
-
+	// Legacy ANSI path handling (kept for backward compatibility with non-Unicode paths)
+	char szSavedParentPath[MAX_PATH] = {0};
 	bool bDirectPath = false;
 	if (nSelected == nCount || lstrlenA(ofDirT) == 0)
 	{
-		{ WCHAR _wb[MAX_PATH]; GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, _wb, MAX_PATH); WideCharToMultiByte(CP_ACP,0,_wb,-1,ofDirT,MAX_PATH,NULL,NULL); }
-		strcpy_s(szSavedParentPath, ofDirT); // Save current path
+		WCHAR _wb[MAX_PATH * 4];
+		GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, _wb, MAX_PATH * 4);
+		WideCharToMultiByte(CP_ACP, 0, _wb, -1, ofDirT, MAX_PATH, NULL, NULL);
+		strcpy_s(szSavedParentPath, ofDirT);
 		if (strlen(ofDirT) == 0) return;
-		// If IDC_CURR_LOCAL already holds a full path (e.g. pasted by user), use it directly
 		if (ofDirT[0] != rfbDirPrefix[0] || ofDirT[1] != rfbDirPrefix[1])
 		{
 			strcpy_s(ofDir, ofDirT);
@@ -1428,50 +1481,9 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 	}
 	if (!bDirectPath)
 	{
-		bool bTmp = false; //PGM @ Advantig
-		if (ofDirT[0] == rfbDirPrefix[0] && ofDirT[1] == rfbDirPrefix[1])
-		{
-			char szTmp[MAX_PATH]; //PGM @ Advantig
-			{ WCHAR _wb[MAX_PATH]; GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, _wb, MAX_PATH); WideCharToMultiByte(CP_ACP,0,_wb,-1,szTmp,MAX_PATH,NULL,NULL); } //PGM @ Advantig
-			if (strlen(szTmp) == 0 && strlen(ofDirT) > 10 ) //PGM @ Advantig
-			{ //PGM @ Advantig
-				if (ResolvePossibleShortcutFolder(hWnd, ofDirT)) //PGM @ Advantig
-				{ //PGM @ Advantig
-					bTmp = true; //PGM @ Advantig
-				} //PGM @ Advantig
-			} //PGM @ Advantig
-			else //PGM @ Advantig
-			{ //PGM @ Advantig
-				strncpy_s(ofDir, MAX_PATH, ofDirT + 2, strlen(ofDirT) - 3); 
-				ofDir[strlen(ofDirT) - 4] = '\0';
-			} //PGM @ Advantig
-		}
-		else 
-			return;
-
-		{ WCHAR _wb2[MAX_PATH]; GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, _wb2, MAX_PATH); WideCharToMultiByte(CP_ACP,0,_wb2,-1,ofDirT,MAX_PATH,NULL,NULL); }
-		strcpy_s(szSavedParentPath, ofDirT); // Save parent path before modification
-		if (!_stricmp(ofDir, ".."))
-		{	
-			char* p;
-			if (strlen(ofDirT) < 1)
-				return;
-			ofDirT[strlen(ofDirT) - 1] = '\0';
-			p = strrchr(ofDirT, '\\');
-			if (p == NULL) return;
-			*p = '\0';
-		}
-		else
-			strcat_s(ofDirT, ofDir);
-		if (!bTmp) //PGM @ Advantig
-			strcat_s(ofDirT, "\\");
-		{
-			WCHAR ofDirTW2[MAX_PATH];
-			MultiByteToWideChar(CP_ACP, 0, ofDirT, -1, ofDirTW2, MAX_PATH);
-			SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, ofDirTW2);
-		}
-		strcpy_s(ofDir, ofDirT);
-		strcat_s(ofDir, "*");
+		// This code path is now bypassed by the Unicode handling above (goto populate_folder)
+		// Kept for compatibility with legacy code paths
+		return;
 	}
 
 	// Select the good drive in the drives combo box (the first time only)
@@ -1487,6 +1499,7 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 
 	SetDlgItemTextW(hWnd, IDC_LOCAL_STATUS, sz_H8);
 
+populate_folder:
 	WIN32_FIND_DATA fd;
 	WIN32_FIND_DATAW fdW;
 	HANDLE ff;
@@ -3004,7 +3017,11 @@ bool FileTransfer::FinishFileReception()
 //
 bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 {
-//	vnclog.Print(0, _T("UnzipPossibleDirectory\n"));
+#if DEBUG_FT
+	OutputDebugStringW(L"\n=== UnzipPossibleDirectory (viewer) ===\n");
+	OutputDebugStringW(L"  szFileName: "); OutputDebugStringW(szFileName); OutputDebugStringW(L"\n");
+#endif
+	
 	// Convert Unicode zip path to ANSI (zip path is always ASCII-safe temp dir)
 	char szFileNameA[MAX_PATH * 3];
 	WideCharToMultiByte(CP_ACP, 0, szFileName, -1, szFileNameA, sizeof(szFileNameA), NULL, NULL);
@@ -3014,6 +3031,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		!strncmp(strrchr(szFileNameA, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 	   )
 	{
+		OutputDebugStringW(L"  Directory zip detected\n");
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileNameA);
@@ -3035,6 +3053,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		WCHAR szFinalDirNameW[MAX_PATH * 4] = L"";
 		if (bIsHexEncoded)
 		{
+			OutputDebugStringW(L"  Hex-encoded dirname detected\n");
 			char szUtf8[MAX_PATH * 4];
 			int nBytes = 0;
 			for (int _di = 0; szDirName[_di] && szDirName[_di + 1]; _di += 2, nBytes++)
@@ -3044,6 +3063,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 			}
 			szUtf8[nBytes] = '\0';
 			MultiByteToWideChar(CP_UTF8, 0, szUtf8, -1, szFinalDirNameW, MAX_PATH * 4);
+			OutputDebugStringW(L"  Decoded dirname: "); OutputDebugStringW(szFinalDirNameW); OutputDebugStringW(L"\n");
 		}
 
 		// Extract to ASCII temp name, then rename to Unicode
@@ -3053,22 +3073,42 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		strcpy_s(szExtractPath, szPath);
 		strcat_s(szExtractPath, MAX_PATH * 3, szExtractName);
 
+		OutputDebugStringW(L"  szPath (ANSI): ");
+		WCHAR _dbgPath[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szPath, -1, _dbgPath, MAX_PATH * 4);
+		OutputDebugStringW(_dbgPath); OutputDebugStringW(L"\n");
+		
+		OutputDebugStringW(L"  szExtractPath (ANSI): ");
+		WCHAR _dbgExtract[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szExtractPath, -1, _dbgExtract, MAX_PATH * 4);
+		OutputDebugStringW(_dbgExtract); OutputDebugStringW(L"\n");
+
 		bool fUnzip = false;
+		WCHAR szExtractPathW[MAX_PATH * 4];
+		MultiByteToWideChar(CP_ACP, 0, szExtractPath, -1, szExtractPathW, MAX_PATH * 4);
+		
 		{ wchar_t _wdn4[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, _wdn4, MAX_PATH * 4);
 		  wchar_t szStatusW6[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW6, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H59, _wdn4); SetStatus(szStatusW6);
 
-		fUnzip = m_pZipUnZip->UnZipDirectory(szExtractPath, szFileNameA);
+		OutputDebugStringW(L"  Calling UnZipDirectory (Unicode)...\n");
+		// Use CMiniZipNG for full Unicode support
+		fUnzip = m_pMiniZipNG->UnZipDirectory(szExtractPathW, szFileName);
 		if (fUnzip)
 			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H61, _wdn4);
 		else
 			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >. %s", sz_H62, _wdn4, sz_H63);
 		SetStatus(szStatusW6); }
 
+		// Check if extracted folder exists
+		DWORD dwAttr = GetFileAttributesW(szExtractPathW);
+		bool bFolderExists = (dwAttr != INVALID_FILE_ATTRIBUTES && (dwAttr & FILE_ATTRIBUTE_DIRECTORY));
+		OutputDebugStringW(L"  Extracted folder exists: "); OutputDebugStringW(bFolderExists ? L"YES\n" : L"NO\n");
+
 		DeleteFileW(szFileName);
 
 		if (fUnzip)
 		{
-			// Build Unicode paths for rename: extracted temp -> final Unicode dirname
+			OutputDebugStringW(fUnzip ? L"  Unzip SUCCESS\n" : L"  Unzip FAILED\n");
+		
+			// Rename extracted temp folder to original Unicode dirname
 			WCHAR szExtractPathW[MAX_PATH * 4];
 			WCHAR szFinalPathW[MAX_PATH * 4];
 			WCHAR szParentW[MAX_PATH * 4];
@@ -3087,8 +3127,17 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 				MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
 				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
 			}
-			MoveFileW(szExtractPathW, szFinalPathW);
+			OutputDebugStringW(L"  Renaming:\n    From: "); OutputDebugStringW(szExtractPathW);
+			OutputDebugStringW(L"\n    To: "); OutputDebugStringW(szFinalPathW); OutputDebugStringW(L"\n");
+			
+			BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+#if DEBUG_FT
+			OutputDebugStringW(bMoved ? L"  Rename SUCCESS\n" : L"  Rename FAILED\n");
 		}
+		OutputDebugStringW(L"=== UnzipPossibleDirectory complete ===\n\n");
+#else
+		}
+#endif
 		return true;
 	}
 	return false;
@@ -3371,7 +3420,11 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 //
 int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 {
-//	vnclog.Print(0, _T("ZipPossibleDirectory\n"));
+#if DEBUG_FT
+	OutputDebugStringW(L"\n=== ZipPossibleDirectory ===\n");
+	OutputDebugStringW(L"  m_szSrcFileNameW: "); OutputDebugStringW(m_szSrcFileNameW); OutputDebugStringW(L"\n");
+#endif
+	
 	char* p1 = strrchr(szSrcFileName, '\\') + 1;
 	char* p2 = strrchr(szSrcFileName, rfbDirSuffix[0]);
 	if (
@@ -3379,6 +3432,9 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		&& p2[1] == rfbDirSuffix[1] && p2 != NULL && p1 < p2  // Check dir suffix
 		) //
 	{
+#if DEBUG_FT
+		OutputDebugStringW(L"  Directory detected\n");
+#endif
 		// sf@2004 - Improving Directory Transfer: Avoids ReadOnly media problem
 		// Use Unicode paths derived from m_szSrcFileNameW to correctly handle
 		// non-ASCII directory names (Arabic, Chinese, etc.)
@@ -3405,6 +3461,9 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		size_t nDirLen = wcslen(szDirNameW);
 		if (nDirLen >= 2) szDirNameW[nDirLen - 2] = L'\0';
 		*pw1 = L'\0'; // szPathW is now "C:\parent\"
+		
+		OutputDebugStringW(L"  szDirNameW: "); OutputDebugStringW(szDirNameW); OutputDebugStringW(L"\n");
+		OutputDebugStringW(L"  szPathW: "); OutputDebugStringW(szPathW); OutputDebugStringW(L"\n");
 
 		// Full source dir path: "C:\parent\dirname"
 		WCHAR szSrcDirW[MAX_PATH * 4];
@@ -3430,9 +3489,16 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		}
 		// Truncate hex to keep zip filename reasonable (max 200 hex chars = 100 bytes UTF-8)
 		if (strlen(szHexName) > 200) szHexName[200] = '\0';
+		
+		OutputDebugStringW(L"  Hex-encoded name: ");
+		WCHAR _dbgHex[MAX_PATH * 8]; MultiByteToWideChar(CP_ACP, 0, szHexName, -1, _dbgHex, MAX_PATH * 8);
+		OutputDebugStringW(_dbgHex); OutputDebugStringW(L"\n");
+		
 		WCHAR szDirZipPathW[MAX_PATH * 4];
 		_snwprintf_s(szDirZipPathW, MAX_PATH * 4, _TRUNCATE, L"%s%hs%hs%s",
 			szWorkingDirW, rfbZipDirectoryPrefix, szHexName, L".zip");
+		
+		OutputDebugStringW(L"  Zip path: "); OutputDebugStringW(szDirZipPathW); OutputDebugStringW(L"\n");
 
 		// Convert to short (8.3) ANSI paths for the ANSI zip library
 		// Short paths are always ASCII-safe
@@ -3458,14 +3524,22 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		{ wchar_t szStatusW10[MAX_PATH * 4 + 64];
 		  _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H64, szSrcDirW);
 		  SetStatus(szStatusW10);
-		  fZip = m_pZipUnZip->ZipDirectory(szSrcDirA, szSrcDirWildA, szDirZipPathA, true);
+		  // Use CMiniZipNG for full Unicode support
+		  fZip = m_pMiniZipNG->ZipDirectory(szSrcDirW, szSrcDirWild, szDirZipPathW, true);
 		  if (fZip)
 			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H66, szSrcDirW);
 		  else
 			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >. %s", sz_H68, szSrcDirW, sz_H69);
 		  SetStatus(szStatusW10); }
+		
+#if DEBUG_FT
+		OutputDebugStringW(fZip ? L"  Zip SUCCESS\n" : L"  Zip FAILED\n");
+#endif
 		if (!fZip) return -1;
 		strcpy_s(szSrcFileName, MAX_PATH * 3, szDirZipPathA);
+#if DEBUG_FT
+		OutputDebugStringW(L"=== ZipPossibleDirectory complete ===\n\n");
+#endif
 		return 1;
 	}
 	else
@@ -3789,10 +3863,21 @@ bool FileTransfer::FinishFileSending()
 
 		ft.type = rfbFileTransfer;
 		ft.contentType = rfbEndOfFile;
+#if DEBUG_FT
+		OutputDebugStringW(L"  Sending rfbEndOfFile message to server\n");
+#endif
 		if (UsingOldProtocol())
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg);
 		else
 			m_pCC->WriteExact((char *)&ft, sz_rfbFileTransferMsg, rfbFileTransfer);
+#if DEBUG_FT
+		OutputDebugStringW(L"  rfbEndOfFile message sent successfully\n");
+#endif
+		// Flush the write queue to ensure rfbEndOfFile is sent before any subsequent messages
+		m_pCC->FlushWriteQueue();
+#if DEBUG_FT
+		OutputDebugStringW(L"  Write queue flushed\n");
+#endif
 		sprintf_s(szStatus, " %ls < %s > %ls", sz_H17, m_szSrcFileName, sz_H27/*, (int)((lTotalComp * 100) / dwTotalNbBytesWritten), fCompress ? "C" : "N"*//*, szDstFileName*/); 
 	}
 	else // Error during File Transfer loop
@@ -4436,7 +4521,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				l_this->m_timer = SetTimer( hWnd, 3333,  1000, NULL);
 				l_this->SetStatus(sz_H37);
 			}
-
+			
 			// Subclass path edit controls so Enter key navigates to typed/pasted path
 			SetWindowSubclass(GetDlgItem(hWnd, IDC_CURR_LOCAL),  PathEditSubclassProc, IDC_CURR_LOCAL,  0);
 			SetWindowSubclass(GetDlgItem(hWnd, IDC_CURR_REMOTE), PathEditSubclassProc, IDC_CURR_REMOTE, 0);

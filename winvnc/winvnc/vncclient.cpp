@@ -2509,11 +2509,11 @@ vncClientThread::run(void* arg)
 				break;
 			}
 		}
-#ifdef _DEBUG
+/*#ifdef _DEBUG
 		char			szText[256];
 		sprintf_s(szText, " msg.type %i \n", msg.type);
 		OutputDebugString(szText);
-#endif
+#endif*/
 		// What to do is determined by the message id
 		switch (msg.type)
 		{
@@ -4076,11 +4076,21 @@ vncClientThread::run(void* arg)
 					break;
 
 				case rfbEndOfFile:
-					if (!settings->getEnableFileTransfer() || !fUserOk) break;
+					vnclog.Print(0, _T("=== SRV: Received rfbEndOfFile message ===\n"));
+					if (!settings->getEnableFileTransfer() || !fUserOk)
+					{
+						vnclog.Print(0, _T("  File transfer disabled or user not OK, ignoring\n"));
+						break;
+					}
 
 					if (m_client->m_fFileDownloadRunning)
 					{
+						vnclog.Print(0, _T("  File download running, calling FinishFileReception\n"));
 						m_client->FinishFileReception();
+					}
+					else
+					{
+						vnclog.Print(0, _T("  File download NOT running (m_fFileDownloadRunning=false)\n"));
 					}
 					break;
 
@@ -4804,7 +4814,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 
 	// Modif sf@2002 - File Transfer
 	m_fFileTransferRunning = FALSE;
-	m_pZipUnZip = new CZipUnZip32(); // Directory File Transfer utils
+	m_pZipUnZip = new CMiniZipNG(); // Directory File Transfer utils (Unicode-aware)
 
 	m_hDestFile = 0;
 	//m_szFullDestName = NULL;
@@ -6292,8 +6302,13 @@ bool vncClient::ReceiveFileChunk(int nLen, int nSize)
 
 void vncClient::FinishFileReception()
 {
+	vnclog.Print(0, _T("=== SRV: FinishFileReception CALLED ===\n"));
+	vnclog.Print(0, _T("  m_fFileDownloadRunning: %d\n"), m_fFileDownloadRunning);
 	if (!m_fFileDownloadRunning)
+	{
+		vnclog.Print(0, _T("  EARLY RETURN: m_fFileDownloadRunning is FALSE\n"));
 		return;
+	}
 
 	m_fFileDownloadRunning = false;
 	m_socket->SetRecvTimeout(settings->getIdleTimeout() * 1000);
@@ -6332,7 +6347,12 @@ void vncClient::FinishFileReception()
 	// received file
 	// Todo: make a better free space check above in this particular case. The free space must be at least
 	// 3 times the size of the directory zip file (this zip file is ~50% of the real directory size)
+	vnclog.Print(0, _T("=== SRV: About to call UnzipPossibleDirectory ===\n"));
+	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,m_szFullDestName,-1,_dbg,MAX_PATH*4);
+	  vnclog.Print(0, _T("  m_szFullDestName: %s\n"), _dbg); }
+	vnclog.Print(0, _T("  m_fFileDownloadError: %d\n"), m_fFileDownloadError);
 	bool bWasDir = UnzipPossibleDirectory(m_szFullDestName);
+	vnclog.Print(0, _T("=== SRV: UnzipPossibleDirectory returned: %d ===\n"), bWasDir);
 	/*
 	if (!m_fFileDownloadError && !strncmp(strrchr(m_szFullDestName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
 	{
@@ -6614,6 +6634,9 @@ bool vncClient::GetSpecialFolderPath(int nId, char* szPath)
 //
 int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 {
+	vnclog.Print(0, _T("\n=== SERVER ZipPossibleDirectory ===\n"));
+	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,szSrcFileName,-1,_dbg,MAX_PATH*4);
+	  vnclog.Print(0, _T("  szSrcFileName: %s\n"), _dbg); }
 	//	vnclog.Print(0, _T("ZipPossibleDirectory\n"));
 	char* p1 = strrchr(szSrcFileName, '\\') + 1;
 	char* p2 = strrchr(szSrcFileName, rfbDirSuffix[0]);
@@ -6685,15 +6708,8 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		_snwprintf_s(szDirZipPathW, MAX_PATH * 4, _TRUNCATE, L"%s%hs%hs%s",
 			szWorkingDirW, rfbZipDirectoryPrefix, szHexName, L".zip");
 
-		// Convert to ANSI for the ANSI zip library (zip path is ASCII-safe, src uses short 8.3)
-		char szSrcDirA[MAX_PATH * 4];
-		char szSrcDirWildA[MAX_PATH * 4];
-		char szDirZipPathA[MAX_PATH * 4];
-		WideCharToMultiByte(CP_ACP, 0, szShortSrcW, -1, szSrcDirA, MAX_PATH * 4, NULL, NULL);
-		WideCharToMultiByte(CP_ACP, 0, szShortSrcWildW, -1, szSrcDirWildA, MAX_PATH * 4, NULL, NULL);
-		WideCharToMultiByte(CP_ACP, 0, szDirZipPathW, -1, szDirZipPathA, MAX_PATH * 4, NULL, NULL);
-
-		bool fZip = m_pZipUnZip->ZipDirectory(szSrcDirA, szSrcDirWildA, szDirZipPathA, true);
+		// Use Unicode paths directly with minizip-ng
+		bool fZip = m_pZipUnZip->ZipDirectory(szShortSrcW, szShortSrcWildW, szDirZipPathW, true);
 		if (!fZip) return -1;
 
 		// Return zip path as UTF-8 in szSrcFileName (filetransferrequestPart2 opens it with CP_UTF8)
@@ -6731,7 +6747,16 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 			// if (p != NULL) *p = '\0'; else return -1;
 			if (strlen(szDirectoryName) > (MAX_PATH - 4)) return -1;
 			strcat_s(szDirectoryName, "\\*.*");
-			bool fZip = m_pZipUnZip->ZipDirectory(szPath, szDirectoryName, szSrcFileName, true);
+			
+			// Convert to Unicode for minizip-ng
+			WCHAR szPathW[MAX_PATH * 4];
+			WCHAR szDirectoryNameW[MAX_PATH * 4];
+			WCHAR szSrcFileNameW[MAX_PATH * 4];
+			MultiByteToWideChar(CP_ACP, 0, szPath, -1, szPathW, MAX_PATH * 4);
+			MultiByteToWideChar(CP_ACP, 0, szDirectoryName, -1, szDirectoryNameW, MAX_PATH * 4);
+			MultiByteToWideChar(CP_ACP, 0, szSrcFileName, -1, szSrcFileNameW, MAX_PATH * 4);
+			
+			bool fZip = m_pZipUnZip->ZipDirectory(szPathW, szDirectoryNameW, szSrcFileNameW, true);
 			if (!fZip) return -1;
 		}
 	}
@@ -6744,12 +6769,16 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 //
 bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 {
-	//	vnclog.Print(0, _T("UnzipPossibleDirectory\n"));
+	vnclog.Print(0, _T("\n=== SERVER UnzipPossibleDirectory ===\n"));
+	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,szFileName,-1,_dbg,MAX_PATH*4);
+	  vnclog.Print(0, _T("  szFileName: %s\n"), _dbg); }
+	
 	if (!m_fFileDownloadError
 		&&
 		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 		)
 	{
+		vnclog.Print(0, _T("  Directory zip detected\n"));
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileName);
@@ -6760,11 +6789,16 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
 
+		{ WCHAR _dbg2[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,szDirName,-1,_dbg2,MAX_PATH*4);
+		  vnclog.Print(0, _T("  Hex dirname: %s\n"), _dbg2); }
+
 		// szDirName now contains either a hex-encoded UTF-8 dirname (new format)
 		// or an 8.3 short dirname (old format). Detect by checking if all chars are hex digits.
 		bool bIsHexEncoded = (strlen(szDirName) > 0 && strlen(szDirName) % 2 == 0);
 		for (int _ci = 0; bIsHexEncoded && szDirName[_ci]; _ci++)
 			if (!isxdigit((unsigned char)szDirName[_ci])) bIsHexEncoded = false;
+
+		vnclog.Print(0, _T("  bIsHexEncoded: %d\n"), bIsHexEncoded);
 
 		// Decode hex -> UTF-8 -> Unicode dirname for the final folder name
 		WCHAR szFinalDirNameW[MAX_PATH * 4] = L"";
@@ -6779,6 +6813,7 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 			}
 			szUtf8[nBytes] = '\0';
 			MultiByteToWideChar(CP_UTF8, 0, szUtf8, -1, szFinalDirNameW, MAX_PATH * 4);
+			vnclog.Print(0, _T("  Decoded dirname: %s\n"), szFinalDirNameW);
 		}
 
 		// Use a short ASCII temp name for extraction, then rename to Unicode
@@ -6787,16 +6822,26 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		strcat_s(szPath, MAX_PATH * 3, szExtractName);
 
 		// Create the Directory - wrap in SEH for safety
+		// Convert ANSI paths to Unicode for minizip-ng
+		WCHAR szPathW[MAX_PATH * 4];
+		WCHAR szFileNameW[MAX_PATH * 4];
+		MultiByteToWideChar(CP_ACP, 0, szPath, -1, szPathW, MAX_PATH * 4);
+		MultiByteToWideChar(CP_ACP, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
+		
 		bool bUnzipOk = false;
 		__try
 		{
-			bUnzipOk = m_pZipUnZip->UnZipDirectory(szPath, szFileName);
+			bUnzipOk = m_pZipUnZip->UnZipDirectory(szPathW, szFileNameW);
 		}
 		__except(EXCEPTION_EXECUTE_HANDLER)
 		{
 			bUnzipOk = false;
 		}
-		{ WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
+		// DEBUG: Keep zip file for inspection
+		// { WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
+		vnclog.Print(0, _T("  DEBUG: Zip file NOT deleted for inspection: %hs\n"), szFileName);
+
+		vnclog.Print(0, _T("  Unzip result: %d\n"), bUnzipOk);
 
 		if (bUnzipOk)
 		{
@@ -6828,11 +6873,15 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 					MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
 					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
 				}
-				MoveFileW(szExtractPathW, szFinalPathW);
+				
+				vnclog.Print(0, _T("  Renaming:\n    From: %s\n    To: %s\n"), szExtractPathW, szFinalPathW);
+				BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+				vnclog.Print(0, _T("  Rename result: %d (err=%lu)\n"), bMoved, bMoved ? 0 : GetLastError());
 			}
 		}
 		else
 			m_fFileDownloadError = true;
+		vnclog.Print(0, _T("=== SERVER UnzipPossibleDirectory complete ===\n\n"));
 		return true;
 	}
 	return false;

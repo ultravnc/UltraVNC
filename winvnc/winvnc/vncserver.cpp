@@ -1785,7 +1785,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		char szParams[MAXPWLEN + 64];
 		// Does the plugin need the VNC password to do its job ?
 		if (!_stricmp(m_pDSMPlugin->GetPluginParams(), "VNCPasswordNeeded"))
-			strcpy_s(szParams, vncDecryptPasswd((char*)password, settings->getSecure()));
+			strcpy_s(szParams, vncDecryptPasswd((char*)settings->getPasswd(), settings->getSecure()));
 		else
 			strcpy_s(szParams, "NoPassword");
 
