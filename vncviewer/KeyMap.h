@@ -445,7 +445,7 @@ static unsigned short const keysym_to_unicode_20a0_20ac[] = {
 #define IsUCSHebrew(c)          ( ((c) >= 0x0590) && ((c) <= 0x05ff) )
 #define IsUCSArabic(c)          ( ((c) >= 0x0600) && ((c) <= 0x06ff) )
 #define IsUCSThai(c)            ( ((c) >= 0x0e00) && ((c) <= 0x0e7f) )
-#define IsUCSGeorgian(c)        ( ((c) >= 0x10a0) && ((c) <= 0x10ff) )
+#define IsUCSGeorgian(c)        ( (((c) >= 0x10a0) && ((c) <= 0x10ff)) || (((c) >= 0x1c90) && ((c) <= 0x1cbf)) )
 #define IsUCSHangulJamo(c)      ( ((c) >= 0x1100) && ((c) <= 0x11ff) )
 #define IsUCSLatinExtAdd(c)     ( ((c) >= 0x1e00) && ((c) <= 0x1eff) )
 #define IsUCSGenPunc(c)         ( ((c) >= 0x2000) && ((c) <= 0x206f) )

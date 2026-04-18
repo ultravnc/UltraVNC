@@ -957,8 +957,9 @@ public:
 				return;
 			
 			WORD unicodeChar = keysymToUnicode(keysym);
+			vnclog.Print(LL_INTWARN, " Unicode path: keysym 0x%x -> unicodeChar 0x%x (%d)\n", keysym, unicodeChar, unicodeChar);
 			if (unicodeChar == 0) {
-				vnclog.Print(LL_INTINFO, "Unhandled keysym 0x%x\n", keysym);
+				vnclog.Print(LL_INTWARN, "Unhandled keysym 0x%x\n", keysym);
 				return;
 			}
 			

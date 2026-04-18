@@ -28,6 +28,12 @@
 #pragma once
 #include <stdarg.h>
 
+// Log level constants (matching server)
+#define LL_INTERR   0   // Internal errors - always shown
+#define LL_INTWARN  8   // Internal warnings
+#define LL_INTINFO  9   // Internal info
+#define LL_SOCKINFO 10  // Socket info
+
 class Log  
 {
 public:

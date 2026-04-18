@@ -442,11 +442,12 @@ CARD32 KeyMap::UCS2X(WCHAR UnicodeChar)
         }
     } else if (IsUCSGeorgian(UnicodeChar)) {
         // Georgian
-       vnclog.Print(8, _T("  0x%04x (Georgian '%c'): "), UnicodeChar, UnicodeChar);
+       vnclog.Print(4, _T("  0x%04x (Georgian '%c'): "), UnicodeChar, UnicodeChar);
         if (ucsGeorgianMap.find(UnicodeChar) != ucsGeorgianMap.end()) {
             XChar = ucsGeorgianMap[UnicodeChar];
+           vnclog.Print(4, _T("Mapped to keysym 0x%04x\n"), XChar);
         } else {
-           vnclog.Print(8, _T("  The character is missing in ucsGeorgianMap\n"));
+           vnclog.Print(4, _T("  The character is missing in ucsGeorgianMap\n"));
         }
     } else if (IsUCSHangulJamo(UnicodeChar)) {
         // Hangul Jamo
@@ -645,8 +646,8 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
 //		return;
 	}
     if (ret < 0 || ret==2) {
-        //  It is a dead key
-       vnclog.Print(8, _T("ToUnicode returns dead key: 0x%02x (%c) "), *ucsChar, *ucsChar);
+        //  It is a dead key (ret < 0) or possibly 2 chars (ret == 2)
+       vnclog.Print(4, _T("ToUnicode returns %d: 0x%04x (%c) 0x%04x (%c)\n"), ret, ucsChar[0], ucsChar[0], ucsChar[1], ucsChar[1]);
 
         if (sendDeadKey) {
             // We try to look it up in our dead key table
@@ -675,7 +676,7 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
 
         FlushDeadKey(KBKeysState);
     } else if (ret > 0) {
-       vnclog.Print(8, _T("ToUnicode returns %d character(s):\n"), ret);
+       vnclog.Print(4, _T("ToUnicode returns %d character(s):\n"), ret);
 
         for (int i = 0; i < ret; i++) {
             CARD32 xChar = UCS2X(*(ucsChar+i));

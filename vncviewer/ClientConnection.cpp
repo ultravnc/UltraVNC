@@ -5217,7 +5217,7 @@ inline void ClientConnection::ProcessKeyEvent(int virtKey, DWORD keyData)
     //      calculate what the ascii would be without mods
     //      send that
 
-	if (m_opts->m_JapKeyboard==0 && virtKey!=69)
+	if (m_opts->m_JapKeyboard==0)
 	{
 		try {
 			m_keymap->PCtoX(virtKey, keyData, this);
@@ -5297,8 +5297,6 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
     ke.key = Swap32IfLE(key);
 	//adzm 2010-09
     WriteExactQueue_timeout((char *)&ke, sz_rfbKeyEventMsg, rfbKeyEvent,5);
-    //vnclog.Print(0, _T("SendKeyEvent: key = x%04x status = %s ke.key=%d\n"), key,
-      //  down ? _T("down") : _T("up"),ke.key);
 }
 
 //
