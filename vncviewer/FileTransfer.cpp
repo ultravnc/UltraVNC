@@ -735,6 +735,19 @@ void FileTransfer::EndFTSession()
 // Free lParam (wstring*) memory for all items in a ListView, then clear it
 // (0x00000001 == FT_LPARAM_UNREADABLE, kept as literal to avoid class-scope dependency)
 //
+// Sort comparator: folders (display text starts with '[') before files, then alphabetical within each group
+static int CALLBACK FolderFirstSort(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
+{
+	HWND hWndList = (HWND)lParamSort;
+	WCHAR sz1[MAX_PATH + 4] = {0}, sz2[MAX_PATH + 4] = {0};
+	ListView_GetItemText(hWndList, lParam1, 0, sz1, MAX_PATH + 4);
+	ListView_GetItemText(hWndList, lParam2, 0, sz2, MAX_PATH + 4);
+	bool b1folder = (sz1[0] == L'[');
+	bool b2folder = (sz2[0] == L'[');
+	if (b1folder != b2folder) return b1folder ? -1 : 1;
+	return lstrcmpiW(sz1, sz2);
+}
+
 static void FTListViewClear(HWND hWndList)
 {
 	int nCount = ListView_GetItemCount(hWndList);
@@ -1137,11 +1150,11 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 	}
 	else if (wcscmp(szFileNameW, L".")) // Test actually Not necessary for remote list
 	{
-		// Insert file using Unicode message
+		// Insert file using Unicode message - append at end so folders always appear first
 		LVITEMW ItemW;
 		memset(&ItemW, 0, sizeof(ItemW));
 		ItemW.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-		ItemW.iItem = 0;
+		ItemW.iItem = ListView_GetItemCount(hWndList); // append after all existing items (folders)
 		ItemW.iSubItem = 0;
 		ItemW.iImage = 1;
 		ItemW.pszText = szFileNameW;
@@ -1164,18 +1177,25 @@ void FileTransfer::AddFileToFileList(HWND hWnd, int nListId, WIN32_FIND_DATA& fd
 		SubW.pszText = szTextW;
 		SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&SubW);
 
-		// Last Modif Time
+		// Last Modif Time - display using OS locale format, store ISO prefix for correct sorting
+		// Format stored: "YYYYMMDDHHMMSS|locale_date locale_time" - sort on full string, display after '|'
 		FILETIME LocalFileTime;
 		FileTimeToLocalFileTime(&fd.ftLastWriteTime, &LocalFileTime);
 		SYSTEMTIME FileTime;
-		FileTimeToSystemTime(fLocalSide ? &LocalFileTime : &LocalFileTime, &FileTime);
-		WCHAR szTimeW[64];
-		swprintf_s(szTimeW, L"%2.2d/%2.2d/%4.4d %2.2d:%2.2d",
-				FileTime.wMonth, FileTime.wDay, FileTime.wYear,
-				FileTime.wHour, FileTime.wMinute);
+		FileTimeToSystemTime(&LocalFileTime, &FileTime);
+		WCHAR szDateW[64] = {0};
+		WCHAR szTimeW[32] = {0};
+		GetDateFormatW(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &FileTime, NULL, szDateW, 64);
+		GetTimeFormatW(LOCALE_USER_DEFAULT, TIME_NOSECONDS, &FileTime, NULL, szTimeW, 32);
+		WCHAR szSortableW[128];
+		swprintf_s(szSortableW, L"%04d%02d%02d%02d%02d|%s %s",
+				FileTime.wYear, FileTime.wMonth, FileTime.wDay,
+				FileTime.wHour, FileTime.wMinute,
+				szDateW, szTimeW);
 
+		SubW.mask = LVIF_TEXT;
 		SubW.iSubItem = 2;
-		SubW.pszText = szTimeW;
+		SubW.pszText = szSortableW;
 		SendMessageW(hWndList, LVM_SETITEMW, 0, (LPARAM)&SubW);
 	}
 }
@@ -1585,6 +1605,9 @@ populate_folder:
 	}
 
 	FindClose(ff);
+
+	// Sort: folders before files, then alphabetical within each group
+	ListView_SortItemsEx(hWndLocalList, FolderFirstSort, (LPARAM)hWndLocalList);
 
 	{ wchar_t _ws58[128]; _snwprintf_s(_ws58, 128, _TRUNCATE, L" > %d %s", nFileCount, sz_H58); SetDlgItemTextW(hWnd, IDC_LOCAL_STATUS, _ws58); }
 
@@ -2034,6 +2057,9 @@ void FileTransfer::FinishDirectoryReception()
 	HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
 
 	{ wchar_t _ws58r[128]; _snwprintf_s(_ws58r, 128, _TRUNCATE, L" > %d %s", m_nFileCount, sz_H58); SetDlgItemTextW(hWnd, IDC_REMOTE_STATUS, _ws58r); }
+
+	// Sort: folders before files, then alphabetical within each group
+	ListView_SortItemsEx(hWndRemoteList, FolderFirstSort, (LPARAM)hWndRemoteList);
 
 	// If some files have been sent to remote side highlight them 
 	HighlightTransferedFiles(hWndLocalList, hWndRemoteList);
@@ -4307,7 +4333,7 @@ void FTAdjustFileNameColumns(HWND hWnd)
 	RECT rc;
 	GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), &rc);
 	int w = rc.right - rc.left;
-	int cw = w - (70 + 100 + 25);
+	int cw = w - (70 + 130 + 25);
 	if (cw < 120) cw = 120;
 
 	LVCOLUMN Column;
@@ -4468,7 +4494,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			Column.mask = LVCF_FMT|LVCF_WIDTH|LVCF_TEXT|LVCF_ORDER|LVCF_SUBITEM;
 			Column.fmt = LVCFMT_LEFT;
-			Column.cx = 100;
+			Column.cx = 130;
 			Column.pszText = (LPWSTR)L"Modified";
 			Column.iSubItem = 2;
 			Column.iOrder = 2;
@@ -5439,7 +5465,51 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 								if ((ItemW.lParam & FT_LPARAM_UNREADABLE) == FT_LPARAM_UNREADABLE)
 								{
 									lpNmlvcd->clrText = RGB(255, 0, 0);
-									SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_DODEFAULT);
+									// Request subitem notifications to color all subitems red
+									SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_NOTIFYSUBITEMDRAW);
+									return TRUE;
+								}
+							}
+							// Request subitem notifications to strip ISO prefix from date column
+							SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_NOTIFYSUBITEMDRAW);
+							return TRUE;
+						}
+					case CDDS_ITEMPREPAINT | CDDS_SUBITEM:
+						{
+							// For date column (subitem 2): strip ISO sort prefix before display
+							if (lpNmlvcd->iSubItem == 2)
+							{
+								WCHAR szFull[128] = {0};
+								LVITEMW getItem;
+								memset(&getItem, 0, sizeof(getItem));
+								getItem.mask = LVIF_TEXT;
+								getItem.iItem = (int)lpNmlvcd->nmcd.dwItemSpec;
+								getItem.iSubItem = 2;
+								getItem.pszText = szFull;
+								getItem.cchTextMax = 128;
+								SendMessageW(lpNmlvcd->nmcd.hdr.hwndFrom, LVM_GETITEMW, 0, (LPARAM)&getItem);
+								WCHAR* pSep = wcschr(szFull, L'|');
+								if (pSep)
+								{
+									// Draw the locale date ourselves and suppress default drawing
+									RECT rc;
+									rc.left = LVIR_LABEL;
+									rc.top = lpNmlvcd->iSubItem;
+									SendMessageW(lpNmlvcd->nmcd.hdr.hwndFrom, LVM_GETSUBITEMRECT,
+										(WPARAM)lpNmlvcd->nmcd.dwItemSpec, (LPARAM)&rc);
+									// Use actual selection state from ListView (not from uItemState which is unreliable at subitem level)
+									BOOL bSelected = (ListView_GetItemState(lpNmlvcd->nmcd.hdr.hwndFrom,
+										(int)lpNmlvcd->nmcd.dwItemSpec, LVIS_SELECTED) & LVIS_SELECTED) != 0;
+									BOOL bFocused = (GetFocus() == lpNmlvcd->nmcd.hdr.hwndFrom);
+									SetBkMode(lpNmlvcd->nmcd.hdc, TRANSPARENT);
+									SetTextColor(lpNmlvcd->nmcd.hdc,
+										(bSelected && bFocused)
+											? GetSysColor(COLOR_HIGHLIGHTTEXT)
+											: lpNmlvcd->clrText);
+									rc.left += 4; // small indent
+									DrawTextW(lpNmlvcd->nmcd.hdc, pSep + 1, -1, &rc,
+										DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+									SetWindowLongPtr(hWnd, DWLP_MSGRESULT, CDRF_SKIPDEFAULT);
 									return TRUE;
 								}
 							}
@@ -5450,7 +5520,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				}
 				break;
 
-			case NM_SETFOCUS:
+				case NM_SETFOCUS:
 				if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_LOCAL_FILELIST))
 				{
 					_this->m_fFocusLocal = true;
@@ -5861,12 +5931,8 @@ int CALLBACK FileTransfer::ListViewLocalCompareProc(LPARAM lParam1, LPARAM lPara
 		iResult = ((s1 >= s2) ? 1 : -1);
 		}
 		break;
-	case 2: //Sort by date
-		{
-		FILETIME ft1 = GetFileTimeFromStringW(szBuf1);
-		FILETIME ft2 = GetFileTimeFromStringW(szBuf2);
-		iResult = CompareFileTime(&ft1, &ft2);
-		}
+	case 2: //Sort by date - stored as "YYYYMMDDHHMMSS|locale_date time", ISO prefix sorts correctly
+		iResult = wcscmp(szBuf1, szBuf2);
 		break;
 		}
 
