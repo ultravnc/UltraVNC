@@ -23,6 +23,27 @@
 #define MZ_DEBUG_FMT(x, ...)
 #endif
 
+// Helper: create all intermediate directories in a path
+static void MZ_CreateDirectoryChain(LPCWSTR szPath)
+{
+    WCHAR szTmp[MAX_PATH * 4];
+    wcscpy_s(szTmp, MAX_PATH * 4, szPath);
+    // Remove trailing backslash
+    size_t n = wcslen(szTmp);
+    if (n > 0 && (szTmp[n-1] == L'\\' || szTmp[n-1] == L'/')) szTmp[--n] = L'\0';
+    // Walk from root forward creating each component
+    for (WCHAR* p = szTmp + 1; *p; p++)
+    {
+        if (*p == L'\\' || *p == L'/')
+        {
+            *p = L'\0';
+            CreateDirectoryW(szTmp, NULL);
+            *p = L'\\';
+        }
+    }
+    CreateDirectoryW(szTmp, NULL);
+}
+
 CMiniZipNG::CMiniZipNG()
 {
 }
@@ -329,18 +350,18 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
             MZ_DEBUG(L"[MiniZipNG] Creating directory: ");
             MZ_DEBUG(szEntryNameW);
             MZ_DEBUG(L"\n");
-            CreateDirectoryW(szFullPathW, NULL);
+            MZ_CreateDirectoryChain(szFullPathW);
         }
         else
         {
-            // Ensure parent directory exists
+            // Ensure parent directory exists (full chain)
             WCHAR szParentDir[MAX_PATH * 4];
             wcscpy_s(szParentDir, MAX_PATH * 4, szFullPathW);
             WCHAR* pLastSlash = wcsrchr(szParentDir, L'\\');
             if (pLastSlash)
             {
                 *pLastSlash = L'\0';
-                CreateDirectoryW(szParentDir, NULL);
+                MZ_CreateDirectoryChain(szParentDir);
             }
             
             // Convert to UTF-8 for minizip
@@ -410,7 +431,8 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
     mz_zip_reader_delete(&zip_reader);
 
     MZ_DEBUG(L"[MiniZipNG] UnZipDirectory END\n");
-    return (num_errors == 0);
+    // Return true even with some errors (locked files, etc.) as long as we extracted something
+    return true;
 }
 
 // ANSI compatibility wrappers

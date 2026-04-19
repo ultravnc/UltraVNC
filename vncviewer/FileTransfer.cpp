@@ -3058,7 +3058,9 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		!strncmp(strrchr(szFileNameA, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 	   )
 	{
-		OutputDebugStringW(L"  Directory zip detected\n");
+#if DEBUG_FT
+		OutputDebugStringW(L"  Directory zip detected - proceeding with extract+rename\n");
+#endif
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileNameA);
@@ -3080,7 +3082,9 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		WCHAR szFinalDirNameW[MAX_PATH * 4] = L"";
 		if (bIsHexEncoded)
 		{
+#if DEBUG_FT
 			OutputDebugStringW(L"  Hex-encoded dirname detected\n");
+#endif
 			char szUtf8[MAX_PATH * 4];
 			int nBytes = 0;
 			for (int _di = 0; szDirName[_di] && szDirName[_di + 1]; _di += 2, nBytes++)
@@ -3090,7 +3094,9 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 			}
 			szUtf8[nBytes] = '\0';
 			MultiByteToWideChar(CP_UTF8, 0, szUtf8, -1, szFinalDirNameW, MAX_PATH * 4);
+#if DEBUG_FT
 			OutputDebugStringW(L"  Decoded dirname: "); OutputDebugStringW(szFinalDirNameW); OutputDebugStringW(L"\n");
+#endif
 		}
 
 		// Extract to ASCII temp name, then rename to Unicode
@@ -3100,6 +3106,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		strcpy_s(szExtractPath, szPath);
 		strcat_s(szExtractPath, MAX_PATH * 3, szExtractName);
 
+#if DEBUG_FT
 		OutputDebugStringW(L"  szPath (ANSI): ");
 		WCHAR _dbgPath[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szPath, -1, _dbgPath, MAX_PATH * 4);
 		OutputDebugStringW(_dbgPath); OutputDebugStringW(L"\n");
@@ -3107,6 +3114,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		OutputDebugStringW(L"  szExtractPath (ANSI): ");
 		WCHAR _dbgExtract[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szExtractPath, -1, _dbgExtract, MAX_PATH * 4);
 		OutputDebugStringW(_dbgExtract); OutputDebugStringW(L"\n");
+#endif
 
 		bool fUnzip = false;
 		WCHAR szExtractPathW[MAX_PATH * 4];
@@ -3115,7 +3123,9 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		{ wchar_t _wdn4[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, _wdn4, MAX_PATH * 4);
 		  wchar_t szStatusW6[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW6, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H59, _wdn4); SetStatus(szStatusW6);
 
+#if DEBUG_FT
 		OutputDebugStringW(L"  Calling UnZipDirectory (Unicode)...\n");
+#endif
 		// Use CMiniZipNG for full Unicode support
 		fUnzip = m_pMiniZipNG->UnZipDirectory(szExtractPathW, szFileName);
 		if (fUnzip)
@@ -3127,13 +3137,17 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		// Check if extracted folder exists
 		DWORD dwAttr = GetFileAttributesW(szExtractPathW);
 		bool bFolderExists = (dwAttr != INVALID_FILE_ATTRIBUTES && (dwAttr & FILE_ATTRIBUTE_DIRECTORY));
+#if DEBUG_FT
 		OutputDebugStringW(L"  Extracted folder exists: "); OutputDebugStringW(bFolderExists ? L"YES\n" : L"NO\n");
+#endif
 
 		DeleteFileW(szFileName);
 
 		if (fUnzip)
 		{
-			OutputDebugStringW(fUnzip ? L"  Unzip SUCCESS\n" : L"  Unzip FAILED\n");
+#if DEBUG_FT
+			OutputDebugStringW(L"  Unzip SUCCESS\n");
+#endif
 		
 			// Rename extracted temp folder to original Unicode dirname
 			WCHAR szExtractPathW[MAX_PATH * 4];
@@ -3154,16 +3168,28 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 				MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
 				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
 			}
+#if DEBUG_FT
 			OutputDebugStringW(L"  Renaming:\n    From: "); OutputDebugStringW(szExtractPathW);
 			OutputDebugStringW(L"\n    To: "); OutputDebugStringW(szFinalPathW); OutputDebugStringW(L"\n");
+#endif
 			
 			BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
 #if DEBUG_FT
-			OutputDebugStringW(bMoved ? L"  Rename SUCCESS\n" : L"  Rename FAILED\n");
+		if (!bMoved)
+		{
+			DWORD dwErr = GetLastError();
+			wchar_t _emsg[128];
+			_snwprintf_s(_emsg, 128, _TRUNCATE, L"  Rename FAILED err=%lu\n", dwErr);
+			OutputDebugStringW(_emsg);
 		}
+		else
+		{
+			OutputDebugStringW(L"  Rename SUCCESS\n");
+		}
+#endif
+		}
+#if DEBUG_FT
 		OutputDebugStringW(L"=== UnzipPossibleDirectory complete ===\n\n");
-#else
-		}
 #endif
 		return true;
 	}
@@ -3551,14 +3577,36 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		{ wchar_t szStatusW10[MAX_PATH * 4 + 64];
 		  _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H64, szSrcDirW);
 		  SetStatus(szStatusW10);
-		  // Switch progress bar to marquee mode for the duration of the blocking zip operation
 		  HWND hProg = GetDlgItem(hWnd, IDC_PROGRESS);
 		  SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) | PBS_MARQUEE);
 		  SendMessage(hProg, PBM_SETMARQUEE, TRUE, 50);
 		  UpdateWindow(hWnd);
-		  // Use CMiniZipNG for full Unicode support
-		  fZip = m_pMiniZipNG->ZipDirectory(szSrcDirW, szSrcDirWild, szDirZipPathW, true);
-		  // Restore progress bar to normal mode
+		  struct ZipThreadParam {
+			  CMiniZipNG* pZip;
+			  LPCWSTR szSrcDir;
+			  LPCWSTR szSrcWild;
+			  LPCWSTR szZipPath;
+			  bool result;
+		  };
+		  ZipThreadParam zipParam = { m_pMiniZipNG, szSrcDirW, szSrcDirWild, szDirZipPathW, false };
+		  HANDLE hZipThread = CreateThread(NULL, 0, [](LPVOID pv) -> DWORD {
+			  ZipThreadParam* p = (ZipThreadParam*)pv;
+			  p->result = p->pZip->ZipDirectory(p->szSrcDir, p->szSrcWild, p->szZipPath, true);
+			  return 0;
+		  }, &zipParam, 0, NULL);
+		  if (hZipThread) {
+			  MSG msg;
+			  while (MsgWaitForMultipleObjects(1, &hZipThread, FALSE, INFINITE, QS_ALLINPUT) != WAIT_OBJECT_0) {
+				  while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+					  TranslateMessage(&msg);
+					  DispatchMessage(&msg);
+				  }
+			  }
+			  CloseHandle(hZipThread);
+			  fZip = zipParam.result;
+		  } else {
+			  fZip = m_pMiniZipNG->ZipDirectory(szSrcDirW, szSrcDirWild, szDirZipPathW, true);
+		  }
 		  SendMessage(hProg, PBM_SETMARQUEE, FALSE, 0);
 		  SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) & ~PBS_MARQUEE);
 		  SendMessage(hProg, PBM_SETPOS, 0, 0);
