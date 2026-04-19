@@ -44,7 +44,7 @@ SOURCES += \
     rfb/vncauth.c \
     rfb/xzywtemplate.c \
     rfb/zywrletemplate.c \
-    ZipUnZip32/ZipUnzip32.cpp
+    common/ZipUnzip/MiniZipNG.cpp
 
 HEADERS += \
     common/Clipboard.h \
@@ -83,7 +83,7 @@ HEADERS += \
     rfb/xzEncode.h \
     rfb/zrleDecode.h \
     rfb/zrleEncode.h \
-    ZipUnZip32/ZipUnZip32.h
+    common/ZipUnzip/MiniZipNG.h
 
 FORMS += \
 

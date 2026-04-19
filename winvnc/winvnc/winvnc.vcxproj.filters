@@ -76,9 +76,6 @@
     <ClCompile Include="vsocket.cpp" />
     <ClCompile Include="..\..\common\win32_helpers.cpp" />
     <ClCompile Include="winvnc.cpp" />
-    <ClCompile Include="..\..\common\ZipUnzip\ZipUnzip32.cpp">
-      <Filter>headers</Filter>
-    </ClCompile>
     <ClCompile Include="credentials.cpp" />
     <ClCompile Include="DeskdupEngine.cpp" />
     <ClCompile Include="ScreenCapture.cpp" />
@@ -102,9 +99,6 @@
     <ClCompile Include="..\..\common\ZipUnzip\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\common\ZipUnzip\ZipUnZip32.h">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="winvnc.h">
       <Filter>headers</Filter>
     </ClInclude>

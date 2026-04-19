@@ -189,10 +189,10 @@ UltraViewer/uProposal.vlb
 UltraViewer/vncviewer.ico
 UltraViewer/vncviewer.png
 VCPKG_README.txt
-ZipUnZip32/LICENSE
-ZipUnZip32/README
-ZipUnZip32/ZipUnZip32.h
-ZipUnZip32/ZipUnzip32.cpp
+common/ZipUnzip/LICENSE
+common/ZipUnzip/MiniZipNG.cpp
+common/ZipUnzip/MiniZipNG.h
+common/ZipUnzip/README
 addon/addons.sln
 addon/eventMessageLogger/logmessages.sln
 addon/eventMessageLogger/logmessages.vcxproj

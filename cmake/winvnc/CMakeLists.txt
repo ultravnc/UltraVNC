@@ -20,7 +20,7 @@ find_package(unofficial-sodium CONFIG REQUIRED)
   
 set(${PROJECT_NAME}_SOURCES
     ../../DSMPlugin/DSMPlugin.cpp
-    ../../common/ZipUnzip/ZipUnzip32.cpp
+    ../../common/ZipUnzip/MiniZipNG.cpp
     ../../common/Clipboard.cpp
     ../../common/Hyperlinks.cpp
     ../../common/UltraVncZ.cpp
