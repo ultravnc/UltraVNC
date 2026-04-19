@@ -257,6 +257,7 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	memset(m_szDeleteButtonLabel, 0, sizeof(m_szDeleteButtonLabel));
 	memset(m_szNewFolderButtonLabel, 0, sizeof(m_szNewFolderButtonLabel));
 	memset(m_szRenameButtonLabel, 0, sizeof(m_szRenameButtonLabel));
+	memset(m_szRefreshButtonLabel, 0, sizeof(m_szRefreshButtonLabel));
     m_ServerFTProtocolVersion = FT_PROTO_VERSION_2;
     m_fServerSupportsUnicode = false;
 	m_nBlockSize = 8192;
@@ -3550,8 +3551,17 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		{ wchar_t szStatusW10[MAX_PATH * 4 + 64];
 		  _snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H64, szSrcDirW);
 		  SetStatus(szStatusW10);
+		  // Switch progress bar to marquee mode for the duration of the blocking zip operation
+		  HWND hProg = GetDlgItem(hWnd, IDC_PROGRESS);
+		  SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) | PBS_MARQUEE);
+		  SendMessage(hProg, PBM_SETMARQUEE, TRUE, 50);
+		  UpdateWindow(hWnd);
 		  // Use CMiniZipNG for full Unicode support
 		  fZip = m_pMiniZipNG->ZipDirectory(szSrcDirW, szSrcDirWild, szDirZipPathW, true);
+		  // Restore progress bar to normal mode
+		  SendMessage(hProg, PBM_SETMARQUEE, FALSE, 0);
+		  SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) & ~PBS_MARQUEE);
+		  SendMessage(hProg, PBM_SETPOS, 0, 0);
 		  if (fZip)
 			_snwprintf_s(szStatusW10, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H66, szSrcDirW);
 		  else
@@ -4333,7 +4343,7 @@ void FTAdjustFileNameColumns(HWND hWnd)
 	RECT rc;
 	GetWindowRect(GetDlgItem(hWnd, IDC_LOCAL_FILELIST), &rc);
 	int w = rc.right - rc.left;
-	int cw = w - (70 + 130 + 25);
+	int cw = w - (70 + 155 + 25);
 	if (cw < 120) cw = 120;
 
 	LVCOLUMN Column;
@@ -4494,7 +4504,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 			Column.mask = LVCF_FMT|LVCF_WIDTH|LVCF_TEXT|LVCF_ORDER|LVCF_SUBITEM;
 			Column.fmt = LVCFMT_LEFT;
-			Column.cx = 130;
+			Column.cx = 155;
 			Column.pszText = (LPWSTR)L"Modified";
 			Column.iSubItem = 2;
 			Column.iOrder = 2;
@@ -4564,6 +4574,10 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			if (l_this->m_szRenameButtonLabel[0] == L'\0')
 			{
 				GetWindowTextW(GetDlgItem(hWnd, IDC_RENAME_B),    l_this->m_szRenameButtonLabel,    64);
+			}
+			if (l_this->m_szRefreshButtonLabel[0] == L'\0')
+			{
+				GetWindowTextW(GetDlgItem(hWnd, IDC_REFRESH), l_this->m_szRefreshButtonLabel, 64);
 			}
 
             l_this->CheckButtonState(hWnd);
@@ -4857,16 +4871,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			}
 			break;
 
-		case IDC_REFRESH_LOCAL:
+		case IDC_REFRESH:
+			if (_this->m_fFocusLocal)
 			{
-				HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
-				FTListViewClear(hWndLocalList);
+				FTListViewClear(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
 				_this->PopulateLocalListBoxW(hWnd, L"");
 			}
-			break;
-
-		case IDC_REFRESH_REMOTE:
-			if (!_this->m_fFileCommandPending)
+			else if (!_this->m_fFileCommandPending)
 			{
 				_this->m_fFileCommandPending = true;
 				_this->RequestRemoteDirectoryContent(hWnd, L"");
@@ -5551,6 +5562,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				hB = GetDlgItem(hWnd, IDC_RENAME_B);
 				_snwprintf_s(szTxtW, 64, _TRUNCATE, L"<- %s", _this->m_szRenameButtonLabel);
 				SetWindowTextW(hB, szTxtW);
+				hB = GetDlgItem(hWnd, IDC_REFRESH);
+				_snwprintf_s(szTxtW, 64, _TRUNCATE, L"<- %s", _this->m_szRefreshButtonLabel);
+				SetWindowTextW(hB, szTxtW);
 			}
 
 			if (lpNmlv->hdr.hwndFrom == GetDlgItem(hWnd, IDC_REMOTE_FILELIST))
@@ -5566,6 +5580,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				SetWindowTextW(hB, szTxtW);
 				hB = GetDlgItem(hWnd, IDC_RENAME_B);
 				_snwprintf_s(szTxtW, 64, _TRUNCATE, L"%s ->", _this->m_szRenameButtonLabel);
+				SetWindowTextW(hB, szTxtW);
+				hB = GetDlgItem(hWnd, IDC_REFRESH);
+				_snwprintf_s(szTxtW, 64, _TRUNCATE, L"%s ->", _this->m_szRefreshButtonLabel);
 				SetWindowTextW(hB, szTxtW);
 			}
 				return TRUE;
@@ -5817,12 +5834,11 @@ void FileTransfer::DisableButtons(HWND hWnd, bool X)
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), FALSE);
-	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_LOCAL), FALSE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), FALSE);
-	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_REMOTE), FALSE);
 
 	// Disable Close Window in in title bar
 	if (X == true) {
@@ -5873,12 +5889,11 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), TRUE);
-	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_LOCAL), TRUE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), TRUE);
-	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_REMOTE), TRUE);
 	// Disable Close Window in in title bar
 	HMENU hMenu = GetSystemMenu(hWnd, 0);
 	int nCount = GetMenuItemCount(hMenu);

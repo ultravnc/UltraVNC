@@ -72,6 +72,7 @@ public:
 	wchar_t				m_szDeleteButtonLabel[64];
 	wchar_t				m_szNewFolderButtonLabel[64];
 	wchar_t				m_szRenameButtonLabel[64];
+	wchar_t				m_szRefreshButtonLabel[64];
 
 	// adzm 2009-08-02
 	char				m_szLastLocalPath[_MAX_PATH];
