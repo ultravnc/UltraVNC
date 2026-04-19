@@ -75,15 +75,6 @@ BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		case WM_CLOSE:
 			return FALSE;
 		case WM_DESTROY:
-			// Free language combobox item data
-			if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
-				HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
-				int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
-				for (int i = 0; i < count; i++) {
-					char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
-					if (langCode) free(langCode);
-				}
-			}
 			EndDialog(hwnd, FALSE);
 			return TRUE;
 	}
@@ -417,6 +408,18 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return true;
 	case WM_COMMAND:
 		_this->onCommand(LOWORD(wParam), hwnd, HIWORD(wParam));
+		break;
+	case WM_DESTROY:
+		// Free language combobox item data (combo lives in the Misc tab)
+		if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
+			HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+			int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
+			for (int i = 0; i < count; i++) {
+				char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
+				if (langCode) free(langCode);
+			}
+		}
+		break;
 	}
 	return (INT_PTR)FALSE;
 }

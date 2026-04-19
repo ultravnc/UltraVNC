@@ -401,6 +401,15 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		return FALSE;*/
 	case WM_DESTROY:
+		// Free language combobox item data
+		if (GetDlgItem(hwnd, IDC_LANGUAGE_COMBO)) {
+			HWND hLangCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
+			int langCount = (int)SendMessage(hLangCombo, CB_GETCOUNT, 0, 0);
+			for (int i = 0; i < langCount; i++) {
+				wchar_t* langCode = (wchar_t*)SendMessage(hLangCombo, CB_GETITEMDATA, i, 0);
+				if (langCode) free(langCode);
+			}
+		}
 		EndDialog(hwnd, FALSE);
 		KillTimer(hwnd, 100);
 		KillTimer(hwnd, 101);
