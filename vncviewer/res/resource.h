@@ -153,6 +153,8 @@
 #define IDC_REMOTE_STATUS               1073
 #define IDC_GLOBAL_STATUS               1075
 #define IDC_HISTORY_CB                  1077
+#define IDC_REFRESH_LOCAL               1078
+#define IDC_REFRESH_REMOTE              1079
 #define IDC_PLUGIN_CHECK                1090
 #define IDC_COMBO1                      1091
 #define IDC_IMAGEFORMAT                 1091

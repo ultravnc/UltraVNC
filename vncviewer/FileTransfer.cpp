@@ -4857,6 +4857,22 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			}
 			break;
 
+		case IDC_REFRESH_LOCAL:
+			{
+				HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
+				FTListViewClear(hWndLocalList);
+				_this->PopulateLocalListBoxW(hWnd, L"");
+			}
+			break;
+
+		case IDC_REFRESH_REMOTE:
+			if (!_this->m_fFileCommandPending)
+			{
+				_this->m_fFileCommandPending = true;
+				_this->RequestRemoteDirectoryContent(hWnd, L"");
+			}
+			break;
+
 		case IDC_ABORT_B:
 			_this->m_fAbort = true;
             _this->m_fUserAbortedFileTransfer = true;
@@ -5801,10 +5817,12 @@ void FileTransfer::DisableButtons(HWND hWnd, bool X)
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), FALSE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_LOCAL), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), FALSE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), FALSE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_REMOTE), FALSE);
 
 	// Disable Close Window in in title bar
 	if (X == true) {
@@ -5855,10 +5873,12 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_ROOTB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_LOCAL_UPB), TRUE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_LOCAL), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_FILELIST), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_ROOTB), TRUE);
 	EnableWindow(GetDlgItem(hWnd, IDC_REMOTE_UPB), TRUE);
+	EnableWindow(GetDlgItem(hWnd, IDC_REFRESH_REMOTE), TRUE);
 	// Disable Close Window in in title bar
 	HMENU hMenu = GetSystemMenu(hWnd, 0);
 	int nCount = GetMenuItemCount(hMenu);
