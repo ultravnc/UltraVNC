@@ -1671,6 +1671,30 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		}
 		break; 
 		}
+	case IDC_JAP_INPUTS:
+	{
+		// If enabling Japanese/Alternate keyboard, disable Unicode/International keys
+		// Both options enabled simultaneously causes "End of stream" connection failures
+		HWND hJap = GetDlgItem(hwnd, IDC_JAP_INPUTS);
+		BOOL japChecked = (SendMessage(hJap, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		if (japChecked) {
+			SendDlgItemMessage(hwnd, IDC_UNICODE_INPUTS, BM_SETCHECK, BST_UNCHECKED, 0);
+		}
+	}
+	return TRUE;
+
+	case IDC_UNICODE_INPUTS:
+	{
+		// If enabling Unicode/International keys, disable Japanese/Alternate keyboard
+		// Both options enabled simultaneously causes "End of stream" connection failures
+		HWND hUnicode = GetDlgItem(hwnd, IDC_UNICODE_INPUTS);
+		BOOL unicodeChecked = (SendMessage(hUnicode, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		if (unicodeChecked) {
+			SendDlgItemMessage(hwnd, IDC_JAP_INPUTS, BM_SETCHECK, BST_UNCHECKED, 0);
+		}
+	}
+	return TRUE;
+
 	default:
 		break;
 	}
@@ -1949,9 +1973,16 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 
 	if (GetDlgItem(hwnd, IDC_UNICODE_INPUTS)) {
 		HWND hUnicodeInputs = GetDlgItem(hwnd, IDC_UNICODE_INPUTS);
+		BOOL unicodeChecked = (SendMessage(hUnicodeInputs, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		// Safety check: Ensure both JapInput and UnicodeInput are not enabled simultaneously
+		// This prevents the "End of stream" connection failure bug
+		if (unicodeChecked && settings->getEnableJapInput()) {
+			unicodeChecked = FALSE;
+			SendDlgItemMessage(hwnd, IDC_UNICODE_INPUTS, BM_SETCHECK, BST_UNCHECKED, 0);
+		}
 		if (m_server)
-			m_server->EnableUnicodeInput(SendMessage(hUnicodeInputs, BM_GETCHECK, 0, 0) == BST_CHECKED);
-		settings->setEnableUnicodeInput(SendMessage(hUnicodeInputs, BM_GETCHECK, 0, 0) == BST_CHECKED);
+			m_server->EnableUnicodeInput(unicodeChecked);
+		settings->setEnableUnicodeInput(unicodeChecked);
 	}
 
 	if (GetDlgItem(hwnd, IDC_WIN8_HELPER)) {

@@ -356,6 +356,11 @@ void SettingsManager::load()
 	m_pref_EnableJapInput = iniFile.ReadInt("admin", "EnableJapInput", m_pref_EnableJapInput);
 	m_pref_ForceCursorShape = iniFile.ReadInt("admin", "ForceCursorShape", m_pref_ForceCursorShape);
 	m_pref_EnableUnicodeInput = iniFile.ReadInt("admin", "EnableUnicodeInput", m_pref_EnableUnicodeInput);
+	// Safety check: Both JapInput and UnicodeInput enabled simultaneously causes "End of stream" bug
+	// If both are enabled, disable UnicodeInput (JapInput takes precedence when both are set)
+	if (m_pref_EnableJapInput && m_pref_EnableUnicodeInput) {
+		m_pref_EnableUnicodeInput = FALSE;
+	}
 	m_pref_EnableWin8Helper = iniFile.ReadInt("admin", "EnableWin8Helper", m_pref_EnableWin8Helper);
 	m_pref_clearconsole = iniFile.ReadInt("admin", "clearconsole", m_pref_clearconsole);
 	G_SENDBUFFER_EX = iniFile.ReadInt("admin", "sendbuffer", G_SENDBUFFER_EX);	
