@@ -19,7 +19,7 @@ find_package(LibLZMA REQUIRED)
 
 set(${PROJECT_NAME}_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
-    ../ZipUnZip32/ZipUnzip32.cpp
+    ../common/ZipUnzip/ZipUnzip32.cpp
     ../common/Clipboard.cpp
     ../common/Hyperlinks.cpp
     ../common/UltraVncZ.cpp

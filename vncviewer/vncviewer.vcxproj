@@ -2342,7 +2342,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\common\win32_helpers.cpp" />
-    <ClCompile Include="..\ZipUnZip32\MiniZipNG.cpp" />
+    <ClCompile Include="..\common\ZipUnzip\MiniZipNG.cpp" />
     <ClCompile Include="xz.cpp" />
     <ClCompile Include="zrle.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -2419,7 +2419,7 @@
     <ClInclude Include="VNCviewerApp.h" />
     <ClInclude Include="VNCviewerApp32.h" />
     <ClInclude Include="..\common\win32_helpers.h" />
-    <ClInclude Include="..\ZipUnZip32\MiniZipNG.h" />
+    <ClInclude Include="..\common\ZipUnzip\MiniZipNG.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\librats\rats_native.vcxproj">

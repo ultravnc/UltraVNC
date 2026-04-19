@@ -3184,7 +3184,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\ZipUnZip32\MiniZipNG.cpp" />
+    <ClCompile Include="..\..\common\ZipUnzip\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\common\d3des.h" />
@@ -3200,7 +3200,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="DeskdupEngine.h" />
     <ClInclude Include="Dtwinver.h" />
     <ClInclude Include="..\..\common\win32_helpers.h" />
-    <ClInclude Include="..\..\ZipUnZip32\MiniZipNG.h" />
+    <ClInclude Include="..\..\common\ZipUnzip\MiniZipNG.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="HelperFunctions.h" />

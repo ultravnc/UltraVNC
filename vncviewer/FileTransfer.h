@@ -15,7 +15,7 @@
 
 #include <list>
 #include <string>
-#include "ZipUnZip32/MiniZipNG.h"
+#include "common/ZipUnzip/MiniZipNG.h"
 
 #define CONFIRM_YES 1
 #define CONFIRM_YESALL 2

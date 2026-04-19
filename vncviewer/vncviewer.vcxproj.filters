@@ -192,7 +192,7 @@
     <ClCompile Include="..\common\vnc_bridge_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ZipUnZip32\MiniZipNG.cpp">
+    <ClCompile Include="..\common\ZipUnzip\MiniZipNG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -326,7 +326,7 @@
     <ClInclude Include="..\common\Hyperlinks.h">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="..\ZipUnZip32\MiniZipNG.h">
+    <ClInclude Include="..\common\ZipUnzip\MiniZipNG.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
