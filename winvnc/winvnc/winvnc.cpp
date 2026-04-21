@@ -1428,8 +1428,8 @@ int WinVNCAppMain()
 {
 	vnclog.SetPath(settings->getDebugPath());
 	vnclog.SetLevel(settings->getDebugLevel());
-	vnclog.SetFile();
 	vnclog.SetMode(settings->getDebugMode());
+	vnclog.SetFile();
 	vnclog.SetVideo(settings->getAvilog());
 
 	vnclog.Print(-1, VNCLOG("WinVNCAPPMain-----Application started\n"));

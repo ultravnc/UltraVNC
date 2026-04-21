@@ -136,7 +136,7 @@ void VNCLog::SetFile()
 	strcat_s(m_filename,"\\");
 	strcat_s(m_filename,"WinVNC.log");
 	m_append = true;
-	if (m_tofile)
+	if (m_tofile || (m_mode & ToFile))
 		OpenFile();
 }
 
