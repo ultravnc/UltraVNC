@@ -4076,22 +4076,9 @@ vncClientThread::run(void* arg)
 					break;
 
 				case rfbEndOfFile:
-					vnclog.Print(0, _T("=== SRV: Received rfbEndOfFile message ===\n"));
-					if (!settings->getEnableFileTransfer() || !fUserOk)
-					{
-						vnclog.Print(0, _T("  File transfer disabled or user not OK, ignoring\n"));
-						break;
-					}
-
+					if (!settings->getEnableFileTransfer() || !fUserOk) break;
 					if (m_client->m_fFileDownloadRunning)
-					{
-						vnclog.Print(0, _T("  File download running, calling FinishFileReception\n"));
 						m_client->FinishFileReception();
-					}
-					else
-					{
-						vnclog.Print(0, _T("  File download NOT running (m_fFileDownloadRunning=false)\n"));
-					}
 					break;
 
 					// We use this message for File Transfer rights (<= RC18)
@@ -4262,6 +4249,9 @@ vncClientThread::run(void* arg)
 						bool fSpecialFolderResolvedW = false;
 						if (nFolder != -1 && fClientWantsUnicode)
 						{
+							// Impersonate logged-in user so Shell APIs return the correct user's folders
+							// (e.g. Desktop/Downloads) when running as a service (SYSTEM account)
+							if (m_client->m_hPToken) ImpersonateLoggedOnUser(m_client->m_hPToken);
 							LPITEMIDLIST pidl = nullptr;
 							LPMALLOC pMalloc = nullptr;
 							HRESULT hrMalloc = SHGetMalloc(&pMalloc);
@@ -4281,10 +4271,12 @@ vncClientThread::run(void* arg)
 							else
 								fShortError = true;
 							if (pMalloc) pMalloc->Release();
+							if (m_client->m_hPToken) RevertToSelf();
 						}
 						else if (nFolder != -1)
 						{
 							// ANSI branch: original behaviour
+							if (m_client->m_hPToken) ImpersonateLoggedOnUser(m_client->m_hPToken);
 							if (m_client->GetSpecialFolderPath(nFolder, szP))
 							{
 								if (szP[strlen(szP) - 1] != '\\') strcat_s(szP, "\\");
@@ -4292,6 +4284,7 @@ vncClientThread::run(void* arg)
 							}
 							else
 								fShortError = true;
+							if (m_client->m_hPToken) RevertToSelf();
 						}
 
 						strcat_s(szDir, "*");
@@ -6347,12 +6340,7 @@ void vncClient::FinishFileReception()
 	// received file
 	// Todo: make a better free space check above in this particular case. The free space must be at least
 	// 3 times the size of the directory zip file (this zip file is ~50% of the real directory size)
-	vnclog.Print(0, _T("=== SRV: About to call UnzipPossibleDirectory ===\n"));
-	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,m_szFullDestName,-1,_dbg,MAX_PATH*4);
-	  vnclog.Print(0, _T("  m_szFullDestName: %s\n"), _dbg); }
-	vnclog.Print(0, _T("  m_fFileDownloadError: %d\n"), m_fFileDownloadError);
 	bool bWasDir = UnzipPossibleDirectory(m_szFullDestName);
-	vnclog.Print(0, _T("=== SRV: UnzipPossibleDirectory returned: %d ===\n"), bWasDir);
 	/*
 	if (!m_fFileDownloadError && !strncmp(strrchr(m_szFullDestName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
 	{
@@ -6634,10 +6622,6 @@ bool vncClient::GetSpecialFolderPath(int nId, char* szPath)
 //
 int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 {
-	vnclog.Print(0, _T("\n=== SERVER ZipPossibleDirectory ===\n"));
-	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,szSrcFileName,-1,_dbg,MAX_PATH*4);
-	  vnclog.Print(0, _T("  szSrcFileName: %s\n"), _dbg); }
-	//	vnclog.Print(0, _T("ZipPossibleDirectory\n"));
 	char* p1 = strrchr(szSrcFileName, '\\') + 1;
 	char* p2 = strrchr(szSrcFileName, rfbDirSuffix[0]);
 	if (
@@ -6769,16 +6753,12 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 //
 bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 {
-	vnclog.Print(0, _T("\n=== SERVER UnzipPossibleDirectory ===\n"));
-	{ WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_ACP,0,szFileName,-1,_dbg,MAX_PATH*4);
-	  vnclog.Print(0, _T("  szFileName: %s\n"), _dbg); }
 	
 	if (!m_fFileDownloadError
 		&&
 		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
 		)
 	{
-		vnclog.Print(0, _T("  Directory zip detected\n"));
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileName);
@@ -6837,11 +6817,9 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		{
 			bUnzipOk = false;
 		}
-		// DEBUG: Keep zip file for inspection
-		// { WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
-		vnclog.Print(0, _T("  DEBUG: Zip file NOT deleted for inspection: %hs\n"), szFileName);
+		{ WCHAR _dp[MAX_PATH * 4]; MakeLongPath(szFileName, _dp, MAX_PATH * 4); DeleteFileW(_dp); }
 
-		vnclog.Print(0, _T("  Unzip result: %d\n"), bUnzipOk);
+
 
 		if (bUnzipOk)
 		{
@@ -6874,14 +6852,11 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
 				}
 				
-				vnclog.Print(0, _T("  Renaming:\n    From: %s\n    To: %s\n"), szExtractPathW, szFinalPathW);
 				BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
-				vnclog.Print(0, _T("  Rename result: %d (err=%lu)\n"), bMoved, bMoved ? 0 : GetLastError());
 			}
 		}
 		else
 			m_fFileDownloadError = true;
-		vnclog.Print(0, _T("=== SERVER UnzipPossibleDirectory complete ===\n\n"));
 		return true;
 	}
 	return false;
