@@ -3003,6 +3003,11 @@ bool FileTransfer::FinishFileReception()
     ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_SHOW);
 	ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B2), SW_SHOW);
 
+	if (bWasDir) {
+		FTListViewClear(GetDlgItem(hWnd, IDC_REMOTE_FILELIST));
+		RequestRemoteDirectoryContent(hWnd, L"");
+	}
+
     if (!m_fFileDownloadError && !bWasDir)
     {
 		// Build real (final) Unicode filename by stripping the !UVNCPFT- prefix from m_szDestFileNameW
@@ -5492,6 +5497,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		MoveWindow(GetDlgItem(hWnd, IDC_DELETE_B),     lf_an+10+2, icy - (buttonUploadHeight + 4) * 7, buttonUploadWidth, buttonUploadHeight, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_NEWFOLDER_B),  lf_an+10+2, icy - (buttonUploadHeight + 4) * 6, buttonUploadWidth, buttonUploadHeight, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_RENAME_B),     lf_an+10+2, icy - (buttonUploadHeight + 4) * 5, buttonUploadWidth, buttonUploadHeight, TRUE);
+		MoveWindow(GetDlgItem(hWnd, IDC_REFRESH),      lf_an+10+2, icy - (buttonUploadHeight + 4) * 4, buttonUploadWidth, buttonUploadHeight, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDC_HIDE_B),       lf_an+10+2, icy - (buttonUploadHeight + 4) * 2, buttonUploadWidth, buttonUploadHeight, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDCANCEL),         lf_an+10+2, icy - (buttonUploadHeight + 4), buttonUploadWidth, buttonUploadHeight, TRUE);
 		MoveWindow(GetDlgItem(hWnd, IDCANCEL2),        lf_an+10+2, icy, buttonUploadWidth, buttonUploadHeight, TRUE);
