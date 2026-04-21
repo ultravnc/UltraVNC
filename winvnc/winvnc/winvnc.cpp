@@ -1427,9 +1427,9 @@ DWORD WINAPI imp_desktop_thread(LPVOID lpParam)
 int WinVNCAppMain()
 {
 	vnclog.SetPath(settings->getDebugPath());
+	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetFile();
 	vnclog.SetMode(settings->getDebugMode());
-	vnclog.SetLevel(settings->getDebugLevel());
 	vnclog.SetVideo(settings->getAvilog());
 
 	vnclog.Print(-1, VNCLOG("WinVNCAPPMain-----Application started\n"));
