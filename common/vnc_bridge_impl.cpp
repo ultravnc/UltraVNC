@@ -42,6 +42,7 @@ bool VncBridge::console_logging_enabled_ = false;
 #include <iphlpapi.h>
 #include <intrin.h>  // For __cpuid
 #include <windows.h> // For GetVolumeInformation
+#include <Shlobj.h>  // For SHGetFolderPathA
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #pragma comment(lib, "iphlpapi.lib")
@@ -63,6 +64,23 @@ librats::NatTraversalConfig VncBridge::create_config() {
     config.stun_servers = { "stun.l.google.com:19302" };
     config.ice_connectivity_timeout_ms = 10000;
     return config;
+}
+
+// Get data directory for librats persistence files (config.json, peers.rats, etc.)
+// Tries user-writable LocalAppData first, falls back to ProgramData (service/admin)
+std::string VncBridge::get_data_directory() {
+#ifdef _WIN32
+    char path[MAX_PATH] = {0};
+    // Try user's LocalAppData first (always writable)
+    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
+        return std::string(path) + "\\UltraVNC";
+    }
+    // Fall back to ProgramData (service / elevated)
+    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
+        return std::string(path) + "\\UltraVNC";
+    }
+#endif
+    return ".";
 }
 
 // Get machine-specific identifier (MAC address + CPU ID + Disk Serial)
@@ -275,7 +293,7 @@ std::string VncBridge::get_validation_error(const std::string& code) {
 VncBridge::VncBridge(const std::string& mode, const std::string& discovery_code,
                      const std::string& vnc_ip, int vnc_port)
     : // Use fixed ports based on mode
-      client_(mode == "server" ? BRIDGE_SERVER_PORT : BRIDGE_CLIENT_PORT, 5, create_config()),
+      client_(mode == "server" ? BRIDGE_SERVER_PORT : BRIDGE_CLIENT_PORT, 5, create_config(), "", get_data_directory()),
       mode_(mode),
       discovery_code_(discovery_code.empty() ? generate_unique_code() : normalize_discovery_code(discovery_code)),
       connected_(false), 
