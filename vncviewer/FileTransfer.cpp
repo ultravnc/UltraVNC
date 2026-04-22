@@ -1353,7 +1353,90 @@ bool FileTransfer::GetSpecialFolderPath(int nId, char* szPath)
 //
 void FileTransfer::PopulateLocalListBoxW(HWND hWnd, LPCWSTR szPathW)
 {
-	// Convert Unicode to ANSI for legacy PopulateLocalListBox
+	if (szPathW[0] == L'\0')
+	{
+		// Empty string = double-click or refresh - delegate directly
+		char szPath[1] = {0};
+		PopulateLocalListBox(hWnd, szPath);
+		return;
+	}
+
+	// Check for "[ .. ]" - up directory
+	WCHAR szUpDirMaskW[16];
+	_snwprintf_s(szUpDirMaskW, 16, _TRUNCATE, L"%hs..%hs", rfbDirPrefix, rfbDirSuffix);
+	if (!_wcsicmp(szPathW, szUpDirMaskW))
+	{
+		// Go up one directory - read current path, strip last component
+		WCHAR szCurrentW[MAX_PATH * 4];
+		GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szCurrentW, MAX_PATH * 4);
+		if (wcslen(szCurrentW) < 1) return;
+		// Strip trailing backslash
+		if (szCurrentW[wcslen(szCurrentW) - 1] == L'\\')
+			szCurrentW[wcslen(szCurrentW) - 1] = L'\0';
+		WCHAR* p = wcsrchr(szCurrentW, L'\\');
+		if (p == NULL) { ListDrives(hWnd); return; } // At root, show drives
+		*(p + 1) = L'\0'; // Keep trailing backslash
+		SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szCurrentW);
+		// IDC_CURR_LOCAL is set - PopulateLocalListBox will read it
+		char szEmpty[1] = {0};
+		PopulateLocalListBox(hWnd, szEmpty);
+		return;
+	}
+
+	// Check for bracketed format from combo box: "[ X: ] - Type" or "[ Shortcut ]"
+	if (szPathW[0] == L'[' && szPathW[1] == L' ')
+	{
+		// Check for special folder shortcuts first
+		if (IsShortcutFolder(szPathW))
+		{
+			// Resolve shortcut folder
+			int nFolder = -1;
+			if (!_wcsnicmp(szPathW, L"[ My Documents ]", wcslen(L"[ My Documents ]")))
+				nFolder = CSIDL_PERSONAL;
+			else if (!_wcsnicmp(szPathW, L"[ Desktop ]", wcslen(L"[ Desktop ]")))
+				nFolder = CSIDL_DESKTOP;
+			else if (!_wcsnicmp(szPathW, L"[ Network Favorites ]", wcslen(L"[ Network Favorites ]")))
+				nFolder = CSIDL_NETHOOD;
+			if (nFolder != -1)
+			{
+				WCHAR szFolderW[MAX_PATH];
+				if (GetSpecialFolderPathW(nFolder, szFolderW))
+				{
+					size_t len = wcslen(szFolderW);
+					if (len > 0 && szFolderW[len-1] != L'\\' && len < MAX_PATH - 1)
+					{
+						szFolderW[len] = L'\\';
+						szFolderW[len+1] = L'\0';
+					}
+					SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szFolderW);
+					FTListViewClear(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
+					char szEmpty[1] = {0};
+					PopulateLocalListBox(hWnd, szEmpty);
+					return;
+				}
+			}
+			return;
+		}
+
+		// Drive letter: "[ C: ] - Local Disk" or "[ C: ]"
+		// Extract drive letter from position 2-3 (e.g., "C:")
+		WCHAR szDriveW[4] = {0};
+		szDriveW[0] = szPathW[2];
+		szDriveW[1] = szPathW[3];
+		szDriveW[2] = L'\0';
+		if (szDriveW[1] == L':')
+		{
+			WCHAR szDrivePathW[8];
+			_snwprintf_s(szDrivePathW, 8, _TRUNCATE, L"%s\\", szDriveW);
+			SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szDrivePathW);
+			FTListViewClear(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
+			char szEmpty[1] = {0};
+			PopulateLocalListBox(hWnd, szEmpty);
+			return;
+		}
+	}
+
+	// Fallback: convert to ANSI for legacy code path
 	char szPath[MAX_PATH];
 	WideCharToMultiByte(CP_ACP, 0, szPathW, -1, szPath, MAX_PATH, NULL, NULL);
 	PopulateLocalListBox(hWnd, szPath);
@@ -1367,6 +1450,8 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 //	vnclog.Print(0, _T("PopulateLocalListBox\n"));
 	char ofDir[MAX_PATH];
 	char ofDirT[MAX_PATH];
+	WCHAR ofDirW[MAX_PATH * 4] = {0};  // Unicode search path - avoids ANSI round-trip corruption
+	WCHAR szSavedParentPathW[MAX_PATH * 4] = {0};  // Unicode parent path for error recovery
 	int nSelected = -1;
 	int nCount = 0;
 	int nFileCount = 0;
@@ -1432,6 +1517,32 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 					if (p == NULL) return;
 					*(p + 1) = L'\0'; // Keep trailing backslash
 				}
+				else if (wcslen(szFolderNameW) == 2 && szFolderNameW[1] == L':')
+				{
+					// Drive letter (e.g. "C:") - absolute path, not relative
+					_snwprintf_s(szNewPathW, MAX_PATH * 4, _TRUNCATE, L"%s\\", szFolderNameW);
+				}
+				else if (!_wcsicmp(szFolderNameW, L"My Documents") ||
+						 !_wcsicmp(szFolderNameW, L"Desktop") ||
+						 !_wcsicmp(szFolderNameW, L"Network Favorites"))
+				{
+					// Special folder - resolve to actual path
+					int nFolder = -1;
+					if (!_wcsicmp(szFolderNameW, L"My Documents")) nFolder = CSIDL_PERSONAL;
+					else if (!_wcsicmp(szFolderNameW, L"Desktop")) nFolder = CSIDL_DESKTOP;
+					else if (!_wcsicmp(szFolderNameW, L"Network Favorites")) nFolder = CSIDL_NETHOOD;
+					if (nFolder != -1 && GetSpecialFolderPathW(nFolder, szNewPathW))
+					{
+						size_t len = wcslen(szNewPathW);
+						if (len > 0 && szNewPathW[len-1] != L'\\' && len < MAX_PATH * 4 - 1)
+						{
+							szNewPathW[len] = L'\\';
+							szNewPathW[len+1] = L'\0';
+						}
+					}
+					else
+						return; // Can't resolve special folder
+				}
 				else
 				{
 					// Navigate into subfolder
@@ -1440,11 +1551,14 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 				
 				SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szNewPathW);
 				
-				// Now populate the folder contents
+				// Build Unicode search path directly - no ANSI round-trip
+				_snwprintf_s(ofDirW, MAX_PATH * 4, _TRUNCATE, L"%s*", szNewPathW);
+				// Save parent path for error recovery
+				wcscpy_s(szSavedParentPathW, szCurrentPathW);
+				
+				// Legacy tracking (ANSI - best effort)
 				WideCharToMultiByte(CP_ACP, 0, szNewPathW, -1, ofDir, MAX_PATH, NULL, NULL);
 				strcat_s(ofDir, "*");
-				
-				// Legacy tracking
 				WideCharToMultiByte(CP_ACP, 0, szFolderNameW, -1, ofDirT, MAX_PATH, NULL, NULL);
 				m_nLastLocalAttemptItem = nSelected;
 				strcpy_s(m_szLastLocalAttemptName, ofDirT);
@@ -1483,18 +1597,22 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 		}
 	}
 
-	// Legacy ANSI path handling (kept for backward compatibility with non-Unicode paths)
+	// Build Unicode search path directly from IDC_CURR_LOCAL
 	char szSavedParentPath[MAX_PATH] = {0};
 	bool bDirectPath = false;
 	if (nSelected == nCount || lstrlenA(ofDirT) == 0)
 	{
 		WCHAR _wb[MAX_PATH * 4];
 		GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, _wb, MAX_PATH * 4);
-		WideCharToMultiByte(CP_ACP, 0, _wb, -1, ofDirT, MAX_PATH, NULL, NULL);
-		strcpy_s(szSavedParentPath, ofDirT);
-		if (strlen(ofDirT) == 0) return;
-		if (ofDirT[0] != rfbDirPrefix[0] || ofDirT[1] != rfbDirPrefix[1])
+		if (wcslen(_wb) == 0) return;
+		if (_wb[0] != L'[')
 		{
+			// Build Unicode search path directly - no ANSI corruption
+			_snwprintf_s(ofDirW, MAX_PATH * 4, _TRUNCATE, L"%s*", _wb);
+			wcscpy_s(szSavedParentPathW, _wb);
+			// Legacy ANSI copies (best effort)
+			WideCharToMultiByte(CP_ACP, 0, _wb, -1, ofDirT, MAX_PATH, NULL, NULL);
+			strcpy_s(szSavedParentPath, ofDirT);
 			strcpy_s(ofDir, ofDirT);
 			strcat_s(ofDir, "*");
 			bDirectPath = true;
@@ -1526,10 +1644,7 @@ populate_folder:
 	HANDLE ff;
 	int bRet = 1;
 
-	// Convert path to Unicode for proper Chinese character support
-	WCHAR ofDirW[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, ofDir, -1, ofDirW, MAX_PATH);
-
+	// ofDirW is already set in Unicode by the code paths above
 	SetErrorMode(SEM_FAILCRITICALERRORS); // No popup please !
 	ff = FindFirstFileW(ofDirW, &fdW);
 	SetErrorMode( 0 );
@@ -1567,34 +1682,25 @@ populate_folder:
 			ListView_RedrawItems(hWndLocalList, m_nLastLocalAttemptItem, m_nLastLocalAttemptItem);
 			UpdateWindow(hWndLocalList);
 		}
-		// Restore saved parent path and re-populate it
-		{
-			WCHAR szSavedW[MAX_PATH * 4];
-			MultiByteToWideChar(CP_ACP, 0, szSavedParentPath, -1, szSavedW, MAX_PATH * 4);
-			SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szSavedW);
-		}
-		strcpy_s(ofDir, szSavedParentPath);
-		strcat_s(ofDir, "*");
-		MultiByteToWideChar(CP_ACP, 0, ofDir, -1, ofDirW, MAX_PATH);
+		// Restore saved parent path and re-populate it using Unicode
+		SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szSavedParentPathW);
+		_snwprintf_s(ofDirW, MAX_PATH * 4, _TRUNCATE, L"%s*", szSavedParentPathW);
 		ff = FindFirstFileW(ofDirW, &fdW);
 		if (ff == INVALID_HANDLE_VALUE)
 			return; // Parent also unreadable, nothing we can do
 		FTListViewClear(hWndLocalList);
-		// Update m_szLastLocalPath to parent
-		lstrcpyA(m_szLastLocalPath, ofDir);
-		int len = strlen(m_szLastLocalPath);
-		if (len > 2) { // truncate off the *
-			m_szLastLocalPath[len-1] = '\0';
-		}
+		// Update m_szLastLocalPath (ANSI - best effort)
+		WideCharToMultiByte(CP_ACP, 0, szSavedParentPathW, -1, m_szLastLocalPath, MAX_PATH, NULL, NULL);
 			// Fall through to populate parent folder (fdW already valid)
 	} else {
 		FTListViewClear(hWndLocalList);
-		// adzm 2009-08-02
-		lstrcpyA(m_szLastLocalPath, ofDir);
-		int len = strlen(m_szLastLocalPath);
-		if (len > 2) { // truncate off the *
-			m_szLastLocalPath[len-1] = '\0';
-		}
+		// Update m_szLastLocalPath from Unicode search path (strip trailing *)
+		WCHAR szPathCopyW[MAX_PATH * 4];
+		wcscpy_s(szPathCopyW, ofDirW);
+		size_t len = wcslen(szPathCopyW);
+		if (len > 0 && szPathCopyW[len-1] == L'*')
+			szPathCopyW[len-1] = L'\0';
+		WideCharToMultiByte(CP_ACP, 0, szPathCopyW, -1, m_szLastLocalPath, MAX_PATH, NULL, NULL);
 	}
 
 	while (bRet != 0)
@@ -2273,20 +2379,27 @@ void FileTransfer::ListDrives(HWND hWnd)
 			break;
 		}
 
-		// Add it to the ListView
-		LVITEM Item;
-		Item.mask = LVIF_TEXT | LVIF_IMAGE;
-		Item.iItem = 0;
-		Item.iSubItem = 0;
-		Item.iImage = 2;
-		Item.pszText = szTheDrive;
-		int nItem = ListView_InsertItem(hWndLocalList, &Item);
+		// Add it to the ListView - store drive letter (e.g. "C:") in lParam for PopulateLocalListBox
+		LVITEMW ItemW;
+		memset(&ItemW, 0, sizeof(ItemW));
+		ItemW.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
+		ItemW.iItem = 0;
+		ItemW.iSubItem = 0;
+		ItemW.iImage = 2;
+		ItemW.pszText = szTheDrive;
+		TCHAR szDriveLetter[4];
+		_tcscpy_s(szDriveLetter, 4, szDrivesList + (nIndex - 4));
+		szDriveLetter[2] = _T('\0');
+		ItemW.lParam = (LPARAM)(new std::wstring(szDriveLetter));
+		int nItem = (int)SendMessageW(hWndLocalList, LVM_INSERTITEMW, 0, (LPARAM)&ItemW);
 		
-		Item.mask = LVIF_TEXT;
-		Item.iItem = nItem;
-		Item.iSubItem = 1;
-		Item.pszText = szType;
-		ListView_SetItem(hWndLocalList, &Item);
+		LVITEMW SubW;
+		memset(&SubW, 0, sizeof(SubW));
+		SubW.mask = LVIF_TEXT;
+		SubW.iItem = nItem;
+		SubW.iSubItem = 1;
+		SubW.pszText = szType;
+		SendMessageW(hWndLocalList, LVM_SETITEMW, 0, (LPARAM)&SubW);
 
 		// Prepare it for Combo Box and add it
 		_tcscat_s(szTheDrive, 32, _T(" - "));
@@ -2299,32 +2412,38 @@ void FileTransfer::ListDrives(HWND hWnd)
 
 	TCHAR szGUIDir[64];
 
-	// MyDocuments
-	LVITEM Item;
-	Item.mask = LVIF_TEXT;
+	// MyDocuments - store shortcut name in lParam for PopulateLocalListBox
+	LVITEMW Item;
+	memset(&Item, 0, sizeof(Item));
+	Item.mask = LVIF_TEXT | LVIF_PARAM;
 	Item.iItem = 0;
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("My Documents"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
-	ListView_InsertItem(hWndLocalList, &Item);
+	Item.lParam = (LPARAM)(new std::wstring(L"My Documents"));
+	SendMessageW(hWndLocalList, LVM_INSERTITEMW, 0, (LPARAM)&Item);
 	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	// Desktop
-	Item.mask = LVIF_TEXT;
+	memset(&Item, 0, sizeof(Item));
+	Item.mask = LVIF_TEXT | LVIF_PARAM;
 	Item.iItem = 0;
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Desktop"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
-	ListView_InsertItem(hWndLocalList, &Item);
+	Item.lParam = (LPARAM)(new std::wstring(L"Desktop"));
+	SendMessageW(hWndLocalList, LVM_INSERTITEMW, 0, (LPARAM)&Item);
 	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	// Network Favorites
-	Item.mask = LVIF_TEXT;
+	memset(&Item, 0, sizeof(Item));
+	Item.mask = LVIF_TEXT | LVIF_PARAM;
 	Item.iItem = 0;
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Network Favorites"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
-	ListView_InsertItem(hWndLocalList, &Item);
+	Item.lParam = (LPARAM)(new std::wstring(L"Network Favorites"));
+	SendMessageW(hWndLocalList, LVM_INSERTITEMW, 0, (LPARAM)&Item);
 	SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_ADDSTRING, 0, (LPARAM)szGUIDir); 
 
 	SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_SETCURSEL, -1, 0);
@@ -5073,16 +5192,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szCurrLocalW, MAX_PATH * 4);
 				if (!wcslen(szCurrLocalW)) break;
 
-				int nSelected = -1;
-
 				HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
-
-				nSelected = ListView_GetSelectedCount(hWndLocalList);
-				if (nSelected == 0 || nSelected > 1)
-				{
-					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_M1, sz_M2, MB_ICONINFORMATION);
-					break; 
-				}
 
 				memset(_this->m_szFTParam, '\0', sizeof(_this->m_szFTParam));
 				_this->m_szFTParamW[0] = L'\0';
@@ -5578,10 +5688,20 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 									rc.top = lpNmlvcd->iSubItem;
 									SendMessageW(lpNmlvcd->nmcd.hdr.hwndFrom, LVM_GETSUBITEMRECT,
 										(WPARAM)lpNmlvcd->nmcd.dwItemSpec, (LPARAM)&rc);
-									// Use actual selection state from ListView (not from uItemState which is unreliable at subitem level)
+									// Use actual selection state from ListView
 									BOOL bSelected = (ListView_GetItemState(lpNmlvcd->nmcd.hdr.hwndFrom,
 										(int)lpNmlvcd->nmcd.dwItemSpec, LVIS_SELECTED) & LVIS_SELECTED) != 0;
 									BOOL bFocused = (GetFocus() == lpNmlvcd->nmcd.hdr.hwndFrom);
+									// Fill background since CDRF_SKIPDEFAULT skips default painting
+									HBRUSH hBrush;
+									if (bSelected && bFocused)
+										hBrush = CreateSolidBrush(GetSysColor(COLOR_HIGHLIGHT));
+									else if (bSelected)
+										hBrush = CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
+									else
+										hBrush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+									FillRect(lpNmlvcd->nmcd.hdc, &rc, hBrush);
+									DeleteObject(hBrush);
 									SetBkMode(lpNmlvcd->nmcd.hdc, TRANSPARENT);
 									SetTextColor(lpNmlvcd->nmcd.hdc,
 										(bSelected && bFocused)
@@ -5955,6 +6075,13 @@ void FileTransfer::EnableButtons(HWND hWnd)
 	EnableMenuItem(hMenu, nCount-2, MF_ENABLED | MF_BYPOSITION);
 	DrawMenuBar(hWnd);
 
+	// Reset progress bar and status after transfer completes or is aborted
+	HWND hProg = GetDlgItem(hWnd, IDC_PROGRESS);
+	SendMessage(hProg, PBM_SETMARQUEE, FALSE, 0);
+	SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) & ~PBS_MARQUEE);
+	SendMessage(hProg, PBM_SETPOS, 0, 0);
+	SetDlgItemTextW(hWnd, IDC_PERCENT, L"");
+	SetDlgItemTextW(hWnd, IDC_GLOBAL_STATUS, L"");
 }
 
 
