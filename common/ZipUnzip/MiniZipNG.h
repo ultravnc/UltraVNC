@@ -24,22 +24,31 @@ public:
     // szWildcard: Wildcard pattern (e.g., "C:\folder\*.*")
     // szZipPath: Output zip file path
     // bRecursive: Recurse into subdirectories
-    // Returns: true on success
+    // Returns: true on success (false if aborted or error)
     bool ZipDirectory(LPCWSTR szDirPath, LPCWSTR szWildcard, LPCWSTR szZipPath, bool bRecursive);
 
     // Unzip a directory (Unicode paths supported)
     // szExtractPath: Where to extract (e.g., "C:\dest")
     // szZipPath: Zip file to extract
-    // Returns: true on success
+    // Returns: true on success (false if aborted or error)
     bool UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath);
 
     // Legacy ANSI interface for compatibility
     bool ZipDirectory(LPCSTR szDirPath, LPCSTR szWildcard, LPCSTR szZipPath, bool bRecursive);
     bool UnZipDirectory(LPCSTR szExtractPath, LPCSTR szZipPath);
 
+    // Abort mechanism - call to request cancellation of ongoing operation
+    void RequestAbort();
+    // Check if abort was requested
+    bool IsAbortRequested() const;
+    // Reset abort flag before starting new operation
+    void ResetAbort();
+
 private:
     bool ZipDirectoryRecursive(void* zip_writer, LPCWSTR szBasePath, LPCWSTR szRelPath);
     bool AddFileToZip(void* zip_writer, LPCWSTR szFilePath, LPCWSTR szZipPath);
+    
+    volatile bool m_fAbortRequested;
 };
 
 #endif // _MINIZIPNG_H

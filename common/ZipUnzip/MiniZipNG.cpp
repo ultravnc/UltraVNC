@@ -44,12 +44,27 @@ static void MZ_CreateDirectoryChain(LPCWSTR szPath)
     CreateDirectoryW(szTmp, NULL);
 }
 
-CMiniZipNG::CMiniZipNG()
+CMiniZipNG::CMiniZipNG() : m_fAbortRequested(false)
 {
 }
 
 CMiniZipNG::~CMiniZipNG()
 {
+}
+
+void CMiniZipNG::RequestAbort()
+{
+    m_fAbortRequested = true;
+}
+
+bool CMiniZipNG::IsAbortRequested() const
+{
+    return m_fAbortRequested;
+}
+
+void CMiniZipNG::ResetAbort()
+{
+    m_fAbortRequested = false;
 }
 
 // Unicode version - Zip a directory
@@ -91,6 +106,13 @@ bool CMiniZipNG::ZipDirectory(LPCWSTR szDirPath, LPCWSTR szWildcard, LPCWSTR szZ
     mz_zip_writer_close(zip_writer);
     mz_zip_writer_delete(&zip_writer);
 
+    // If aborted, delete the partial zip file
+    if (!bSuccess && m_fAbortRequested)
+    {
+        MZ_DEBUG(L"  Abort requested - deleting partial zip file\n");
+        DeleteFileW(szZipPath);
+    }
+
     MZ_DEBUG(bSuccess ? L"[MiniZipNG] ZipDirectory SUCCESS\n" : L"[MiniZipNG] ZipDirectory FAILED\n");
     return bSuccess;
 }
@@ -123,6 +145,14 @@ bool CMiniZipNG::ZipDirectoryRecursive(void* zip_writer, LPCWSTR szBasePath, LPC
     bool bSuccess = true;
     do
     {
+        // Check for abort request
+        if (m_fAbortRequested)
+        {
+            MZ_DEBUG(L"  [Recursive] Abort requested - stopping\n");
+            bSuccess = false;
+            break;
+        }
+
         // Skip . and ..
         if (wcscmp(fd.cFileName, L".") == 0 || wcscmp(fd.cFileName, L"..") == 0)
             continue;
@@ -309,6 +339,14 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
     
     while (err == MZ_OK)
     {
+        // Check for abort request
+        if (m_fAbortRequested)
+        {
+            MZ_DEBUG(L"[MiniZipNG] Abort requested during extraction\n");
+            bAllOk = false;
+            break;
+        }
+
         // Get entry info
         mz_zip_file* file_info = NULL;
         err = mz_zip_reader_entry_get_info(zip_reader, &file_info);
@@ -424,11 +462,32 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
         err = mz_zip_reader_goto_next_entry(zip_reader);
     }
     
-    MZ_DEBUG_FMT(L"[MiniZipNG] Extraction complete, errors: %d\n", num_errors);
+    MZ_DEBUG_FMT(L"[MiniZipNG] Extraction complete, errors: %d, aborted: %d\n", num_errors, m_fAbortRequested ? 1 : 0);
 
     // Close zip file
     mz_zip_reader_close(zip_reader);
     mz_zip_reader_delete(&zip_reader);
+
+    // If aborted, try to clean up the partial extraction folder
+    if (m_fAbortRequested)
+    {
+        MZ_DEBUG(L"[MiniZipNG] Abort requested - cleaning up partial extraction\n");
+        // Delete the partially extracted folder
+        WCHAR szExtractDirW[MAX_PATH * 4];
+        // szExtractPath is like "C:\temp\UVNCTMP12345678", extract just the folder name
+        const WCHAR* pLastSlash = wcsrchr(szExtractPath, L'\\');
+        if (pLastSlash)
+        {
+            wcscpy_s(szExtractDirW, MAX_PATH * 4, szExtractPath);
+        }
+        else
+        {
+            _snwprintf_s(szExtractDirW, MAX_PATH * 4, _TRUNCATE, L"%s\\%s", szLongPathW, szExtractPath);
+        }
+        // Recursively remove the partial extraction directory
+        RemoveDirectoryW(szLongPathW);
+        return false;
+    }
 
     MZ_DEBUG(L"[MiniZipNG] UnZipDirectory END\n");
     // Return true even with some errors (locked files, etc.) as long as we extracted something

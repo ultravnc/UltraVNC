@@ -3250,8 +3250,38 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 #if DEBUG_FT
 		OutputDebugStringW(L"  Calling UnZipDirectory (Unicode)...\n");
 #endif
-		// Use CMiniZipNG for full Unicode support
-		fUnzip = m_pMiniZipNG->UnZipDirectory(szExtractPathW, szFileName);
+		// Reset abort flag before starting unzip operation
+		m_pMiniZipNG->ResetAbort();
+		// Use CMiniZipNG for full Unicode support - run in thread to allow abort
+		struct UnzipThreadParam {
+			CMiniZipNG* pZip;
+			LPCWSTR szExtractPath;
+			LPCWSTR szZipPath;
+			bool result;
+		};
+		UnzipThreadParam unzipParam = { m_pMiniZipNG, szExtractPathW, szFileName, false };
+		HANDLE hUnzipThread = CreateThread(NULL, 0, [](LPVOID pv) -> DWORD {
+			UnzipThreadParam* p = (UnzipThreadParam*)pv;
+			p->result = p->pZip->UnZipDirectory(p->szExtractPath, p->szZipPath);
+			return 0;
+		}, &unzipParam, 0, NULL);
+		if (hUnzipThread) {
+			MSG msg;
+			while (MsgWaitForMultipleObjects(1, &hUnzipThread, FALSE, INFINITE, QS_ALLINPUT) != WAIT_OBJECT_0) {
+				// Check if user requested abort and signal the unzip thread to stop
+				if (m_fAbort && !m_pMiniZipNG->IsAbortRequested()) {
+					m_pMiniZipNG->RequestAbort();
+				}
+				while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+			}
+			CloseHandle(hUnzipThread);
+			fUnzip = unzipParam.result;
+		} else {
+			fUnzip = m_pMiniZipNG->UnZipDirectory(szExtractPathW, szFileName);
+		}
 		if (fUnzip)
 			_snwprintf_s(szStatusW6, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H61, _wdn4);
 		else
@@ -3705,6 +3735,8 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		  SetWindowLong(hProg, GWL_STYLE, GetWindowLong(hProg, GWL_STYLE) | PBS_MARQUEE);
 		  SendMessage(hProg, PBM_SETMARQUEE, TRUE, 50);
 		  UpdateWindow(hWnd);
+		  // Reset abort flag before starting zip operation
+		  m_pMiniZipNG->ResetAbort();
 		  struct ZipThreadParam {
 			  CMiniZipNG* pZip;
 			  LPCWSTR szSrcDir;
@@ -3721,6 +3753,10 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 		  if (hZipThread) {
 			  MSG msg;
 			  while (MsgWaitForMultipleObjects(1, &hZipThread, FALSE, INFINITE, QS_ALLINPUT) != WAIT_OBJECT_0) {
+				  // Check if user requested abort and signal the zip thread to stop
+				  if (m_fAbort && !m_pMiniZipNG->IsAbortRequested()) {
+					  m_pMiniZipNG->RequestAbort();
+				  }
 				  while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 					  TranslateMessage(&msg);
 					  DispatchMessage(&msg);
