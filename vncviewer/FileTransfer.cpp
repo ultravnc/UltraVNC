@@ -1399,11 +1399,11 @@ void FileTransfer::PopulateLocalListBoxW(HWND hWnd, LPCWSTR szPathW)
 				nFolder = CSIDL_NETHOOD;
 			if (nFolder != -1)
 			{
-				WCHAR szFolderW[MAX_PATH];
+				WCHAR szFolderW[MAX_PATH * 4];
 				if (GetSpecialFolderPathW(nFolder, szFolderW))
 				{
 					size_t len = wcslen(szFolderW);
-					if (len > 0 && szFolderW[len-1] != L'\\' && len < MAX_PATH - 1)
+					if (len > 0 && szFolderW[len-1] != L'\\' && len < MAX_PATH * 4 - 2)
 					{
 						szFolderW[len] = L'\\';
 						szFolderW[len+1] = L'\0';
@@ -5005,10 +5005,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 
 		case IDC_LOCAL_ROOTB:
 			{
-			wchar_t ofDirW[MAX_PATH];
+			wchar_t ofDirW[MAX_PATH * 4] = {0};
 			int nSelected = SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_GETCURSEL, 0, 0); 
 			if (nSelected == -1) break;
 			SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDirW);
+			// Truncate at first ']' to handle "[ C: ] - Local Disk" format
+			wchar_t* pEnd = wcschr(ofDirW, L']');
+			if (pEnd) *(pEnd + 1) = L'\0';
 			_this->PopulateLocalListBoxW(hWnd, ofDirW);
 			}
 			break;
@@ -5016,10 +5019,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		case IDC_REMOTE_ROOTB:
 			if (!_this->m_fFileCommandPending)
 			{
-				WCHAR ofDirW[MAX_PATH];
+				WCHAR ofDirW[MAX_PATH * 4] = {0};
 				int nSelected = SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETCURSEL, 0, 0);
 				if (nSelected == -1) break;
 				SendMessageW(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDirW);
+				// Truncate at first ']' to handle "[ C: ] - Remote" format
+				WCHAR* pEnd = wcschr(ofDirW, L']');
+				if (pEnd) *(pEnd + 1) = L'\0';
 				_this->m_fFileCommandPending = true;
 				_this->RequestRemoteDirectoryContent(hWnd, ofDirW);
 			}
@@ -5389,10 +5395,13 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
             { 
 	        case CBN_SELCHANGE:
 				{
-				wchar_t ofDirW[MAX_PATH];
+				wchar_t ofDirW[MAX_PATH * 4] = {0};
 				int nSelected = SendMessage(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_GETCURSEL, 0, 0); 
 				if (nSelected == -1) break;
 				SendMessageW(GetDlgItem(hWnd, IDC_LOCAL_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDirW);
+				// Truncate at first ']' to handle "[ C: ] - Local Disk" format
+				wchar_t* pEnd = wcschr(ofDirW, L']');
+				if (pEnd) *(pEnd + 1) = L'\0';
 				_this->PopulateLocalListBoxW(hWnd, ofDirW);
 				break;
 				}
@@ -5404,7 +5413,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
             { 
 	        case CBN_SELCHANGE: 
 				{
-				WCHAR ofDirW[MAX_PATH];
+				WCHAR ofDirW[MAX_PATH * 4] = {0};
 				int nSelected = SendMessage(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETCURSEL, 0, 0); 
 				if (nSelected == -1) break;
 				SendMessageW(GetDlgItem(hWnd, IDC_REMOTE_DRIVECB), CB_GETLBTEXT, (WPARAM)nSelected, (LPARAM)ofDirW);
@@ -5684,7 +5693,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 								{
 									// Draw the locale date ourselves and suppress default drawing
 									RECT rc;
-									rc.left = LVIR_LABEL;
+									rc.left = LVIR_BOUNDS;  // Use BOUNDS for subitems, not LABEL
 									rc.top = lpNmlvcd->iSubItem;
 									SendMessageW(lpNmlvcd->nmcd.hdr.hwndFrom, LVM_GETSUBITEMRECT,
 										(WPARAM)lpNmlvcd->nmcd.dwItemSpec, (LPARAM)&rc);
