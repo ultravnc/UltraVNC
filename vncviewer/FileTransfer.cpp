@@ -1514,7 +1514,11 @@ void FileTransfer::PopulateLocalListBox(HWND hWnd, LPSTR szPath)
 					if (szNewPathW[wcslen(szNewPathW) - 1] == L'\\')
 						szNewPathW[wcslen(szNewPathW) - 1] = L'\0';
 					WCHAR* p = wcsrchr(szNewPathW, L'\\');
-					if (p == NULL) return;
+					if (p == NULL) {
+						// At root of drive, show drives list
+						ListDrives(hWnd);
+						return;
+					}
 					*(p + 1) = L'\0'; // Keep trailing backslash
 				}
 				else if (wcslen(szFolderNameW) == 2 && szFolderNameW[1] == L':')
@@ -2218,7 +2222,7 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, UINT nLen)
 
 	HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
 
-	SendDlgItemMessage(hWnd, IDC_REMOTE_DRIVECB, LB_RESETCONTENT, 0, 0L);
+	SendDlgItemMessage(hWnd, IDC_REMOTE_DRIVECB, CB_RESETCONTENT, 0, 0L);
 	FTListViewClear(hWndRemoteList);
 	SetDlgItemTextW(hWnd, IDC_CURR_REMOTE, L"");
 
@@ -2338,7 +2342,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	dwLen = GetLogicalDriveStrings(256, szDrivesList);
 
 	HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
-	SendDlgItemMessage(hWnd, IDC_LOCAL_DRIVECB, LB_RESETCONTENT, 0, 0L);
+	SendDlgItemMessage(hWnd, IDC_LOCAL_DRIVECB, CB_RESETCONTENT, 0, 0L);
 
 	FTListViewClear(hWndLocalList);
 	SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, L"");
@@ -2383,7 +2387,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 		LVITEMW ItemW;
 		memset(&ItemW, 0, sizeof(ItemW));
 		ItemW.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
-		ItemW.iItem = 0;
+		ItemW.iItem = (int)SendMessageW(hWndLocalList, LVM_GETITEMCOUNT, 0, 0); // Append to end
 		ItemW.iSubItem = 0;
 		ItemW.iImage = 2;
 		ItemW.pszText = szTheDrive;
@@ -2416,7 +2420,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	LVITEMW Item;
 	memset(&Item, 0, sizeof(Item));
 	Item.mask = LVIF_TEXT | LVIF_PARAM;
-	Item.iItem = 0;
+	Item.iItem = (int)SendMessageW(hWndLocalList, LVM_GETITEMCOUNT, 0, 0); // Append to end
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("My Documents"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
@@ -2427,7 +2431,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	// Desktop
 	memset(&Item, 0, sizeof(Item));
 	Item.mask = LVIF_TEXT | LVIF_PARAM;
-	Item.iItem = 0;
+	Item.iItem = (int)SendMessageW(hWndLocalList, LVM_GETITEMCOUNT, 0, 0); // Append to end
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Desktop"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
@@ -2438,7 +2442,7 @@ void FileTransfer::ListDrives(HWND hWnd)
 	// Network Favorites
 	memset(&Item, 0, sizeof(Item));
 	Item.mask = LVIF_TEXT | LVIF_PARAM;
-	Item.iItem = 0;
+	Item.iItem = (int)SendMessageW(hWndLocalList, LVM_GETITEMCOUNT, 0, 0); // Append to end
 	Item.iSubItem = 0;
 	_sntprintf_s(szGUIDir, 64, _TRUNCATE, _T("%s%s%s"), L"[ ", _T("Network Favorites"), L" ]");
 	Item.pszText = szGUIDir; // Todo: Fr/De
@@ -3185,6 +3189,13 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 #if DEBUG_FT
 		OutputDebugStringW(L"  Directory zip detected - proceeding with extract+rename\n");
 #endif
+		// Get parent path in Unicode directly (preserves national characters)
+		WCHAR szParentPathW[MAX_PATH * 4];
+		wcscpy_s(szParentPathW, szFileName);
+		WCHAR* pw = wcsrchr(szParentPathW, L'\\');
+		if (pw) *(pw + 1) = L'\0'; // Keep trailing backslash, remove filename
+		
+		// Also get ANSI version for zip library (zip path itself is ASCII-safe)
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
 		strcpy_s(szPath, szFileNameA);
@@ -3194,7 +3205,8 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		char* p3 = strrchr(szDirName, '.');
 		*p3 = '\0';
 		if (p != NULL) *p = '\0';
-		// szPath is now the parent dir (e.g. "C:\local\dest\")
+		// szPath is now the parent dir in ANSI (for zip extraction)
+		// szParentPathW is the parent dir in Unicode (for rename, preserves national chars)
 		// szDirName is either hex-encoded UTF-8 dirname or 8.3 name (old format)
 
 		// Detect hex encoding: all chars are hex digits and length is even
@@ -3306,21 +3318,19 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 			// Rename extracted temp folder to original Unicode dirname
 			WCHAR szExtractPathW[MAX_PATH * 4];
 			WCHAR szFinalPathW[MAX_PATH * 4];
-			WCHAR szParentW[MAX_PATH * 4];
 
-			// Parent = szPath (ANSI, ASCII-safe) -> Unicode
-			MultiByteToWideChar(CP_ACP, 0, szPath, -1, szParentW, MAX_PATH * 4);
+			// Use szParentPathW directly (Unicode, preserves national chars)
 			WCHAR szExtractNameW[64];
 			MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, szExtractNameW, 64);
-			_snwprintf_s(szExtractPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szExtractNameW);
+			_snwprintf_s(szExtractPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szExtractNameW);
 
 			if (wcslen(szFinalDirNameW) > 0)
-				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szFinalDirNameW);
+				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szFinalDirNameW);
 			else
 			{
 				WCHAR szDirNameW2[MAX_PATH * 4];
 				MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
-				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
+				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szDirNameW2);
 			}
 #if DEBUG_FT
 			OutputDebugStringW(L"  Renaming:\n    From: "); OutputDebugStringW(szExtractPathW);
