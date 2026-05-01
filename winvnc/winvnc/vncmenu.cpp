@@ -740,26 +740,18 @@ bool vncMenu::OpenWebpageFromApp(int iMsg)
 	if (!hPToken)
 		return false;
 
-	char dir[MAX_PATH];
-	strcpy_s(dir, exe_file_name);
-	if (iMsg == ID_VISITUSONLINE_HOMEPAGE)
-		strcat_s(dir, " -openhomepage");
-	if (iMsg == ID_VISITUSONLINE_FORUM)
-		strcat_s(dir, " -openforum");
-	if (iMsg == ID_VISITUSONLINE_GITHUB)
-		strcat_s(dir, " -opengithub");
-	if (iMsg == ID_VISITUSONLINE_MASTODON)
-		strcat_s(dir, " -openmastodon");
-	if (iMsg == ID_VISITUSONLINE_BLUESKY)
-		strcat_s(dir, " -openbluesky");
-	if (iMsg == ID_VISITUSONLINE_FACEBOOK)
-		strcat_s(dir, " -openfacebook");
-	if (iMsg == ID_VISITUSONLINE_XTWITTER)
-		strcat_s(dir, " -openxtwitter");
-	if (iMsg == ID_VISITUSONLINE_REDDIT)
-		strcat_s(dir, " -openreddit");
-	if (iMsg == ID_VISITUSONLINE_OPENHUB)
-		strcat_s(dir, " -openopenhub");
+	char dir[MAX_PATH * 2];
+	const char* suffix = "";
+	if (iMsg == ID_VISITUSONLINE_HOMEPAGE) suffix = "-openhomepage";
+	else if (iMsg == ID_VISITUSONLINE_FORUM) suffix = "-openforum";
+	else if (iMsg == ID_VISITUSONLINE_GITHUB) suffix = "-opengithub";
+	else if (iMsg == ID_VISITUSONLINE_MASTODON) suffix = "-openmastodon";
+	else if (iMsg == ID_VISITUSONLINE_BLUESKY) suffix = "-openbluesky";
+	else if (iMsg == ID_VISITUSONLINE_FACEBOOK) suffix = "-openfacebook";
+	else if (iMsg == ID_VISITUSONLINE_XTWITTER) suffix = "-openxtwitter";
+	else if (iMsg == ID_VISITUSONLINE_REDDIT) suffix = "-openreddit";
+	else if (iMsg == ID_VISITUSONLINE_OPENHUB) suffix = "-openopenhub";
+	sprintf_s(dir, "\"%s\" %s", exe_file_name, suffix);
 
 	STARTUPINFO          StartUPInfo;
 	PROCESS_INFORMATION  ProcessInfo;
@@ -1043,9 +1035,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				break;
 			}
 
-			char dir[MAX_PATH];			
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -rebootsafemodehelper");
+			char dir[MAX_PATH + 32];			
+			sprintf_s(dir, "\"%s\" -rebootsafemodehelper", exe_file_name);
 
 			STARTUPINFO          StartUPInfo{};
 			PROCESS_INFORMATION  ProcessInfo{};
@@ -1076,9 +1067,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				break;
 			}
 
-			char dir[MAX_PATH];
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -rebootforcedehelper");
+			char dir[MAX_PATH + 32];
+			sprintf_s(dir, "\"%s\" -rebootforcedehelper", exe_file_name);
 
 			STARTUPINFO          StartUPInfo{};
 			PROCESS_INFORMATION  ProcessInfo{};
@@ -1111,9 +1101,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 				serviceHelpers::Set_uninstall_service_as_admin();
 				break;
 			}
-			char dir[MAX_PATH];
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -uninstallhelper");
+			char dir[MAX_PATH + 32];
+			sprintf_s(dir, "\"%s\" -uninstallhelper", exe_file_name);
 
 			STARTUPINFO          StartUPInfo{};
 			PROCESS_INFORMATION  ProcessInfo{};
@@ -1143,9 +1132,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (!hPToken)
 				goto error6;
 
-			char dir[MAX_PATH];
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -installhelper");
+			char dir[MAX_PATH + 32];
+			sprintf_s(dir, "\"%s\" -installhelper", exe_file_name);
 
 			STARTUPINFO          StartUPInfo;
 			PROCESS_INFORMATION  ProcessInfo;
@@ -1205,9 +1193,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					goto error7;
 				}
 
-				char dir[MAX_PATH];
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -stopservicehelper");
+				char dir[MAX_PATH + 32];
+				sprintf_s(dir, "\"%s\" -stopservicehelper", exe_file_name);
 
 				StartUPInfo.wShowWindow = SW_SHOW;
 				StartUPInfo.lpDesktop = "Winsta0\\Default";
@@ -1260,9 +1247,8 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					break;
 				}
 
-				char dir[MAX_PATH];
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -startservicehelper");
+				char dir[MAX_PATH + 32];
+				sprintf_s(dir, "\"%s\" -startservicehelper", exe_file_name);
 
 				STARTUPINFO          StartUPInfo{};
 				PROCESS_INFORMATION  ProcessInfo{};
