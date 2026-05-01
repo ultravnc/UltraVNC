@@ -563,6 +563,8 @@ protected:
 	BOOL m_fFileTransferRunning;
 	CMiniZipNG		*m_pZipUnZip;
 
+	bool m_fClientSupportsUnicode; // Set if client responds to protocol version (UTF-8 capable)
+
 	char  m_szFullDestName[MAX_PATH * 4];
 	char  m_szFileTime[18];
 	char* m_pBuff;

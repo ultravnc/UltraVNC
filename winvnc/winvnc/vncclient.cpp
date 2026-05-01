@@ -2772,6 +2772,7 @@ vncClientThread::run(void* arg)
 
 					if (Swap32IfLE(encoding) == rfbEncodingFTProtocolVersion) {
 						need_ft_version_msg = true;
+						m_client->m_fClientSupportsUnicode = true; // Client supports FT_PROTO_VERSION_4 (UTF-8)
 						vnclog.Print(LL_INTINFO, VNCLOG("FTProtocolVersion protocol extension enabled\n"));
 						continue;
 					}
@@ -4807,6 +4808,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 
 	// Modif sf@2002 - File Transfer
 	m_fFileTransferRunning = FALSE;
+	m_fClientSupportsUnicode = false; // Set to true when client sends rfbEncodingFTProtocolVersion
 	m_pZipUnZip = new CMiniZipNG(); // Directory File Transfer utils (Unicode-aware)
 
 	m_hDestFile = 0;
@@ -6802,11 +6804,13 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 		strcat_s(szPath, MAX_PATH * 3, szExtractName);
 
 		// Create the Directory - wrap in SEH for safety
-		// Convert ANSI paths to Unicode for minizip-ng
+		// Convert paths to Unicode for minizip-ng
+		// Use CP_UTF8 for Unicode-capable clients, CP_ACP for old clients
+		UINT cp = m_fClientSupportsUnicode ? CP_UTF8 : CP_ACP;
 		WCHAR szPathW[MAX_PATH * 4];
 		WCHAR szFileNameW[MAX_PATH * 4];
-		MultiByteToWideChar(CP_ACP, 0, szPath, -1, szPathW, MAX_PATH * 4);
-		MultiByteToWideChar(CP_ACP, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
+		MultiByteToWideChar(cp, 0, szPath, -1, szPathW, MAX_PATH * 4);
+		MultiByteToWideChar(cp, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
 		
 		bool bUnzipOk = false;
 		__try
@@ -6828,12 +6832,12 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 			WCHAR szFinalPathW[MAX_PATH * 4];
 			// Parent path (destination dir) from szFileName
 			WCHAR szFileNameW[MAX_PATH * 4];
-			MultiByteToWideChar(CP_ACP, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
+			MultiByteToWideChar(cp, 0, szFileName, -1, szFileNameW, MAX_PATH * 4);
 			wcscpy_s(szExtractPathW, szFileNameW);
 			WCHAR* pParent = wcsrchr(szExtractPathW, L'\\');
 			if (pParent) *(pParent + 1) = L'\0';
 			WCHAR szExtractNameW[64];
-			MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, szExtractNameW, 64);
+			MultiByteToWideChar(cp, 0, szExtractName, -1, szExtractNameW, 64);
 			wcscat_s(szExtractPathW, MAX_PATH * 4, szExtractNameW);
 
 			// Build final path = parent + Unicode dirname
@@ -6848,7 +6852,7 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 				else
 				{
 					WCHAR szDirNameW2[MAX_PATH * 4];
-					MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
+					MultiByteToWideChar(cp, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
 					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
 				}
 				
