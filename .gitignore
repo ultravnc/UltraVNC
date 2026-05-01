@@ -155,8 +155,6 @@ cmake/CMakeUserPresets.json
 cmake/build/
 cmake/out/
 
-vcpkg-configuration.json
-
 zlib/
 zstd/
 

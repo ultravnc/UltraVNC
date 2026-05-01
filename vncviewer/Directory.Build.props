@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <VcpkgEnabled>true</VcpkgEnabled>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgOverlayTriplets>$(MSBuildThisFileDirectory)..\triplets</VcpkgOverlayTriplets>
+  </PropertyGroup>
+</Project>
