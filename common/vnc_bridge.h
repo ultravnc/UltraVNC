@@ -59,7 +59,7 @@ private:
     
     // Private helper methods
     static librats::NatTraversalConfig create_config();
-    static std::string get_data_directory();
+    static std::string get_data_directory(const std::string& mode);
     static std::string generate_unique_code();
     static std::string get_machine_id();
     static std::string calculate_checksum(const std::string& base_code);

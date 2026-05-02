@@ -68,19 +68,35 @@ librats::NatTraversalConfig VncBridge::create_config() {
 
 // Get data directory for librats persistence files (config.json, peers.rats, etc.)
 // Tries user-writable LocalAppData first, falls back to ProgramData (service/admin)
-std::string VncBridge::get_data_directory() {
+std::string VncBridge::get_data_directory(const std::string& mode) {
+    std::string base_dir;
+    
 #ifdef _WIN32
     char path[MAX_PATH] = {0};
     // Try user's LocalAppData first (always writable)
     if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
-        return std::string(path) + "\\UltraVNC";
+        base_dir = std::string(path) + "\\UltraVNC";
+    } else if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
+        // Fall back to ProgramData (service / elevated)
+        base_dir = std::string(path) + "\\UltraVNC";
+    } else {
+        base_dir = ".";
     }
-    // Fall back to ProgramData (service / elevated)
-    if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_COMMON_APPDATA, NULL, 0, path))) {
-        return std::string(path) + "\\UltraVNC";
-    }
+#else
+    base_dir = ".";
 #endif
-    return ".";
+
+    // Add mode-specific subfolder (Server or Client)
+    std::string mode_subdir = (mode == "server") ? "Server" : "Client";
+    std::string full_dir = base_dir + "\\" + mode_subdir;
+    
+    // Create directory if it doesn't exist
+#ifdef _WIN32
+    CreateDirectoryA(base_dir.c_str(), NULL);
+    CreateDirectoryA(full_dir.c_str(), NULL);
+#endif
+    
+    return full_dir;
 }
 
 // Get machine-specific identifier (MAC address + CPU ID + Disk Serial)
@@ -293,7 +309,7 @@ std::string VncBridge::get_validation_error(const std::string& code) {
 VncBridge::VncBridge(const std::string& mode, const std::string& discovery_code,
                      const std::string& vnc_ip, int vnc_port)
     : // Use fixed ports based on mode
-      client_(mode == "server" ? BRIDGE_SERVER_PORT : BRIDGE_CLIENT_PORT, 5, create_config(), "", get_data_directory()),
+      client_(mode == "server" ? BRIDGE_SERVER_PORT : BRIDGE_CLIENT_PORT, 5, create_config(), "", get_data_directory(mode)),
       mode_(mode),
       discovery_code_(discovery_code.empty() ? generate_unique_code() : normalize_discovery_code(discovery_code)),
       connected_(false), 
