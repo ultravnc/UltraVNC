@@ -237,7 +237,6 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_ABOUT:
 			ShowAboutBox();
 			break;
-		case IDC_RADIOBRIDGE:
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
 			_this->ModeSwitch(hwnd, wParam);
@@ -580,16 +579,11 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	}
 
 	SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, false, 0);
-	SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_SETCHECK, false, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, false, 0);
 
 	if (m_connectionType == REPEATER_SERVER) {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, true, 0);
 		ModeSwitch(hwnd, IDC_RADIOREPEATER);
-	}
-	else if (m_connectionType == UDP_BRIDGE) {
-		SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_SETCHECK, true, 0);
-		ModeSwitch(hwnd, IDC_RADIOBRIDGE);
 	}
 	else {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, true, 0);
@@ -806,13 +800,13 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 {
 	SetTimer(hwnd, 100, 1000, NULL);
 	switch (LOWORD(wParam))
-	{		
-	case IDC_RADIOREPEATER:	
+	{
+	case IDC_RADIOREPEATER:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		SetDlgItemText(hwnd, IDC_LINE1, _T("ID:12345679"));
-		SetDlgItemText(hwnd, IDC_LINE2, _T("repeater:port"));	
+		SetDlgItemText(hwnd, IDC_LINE2, _T("repeater:port"));
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
 	case IDC_RADIODIRECT:
@@ -820,14 +814,6 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		SetDlgItemText(hwnd, IDC_LINE1, _T("server[:port]"));
-		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
-		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
-		break;
-	case IDC_RADIOBRIDGE:
-		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
-		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
-		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
-		SetDlgItemText(hwnd, IDC_LINE1, _T("Access code"));
 		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;

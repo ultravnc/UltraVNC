@@ -397,10 +397,6 @@ void vncMenu::addMenus()
 		(settings->getAllowProperties() && settings->getShowSettings()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
-	
-	// Add bridge code menu item if bridge is running
-	EnableMenuItem(m_hmenu, ID_COPY_BRIDGE_CODE,
-		m_server->IsBridgeRunning() ? MF_ENABLED : MF_GRAYED);
 
 	if (settings->RunningFromExternalService())
 		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart UltraVNC Server");
@@ -457,25 +453,6 @@ void vncMenu::setToolTip()
 		wcsncat_s(m_tooltip, namebufw, _TRUNCATE);
 	}
 
-	// Add bridge discovery code if bridge is running
-	if (m_server->IsBridgeRunning()) {
-		const char* discovery_code = m_server->GetDiscoveryCode();
-		if (discovery_code && strlen(discovery_code) > 0) {
-			wchar_t bridge_info[64];
-			char formatted_code[32];
-			
-			// Format code as XXX-XXXX-XXX-XX for better readability
-			if (strlen(discovery_code) == 12) {
-				sprintf_s(formatted_code, "%.3s-%.4s-%.3s-%.2s", 
-					discovery_code, discovery_code + 3, discovery_code + 7, discovery_code + 10);
-			} else {
-				strcpy_s(formatted_code, discovery_code);
-			}
-			
-			swprintf_s(bridge_info, L" - Bridge: %hs", formatted_code);
-			wcsncat_s(m_tooltip, bridge_info, _TRUNCATE);
-		}
-	}
 
 	if (settings->RunningFromExternalService())
 		wcsncat_s(m_tooltip, L" - service - ", _TRUNCATE);
@@ -881,41 +858,6 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			vnclog.Print(LL_INTINFO, VNCLOG("show user properties requested\n"));
 			_this->m_properties.ShowDialog();
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
-			break;
-
-		case ID_COPY_BRIDGE_CODE:
-			// Copy bridge discovery code to clipboard
-			if (_this->m_server->IsBridgeRunning()) {
-				const char* discovery_code = _this->m_server->GetDiscoveryCode();
-				if (discovery_code && strlen(discovery_code) > 0) {
-					// Format code for better readability
-					char formatted_code[32];
-					if (strlen(discovery_code) == 12) {
-						sprintf_s(formatted_code, "%.3s-%.4s-%.3s-%.2s", 
-							discovery_code, discovery_code + 3, discovery_code + 7, discovery_code + 10);
-					} else {
-						strcpy_s(formatted_code, discovery_code);
-					}
-					
-					// Copy to clipboard
-					if (OpenClipboard(hwnd)) {
-						EmptyClipboard();
-						HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, strlen(formatted_code) + 1);
-						if (hClipboardData) {
-							char* pchData = (char*)GlobalLock(hClipboardData);
-							strcpy_s(pchData, strlen(formatted_code) + 1, formatted_code);
-							GlobalUnlock(hClipboardData);
-							SetClipboardData(CF_TEXT, hClipboardData);
-						}
-						CloseClipboard();
-						
-						// Show notification
-						wchar_t notification[128];
-						swprintf_s(notification, L"Bridge code %hs copied to clipboard", formatted_code);
-						vncMenu::NotifyBalloon(notification, L"UltraVNC Bridge");
-					}
-				}
-			}
 			break;
 
 		case ID_OUTGOING_CONN:
@@ -2061,12 +2003,6 @@ void vncMenu::updateMenu()
 		(settings->getAllowProperties() && settings->getShowSettings()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
-	
-	// Enable/disable bridge code menu item based on bridge status
-	if (s_server) {
-		EnableMenuItem(m_hmenu, ID_COPY_BRIDGE_CODE,
-			s_server->IsBridgeRunning() ? MF_ENABLED : MF_GRAYED);
-	}
 	
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);

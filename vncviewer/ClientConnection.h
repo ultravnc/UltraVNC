@@ -194,11 +194,6 @@ private:
 	bool brfbClientInitExtraMsgSupportNew = false;
 	CRITICAL_SECTION crit;
 	UltraVncZ *ultraVncZlib;
-	
-	// VNC Bridge support
-	std::unique_ptr<class VncBridge> m_bridge;
-	std::unique_ptr<std::thread> m_bridge_thread;
-	bool m_bridge_running;
 
 	UltraVncZ ultraVncZTight[4];
 	Fps fps;
@@ -245,7 +240,6 @@ private:
 	void SetDSMPluginStuff();
 	void GetConnectDetails();
 	void Connect();
-	void ConnectBridge();
 	void ConnectProxy();
 	void SetSocketOptions();
 	///////////////////////////////////////////////

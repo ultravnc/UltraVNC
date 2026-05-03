@@ -925,10 +925,6 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			m_fUseDSMPlugin = true;
 			_tcscpy_s(m_szDSMPluginFilename, _countof(m_szDSMPluginFilename), args[j]);
 		}
-		else if (SwitchMatch(args[j], _T("bridge")))
-		{
-			m_connectionType = UDP_BRIDGE;
-		}
 		else if (SwitchMatch(args[j], _T("proxy")))
 		{
 			if (++j == i)

@@ -189,9 +189,6 @@
     <ClCompile Include="..\common\Hyperlinks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\vnc_bridge_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\common\ZipUnzip\MiniZipNG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

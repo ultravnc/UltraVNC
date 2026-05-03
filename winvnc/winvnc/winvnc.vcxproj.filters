@@ -95,7 +95,6 @@
     <ClCompile Include="RulesListView.cpp" />
     <ClCompile Include="DlgChangePassword.cpp" />
     <ClCompile Include="..\..\common\inifile.cpp" />
-    <ClCompile Include="..\..\common\vnc_bridge_impl.cpp" />
     <ClCompile Include="..\..\common\ZipUnzip\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -316,9 +315,6 @@
     <ClInclude Include="RulesListView.h" />
     <ClInclude Include="DlgChangePassword.h" />
     <ClInclude Include="..\..\common\inifile.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\common\vnc_bridge.h">
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\common\ZipUnzip\MiniZipNG.h" />

@@ -32,7 +32,6 @@
 #include "SettingsManager.h"
 #include "Localization.h" // ACT : Add localization on messages
 #include "ScSelect.h"
-#include "../../common/vnc_bridge.h"
 
 #pragma comment(lib, "iphlpapi.lib")
 
@@ -172,15 +171,11 @@ vncServer::vncServer()
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
-	
-	// VNC Bridge initialization
-	m_bridge_running = false;
+
 }
 
 vncServer::~vncServer()
 {
-	// Stop bridge before other cleanup
-	StopBridge();
 	
 	ShutdownServer();}
 
@@ -1264,8 +1259,6 @@ vncServer::EnableConnections(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
-			// Auto-start bridge if enabled in settings
-			UpdateBridgeSettings();
 		}
 	}
 	else {
@@ -2090,93 +2083,3 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 		EnableConnections(SockConnected());
 };
 
-// VNC Bridge implementation
-BOOL vncServer::StartBridge()
-{
-	if (m_bridge_running) {
-		return TRUE; // Already running
-	}
-
-	try {
-		// Generate deterministic discovery code based on hardware
-		// This will always be the same for the same machine (CPU + MAC + Disk)
-		m_discovery_code = VncBridge::get_auto_generated_code();
-
-		// Create bridge instance in server mode
-		m_bridge = std::make_unique<VncBridge>("server", m_discovery_code, "127.0.0.1", m_port);
-
-		// Start bridge thread
-		m_bridge_running = true;
-		m_bridge_thread = std::make_unique<std::thread>([this]() {
-			try {
-				m_bridge->run_server_mode();
-			}
-			catch (const std::exception& e) {
-				vnclog.Print(LL_INTERR, VNCLOG("Bridge thread error: %s\n"), e.what());
-				m_bridge_running = false;
-			}
-			});
-
-		vnclog.Print(LL_STATE, VNCLOG("Bridge started with code: %s\n"), m_discovery_code.c_str());
-		return TRUE;
-
-	}
-	catch (const std::exception& e) {
-		vnclog.Print(LL_INTERR, VNCLOG("Failed to start bridge: %s\n"), e.what());
-		StopBridge();
-		return FALSE;
-	}
-}
-
-void vncServer::StopBridge()
-{
-	if (m_bridge_running && m_bridge) {
-		m_bridge_running = false;
-
-		// Signal bridge to stop - this signals all internal threads
-		m_bridge->stop();
-
-		// Wait for the bridge thread to finish
-		if (m_bridge_thread && m_bridge_thread->joinable()) {
-			m_bridge_thread->join();
-		}
-		m_bridge_thread.reset();
-		
-		// Now safe to destroy the bridge
-		m_bridge.reset();
-	}
-
-	m_discovery_code.clear();
-	vnclog.Print(LL_STATE, VNCLOG("Bridge stopped\n"));
-}
-
-const char* vncServer::GetDiscoveryCode()
-{
-	return m_discovery_code.c_str();
-}
-
-BOOL vncServer::IsBridgeRunning()
-{
-	return m_bridge_running && m_bridge && m_bridge->is_running();
-}
-
-void vncServer::UpdateBridgeSettings()
-{
-	// Check if bridge should be running based on settings
-	BOOL shouldRun = settings->getUseBridge();
-	BOOL isRunning = IsBridgeRunning();
-
-	if (shouldRun && !isRunning) {
-		// Start bridge
-		vnclog.Print(LL_STATE, VNCLOG("Starting bridge due to settings\n"));
-		StartBridge();
-	}
-	else if (!shouldRun && isRunning) {
-		// Stop bridge
-		vnclog.Print(LL_STATE, VNCLOG("Stopping bridge due to settings\n"));
-		StopBridge();
-	}
-	
-	// Update menu to reflect bridge status
-	vncMenu::updateMenu();
-}

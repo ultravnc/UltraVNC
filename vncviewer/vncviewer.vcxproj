@@ -1183,7 +1183,6 @@
     <ClCompile Include="..\common\mnemonic.c" />
     <ClCompile Include="..\common\mn_wordlist.c" />
     <ClCompile Include="..\common\UltraVncZ.cpp" />
-    <ClCompile Include="..\common\vnc_bridge_impl.cpp" />
     <ClCompile Include="AboutBox.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2422,9 +2421,6 @@
     <ClInclude Include="..\common\ZipUnzip\MiniZipNG.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\librats\rats_native.vcxproj">
-      <Project>{0ef3ce9b-836f-3257-931f-94962827a269}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>

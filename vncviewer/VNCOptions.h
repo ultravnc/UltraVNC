@@ -30,7 +30,6 @@
 enum ConnectionType {
 	DIRECT_TCP = 0,      // Direct TCP connection
 	REPEATER_SERVER = 1, // Repeater server (proxy mode)
-	UDP_BRIDGE = 2       // Bridge over UDP NAT
 };
 
 inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {

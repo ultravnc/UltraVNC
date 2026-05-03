@@ -30,8 +30,6 @@ extern "C" {
 	#include "vncauth.h"
 }
 
-// VNC Bridge functionality
-#include "../common/vnc_bridge.h"
 #include <thread>
 #include <memory>
 
@@ -224,18 +222,7 @@ extern wchar_t sz_F6[64];
 extern bool command_line;
 
 void ClientConnection::QuietException_helper(const wchar_t* info)
-{
-	// Stop the viewer-side bridge thread if it's running
-	if (m_bridge_running && m_bridge) {
-		m_bridge_running = false;
-		m_bridge->stop();  // Signal the bridge to stop its loops
-		
-		// Detach and let the process exit - stop() already set running_ = false
-		if (m_bridge_thread && m_bridge_thread->joinable()) {
-			m_bridge_thread->detach();
-		}
-	}
-	
+{	
 	throw QuietException(info);
 }
 
@@ -437,7 +424,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_pDSMPlugin = new CDSMPlugin();
 	m_fUsePlugin = false;
 	m_connectionType = DIRECT_TCP;
-	m_bridge_running = false;
 	m_pNetRectBuf = NULL;
 	m_fReadFromNetRectBuf = false;  //
 	m_nNetRectBufOffset = 0;
@@ -795,8 +781,6 @@ void ClientConnection::DoConnection(bool reconnect)
 	if (m_sock == INVALID_SOCKET) {
 		if (_tcslen(m_proxyhost) > 0 && m_connectionType == REPEATER_SERVER)
 			ConnectProxy();
-		else if (m_connectionType == UDP_BRIDGE)
-			ConnectBridge();
 		else
 			Connect();
 	}
@@ -1968,127 +1952,6 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	return 0;
 }
 
-void ClientConnection::ConnectBridge()
-{
-	if (!m_opts->m_NoStatus && !m_hwndStatus)
-		GTGBS_ShowConnectWindow();
-
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Validating discovery code...")); Sleep(100); }
-	
-	char _mhostA[250]; WideCharToMultiByte(CP_UTF8,0,m_host,-1,_mhostA,250,NULL,NULL);
-	std::string discovery_code = _mhostA;
-	
-	// Use VncBridge validation functions
-	if (!VncBridge::validate_discovery_code(discovery_code)) {
-		std::string error = VncBridge::get_validation_error(discovery_code);
-		std::wstring full_error = L"Invalid Discovery Code\n";
-		wchar_t error_wide[256];
-		MultiByteToWideChar(CP_UTF8, 0, error.c_str(), -1, error_wide, 256);
-		full_error += error_wide;
-		throw WarningException(full_error.c_str());
-	}
-	
-	// Normalize the code to digits only
-	discovery_code = VncBridge::normalize_discovery_code(discovery_code);
-
-	
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Discovery code validated successfully")); Sleep(100); }
-
-	
-	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Starting embedded bridge...")); Sleep(100); }
-	
-	try {
-		// Create VNC Bridge instance
-		m_bridge = std::make_unique<VncBridge>("client", discovery_code);
-		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Bridge created, starting client thread...")); Sleep(100); }
-		
-		// Start bridge thread
-		m_bridge_running = true;
-		m_bridge_thread = std::make_unique<std::thread>([this]() {
-			try {
-				m_bridge->run_client_mode();
-			} catch (const std::exception&) {
-				m_bridge_running = false;
-			}
-		});
-		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Bridge thread started, waiting for UDP tunnel...")); Sleep(100); }
-		
-		// Wait for bridge to establish UDP tunnel (up to 30 seconds)
-		int wait_count = 0;
-		const int max_wait = 60;  // 30 seconds (60 * 500ms)
-		while (!m_bridge->is_connected() && m_bridge_running && wait_count < max_wait && !Pressed_Cancel) {
-			Sleep(500);
-			wait_count++;
-			if (m_hwndStatus && (wait_count % 4 == 0)) {
-				wchar_t status[128];
-				_snwprintf_s(status, 128, _TRUNCATE, L"Waiting for UDP tunnel... (%d/%d sec)", wait_count / 2, max_wait / 2);
-				SetDlgItemText(m_hwndStatus, IDC_STATUS, status);
-			}
-		}
-		
-		// Check if user cancelled
-		if (Pressed_Cancel) {
-			throw std::runtime_error("Connection cancelled by user");
-		}
-		
-		if (!m_bridge->is_connected()) {
-			throw std::runtime_error("UDP tunnel connection timed out after 30 seconds");
-		}
-		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("UDP tunnel established! Connecting to bridge...")); Sleep(500); }
-		
-		// Give the TCP server a moment to start after connection
-		Sleep(1000);
-		
-		if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Connecting to bridge on localhost:5901...")); Sleep(100); }
-		
-		// Connect to the bridge's TCP port
-		_tcscpy_s(m_host, _countof(m_host), _T("127.0.0.1"));
-		m_port = 5901;
-		
-		// Call the regular Connect method to connect to the bridge
-		Connect();
-		
-	} catch (const std::exception& e) {
-		// Clean up on error - signal bridge to stop but don't block
-		m_bridge_running = false;
-		if (m_bridge) {
-			m_bridge->stop();
-		}
-		if (m_bridge_thread && m_bridge_thread->joinable()) {
-			m_bridge_thread->detach();  // Don't block - let it exit on its own
-		}
-		m_bridge_thread.reset();
-		// Release the bridge pointer without destroying it
-		// The detached thread may still be using it, so we can't delete it
-		// It will be cleaned up when the process exits (intentional leak)
-		if (m_bridge) {
-			m_bridge.release();
-		}
-		
-		// If user cancelled, throw quietly
-		if (Pressed_Cancel) {
-			throw QuietException(L"Connection cancelled");
-		}
-		
-		std::wstring error_msg = L"Failed to start embedded bridge:\n\n";
-		char what_buf[512];
-		strncpy_s(what_buf, e.what(), _TRUNCATE);
-		wchar_t what_wide[512];
-		MultiByteToWideChar(CP_UTF8, 0, what_buf, -1, what_wide, 512);
-		error_msg += what_wide;
-		error_msg += L"\n\nPlease use the external bridge client:\n";
-		error_msg += L"vnc_bridge client \"";
-		wchar_t dc_wide[256];
-		MultiByteToWideChar(CP_UTF8, 0, discovery_code.c_str(), -1, dc_wide, 256);
-		error_msg += dc_wide;
-		error_msg += L"\"\n\n";
-		error_msg += L"Then connect VNC viewer to localhost:5901";
-		throw WarningException(error_msg.c_str());
-	}
-}
 void ClientConnection::Connect()
 {
 	if (m_opts->m_ipv6) {
@@ -4714,22 +4577,6 @@ ClientConnection::CloseWindows()
 }
 ClientConnection::~ClientConnection()
 {
-	// Stop bridge thread if running
-	if (m_bridge_running && m_bridge) {
-		m_bridge_running = false;
-		m_bridge->stop();  // Signal the bridge to stop its loops
-		
-		// Detach the thread - don't try to join as it may block
-		if (m_bridge_thread && m_bridge_thread->joinable()) {
-			m_bridge_thread->detach();
-		}
-		m_bridge_thread.reset();
-		
-		// Release the bridge pointer without destroying it
-		// The detached thread may still be using it, so we can't delete it
-		// It will be cleaned up when the process exits (intentional leak)
-		m_bridge.release();
-	}
 	
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_hwndStatus)

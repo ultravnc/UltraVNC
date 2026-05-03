@@ -1407,7 +1407,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClCompile Include="..\..\common\Hyperlinks.cpp" />
     <ClCompile Include="..\..\common\inifile.cpp" />
     <ClCompile Include="..\..\common\UltraVncZ.cpp" />
-    <ClCompile Include="..\..\common\vnc_bridge_impl.cpp" />
     <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
     <ClCompile Include="..\loadmemory\MemoryModule.c" />
     <ClCompile Include="benchmark.cpp" />
@@ -3191,7 +3190,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="..\..\common\Hyperlinks.h" />
     <ClInclude Include="..\..\common\inifile.h" />
     <ClInclude Include="..\..\common\UltraVncZ.h" />
-    <ClInclude Include="..\..\common\vnc_bridge.h" />
     <ClInclude Include="..\loadmemory\loadDllFromMemory.h" />
     <ClInclude Include="..\loadmemory\MemoryModule.h" />
     <ClInclude Include="cadthread.h" />

@@ -143,13 +143,6 @@ public:
 
 	virtual void ShutdownServer();
 	HANDLE retryThreadHandle;
-	
-	// VNC Bridge methods
-	virtual BOOL StartBridge();
-	virtual void StopBridge();
-	virtual const char* GetDiscoveryCode();
-	virtual BOOL IsBridgeRunning();
-	virtual void UpdateBridgeSettings(); // Handle settings changes
 
 protected:
 	// Send a notification message
@@ -361,11 +354,6 @@ protected:
 	BOOL sethook;
 	CloudThread* cloudThread;
 	
-	// VNC Bridge support
-	std::unique_ptr<class VncBridge> m_bridge;
-	std::unique_ptr<std::thread> m_bridge_thread;
-	bool m_bridge_running;
-	std::string m_discovery_code;
 };
 
 #endif
