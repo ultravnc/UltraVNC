@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {color: #FFFFFF}
+-->
+</style>
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>epoll</strong></h4>
+<p>The <b>epoll</b> method can be used to effectively poll the IO events for a large number of sockets. It includes the following APIs.</p>
+
+<div class="code">
+#ifndef WIN32<br />
+   &nbsp;&nbsp;&nbsp;typedef int SYSSOCKET;<br />
+#else<br />
+   &nbsp;&nbsp;&nbsp;typedef SOCKET SYSSOCKET;<br />
+#endif<br />
+
+  int epoll_create();<br />
+  int epoll_add_usock(const int <span class="style1">eid</span>, const UDTSOCKET <span class="style1">usock</span>, const int* <span class="style1">events</span> = NULL);<br />
+  int epoll_add_ssock(const int <span class="style1">eid</span>, const UDTSOCKET <span class="style1">ssock</span>, const int* <span class="style1">events</span> = NULL);<br />
+  int epoll_remove_usock(const int <span class="style1">eid</span>, const UDTSOCKET <span class="style1">usock</span>);<br />
+  int epoll_remove_ssock(const int <span class="style1">eid</span>, const UDTSOCKET <span class="style1">ssock</span>);<br />
+  int epoll_wait(const int <span class="style1">eid</span>, std::set&lt;UDTSOCKET&gt;* <span class="style1">readfds</span>, std::set&lt;UDTSOCKET&gt;* <span class="style1">writefds</span>, int64_t msTimeOut, std::set&lt;SYSSOCKET&gt;* <span class="style1">lrfds</span> = NULL, std::set&lt;SYSSOCKET&gt;* <span class="style1">wrfds</span> = NULL);<br />
+  int epoll_release(const int <span class="style1">eid</span>);
+</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><em>eid</em></dt>
+  <dd>[in] The epoll ID allocated by epoll_create and used by subsequent epoll functions. </dd>
+  <dt><em>usock</em></dt>
+  <dd>[in] the UDT socket ID to be added to or removed from the epoll.</dd>
+  <dt><em>ssock</em></dt>
+  <dd>[in] the system socket ID to be added to or removed from the epoll.</dd>
+  <dt><em>events</em></dt>
+  <dd>[in] events to be watched.</dd>
+  <dt><em>readfds</em></dt>
+  <dd>[out] Optional pointer to a set of UDT sockets that are ready to read.</dd>
+  <dt><em>writefds</em></dt>
+  <dd>[out] Optional pointer to a set of UDT sockets that are ready to write, or are broken.</dd>
+  <dt><em>msTimeOut</em></dt>
+  <dd>[in] The time that this epoll should wait for the status change in the input groups, in milliseconds.</dd>
+  <dt><em>lrfds</em></dt>
+  <dd>[out] Optional pointer to a set of system sockets that are ready to read.</dd>
+  <dt><em>lwfds</em></dt>
+  <dd>[out] Optional pointer to a set of system sockets that are ready to write, or are broken.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>If successful, <strong>epoll_create</strong> returns a new epoll ID, <strong>epoll_wait</strong> returns the total number of UDT sockets and system sockets ready for IO, and the other three functions return 0. On error, all functions return negative error values. The error can be one of the following. </p>
+
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>EINVPARAM</td>
+    <td>5003</td>
+    <td>Invalid parameters. </td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td>Invalid socket. </td>
+  </tr>
+  <tr>
+    <td>EINVPOLLID</td>
+    <td>5013</td>
+    <td>EPoll ID is invalid. </td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>The <strong>epoll</strong> functions provides a highly scalable and efficient way to wait for UDT sockets IO events. It should be used instead of <a href="select.htm">select</a> and <a href="selectex.htm">selectEx</a> when the application needs to wait for a very large number of sockets. In addition, epoll also offers to wait on system sockets at the same time, which can be convenient when an application uses both UDT and TCP/UDP. </p>
+<p>Applications should use <strong>epoll_create</strong> to create an epoll ID and use <strong>epoll_add_usock/ssock</strong> and <strong>epoll_remove_usock/ssock</strong> to add/remove sockets. If a socket is already in the epoll set, it will be ignored if being added again. Adding invalid or closed sockets will cause error. However, they will simply be ignored without any error returned when being removed. </p>
+<p>Multiple epoll entities can be created and there is no upper limits as long as system resource allows. There is also no hard limit on the number of UDT sockets. The number system descriptors supported by UDT::epoll are platform dependent.</p>
+<p>For system sockets on Linux, developers may choose to watch individual events from EPOLLIN (read), EPOLLOUT (write), and EPOLLERR (exceptions). When using <strong>epoll_remove_ssock</strong>, if the socket is waiting on multiple events, only those specified in <em>events</em> are removed. The events can be a combination (with &quot;|&quot; operation) of any of the following values. </p>
+<p>enum EPOLLOpt<br />
+{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;UDT_EPOLL_IN = 0x1,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;UDT_EPOLL_OUT = 0x4,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;UDT_EPOLL_ERR = 0x8<br />
+};</p>
+<p>For all other situations, the parameter <em>events</em> is ignored and all events will be watched. </p>
+<p>Note that exceptions are categorized as write events, so when the application choose to write to this socket, it will detect the exception.</p>
+<p>Finally, for <strong>epoll_wai</strong>t, negative timeout value will make the function to wait until an event happens. If the timeout value is 0, then the function returns immediately with any sockets associated an IO event. If timeout occurs before any event happens, the function returns 0. </p>
+<dl>
+  <h5>See Also</h5>
+  <p><strong><a href="select.htm">select</a></strong>, <a href="selectex.htm"><strong>selectEx</strong> </a></p>
+  <dt>&nbsp;</dt>
+</dl>
+
+</body>
+</html>

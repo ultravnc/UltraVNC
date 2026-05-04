@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Hello World!</font></h3>
+<p>In this section we will introduce the simplest UDT program that can transfer data in high performance.</p>
+
+<p>This simple "Hello World!" example includes a server program and a client program just like any socket programming tutorial. These are the simpler version of the appserver and appclient 
+examples in ./app directory.</p>
+
+<p>To compile, use <em>gcc -o server server.cpp -I
+  <udt.h location> 
+  -L
+  <libudt.so location>
+-ludt -lstdc++ -lpthread</em>. For more details, please refer to the Makefile in <em>./app</em> directory.</p>
+
+<p><b>UDT server example</b></p>
+
+<div class="code">
+#include &lt;arpa/inet.h&gt;<br>
+#include &lt;udt.h&gt;<br>
+#include &lt;iostream.h&gt;<br>
+<br>
+using namespace std;<br>
+<br>
+int main()<br>
+{<br>
+UDTSOCKET serv = UDT::socket(AF_INET, SOCK_STREAM, 0);<br>
+<br>
+sockaddr_in my_addr;<br>
+my_addr.sin_family = AF_INET;<br>
+my_addr.sin_port = htons(9000);<br>
+my_addr.sin_addr.s_addr = INADDR_ANY;<br>
+memset(&(my_addr.sin_zero), '\0', 8);<br>
+<br>
+if (UDT::ERROR == UDT::bind(serv, (sockaddr*)&my_addr, sizeof(my_addr)))<br>
+{<br>
+&nbsp;&nbsp;cout << "bind: " << UDT::getlasterror().getErrorMessage();<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+UDT::listen(serv, 10);<br>
+<br>
+int namelen;<br>
+sockaddr_in their_addr;<br>
+<br>
+UDTSOCKET recver = UDT::accept(serv, (sockaddr*)&their_addr, &namelen);<br>
+<br>
+char ip[16];<br>
+cout << "new connection: " << inet_ntoa(their_addr.sin_addr) << ":" << ntohs(their_addr.sin_port) << endl;<br>
+<br>
+char data[100];<br>
+<br>
+if (UDT::ERROR == UDT::recv(recver, data, 100, 0))<br>
+{<br>
+&nbsp;&nbsp;cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+cout << data << endl;<br>
+<br>
+UDT::close(recver);<br>
+UDT::close(serv);<br>
+<br>
+return 1;<br>
+}
+</div>
+
+<p>This simple server tries to bind itself at port 9000. If succeed, it listens at port 9000 and accepts a client and then reads a string.</p>
+<p><strong>UDT client example </strong></p>
+<div class="code">
+#include &lt;iostream&gt;<br>
+#include &lt;udt.h&gt;<br>
+#include &lt;arpa/inet.h&gt;<br>
+<br>
+using namespace std;<br>
+using namespace UDT;<br>
+<br>
+int main()<br>
+{<br>
+UDTSOCKET client = UDT::socket(AF_INET, SOCK_STREAM, 0);<br>
+<br>
+sockaddr_in serv_addr;<br>
+serv_addr.sin_family = AF_INET;<br>
+serv_addr.sin_port = htons(9000);<br>
+inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);<br>
+<br>
+memset(&(serv_addr.sin_zero), '\0', 8);<br>
+<br>
+// connect to the server, implict bind<br>
+if (UDT::ERROR == UDT::connect(client, (sockaddr*)&serv_addr, sizeof(serv_addr)))<br>
+{<br>
+&nbsp;&nbsp;cout << "connect: " << UDT::getlasterror().getErrorMessage();<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+char* hello = "hello world!\n";<br>
+if (UDT::ERROR == UDT::send(client, hello, strlen(hello) + 1, 0))<br>
+{<br>
+&nbsp;&nbsp;cout << "send: " << UDT::getlasterror().getErrorMessage();<br>
+&nbsp;&nbsp;return 0;<br>
+}<br>
+<br>
+UDT::close(client);<br>
+<br>
+return 1;<br>
+}
+</div>
+
+<p>The client side connects to the local address (127.0.0.1) at port 9000, and sends a "hello world!" message.</p>
+<p>Note that in this "Hello World!" example the UDT::send and UDT::recv routines should use a loop to check return value. However, since the string length is very small and can be hold in one packet, we omit the loop part in order to give a simpler example.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

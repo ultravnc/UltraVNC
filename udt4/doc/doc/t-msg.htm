@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Messaging with Partial Reliability</font></h3>
+<p>When a UDT socket is created as SOCK_DGRAM type, UDT will send and receive data as messages. The boundary of the message is preserved and the message is delivered 
+as a whole unit. Sending or receving messages do not need a loop; a message will be either completely delivered or not delivered at all. However, at the receiver 
+side, if the user buffer is shorter than the message length, only part of the message will be copied into the user buffer while the message will still be 
+discarded.</p>
+
+<p>Example: send and receive messages using UDT.</p>
+<div class="code">
+UDTSOCKET u = UDT::socket(AF_INET, SOCK_DGRAM, 0);<br>
+<br>
+char data[1024];<br>
+int size = 1024;<br>
+<br>
+int ssize = UDT::sendmsg(client, data, size, -1, false);<br>
+<br>
+int rsize = UDT::recvmsg(u, data, size);
+</div>
+
+<p>At the sender side, applications can specify two options for every message. The first is the life time (TTL) of a message. The default value is infinite, which 
+means that the message will always be delivered. If the value is a postive one, UDT will discard the message if it cannot be delivered by the life time expires. 
+The second is the order of the message. An in-order message means that this message will not be delivered unless all the messages prior to it are either delivered 
+or discarded.</p>
+
+<p>Synchronization modes (blocking vs. non-blocking) are also applied to SOCK_DGRAM sockets, so does not other UDT mechanisms including but limited to congestion 
+control, flow control, and connection maintainence. Finally, note that UDT SOCK_DGRAM socket is also connection oriented. A UDT connection can only be set up 
+between the same socket types.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

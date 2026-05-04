@@ -36,6 +36,7 @@
 #include "credentials.h"
 #include "ScSelect.h"
 #include "Localization.h"
+#include "CloudDialog.h"
 
 #ifndef __GNUC__
 // [v1.0.2-jp1 fix]
@@ -406,6 +407,9 @@ void vncMenu::addMenus()
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
 
+	EnableMenuItem(m_hmenu, ID_COPY_BRIDGE_CODE, MF_ENABLED);
+	EnableMenuItem(m_hmenu, ID_TRAY_CLOUDCONNECT, MF_ENABLED);
+
 	if (settings->RunningFromExternalService())
 		ModifyMenu(m_hmenu, ID_CLOSE, MF_BYCOMMAND | MF_STRING, ID_CLOSE, "Restart UltraVNC Server");
 	else
@@ -461,6 +465,25 @@ void vncMenu::setToolTip()
 		wcsncat_s(m_tooltip, namebufw, _TRUNCATE);
 	}
 
+	// Add bridge discovery code if bridge is running
+	if (m_server->IsBridgeRunning()) {
+		const char* discovery_code = m_server->GetDiscoveryCode();
+		if (discovery_code && strlen(discovery_code) > 0) {
+			wchar_t bridge_info[64];
+			char formatted_code[32];
+
+			// Format code as XXX-XXXX-XXX-XX for better readability
+			if (strlen(discovery_code) == 12) {
+				sprintf_s(formatted_code, "%.3s-%.4s-%.3s-%.2s", 
+					discovery_code, discovery_code + 3, discovery_code + 7, discovery_code + 10);
+			} else {
+				strcpy_s(formatted_code, discovery_code);
+			}
+
+			swprintf_s(bridge_info, L" - Bridge: %hs", formatted_code);
+			wcsncat_s(m_tooltip, bridge_info, _TRUNCATE);
+		}
+	}
 
 	if (settings->RunningFromExternalService())
 		wcsncat_s(m_tooltip, L" - service - ", _TRUNCATE);
@@ -868,6 +891,51 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			_this->FlashTrayIcon(_this->m_server->AuthClientCount() != 0);
 			break;
 
+		case ID_TRAY_CLOUDCONNECT:
+		{
+			static CloudDialog cloudDlg;
+			cloudDlg.Init(_this->m_server);
+			cloudDlg.Show(true);
+		}
+		break;
+
+		case ID_COPY_BRIDGE_CODE:
+		{
+			// Use running discovery code if available, fall back to configured code
+			const char* discovery_code = nullptr;
+			if (_this->m_server->IsBridgeRunning())
+				discovery_code = _this->m_server->GetDiscoveryCode();
+			if (!discovery_code || strlen(discovery_code) == 0)
+				discovery_code = _this->m_server->code;
+
+			if (discovery_code && strlen(discovery_code) > 0) {
+				char formatted_code[32];
+				if (strlen(discovery_code) == 12) {
+					sprintf_s(formatted_code, "%.3s-%.4s-%.3s-%.2s",
+						discovery_code, discovery_code + 3, discovery_code + 7, discovery_code + 10);
+				} else {
+					strcpy_s(formatted_code, discovery_code);
+				}
+				if (OpenClipboard(hwnd)) {
+					EmptyClipboard();
+					HGLOBAL hClipboardData = GlobalAlloc(GMEM_DDESHARE, strlen(formatted_code) + 1);
+					if (hClipboardData) {
+						char* pchData = (char*)GlobalLock(hClipboardData);
+						strcpy_s(pchData, strlen(formatted_code) + 1, formatted_code);
+						GlobalUnlock(hClipboardData);
+						SetClipboardData(CF_TEXT, hClipboardData);
+					}
+					CloseClipboard();
+					wchar_t notification[128];
+					swprintf_s(notification, L"Bridge code %hs copied to clipboard", formatted_code);
+					vncMenu::NotifyBalloon(notification, L"UltraVNC Bridge");
+				}
+			} else {
+				MessageBoxA(hwnd, "No bridge code configured.\nOpen Cloud Connect to set a code.", "UltraVNC Bridge", MB_OK | MB_ICONINFORMATION);
+			}
+			break;
+		}
+
 		case ID_OUTGOING_CONN:
 			// Connect out to a listening VNC Viewer
 		{
@@ -1260,6 +1328,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (submenu)
 			{
 				SetMenuDefaultItem(submenu, 0, TRUE);
+				_this->updateMenu();
 				SetForegroundWindow(hwnd);
 				// respect menu drop alignment
 				UINT uFlags = TPM_RIGHTBUTTON;
@@ -1299,6 +1368,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			// SetForegroundWindow. To find out more, search for Q135788 in MSDN.
 			//
 			SetForegroundWindow(_this->m_nid.hWnd);
+			_this->updateMenu();
 
 			// Display the menu at the desired position
 			TrackPopupMenu(submenu,
@@ -2011,6 +2081,8 @@ void vncMenu::updateMenu()
 		(settings->getAllowProperties() && settings->getShowSettings()) ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(m_hmenu, ID_CLOSE,
 		settings->getAllowShutdown() ? MF_ENABLED : MF_GRAYED);
+	
+	EnableMenuItem(m_hmenu, ID_COPY_BRIDGE_CODE, MF_ENABLED);
 	
 	EnableMenuItem(m_hmenu, ID_KILLCLIENTS,
 		settings->getAllowEditClients() ? MF_ENABLED : MF_GRAYED);

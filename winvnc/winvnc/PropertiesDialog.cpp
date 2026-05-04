@@ -1685,6 +1685,9 @@ void PropertiesDialog::UpdateServer()
 
 	m_server->EnableConnections(settings->getEnableConnections());
 
+	// VNC Bridge settings
+	m_server->UpdateBridgeSettings();
+
 	// DSM Plugin prefs
 	if (settings->getUseDSMPlugin())
 		m_server->SetDSMPlugin(false);
@@ -2902,6 +2905,13 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_REVERSEAUTH)) {
 		HWND hReverseAuth = GetDlgItem(hwnd, IDC_REVERSEAUTH);
 		settings->setReverseAuthRequired(SendMessage(hReverseAuth, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	}
+
+	if (GetDlgItem(hwnd, IDC_CHECKBRIDGE)) {
+		HWND hUseBridge = GetDlgItem(hwnd, IDC_CHECKBRIDGE);
+		settings->setUseBridge(SendMessage(hUseBridge, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		if (m_server)
+			m_server->UpdateBridgeSettings();
 	}
 
 	if (GetDlgItem(hwnd, IDC_SCALE)) {
