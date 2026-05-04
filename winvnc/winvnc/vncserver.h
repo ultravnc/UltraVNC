@@ -56,7 +56,7 @@ const int MAX_CLIENTS = 128;
 
 // The vncServer class itself
 
-class CloudThread;
+#include "cloud_server.h"
 
 class vncServer
 {
@@ -143,6 +143,13 @@ public:
 
 	virtual void ShutdownServer();
 	HANDLE retryThreadHandle;
+
+	// VNC Bridge methods
+	virtual BOOL StartBridge();
+	virtual void StopBridge();
+	virtual const char* GetDiscoveryCode();
+	virtual BOOL IsBridgeRunning();
+	virtual void UpdateBridgeSettings(); // Handle settings changes
 
 protected:
 	// Send a notification message
@@ -266,6 +273,15 @@ public:
 	bool OS_Shutdown;
 	void StopReconnectAll();
 	char* getInfoMsg();
+
+	// Cloud NAT traversal public API (used by CloudDialog)
+	void cloudConnect(bool enable, TCHAR* server);
+	bool isCloudThreadRunning();
+	bool isBridgeStarted() { return m_bridge_running && m_cloud_proxy != nullptr; }
+	CloudStatus getStatus();
+	const char* getExternalIpAddress();
+	const char* getCloudStatusText();
+	CloudServerProxy* getCloudProxy() { return m_cloud_proxy.get(); }
 	int m_virtualDisplaySupported;
 	VirtualDisplay *virtualDisplay;
 
@@ -354,8 +370,13 @@ protected:
 	bool KillAuthClientsBuzy;	
 	BOOL sethook;
 	BOOL m_pendingDSMPlugin;
-	CloudThread* cloudThread;
-	
+	// Cloud NAT traversal
+	std::unique_ptr<CloudServerProxy> m_cloud_proxy;
+	std::unique_ptr<std::thread> m_bridge_thread;
+	bool m_bridge_running = false;
+	std::string m_discovery_code;
+	std::string m_cached_external_ip;
+	std::string m_cached_status_text;
 };
 
 #endif

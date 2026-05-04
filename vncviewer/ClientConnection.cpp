@@ -31,6 +31,8 @@ extern "C" {
 	#include "vncauth.h"
 }
 
+// Cloud NAT traversal
+#include "cloud_connect.h"
 #include <thread>
 #include <memory>
 
@@ -229,7 +231,13 @@ extern wchar_t sz_F6[64];
 extern bool command_line;
 
 void ClientConnection::QuietException_helper(const wchar_t* info)
-{	
+{
+	// Stop cloud proxy if running
+	if (m_cloudProxy) {
+		m_cloudProxy->Stop();
+		m_cloudProxy.reset();
+	}
+
 	throw QuietException(info);
 }
 
@@ -789,6 +797,8 @@ void ClientConnection::DoConnection(bool reconnect)
 	if (m_sock == INVALID_SOCKET) {
 		if (_tcslen(m_proxyhost) > 0 && m_connectionType == REPEATER_SERVER)
 			ConnectProxy();
+		else if (m_connectionType == UDP_BRIDGE)
+			ConnectBridge();
 		else
 			Connect();
 	}
@@ -1922,6 +1932,7 @@ void ClientConnection::GetConnectDetails()
 				m_port = sessdlg.m_port;
 				_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 				m_proxyport = sessdlg.m_proxyport;
+				_tcsncpy_s(m_cloudMatchmakerHost, sessdlg.m_cloudMatchmakerHost, MAX_HOST_NAME_LEN);
 				m_connectionType = sessdlg.m_connectionType;
 				if (m_opts->autoDetect)
 					m_opts->m_Use8Bit = rfbPFFullColors;
@@ -1961,6 +1972,93 @@ DWORD WINAPI SocketTimeout(LPVOID lpParam)
 	return 0;
 }
 
+void ClientConnection::ConnectBridge()
+{
+	if (!m_opts->m_NoStatus && !m_hwndStatus)
+		GTGBS_ShowConnectWindow();
+
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Preparing NAT traversal...")); Sleep(100); }
+
+	// Get discovery code from host field
+	char codeA[250]{};
+	WideCharToMultiByte(CP_UTF8, 0, m_host, -1, codeA, 250, NULL, NULL);
+	std::string code = codeA;
+	if (code.empty()) {
+		throw WarningException(L"Discovery code is empty.\nEnter the code provided by the VNC server.");
+	}
+
+	// Normalize code: extract digits only (strips dashes, spaces, etc.)
+	{
+		std::string digits;
+		for (char c : code)
+			if (c >= '0' && c <= '9') digits += c;
+		code = digits;
+	}
+
+	// Validate: must be exactly 12 digits with correct checksum (last 2 = sum_of_first_10 % 100)
+	if (code.size() != 12) {
+		throw WarningException(
+			L"Invalid discovery code.\n\n"
+			L"Expected 12 digits (format: XXX-XXXX-XXX-##)\n"
+			L"Example: 123-4567-890-12");
+	}
+	{
+		uint32_t sum = 0;
+		for (int i = 0; i < 10; i++) sum += (uint32_t)(code[i] - '0' + '0'); // sum of ASCII vals
+		char expected[3];
+		sprintf_s(expected, "%02u", sum % 100);
+		if (code[10] != expected[0] || code[11] != expected[1]) {
+			throw WarningException(
+				L"Invalid discovery code: checksum mismatch.\n\n"
+				L"Please re-enter the code exactly as shown on the server.");
+		}
+	}
+
+	// Get matchmaker host - use saved setting if set, otherwise default
+	std::string matchmakerHost = CLOUD_MATCHMAKER_HOST;
+	if (_tcslen(m_cloudMatchmakerHost) > 0) {
+		char mmA[MAX_HOST_NAME_LEN]{};
+		WideCharToMultiByte(CP_UTF8, 0, m_cloudMatchmakerHost, -1, mmA, MAX_HOST_NAME_LEN, NULL, NULL);
+		matchmakerHost = mmA;
+	}
+
+	// Create cloud proxy
+	m_cloudProxy = std::make_unique<CloudProxyServer>();
+
+	// Status callback - updates the connect window
+	HWND hStatus = m_hwndStatus;
+	auto statusCb = [hStatus](const wchar_t* msg) {
+		if (hStatus) SetDlgItemText(hStatus, IDC_STATUS, msg);
+	};
+
+	// Connect: announce -> wait for match -> UDT rendezvous -> TCP proxy
+	bool ok = m_cloudProxy->Connect(code, matchmakerHost, statusCb);
+
+	if (Pressed_Cancel) {
+		m_cloudProxy->Stop();
+		m_cloudProxy.reset();
+		QuietException_helper(L"Connection cancelled");
+	}
+
+	if (!ok) {
+		m_cloudProxy.reset();
+		wchar_t err[512];
+		_snwprintf_s(err, 512, _TRUNCATE,
+			L"NAT traversal failed.\n\n"
+			L"Code: %S\nMatchmaker: %S\n\n"
+			L"Ensure the VNC server is also waiting with the same code.",
+			code.c_str(), matchmakerHost.c_str());
+		throw WarningException(err);
+	}
+
+	if (m_hwndStatus) { SetDlgItemText(m_hwndStatus, IDC_STATUS, _T("Tunnel ready, connecting...")); Sleep(300); }
+
+	// Redirect to local TCP proxy port
+	_tcscpy_s(m_host, _countof(m_host), _T("127.0.0.1"));
+	m_port = CLOUD_LOCAL_TCP_PORT;
+
+	Connect();
+}
 void ClientConnection::Connect()
 {
 	if (m_opts->m_ipv6) {
@@ -4786,7 +4884,12 @@ ClientConnection::CloseWindows()
 }
 ClientConnection::~ClientConnection()
 {
-	
+	// Stop cloud proxy if running
+	if (m_cloudProxy) {
+		m_cloudProxy->Stop();
+		m_cloudProxy.reset();
+	}
+
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_hwndStatus)
 		EndDialog(m_hwndStatus,0);

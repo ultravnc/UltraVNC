@@ -32,7 +32,8 @@
 #include "SettingsManager.h"
 #include "Localization.h" // ACT : Add localization on messages
 #include "ScSelect.h"
-
+#include <intrin.h>
+#include <cstdint>
 #pragma comment(lib, "iphlpapi.lib")
 
 extern bool g_Desktop_running;
@@ -71,49 +72,70 @@ vncServer::ServerUpdateTracker::add_copied(const rfb::Region2D& dest, const rfb:
 }
 
 char* vncServer::generateCode() {
-	PIP_ADAPTER_INFO AdapterInfo{};
-	DWORD dwBufLen = sizeof(IP_ADAPTER_INFO);
-	char* mac_addr = (char*)malloc(18);
+	// Build machine_id from MAC + CPU + disk serial (same as original vnc_bridge_impl)
+	std::string machine_id;
 
-	AdapterInfo = (IP_ADAPTER_INFO*)malloc(sizeof(IP_ADAPTER_INFO));
-	if (AdapterInfo == NULL) {
-		free(mac_addr);
-		return NULL; // it is safe to call free(NULL)
-	}
-
-	// Make an initial call to GetAdaptersInfo to get the necessary size into the dwBufLen variable
-	if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == ERROR_BUFFER_OVERFLOW) {
-		free(AdapterInfo);
-		AdapterInfo = (IP_ADAPTER_INFO*)malloc(dwBufLen);
-		if (AdapterInfo == NULL) {
-			free(mac_addr);
-			return NULL;
+	// MAC address
+	IP_ADAPTER_INFO adapterBuf[16];
+	DWORD bufLen = sizeof(adapterBuf);
+	if (GetAdaptersInfo(adapterBuf, &bufLen) == ERROR_SUCCESS) {
+		PIP_ADAPTER_INFO a = adapterBuf;
+		if (a) {
+			char hex[3];
+			for (int i = 0; i < 6; i++) {
+				sprintf_s(hex, "%02X", a->Address[i]);
+				machine_id += hex;
+			}
 		}
 	}
 
-	if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == NO_ERROR) {
-		// Contains pointer to current adapter info
-		PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
-		do {
-			// technically should look at pAdapterInfo->AddressLength
-			//   and not assume it is 6.
-			sprintf_s(mac_addr, 18, "%02X%02X%02X%02X%02X",
-				pAdapterInfo->Address[0],// pAdapterInfo->Address[1],
-				pAdapterInfo->Address[4], pAdapterInfo->Address[3],
-				pAdapterInfo->Address[2], pAdapterInfo->Address[5]);
+	// CPU ID
+	int cpu_info[4] = { 0 };
+	__cpuid(cpu_info, 1);
+	char cpu_id[32];
+	sprintf_s(cpu_id, "%08X%08X", cpu_info[3], cpu_info[0]);
+	machine_id += cpu_id;
 
-			if (!(pAdapterInfo->Address[0] == 0 && pAdapterInfo->Address[4] == 0 &&
-					pAdapterInfo->Address[3] == 0 && pAdapterInfo->Address[2] == 0 &&
-					pAdapterInfo->Address[5] == 0)) {
-				free(AdapterInfo);
-				return mac_addr; // caller must free.
-			}
-
-			pAdapterInfo = pAdapterInfo->Next;
-		} while (pAdapterInfo && pAdapterInfo->Address[0] == 0);
+	// Disk serial
+	DWORD serial = 0;
+	if (GetVolumeInformationW(L"C:\\", nullptr, 0, &serial, nullptr, nullptr, nullptr, 0)) {
+		char disk[16];
+		sprintf_s(disk, "%08X", serial);
+		machine_id += disk;
 	}
-	free(AdapterInfo);
-	return mac_addr; // caller must free.
+
+	if (machine_id.empty())
+		machine_id = "FALLBACK123456";
+
+	// Portable FNV-based hash (same as vnc_bridge_impl::portable_hash)
+	uint64_t hash = 0x123456789ABCDEF0ULL;
+	const uint64_t prime = 0x100000001B3ULL;
+	for (size_t i = 0; i < machine_id.size(); i++) {
+		hash ^= (uint64_t)(unsigned char)machine_id[i];
+		hash *= prime;
+	}
+
+	// Extract 10 decimal digits from hash
+	char* result = (char*)malloc(14); // "XXXXXXXXXX##\0"
+	std::string base;
+	uint64_t h = hash;
+	for (int i = 0; i < 10; i++) {
+		base += (char)('0' + (h % 10));
+		h /= 10;
+		if (h == 0 && i < 9) {
+			// rehash for more digits
+			h = hash ^ (uint64_t)(i + 1) * prime;
+		}
+	}
+
+	// 2-digit checksum: sum of chars % 100
+	uint32_t sum = 0;
+	for (char c : base) sum += (unsigned char)c;
+	char chk[3];
+	sprintf_s(chk, "%02u", sum % 100);
+
+	sprintf_s(result, 14, "%s%s", base.c_str(), chk);
+	return result; // caller must free
 }
 
 
@@ -173,12 +195,14 @@ vncServer::vncServer()
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
-
+	// VNC Bridge initialization
+	m_bridge_running = false;
 }
 
 vncServer::~vncServer()
 {
-	
+	// Stop bridge before other cleanup
+	StopBridge();
 	ShutdownServer();}
 
 void
@@ -1272,6 +1296,8 @@ vncServer::EnableConnections(BOOL On)
 
 			// Now let's start the HTTP connection stuff
 			EnableHTTPConnect(m_enableHttpConn);
+			// Auto-start bridge if enabled in settings
+			UpdateBridgeSettings();
 		}
 	}
 	else {
@@ -2126,3 +2152,134 @@ void vncServer::SetAutoPortSelect(const BOOL autoport)
 		EnableConnections(SockConnected());
 };
 
+// Cloud NAT traversal public API
+void vncServer::cloudConnect(bool enable, TCHAR* server) {
+	if (enable) {
+		if (server && server[0] != _T('\0')) {
+#ifdef UNICODE
+			char mb[256]{};
+			WideCharToMultiByte(CP_UTF8, 0, server, -1, mb, sizeof(mb), nullptr, nullptr);
+			settings->setCloudServer(server);
+#else
+			settings->setCloudServer(server);
+#endif
+		}
+		StartBridge();
+	} else {
+		StopBridge();
+	}
+}
+
+bool vncServer::isCloudThreadRunning() {
+	return m_bridge_running && m_cloud_proxy && m_cloud_proxy->IsRunning();
+}
+
+CloudStatus vncServer::getStatus() {
+	if (m_cloud_proxy)
+		return m_cloud_proxy->GetStatus();
+	return csOffline;
+}
+
+const char* vncServer::getExternalIpAddress() {
+	if (m_cloud_proxy) {
+		m_cached_external_ip = m_cloud_proxy->GetExternalIp();
+		return m_cached_external_ip.c_str();
+	}
+	return "";
+}
+
+const char* vncServer::getCloudStatusText() {
+	if (m_cloud_proxy) {
+		m_cached_status_text = m_cloud_proxy->GetStatusText();
+		return m_cached_status_text.c_str();
+	}
+	return "";
+}
+
+// Cloud NAT traversal implementation
+BOOL vncServer::StartBridge()
+{
+	if (m_bridge_running) {
+		return TRUE;
+	}
+
+	// Use code[] if set, otherwise generate one from hostname
+	if (strlen(code) == 0) {
+		char hostname[64]{};
+		gethostname(hostname, sizeof(hostname));
+		strncpy_s(code, hostname, sizeof(code) - 1);
+	}
+	m_discovery_code = code;
+
+	// Convert TCHAR* cloud server to std::string
+	std::string matchmakerHost;
+	TCHAR* tcsHost = settings->getCloudServer();
+	if (tcsHost && tcsHost[0] != _T('\0')) {
+#ifdef UNICODE
+		char mbHost[256]{};
+		WideCharToMultiByte(CP_UTF8, 0, tcsHost, -1, mbHost, sizeof(mbHost), nullptr, nullptr);
+		matchmakerHost = mbHost;
+#else
+		matchmakerHost = tcsHost;
+#endif
+	}
+	if (matchmakerHost.empty())
+		matchmakerHost = CLOUD_SERVER_MATCHMAKER_HOST;
+
+	m_cloud_proxy = std::make_unique<CloudServerProxy>(
+		m_discovery_code,
+		(uint16_t)m_port,
+		matchmakerHost
+	);
+
+	m_bridge_running = true;
+	m_bridge_thread = std::make_unique<std::thread>([this]() {
+		m_cloud_proxy->Run();
+		m_bridge_running = false;
+	});
+
+	return TRUE;
+}
+
+void vncServer::StopBridge()
+{
+	if (m_cloud_proxy) {
+		m_cloud_proxy->Stop();
+	}
+
+	m_bridge_running = false;
+
+	if (m_bridge_thread && m_bridge_thread->joinable()) {
+		m_bridge_thread->join();
+	}
+	m_bridge_thread.reset();
+	m_cloud_proxy.reset();
+
+	m_discovery_code.clear();
+	vnclog.Print(LL_STATE, VNCLOG("Cloud NAT stopped\n"));
+}
+
+const char* vncServer::GetDiscoveryCode()
+{
+	return m_discovery_code.c_str();
+}
+
+BOOL vncServer::IsBridgeRunning()
+{
+	return m_bridge_running && m_cloud_proxy && m_cloud_proxy->IsRunning();
+}
+
+void vncServer::UpdateBridgeSettings()
+{
+	BOOL shouldRun = settings->getUseBridge();
+	BOOL isRunning = IsBridgeRunning();
+
+	if (shouldRun && !isRunning) {
+		StartBridge();
+	}
+	else if (!shouldRun && isRunning) {
+		StopBridge();
+	}
+
+	vncMenu::updateMenu();
+}

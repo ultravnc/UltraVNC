@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Firewall Traversing with UDT</font></h3>
+<p>While UDT was originally written for extremely high speed data transfer, there are many other potential benefits from this reliable UDP-based library. One particular usage is to setup 
+reliable connections between machines behind firewalls. To meet this requirement, UDT has added the rendezvous connection setup support.</p>
+
+<p>Traditional BSD socket setup process requires explicit server side and client side. To punch NAT firewalls, a common method is to use the SO_REUSEADDR socket option to open two sockets 
+bound to the same port, one listens and the other connects. UDT provides the more convenient rendezvous connection setup, in which there is no server or client, and two users can connect to 
+each other directly.</p>
+
+<p>With UDT, all sockets within one process can be bound to the same UDP port (but at most one listening socket on the same port is allowed). This is also helpful for system administrators to open a specific UDP port for all UDT traffic. </p>
+
+<p>Example: Rendezvous connection setup. (Note that there is no need to set UDT_REUSEADDR here because it is true by default.) </p>
+<div class="code">
+UDTSOCKET u;<br>
+...<br>
+<br>
+bool rendezvous = true;<br>
+UDT::setsockopt(u, 0, UDT_RENDEZVOUS, &rendezvous, sizeof(bool));<br>
+UDT::bind(u, &known_addr, sizeof(known_addr));<br>
+UDT::connect(u, &peer_addr, sizeof(peer_addr));
+</div>
+
+<p>In addition, UDT also allows to bind on an existing UDP socket. This is useful in two situations. First, sometimes the application must send packet to a name server in order to obtain its address (for example, this is true when behind an NAT firewall). Users may create a UDP socket and send some UDP packets to the name server to obtain the binding address. Then the UDP socket can be used directly for UDT (see <a href="bind.htm">bind</a>) so that the application does not need to close the UDP socket and open a new UDT socket on the same address again. </p>
+<p>Second, some firewalls working on local system may change the port mapping or close the &quot;hole&quot; is the punching UDP socket is closed, thus a new UDT socket on the same address will not be able to traverse the firewall. In this situation, binding the UDT socket on the existing UDP socket is not only convenient but necessary. </p>
+<p>&nbsp;</p>
+</body>
+</html>

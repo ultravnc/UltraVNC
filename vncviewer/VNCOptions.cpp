@@ -180,6 +180,7 @@ VNCOptions::VNCOptions()
 	// m_fAutoAdjust = false;
 	m_host_options[0] = '\0';
 	m_proxyhost[0] = '\0';
+	m_cloudMatchmakerHost[0] = '\0';
 	m_port = -1;
 	m_proxyport = -1;
 	m_kbdname[0] = '\0';
@@ -377,6 +378,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	_tcscpy_s(m_proxyhost, MAX_HOST_NAME_LEN, s.m_proxyhost);
 	m_proxyport = s.m_proxyport;
+	_tcscpy_s(m_cloudMatchmakerHost, MAX_HOST_NAME_LEN, s.m_cloudMatchmakerHost);
 	m_connectionType = s.m_connectionType;
 	m_allowMonitorSpanning = s.m_allowMonitorSpanning;
 	m_ChangeServerRes = s.m_ChangeServerRes;
@@ -931,6 +933,10 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			}
 			m_fUseDSMPlugin = true;
 			_tcscpy_s(m_szDSMPluginFilename, _countof(m_szDSMPluginFilename), args[j]);
+		}
+		else if (SwitchMatch(args[j], _T("bridge")))
+		{
+			m_connectionType = UDP_BRIDGE;
 		}
 		else if (SwitchMatch(args[j], _T("proxy")))
 		{
