@@ -14,9 +14,6 @@
 #include "SettingsManager.h"
 #include "resource.h"
 
-#ifdef _CLOUD
-#include "./UdtCloudlib/proxy/Cloudthread.h"
-
 extern HINSTANCE	hInstResDLL;
 
 CloudDialog::CloudDialog()
@@ -99,15 +96,14 @@ CloudDialog::DialogProc(HWND hwnd,
 		}
 		SetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer());
 		SetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code);
-		SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_SETCHECK, settings->getCloudEnabled(), 0);
-		if (_this->m_server->isCloudThreadRunning()) {
+		SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_SETCHECK, settings->getUseBridge(), 0);
+		if (_this->m_server->isBridgeStarted()) {
 			SetDlgItemText(hwnd, IDC_STARTCLOUD, "Stop");
-			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), SW_SHOW);
 		}
 		else {
-			_this->m_server->cloudConnect(settings->getCloudEnabled(), settings->getCloudServer());
 			SetDlgItemText(hwnd, IDC_STARTCLOUD, "Start");
-			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), false);
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), SW_HIDE);
 		}
 
 		HFONT  hfont = CreateFont(
@@ -130,9 +126,47 @@ CloudDialog::DialogProc(HWND hwnd,
 		SetForegroundWindow(hwnd);
 		SetTimer(hwnd, 120, 1000, NULL);
 		_this->m_dlgvisible = TRUE;
-		ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
-		ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
-		ShowWindow(GetDlgItem(hwnd, IDC_RED), true);
+		// Hide all LEDs first, then show only the active one
+		ShowWindow(GetDlgItem(hwnd, IDC_GREEN),  SW_HIDE);
+		ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), SW_HIDE);
+		ShowWindow(GetDlgItem(hwnd, IDC_RED),    SW_HIDE);
+		switch (_this->m_server->getStatus()) {
+		case csConnected:
+			ShowWindow(GetDlgItem(hwnd, IDC_GREEN), SW_SHOW);
+			break;
+		case csOnline:
+		case csRendezvous:
+			ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), SW_SHOW);
+			break;
+		default: // csOffline
+			if (_this->m_server->isBridgeStarted())
+				ShowWindow(GetDlgItem(hwnd, IDC_RED), SW_SHOW);
+			break;
+		}
+		{
+			const char* extIp = _this->m_server->getExternalIpAddress();
+			SetDlgItemTextA(hwnd, IDC_EXTERNALIPADDRESS, (extIp && extIp[0] != '\0') ? extIp : "");
+			char title[256];
+			snprintf(title, sizeof(title), "UltraVNC Server - Cloud connect [%s]", _this->m_server->getCloudStatusText());
+			SetWindowTextA(hwnd, title);
+		}
+		// Drain log lines from the proxy and append to IDC_CLOUDSTATUS
+		{
+			CloudServerProxy* proxy = _this->m_server->getCloudProxy();
+			if (proxy) {
+				auto lines = proxy->DrainLogs();
+				if (!lines.empty()) {
+					HWND hLog = GetDlgItem(hwnd, IDC_CLOUDSTATUS);
+					for (const auto& line : lines) {
+						int len = GetWindowTextLengthA(hLog);
+						SendMessageA(hLog, EM_SETSEL, len, len);
+						SendMessageA(hLog, EM_REPLACESEL, FALSE, (LPARAM)line.c_str());
+					}
+					// Scroll to bottom
+					SendMessageA(GetDlgItem(hwnd, IDC_CLOUDSTATUS), WM_VSCROLL, SB_BOTTOM, 0);
+				}
+			}
+		}
 		if (_this->SC) {
 			SendMessage(GetDlgItem(hwnd, IDC_STARTCLOUD), BM_CLICK, 0, 0);
 		}
@@ -148,48 +182,70 @@ CloudDialog::DialogProc(HWND hwnd,
 				SetDlgItemText(hwnd, IDC_STARTCLOUD, "Start");
 				ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), false);
 			}
-			SetDlgItemText(hwnd, IDC_EXTERNALIPADDRESS, _this->m_server->getExternalIpAddress());
+			{
+				const char* extIp = _this->m_server->getExternalIpAddress();
+				SetDlgItemTextA(hwnd, IDC_EXTERNALIPADDRESS, (extIp && extIp[0] != '\0') ? extIp : "");
+				char title[256];
+				snprintf(title, sizeof(title), "UltraVNC Server - Cloud connect [%s]", _this->m_server->getCloudStatusText());
+				SetWindowTextA(hwnd, title);
+			}
+			// Hide all LEDs first, then show only the active one
+			ShowWindow(GetDlgItem(hwnd, IDC_GREEN),  SW_HIDE);
+			ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), SW_HIDE);
+			ShowWindow(GetDlgItem(hwnd, IDC_RED),    SW_HIDE);
 			switch (_this->m_server->getStatus()) {
 				case csConnected:
-					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), true);
-					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
-					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), SW_SHOW);
 					break;
-				case csOnline:	
+				case csOnline:
 				case csRendezvous:
-					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
-					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), true);
-					ShowWindow(GetDlgItem(hwnd, IDC_RED), false);
+					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), SW_SHOW);
 					break;
 				default:
-					ShowWindow(GetDlgItem(hwnd, IDC_GREEN), false);
-					ShowWindow(GetDlgItem(hwnd, IDC_YELLOW), false);
-					ShowWindow(GetDlgItem(hwnd, IDC_RED), true);
+					if (_this->m_server->isBridgeStarted())
+						ShowWindow(GetDlgItem(hwnd, IDC_RED), SW_SHOW);
 					break;
 			}
-			
-
+			// Drain log lines from proxy into IDC_CLOUDSTATUS
+			{
+				CloudServerProxy* proxy = _this->m_server->getCloudProxy();
+				if (proxy) {
+					auto lines = proxy->DrainLogs();
+					HWND hLog = GetDlgItem(hwnd, IDC_CLOUDSTATUS);
+					for (const auto& line : lines) {
+						int len = GetWindowTextLengthA(hLog);
+						SendMessageA(hLog, EM_SETSEL, len, len);
+						SendMessageA(hLog, EM_REPLACESEL, FALSE, (LPARAM)line.c_str());
+					}
+					if (!lines.empty())
+						SendMessageA(hLog, WM_VSCROLL, SB_BOTTOM, 0);
+				}
+			}
 		}
 		break;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
-		{
+	{
 
 		case IDCANCEL:
 			EndDialog(hwnd, TRUE);
 			_this->m_dlgvisible = FALSE;
 			return TRUE;
 		case IDOK:
+		{
 			TCHAR cloudServer[MAX_HOST_NAME_LEN];
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, cloudServer, MAX_HOST_NAME_LEN);
 			settings->setCloudServer(cloudServer);
 			GetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code, 18);
-			settings->setCloudEnabled(SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED);
+			BOOL autoStart = SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED;
+			settings->setCloudEnabled(autoStart);
+			settings->setUseBridge(autoStart);
 			_this->SaveToIniFile();
 			EndDialog(hwnd, TRUE);
 			_this->m_dlgvisible = FALSE;
 			return TRUE;
+		}
 
 		case IDC_STARTCLOUD:
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
@@ -213,4 +269,3 @@ CloudDialog::DialogProc(HWND hwnd,
 	}
 	return 0;
 }
-#endif // _CLOUD

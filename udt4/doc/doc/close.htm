@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>close</strong></h4>
+<p>The <b>close</b> method closes a UDT connection.</p>
+
+<div class="code">int close(<br />
+&nbsp; UDTSOCKET <font color="#FFFFFF">u</font><br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><i>u</i></dt>
+  <dd>[in] Descriptor identifying the socket to close.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>If success, 0 is returned; otherwise, UDT::ERROR is returned and specific error information can be retrieved by <a href="error.htm">getlasterror</a>.</p>
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td><i>u</i> is an invalid UDT socket.</td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>The <strong>close</strong> method gracefully shutdowns the UDT connection and releases all related data structures associated with the UDT socket. If there is no connection associated 
+with the socket, <strong>close</strong> simply release the socket resources.</p>
+<p>On a blocking socket, if UDT_LINGER is non-zero, the <strong>close</strong> call will wait until all data in the sending buffer are sent out or the waiting time has exceeded the 
+expiration time set by UDT_LINGER. However, if UDT_SYNSND is set to false (i.e., non-blocking sending), <strong>close</strong> will return immediately and any linger data will be sent at background until the linger timer expires.</p>
+<p>The closing UDT socket will send a shutdown message to the peer side so that the peer socket will also be closed. This is a best-effort message. If the message is not successfully 
+delivered, the peer side will also be closed after a time-out. In UDT, <u>shutdown</u> is not supported.</p>
+<p>All sockets should be closed if they are not used any more.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="socket.htm">socket</a>, <a href="opt.htm">setsockopt</a></strong></p>
+<p>&nbsp;</p>
+
+</body>
+</html>

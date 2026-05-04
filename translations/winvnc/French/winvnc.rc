@@ -318,6 +318,8 @@ BEGIN
     BEGIN
         MENUITEM "&Paramètres",                   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
+        MENUITEM "Copier le code bridge",            ID_COPY_BRIDGE_CODE
+        MENUITEM SEPARATOR
         MENUITEM "&À propos de UltraVNC Server...",   ID_ABOUT
         POPUP "Visiter nos liens"
         BEGIN

@@ -88,6 +88,7 @@
     <ClCompile Include="vsocket.cpp" />
     <ClCompile Include="..\..\common\win32_helpers.cpp" />
     <ClCompile Include="winvnc.cpp" />
+    <ClCompile Include="..\..\common\vnc_bridge_impl.cpp" />
     <ClCompile Include="..\..\common\ZipUnzip\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,9 @@
     <ClInclude Include="vsocket.h" />
     <ClInclude Include="vtypes.h" />
     <ClInclude Include="winvnc.h" />
+    <ClInclude Include="..\..\common\vnc_bridge.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winvnc.rc" />

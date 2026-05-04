@@ -270,6 +270,7 @@
 #define IDC_RADIO_NOVIRT                1185
 #define IDC_RADIOBRIDGE                 1185
 #define IDC_HIDEENDOFSTREAMERROR        1186
+#define IDC_CLOUD_STATUS                1187
 #define IDC_ENCODING_BASE               1199
 #define IDC_RAWRADIO                    2000
 #define IDC_RRERADIO                    2002
