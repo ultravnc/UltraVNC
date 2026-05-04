@@ -187,6 +187,7 @@ void SessionDialog::SaveToFile(wchar_t *fname, bool asDefault)
 	saveInt(L"requestedHeight", requestedHeight, fname);
 
 
+	WritePrivateProfileStringW(L"connection", L"cloudMatchmakerHost", m_cloudMatchmakerHost, fname);
 	WritePrivateProfileStringW(L"options", L"DSMPlugin",	szDSMPluginFilename, fname);
 	WritePrivateProfileStringW(L"options", L"folder",		folder, fname);
 	WritePrivateProfileStringW(L"options", L"prefix",		prefix, fname);
@@ -306,6 +307,7 @@ void SessionDialog::LoadFromFile(wchar_t *fname)
 
   GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, fname);
   m_proxyport = GetPrivateProfileIntW(L"connection", L"proxyport", 0, fname);
+  GetPrivateProfileStringW(L"connection", L"cloudMatchmakerHost", L"", m_cloudMatchmakerHost, MAX_HOST_NAME_LEN, fname);
   overwriteCommandLine();
 
 }

@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>sendmsg</strong></h4>
+<p>The <b>sendmsg</b> method sends a message to the peer side.</p>
+
+<div class="code">int sendmsg(<br />
+&nbsp; UDTSOCKET <font color="#FFFFFF">u</font>,<br />
+&nbsp; const char* <font color="#FFFFFF">msg</font>,<br />
+&nbsp; int <font color="#FFFFFF">len</font>,<br />
+&nbsp; int <font color="#FFFFFF">ttl</font> = -1,<br />
+&nbsp; bool <font color="#FFFFFF">inorder</font> = false<br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><i>u</i></dt>
+  <dd>[in] Descriptor identifying a connected socket.</dd>
+  <dt><em>buf</em></dt>
+  <dd>[in] The buffer pointed to a message.</dd>
+  <dt><em>len</em></dt>
+  <dd>[in] Length of the buffer.</dd>
+  <dt><em>ttl</em></dt>
+  <dd>[in] Optional. The Time-to-Live of the message (milliseconds). Default is -1, which means infinite.</dd>
+  <dt><em>inorder</em></dt>
+  <dd>[in] Optional. Flag indicating if the message should be delivered in order. Default is negative.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>On success, <b>sendmsg</b> returns the actual size of message that has just been sent. The size should be equal to <i>len</i>. Otherwise UDT::ERROR is returned and 
+specific error information can be retrieved by <a href="error.htm">getlasterror</a>. If UDT_SNDTIMEO is set to a positive value, zero will be returned if the message 
+cannot be sent before the timer expires.</p>
+
+<table width="100%" border="1" cellpadding="1" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>ECONNLOST</td>
+    <td>2001</td>
+    <td>connection has been broken.</td>
+  </tr>
+  <tr>
+    <td>ENOCONN</td>
+    <td>2002</td>
+    <td><i>u</i> is not connected.</td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td><i>u</i> is not an valid socket.</td>
+  </tr>
+  <tr>
+    <td>ESTREAMILL</td>
+    <td>5009</td>
+    <td>cannot use <i>sendmsg</i> in SOCK_STREAM mode.</td>
+  </tr>
+  <tr>
+    <td>ELARGEMSG</td>
+    <td>5012</td>
+    <td>the message is too large to be hold in the sending buffer.</td>
+  </tr>
+  <tr>
+    <td>SASYNCSND</td>
+    <td>6001</td>
+    <td><i>u</i> is non-blocking (UDT_SNDSYN = false) but no buffer space is available.</td>
+  </tr>
+  <tr>
+    <td>ETIMEOUT</td>
+    <td>6003</td>
+    <td>Timeout on UDT_SNDTIMEO .</td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>The <strong>sendmsg</strong> method sends a message to the peer side. The UDT socket must be in SOCK_DGRAM mode in order to send or receive messages. 
+Message is the minimum data unit in this situation. In particular, <strong>sendmsg</strong> always tries to send the message out as a whole, that is, the message will 
+either to completely sent or it is not sent at all.</p>
+<p>In blocking mode (default), <strong>sendmsg</strong></strong> waits until there is enough space to hold the whole message. In non-blocking mode, <strong>sendmsg</strong> 
+returns immediately and returns error if no buffer space available.</p>
+<p>If UDT_SNDTIMEO is set and the socket is in blocking mode, <strong>sendmsg</strong> only waits a limited time specified by UDT_SNDTIMEO option. If there is still 
+no buffer space available when the timer expires, error will be returned. UDT_SNDTIMEO has no effect for non-blocking socket.</p>
+<p>The <i>ttl</i> parameter gives the message a limited life time, which starts counting once the first packet of the message is sent out. If the message has not 
+been delivered to the receiver after the TTL timer expires and each packet in the message has been sent out at least once,  the message will be discarded. Lost packets in the message will be retransmitted before TTL expires. </p>
+<p>On the other hand, the <i>inorder</i> option decides if this message should be delivered in order. That is, the message should not be delivered to the receiver 
+side application unless all messages prior to it are either delivered or discarded.</p>
+<p>Finally, if the message size is greater than the size of the receiver buffer, the message will never be received in whole by the receiver side. Only the beginning
+part that can be hold in the receiver buffer may be read and the rest will be discarded.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="recvmsg.htm">send</a></strong>, <a href="recv.htm"><strong>recv</strong></a>, <a href="recvmsg.htm"><strong>recvmsg</strong></a> </p>
+
+<p>&nbsp;</p>
+
+</body>
+</html>

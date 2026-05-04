@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>accept</strong></h4>
+<p>The <b>accept</b> method retrieves an incoming connection.</p>
+
+<div class="code">UDTSOCKET accept(<br />
+&nbsp; UDTSOCKET <font color="#FFFFFF">u</font>,<br />
+&nbsp; struct sockaddr* <font color="#FFFFFF">addr</font>,<br />
+&nbsp; int* <font color="#FFFFFF">addrlen</font><br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><i>u</i></dt>
+  <dd>[in] Descriptor identifying a listening socket.</dd>
+  <dt><em>addr</em></dt>
+  <dd>[out] Address of the peer side of the new accepted connection.</dd>
+  <dt><em>addrlen</em></dt>
+  <dd>[out] Length of the <i>addr</i> structure.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>If no error occurs, <b>accept</b> returns the UDT socket descriptor of the new connection; otherwise, it returns
+  UDT::INVALID_SOCK.</p>
+<p>On a successful return, the address of the peer 
+  side of the connection is written into <i>addr</i>, and its length is in <i>addrlen</i>, if the <i>addr</i> parameter is not NULL.</p>
+<p>If an error is returned, the error information 
+  can be retrieved by <a href="error.htm">getlasterror</a>. One of the following error can cause an <b>accept</b> error:</p>
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td><i>u</i> is an invalid UDT socket.</td>
+  </tr>
+  <tr>
+    <td>ENOLISTEN</td>
+    <td>5006</td>
+    <td><i>u</i> is not in the listening state.</td>
+  </tr>
+  <tr>
+    <td>ERDVNOSERV</td>
+    <td>5007</td>
+    <td><i>u</i> is set up to support rendezvous connection.</td>
+  </tr>
+  <tr>
+    <td>EASYNCRCV</td>
+    <td>6002</td>
+    <td><i>u</i> is non-blocking (UDT_RCVSYN = false) but there is no connection available.</td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>Once a UDT socket is in listening state, it accepts new connections and maintains the pending connections in a queue. An <strong>accept</strong> call retrieves 
+the first connection in the queue, removes it from the queue, and returns the associate socket descriptor. </p>
+<p>If there is no connections in the queue when <strong>accept</strong> is called, a blocking socket will wait until a new connection is set up, whereas a 
+non-blocking socket will return immediately with an error.</p>
+<p>The accepted sockets will inherit all proper attributes from the listening socket.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="listen.htm">listen</a>, <a href="connect.htm">connect</a>, <a href="opt.htm">setsockopt</a>, <a href="opt.htm">getsockopt</a></strong></p>
+<p>&nbsp;</p>
+
+</body>
+</html>

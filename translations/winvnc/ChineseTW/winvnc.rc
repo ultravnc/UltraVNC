@@ -318,6 +318,8 @@ BEGIN
     BEGIN
         MENUITEM "设置(&S)",                   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
+        MENUITEM "复制Bridge代码",            ID_COPY_BRIDGE_CODE
+        MENUITEM SEPARATOR
         MENUITEM "关于 UltraVNC 服务器(&A)...",   ID_ABOUT
         POPUP "访问我们的链接"
         BEGIN

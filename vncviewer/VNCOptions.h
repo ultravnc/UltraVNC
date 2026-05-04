@@ -30,6 +30,7 @@
 enum ConnectionType {
 	DIRECT_TCP = 0,      // Direct TCP connection
 	REPEATER_SERVER = 1, // Repeater server (proxy mode)
+	UDP_BRIDGE = 2       // Bridge over UDP NAT
 };
 
 inline bool SwitchMatch(LPCTSTR arg, LPCTSTR swtch) {
@@ -122,6 +123,7 @@ public:
 	int     m_port;
 	TCHAR   m_proxyhost[MAX_HOST_NAME_LEN];
 	int     m_proxyport;
+	TCHAR   m_cloudMatchmakerHost[MAX_HOST_NAME_LEN];
 	ConnectionType	m_connectionType;
 	bool	m_allowMonitorSpanning;
 	bool	m_ChangeServerRes;

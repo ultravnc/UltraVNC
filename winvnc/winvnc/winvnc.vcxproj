@@ -2991,6 +2991,8 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="SchannelTLS.cpp" />
+    <ClCompile Include="cloud_server.cpp" />
+    <ClCompile Include="CloudDialog.cpp" />
     <ClCompile Include="vncserver.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='SC_20_DEBUG|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3271,6 +3273,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="vnclog.h" />
     <ClInclude Include="vncmenu.h" />
     <ClInclude Include="vncpasswd.h" />
+    <ClInclude Include="cloud_server.h" />
     <ClInclude Include="vncserver.h" />
     <ClInclude Include="vncsetauth.h" />
     <ClInclude Include="vncsockconnect.h" />
@@ -3427,4 +3430,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\udt4\win\udt.vcxproj">
+      <Project>{D84D100A-7C21-4CCB-B16E-0FB37137C16C}</Project>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

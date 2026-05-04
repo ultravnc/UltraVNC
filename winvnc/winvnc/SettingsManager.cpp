@@ -269,7 +269,7 @@ void SettingsManager::setDefaults()
 	m_pref_locdom2 = false;
 	m_pref_locdom3 = false;
 
-	memset(m_pref_cloudServer, 0, MAX_HOST_NAME_LEN);
+	_tcscpy_s(m_pref_cloudServer, _T("support1.uvnc.com"));
 	memset(m_pref_alternateShell, 0, 129);
 	m_pref_cloudEnabled = false;
 	m_pref_AllowUserSettingsWithPassword = false;
@@ -382,6 +382,8 @@ void SettingsManager::load()
 	iniFile.ReadString("admin_auth", "group3", m_pref_group3, 150);
 
 	iniFile.ReadString("admin", "cloudServer", m_pref_cloudServer, MAX_HOST_NAME_LEN);
+	if (m_pref_cloudServer[0] == _T('\0'))
+		_tcscpy_s(m_pref_cloudServer, _T("support1.uvnc.com"));
 	m_pref_cloudEnabled = iniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
 
 	iniFile.ReadString("admin", "alternate_shell", m_pref_alternateShell, 1024);

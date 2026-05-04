@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>getlasterror</strong></h4>
+<p>The <b>getlasterror</b> method the last UDT error within the same thread.</p>
+
+<div class="code">ERRORINFO&amp; getlasterror(<br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dd>None.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>The last UDT error within the same thread is retrieved and returned in an <a href = "structure.htm">ERRORINFO</a> structure. If there is no error, a special SUCCESS code (0) will be 
+returned. The <strong>getlasterror</strong> will always succeed. The returned value is a reference to the internal UDT ERRORINFO structure and application may clear it if necessary. </p>
+
+<h5>Description</h5>
+<p>The <strong>getlasterror</strong> method reads the last UDT error in the thread where this method is called. The error information is stored in thread specific storage.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="ecode.htm">Error Code List</a></strong>, <a href="t-error.htm"><strong>Error Handling</strong></a> </p>
+<p>&nbsp;</p>
+
+</body>
+</html>

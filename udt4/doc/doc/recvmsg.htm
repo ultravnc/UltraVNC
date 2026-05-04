@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title> UDT Reference</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: Functions</div>
+
+<h4 class="func_name"><strong>recvmsg</strong></h4>
+<p>The <b>recvmsg</b> method receives a valid message.</p>
+
+<div class="code">int recvmsg(<br />
+&nbsp; UDTSOCKET <font color="#FFFFFF">u</font>,<br />
+&nbsp; char* <font color="#FFFFFF">msg</font>,<br />
+&nbsp; int <font color="#FFFFFF">len</font><br />
+);</div>
+
+<h5>Parameters</h5>
+<dl>
+  <dt><i>u</i></dt>
+  <dd>[in] Descriptor identifying a connected socket.</dd>
+  <dt><em>msg</em></dt>
+  <dd>[out] The buffer used to store incoming message.</dd>
+  <dt><em>len</em></dt>
+  <dd>[in] Length of the buffer.</dd>
+</dl>
+
+<h5>Return Value</h5>
+<p>On success, <b>recvmsg</b> returns the actual size of received message. Otherwise UDT::ERROR is returned and specific error information can be retrieved by <a 
+href="error.htm">getlasterror</a>. If UDT_RCVTIMEO is set to a positive value, zero will be returned if no message is received before the timer expires.</p>
+
+<table width="100%" border="1" cellpadding="2" cellspacing="0" bordercolor="#CCCCCC">
+  <tr>
+    <td width="17%" class="table_headline"><strong>Error Name</strong></td>
+    <td width="17%" class="table_headline"><strong>Error Code</strong></td>
+    <td width="83%" class="table_headline"><strong>Comment</strong></td>
+  </tr>
+  <tr>
+    <td>ECONNLOST</td>
+    <td>2001</td>
+    <td>connection has been broken and no data left in receiver buffer.</td>
+  </tr>
+  <tr>
+    <td>ENOCONN</td>
+    <td>2002</td>
+    <td><i>u</i> is not connected.</td>
+  </tr>
+  <tr>
+    <td>EINVSOCK</td>
+    <td>5004</td>
+    <td><i>u</i> is not an valid socket.</td>
+  </tr>
+  <tr>
+    <td>ESTREAMILL</td>
+    <td>5009</td>
+    <td>cannot use <i>recvmsg</i> in SOCK_STREAM mode.</td>
+  </tr>
+  <tr>
+    <td>EASYNCRCV</td>
+    <td>6002</td>
+    <td><i>u</i> is non-blocking (UDT_RCVSYN = false) but no message is available.</td>
+  </tr>
+  <tr>
+    <td>ETIMEOUT</td>
+    <td>6003</td>
+    <td>Timeout on UDT_RCVTIMEO .</td>
+  </tr>
+</table>
+
+<h5>Description</h5>
+<p>The <strong>recvmsg</strong> method reads a message from the protocol buffer. The UDT socket must be in SOCK_DGRAM mode in order to send or receive messages. Message is the minimum 
+data unit in this situation. Each <strong>recvmsg</strong> will read no more than one message, even if the message is smaller than the size of <i>buf</i> and there 
+are more messages available. On the other hand, if the <i>buf</i> is not enough to hold the first message, only part of the message will be copied into the buffer, 
+but the message will still be discarded after this <strong>recvmsg</strong> call.</p>
+<p>In blocking mode (default), <strong>recvmsg</strong> waits until there is a valid message received into the receiver buffer. In non-blocking mode, 
+<strong>recvmsg</strong></strong> returns immediately and returns error if no message available.</p>
+<p>If UDT_RCVTIMEO is set and the socket is in blocking mode, <strong>recvmsg</strong> only waits a limited time specified by UDT_RCVTIMEO option. If there is still 
+no message available when the timer expires, error will be returned. UDT_RCVTIMEO has no effect for non-blocking socket.</p>
+
+<h5>See Also</h5>
+<p><strong><a href="sendmsg.htm">send</a></strong>, <a href="recv.htm"><strong>recv</strong></a>, <a href="sendmsg.htm"><strong>sendmsg</strong></a> </p>
+<p>&nbsp;</p>
+
+</body>
+</html>

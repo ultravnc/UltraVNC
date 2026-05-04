@@ -1331,6 +1331,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="cloud_connect.cpp" />
     <ClCompile Include="ClientConnectionCacheRect.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2421,6 +2422,9 @@
     <ClInclude Include="..\common\ZipUnzip\MiniZipNG.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\udt4\win\udt.vcxproj">
+      <Project>{D84D100A-7C21-4CCB-B16E-0FB37137C16C}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\rdr\rdr.vcxproj">
       <Project>{f5244002-0fff-4f19-a941-fcce1861f132}</Project>
     </ProjectReference>

@@ -22,6 +22,8 @@
 #include "display.h"
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
+#include "cloud_connect.h"
+#include <thread>
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
 
@@ -53,6 +55,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	/////////////////////////////////////////////////
 	TCHAR tmphost2[256];
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
+	_tcscpy_s(m_cloudMatchmakerHost, _countof(m_cloudMatchmakerHost), m_pOpt->m_cloudMatchmakerHost);
 	if (_tcscmp(m_proxyhost, _T("")) != 0) {
 		_tcscat_s(m_proxyhost, _countof(m_proxyhost), _T(":"));
 		_itot_s(m_pOpt->m_proxyport, tmphost2, _countof(tmphost2), 10);
@@ -239,12 +242,62 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_ABOUT:
 			ShowAboutBox();
 			break;
+		case IDC_RADIOBRIDGE:
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
 			_this->ModeSwitch(hwnd, wParam);
 			SetTimer(hwnd, 100, 3000, NULL);
 			break;
 		case IDC_HOSTNAME_EDIT:
+			if (HIWORD(wParam) == CBN_EDITCHANGE || HIWORD(wParam) == CBN_SELCHANGE) {
+				// In Bridge mode: validate syntax and probe online status
+				if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+					HWND hStatus = GetDlgItem(hwnd, IDC_CLOUD_STATUS);
+					TCHAR codeRaw[256]{};
+					GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, codeRaw, 256);
+					// Strip non-digits to validate
+					std::string digits;
+					for (int i = 0; codeRaw[i]; i++)
+						if (codeRaw[i] >= '0' && codeRaw[i] <= '9') digits += (char)codeRaw[i];
+					if (digits.size() != 12) {
+						SetWindowText(hStatus, digits.empty() ? _T("") : _T("Invalid code (need 12 digits)"));
+						SetWindowLong(hStatus, GWL_STYLE, GetWindowLong(hStatus, GWL_STYLE) | WS_VISIBLE);
+						ShowWindow(hStatus, SW_SHOW);
+						EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
+						KillTimer(hwnd, 102);
+					} else {
+						// Valid syntax - check checksum
+						uint32_t sum = 0;
+						for (int i = 0; i < 10; i++) sum += (uint32_t)(unsigned char)digits[i];
+						char expected[3]; sprintf_s(expected, "%02u", sum % 100);
+						if (digits[10] != expected[0] || digits[11] != expected[1]) {
+							SetWindowText(hStatus, _T("Invalid code (checksum error)"));
+							SetWindowLong(hStatus, GWL_STYLE, GetWindowLong(hStatus, GWL_STYLE) | WS_VISIBLE);
+							ShowWindow(hStatus, SW_SHOW);
+							EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
+							KillTimer(hwnd, 102);
+						} else {
+							// Good syntax - probe async and start polling
+							SetWindowText(hStatus, _T("Checking..."));
+							ShowWindow(hStatus, SW_SHOW);
+							EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
+							SetTimer(hwnd, 102, 5000, NULL);
+							std::string code = digits;
+							std::string mmHost;
+							{
+								char tmp[MAX_HOST_NAME_LEN]{};
+								WideCharToMultiByte(CP_UTF8, 0, _this->m_cloudMatchmakerHost, -1, tmp, MAX_HOST_NAME_LEN, NULL, NULL);
+								mmHost = (tmp[0] != '\0') ? tmp : CLOUD_MATCHMAKER_HOST;
+							}
+							std::thread([hwnd, hStatus, code, mmHost]() {
+								bool online = CloudProxyServer::Probe(code, mmHost);
+								SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
+								EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
+							}).detach();
+						}
+					}
+				}
+			}
 			if (HIWORD(wParam) == CBN_SELCHANGE) {
 				TCHAR hostname[256];
 				int ItemIndex = SendMessage((HWND)lParam, CB_GETCURSEL, 0, 0);
@@ -414,12 +467,42 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EndDialog(hwnd, FALSE);
 		KillTimer(hwnd, 100);
 		KillTimer(hwnd, 101);
+		KillTimer(hwnd, 102);
 		return TRUE;
 	case WM_TIMER:
 		if ((UINT)wParam == 100) {
 			KillTimer(hwnd, 100);
 		}
-		if ((UINT)wParam == 101) 
+		if ((UINT)wParam == 101)
+			return 0;
+		if ((UINT)wParam == 102) {
+			// Periodic cloud probe poll (Bridge mode only)
+			if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+				HWND hStatus = GetDlgItem(hwnd, IDC_CLOUD_STATUS);
+				TCHAR codeRaw[256]{};
+				GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, codeRaw, 256);
+				std::string digits;
+				for (int i = 0; codeRaw[i]; i++)
+					if (codeRaw[i] >= '0' && codeRaw[i] <= '9') digits += (char)codeRaw[i];
+				if (digits.size() == 12) {
+					uint32_t sum = 0;
+					for (int i = 0; i < 10; i++) sum += (uint32_t)(unsigned char)digits[i];
+					char expected[3]; sprintf_s(expected, "%02u", sum % 100);
+					if (digits[10] == expected[0] && digits[11] == expected[1]) {
+						SetWindowText(hStatus, _T("Checking..."));
+						std::string code = digits;
+						char mmHostBuf[MAX_HOST_NAME_LEN]{};
+						WideCharToMultiByte(CP_UTF8, 0, _this->m_cloudMatchmakerHost, -1, mmHostBuf, MAX_HOST_NAME_LEN, NULL, NULL);
+						std::string mmHost102 = (mmHostBuf[0] != '\0') ? mmHostBuf : CLOUD_MATCHMAKER_HOST;
+						std::thread([hwnd, hStatus, code, mmHost102]() {
+							bool online = CloudProxyServer::Probe(code, mmHost102);
+							SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
+							EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
+						}).detach();
+					}
+				}
+			}
+		}
 		return 0;
 	}
 	return 0;
@@ -575,11 +658,20 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 	}
 
 	SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, false, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_SETCHECK, false, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, false, 0);
 
 	if (m_connectionType == REPEATER_SERVER) {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, true, 0);
 		ModeSwitch(hwnd, IDC_RADIOREPEATER);
+	}
+	else if (m_connectionType == UDP_BRIDGE) {
+		SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_SETCHECK, true, 0);
+		ModeSwitch(hwnd, IDC_RADIOBRIDGE);
+		// Trigger validate+probe on the pre-filled code from ini
+		PostMessage(hwnd, WM_COMMAND,
+			MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE),
+			(LPARAM)GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
 	}
 	else {
 		SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, true, 0);
@@ -805,17 +897,31 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_HIDE);
+		KillTimer(hwnd, 102);
 		SetDlgItemText(hwnd, IDC_LINE1, sz_ID);
 		SetDlgItemText(hwnd, IDC_LINE2, sz_Port);
-		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), TRUE);
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_HIDE);
+		KillTimer(hwnd, 102);
 		SetDlgItemText(hwnd, IDC_LINE1, sz_Computer);
 		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
-		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), TRUE);
+		break;
+	case IDC_RADIOBRIDGE:
+		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
+		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_SHOW);
+		SetDlgItemText(hwnd, IDC_LINE1, _T("Access code"));
+		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
+		SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T(""));
+		EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
 		break;
 	}
 }

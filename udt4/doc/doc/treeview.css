@@ -1,0 +1,8 @@
+/* jSh - Stylesheet for JavaScript TreeView documentation */
+
+pre { margin-left:10px; }
+h1,h2,h3,h4,h5,h6,pre,tt { color:#0000CC; }
+a.an { text-decoration:none; }
+a:active  { color:#CC0000; text-decoration:none; }
+a:link    { color:#CC0000; text-decoration:underline; }
+a:visited { color:#990066; text-decoration:underline; }

@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Transition from UDT3</font></h3>
+<p>If you have never used UDT before, please skip this page.</p>
+
+<p>If you are familiar with previous versions of UDT, in particular UDT3, please noted that we have several major changes in UDT4 and you may need to modify your existing code a little 
+in order to use UDT4. In addition, different versions of UDT do not communicate with each other.</p>
+
+<p>UDT4 have made the following improvements </p>
+<ul>
+  <li>UDT4 uses a UDP multiplexer for multiple UDT sockets, therefore it is possible (and by default) all UDT sockets in one process will share one UDP port. This scheme makes it easier 
+for firewall traversing.</li>
+  <li>UDT4 has a new buffer management module that enables all UDT sockets in one process can share protocol buffer. The goodness it brings is the much less memory usage for multiple 
+UDT connections compared to previous versions.</li>
+  <li>UDT4 can automatically resize its buffer in order to reduce memory usage while providing maximum throughput.</li>
+  <li>Because of the new memory management scheme, overlapped IO has been removed from UDT4. If your existing code uses overlapped IO, you need to modify it to use regular IO. This is 
+the only change needed for exiting code to move from UDT3 to UDT4.</li>
+  <li>UDT4 has an enhanced code based and some bug fixes.</li>
+</ul>
+
+<p>Finally, UDT4 does not provide the NS-2 simulation code (nor any support to previous versions of simulation code) any more.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

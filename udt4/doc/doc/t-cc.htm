@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+<style type="text/css">
+<!--
+.style1 {color: #CC0000}
+-->
+</style>
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">User-defined Congestion Control Algorithm</font></h3>
+<p>You can add your own congestion control algorithm into UDT. It is as simple as to define several callback functions that will be triggered on certain events, e.g, when an ACK is 
+received.</p>
+
+<p>All the congestion control callback functions are collected in a C++ class CCC. You have to inherit this class to define your own congestion control algorithm. That is, UDT/CCC uses an 
+object-oriented design. CCC in defined in ccc.h, which you have to include in your files in order to enable this feature.</p>
+
+<p>The CCC class contains two control variables: m_dPktSndPeriod, and m_dCWndSize. m_dPktSndPeriod is a double float number representing the packet sending period (as to be used in rate 
+control), in microseconds. m_dCWndSize is a double float number representing the size of the congestion window (cwnd), in number of packets. The congestion control algorithm will need to 
+update at least one of them. For example, for pure window based approach, m_dPktSndPeriod should always be zero.</p>
+
+<p>The fast way to learn CCC is to use the examples in ./app/cc.h. The file cc.h also includes many more advanced control mechanisms that your control classes can be derived from. For 
+example, if you are designing a new TCP variant, you can implement the new control class directly from CTCP.</p>
+
+<p>Here we demonstrate the usage of UDT/CCC by writing a reliable UDP blast control mechanism.</p>
+
+<div class="code">
+class CUDPBlast: public CCC<br>
+{<br>
+public:<br />
+&nbsp;&nbsp;CUDPBlast() {m_dCWndSize = 83333.0;}<br>
+<br>
+public:<br>
+&nbsp;&nbsp;void setRate(int mbps)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;m_dPktSndPeriod = (m_iMSS * 8.0) / mbps;<br>
+&nbsp;&nbsp;}<br>
+};</div>
+
+<p>In this example, CUDPBlast inherits from the base class CCC. In the constructor, it sets the congestion window size to a large value so that it will not affect the packet sending. (This 
+is pure rate based method to blast UDP packets.) The method SetRate() can be used to set a fixed packet sending rate at any time.</p>
+
+<p>The application can use setsockopt/getsockopt to assign this control class to a UDT instance, and/or set its parameters.</p>
+
+<div class="code">
+UDT::setsockopt(usock, 0, UDT_CC, new CCCFactory&lt;CUDPBlast&gt;
+  <CUDPBlast>
+  , sizeof(CCCFactory&lt;CUDPBlast&gt;
+  <CUDPBlast>));
+</div>
+
+
+<p>The above code assigns the CUDPBlast control algorthm to a UDT socket usock. Note that CCCFactory<CUDPBlast> is using the Abstract Factory design pattern.</p>
+
+<p>To set a specific data sending rate, the application needs to obtain a handle to the concrete CCC class instance used by the UDT socket usock.</p>
+
+<div class="code">
+CUDPBlast* cchandle = NULL;<br>
+int temp;<br>
+UDT::getsockopt(usock, 0, UDT_CC, &cchandle, &temp);
+</div>
+
+<p>The application can then call the method of setRate() to set a 500Mbps data rate.</p>
+
+<div class="code">
+if (NULL != cchandle)<br>
+&nbsp;&nbsp;cchandle->setRate(500);
+</div>
+
+<p>The UDT/CCC can be used to implement most control mechanims, including but not limited to rate-based approaches, TCP variants (e.g., TCP, Scalable, HighSpeed, BiC, Vegas, FAST), and 
+group-based approaches (e.g., GTP, CM).</p>
+
+<h5>Note</h5>
+<p>1. Do NOT call regular UDT API inside CCC or its derived classes. Unknown error could happen.</p>
+
+<p>2. CCCFactory<...> is a C++ template class. You do not need to derive any classes from it.</p>
+
+<p>3. UDT will not release the CCCFactory<...> instance. The application should release it, at anywhere after the setsockopt() call.</p>
+
+<h5>See Also</h5>
+<p><a href="ccc.htm"><strong>Congestion Control Class</strong></a></p>
+
+<p>&nbsp;</p>
+</body>
+</html>
