@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Reference: CCC </div>
+<h3><font color="#000080">Base Congestion Control Class</font></h3>
+<p>The following class CCC (some details are omitted) is the base class that a user-define congestion control algorithm should inherit from and overload the proper functions.</p>
+
+<p>The class definition is in ccc.h, all new control algorithms definition should include this header file.</p>
+
+<div class="code">
+  <p>class CCC<br />
+    {<br />
+    public:<br />
+  &nbsp;&nbsp;CCC();<br />
+  &nbsp;&nbsp;virtual ~CCC() {}
+  </p>
+    public:<br />
+  &nbsp;&nbsp;virtual void init() {}<br />
+  &nbsp;&nbsp;virtual void close() {}<br />
+  &nbsp;&nbsp;virtual void onACK(const int&amp; ack) {}<br />
+  &nbsp;&nbsp;virtual void onLoss(const int* losslist, const int&amp; size) {}
+    &nbsp;&nbsp;virtual void onTimeout() {}<br />
+  &nbsp;&nbsp;virtual void onPktSent(const CPacket* pkt) {}<br />
+  &nbsp;&nbsp;virtual void onPktReceived(const CPacket* pkt) {}<br />
+  &nbsp;&nbsp;virtual void processCustomMsg(const CPacket&amp; pkt) {}<br />
+    <br />
+    protected:<br />
+  &nbsp;&nbsp;void setACKTimer(const int&amp; msINT);<br />
+  &nbsp;&nbsp;void setACKInterval(const int&amp; pktINT);<br />
+  &nbsp;&nbsp;void setRTO(const int&amp; usRTO);<br />
+  &nbsp;&nbsp;void sendCustomMsg(CPacket&amp; pkt) const; <br />
+  &nbsp;&nbsp;const UDT::TRACEINFO* getPerfInfo();<br />
+    <br />
+    protected:<br />
+  &nbsp;&nbsp;double m_dPktSndPeriod;<br />
+  &nbsp;&nbsp;double m_dCWndSize;<br />
+    <br />
+  &nbsp;&nbsp;int m_iMSS;<br />
+  &nbsp;&nbsp;int m_iRTT;<br />
+    }; </p>
+</div>
+
+<p>void <strong>init</strong>()</p>
+
+<p>This is the callback function to be called at the start of a UDT connection. It can be used to initialize the packet sending period, initial sending rate, etc. It can also be used to 
+start timer thread. It is RECOMMENDED that the initializations are done in this method, rather than in the constructor.</p>
+
+<p>void <strong>close</strong>()</p>
+
+</p>The clear-ups can be done in this method.</p>
+
+<p>void <strong>onACK</strong>(ack)</p>
+
+<p>This is the callback function to be called when an ACK is received. The parameter of ack is the acknowledged packet sequence number.</p>
+
+<p>void <strong>onLoss</strong>(losslist, size)</p>
+
+<p>This callback function is called when the sender detects a loss event, e.g., by duplicate ACK or explicit loss report. losslist is the packet sequence numbers of the lost packets and size 
+the length of the loss list.</p>
+
+<p>void <strong>onTimeout</strong>()</p>
+
+<p>This callback function is called when a timeout event occurs if there is unacknowledged data in the sender side.</p>
+
+<p>void <strong>onPktSent</strong>(pkt)</p>
+
+<p>This callback function is called when a data packet is sent. All the packet information can be accessed though the pkt pointer. This callback function is useful to record the packet 
+timestamp in a delay-based approach and compute RTT in onACK(), because UDT does not compute RTT for all packets.</p>
+
+<p>See UDT specification and ./src/packet.cpp for the packet structure.</p>
+
+<p>void <strong>onPktReceived</strong>(pkt)</p>
+
+<p>This callback function is called when a data packet is received. Packet information can be accessed through pkt.</p>
+
+<p>void <strong>processCustomMsg</strong>(pkt)</p>
+
+<p>This callback function tells UDT how to process user defined control message (pkt).</p>
+
+<p>void <strong>setACKTimer</strong>(msINT)</p>
+
+<p>This method is used to enable timer-based acknowledging and set the ACK timer. It should be called by an inherited class (for example, in init()) if the new congestion control need 
+timer-based acknowledging. msINT is the ACK timer in millisecond. Note that the highest precision of the ACK timer depends on the specific platform, and cannot exceed 1 millisecond.</p>
+
+<p>void <strong>setACKInterval</strong>(pktINT)</p>
+
+<p>This method is used to configure the number of packets to be received before an ACK is sent. This is the default acknowledging method and by default every packet will be acknowledged. 
+Packet-based and timer-based acknowledging are exclusive. pktINT is the packet interval.</p>
+
+<p>void <strong>setRTO</strong>(usRTO)</p>
+
+<p>This method is used to set timeout value. The value usRTO is measured by microseconds.</p>
+
+<p>void <strong>sendCustomMsg</strong>(pkt)</p>
+
+<p>The method can be used to send a user defined control message. The control message pkt must conform to the packet format defined in ./src/packet.cpp. IMPORTANT: This message is sent 
+through UDP; therefore, it is not guaranteed to be sent successfully nor in order.</p>
+
+<p>const UDT::TRACEINFO* <strong>getPerfInfo</strong>()</p>
+
+<p>The internal UDT parameters and flow statistics can be read using this method. This is similar to the perfmon() method.</p>
+
+<p>double <strong>m_dPktSndPeriod</strong></p>
+
+<p>This is the packet sending period that should be updated by a rate control algorithm. If a pure window based algorithm is used, fix this variable to 0. It is measured by microsecond.</p>
+
+<p>double <strong>m_dCWndSize</strong></p>
+
+<p>This is the congestion window size that should updated by window control algorithm. If a pure rate control algorithm is used, fix this variable to infinite.</p>
+
+<h5>See Also</h5>
+<p><a href="t-cc.htm"><strong>User-defined congestion controls</strong></a></p>
+
+<p>&nbsp;</p>
+</body>
+</html>

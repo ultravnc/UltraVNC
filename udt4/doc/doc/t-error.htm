@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Introduction</title>
+<link rel="stylesheet" href="udtdoc.css" type="text/css" />
+</head>
+
+<body>
+<div class="ref_head">&nbsp;UDT Tutorial</div>
+
+<h3><font color="#000080">Error Handling</font></h3>
+<p>All UDT API will return an error upon a failed operation. Particularly, UDT defines UDT::INVALID_SOCK and UDT::ERROR as error returned values. Application should check the return 
+value against these two constants (several routine return false as error value).</p>
+
+<p>On error, <a href="error.htm"><strong>getlasterror</strong></a> can be used to retrieve the error information. In fact, the function returns the latest error occurred in the thread where the function is called. <a href="error.htm"><strong>getlasterror</strong></a> returns an <a href="structure.htm"><strong>ERRORINFO</strong></a> structure, it contains both the error code and special text error message. Two helper functions of <a href="structure.htm"><strong>getErrorCode</strong></a> and <a href="structure.htm"><strong>getErrorMessage</strong></a> can be used to read these 
+information.</p>
+<p>The UDT error information is thread local (that is, an error in another thread will not affect the error information in the current thread). The returned value is a reference to the UDT internal error structure.</p>
+<p>Note that a successful call will NOT clear the error. Therefore, applications should use the return value of a UDT API to check the result of a UDT call. <a href="error.htm"><strong>getlasterror</strong></a> only provides detailed information when necessary. However, application can use <strong>getlasterror().<a href="structure.htm">clear()</a></strong> to clear the previously logged error if needed. </p>
+<p><strong>Example</strong>: check UDT::bind error.</p>
+<div class="code">
+sockaddr_in my_addr;<br>
+my_addr.sin_family = AF_INET;<br>
+my_addr.sin_port = htons(21); //invalid port number<br>
+my_addr.sin_addr.s_addr = INADDR_ANY;<br>
+memset(&(my_addr.sin_zero), '\0', 8);<br>
+<br>
+UDTSOCKET serv = UDT::socket(AF_INET, SOCK_STREAM, 0);<br>
+if (UDT::ERROR == UDT::bind(serv, (sockaddr*)&my_addr, sizeof(my_addr)))<br>
+{<br>
+&nbsp;&nbsp;cout << "bind: " << UDT::getlasterror().getErrorMessage();<br>
+&nbsp;&nbsp;// further action may depends on UDT::getlasterror().getErrorCode().<br>
+&nbsp;&nbsp;// system level error can be accessed through "errno"<br>
+&nbsp;&nbsp;return 0;<br>
+}
+</div>
+
+<p>In the example above, the output will be:</p>
+<div class="code">
+error message: Couldn't set up network connection: Permission denied.
+</div>
+
+<p>The UDT error code only reflects the operation error of the UDT socket level. Applications can still read the system level error (e.g., <u>errno</u> in Linux, <u>GetLastError</u> in Windows) to read 
+more specific error information. However, the error message obtained by getErrorMessage contains information of both the UDT level error and the system level error.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>
