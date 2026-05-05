@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -372,7 +372,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../omnithread;..;../librats/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../omnithread;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_CRT_SECURE_NO_WARNINGS;_VIEWER;_XZ;_VCPKG;_UNICODE;UNICODE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -392,9 +392,9 @@
     </PreLinkEvent>
     <Link>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../librats/Win32/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
@@ -421,7 +421,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../omnithread;..;../librats/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../omnithread;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;__NT__;_WINSTATIC;__WIN32__;_CRT_SECURE_NO_WARNINGS;_X64;_VIEWER;_XZ;_VCPKG;_UNICODE;UNICODE;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -441,7 +441,7 @@
     </PreLinkEvent>
     <Link>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;iphlpapi.lib;rats.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
@@ -450,7 +450,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\winvnc\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\winvnc\omnithread\x64\Debug;..\winvnc\x64\debug;..\librats\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vncviewer\x64\Debug;..\winvnc\Debug\x64\liblzma;..\rdr\x64\Debug;..\zlib\contrib\vstudio\vc15\x64\ZlibStatDebug;..\zipunzip_src\zip20\windll\visualc\lib\x64\Debug;..\zipunzip_src\unzip\windll\vc6\lib\x64\Debug;..\winvnc\omnithread\x64\Debug;..\winvnc\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -499,7 +499,7 @@
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -796,7 +796,7 @@
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -859,7 +859,7 @@
     </PreLinkEvent>
     <Link>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>.\x64\Release\;..\zlib\contrib\vstudio\vc15\x64\ZlibStatrelease_viewer;.\Release\x64\liblzma\;.\omnithread\x64\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1122,7 +1122,7 @@
     </PreLinkEvent>
     <Link>
       <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;ws2_32.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
