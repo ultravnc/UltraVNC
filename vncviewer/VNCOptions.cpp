@@ -304,9 +304,6 @@ void VNCOptions::setDefaultDocumentPath()
 		wcscat_s(m_document_folder, MAX_PATH, L"\\");
 		wcscat_s(m_document_folder, MAX_PATH, APPDIR);
 
-		struct _stat st;
-		if (_wstat(m_document_folder, &st) == -1)
-			_wmkdir(m_document_folder);
 	}
 	else {
 		wchar_t* tempvar = _wgetenv(L"TEMP");

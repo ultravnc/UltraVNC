@@ -88,6 +88,9 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
 
 	TCHAR filename[MAX_PATH];
 	TCHAR expanded_filename[MAX_PATH];
+	if (GetFileAttributesW(m_folder) == INVALID_FILE_ATTRIBUTES)
+		CreateDirectoryW(m_folder, NULL);
+
 	_tcscpy_s(filename, m_folder);
 	_tcscat_s(filename, _T("\\"));
 	_tcscat_s(filename, m_prefix); 
