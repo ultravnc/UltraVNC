@@ -1487,11 +1487,10 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			if (!hPToken)
 				break;
 
-			char dir[MAX_PATH];
+			char dir[MAX_PATH + 32];
 			char exe_file_name[MAX_PATH];
 			GetModuleFileName(0, exe_file_name, MAX_PATH);
-			strcpy_s(dir, exe_file_name);
-			strcat_s(dir, " -securityeditorhelper");
+			sprintf_s(dir, "\"%s\" -securityeditorhelper", exe_file_name);
 
 			STARTUPINFO          StartUPInfo;
 			PROCESS_INFORMATION  ProcessInfo;

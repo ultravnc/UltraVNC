@@ -190,11 +190,10 @@ DWORD WINAPI vncCad::Cadthread(LPVOID lpParam)
 		if (result == IDYES) {
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (hPToken) {
-				char dir[MAX_PATH];
+				char dir[MAX_PATH + 32];
 				char exe_file_name[MAX_PATH];
 				GetModuleFileName(0, exe_file_name, MAX_PATH);
-				strcpy_s(dir, exe_file_name);
-				strcat_s(dir, " -softwarecadhelper");
+				sprintf_s(dir, "\"%s\" -softwarecadhelper", exe_file_name);
 
 				STARTUPINFO          StartUPInfo{};
 				PROCESS_INFORMATION  ProcessInfo{};

@@ -27,7 +27,7 @@
 #pragma comment(lib, "libsodium.lib")
 
 SettingsManager* SettingsManager::s_instance = NULL;
-SettingsManager* settings = SettingsManager::getInstance();
+SettingsManager* settings = nullptr;
 
 SettingsManager* SettingsManager::getInstance()
 {

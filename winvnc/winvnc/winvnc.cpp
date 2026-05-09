@@ -446,6 +446,19 @@ void extractConfig(char* szCmdLine)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2, int iCmdShow)
 {
 	SetDllDirectory(TEXT(""));
+	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32);
+	settings = SettingsManager::getInstance();
+
+	typedef BOOL (WINAPI *pSetProcessMitigationPolicy_t)(PROCESS_MITIGATION_POLICY, PVOID, SIZE_T);
+	HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+	if (hKernel32) {
+		pSetProcessMitigationPolicy_t pSetProcessMitigationPolicy = (pSetProcessMitigationPolicy_t)GetProcAddress(hKernel32, "SetProcessMitigationPolicy");
+		if (pSetProcessMitigationPolicy) {
+			PROCESS_MITIGATION_IMAGE_LOAD_POLICY policy = {};
+			policy.PreferSystem32Images = 1;
+			pSetProcessMitigationPolicy(ProcessImageLoadPolicy, &policy, sizeof(policy));
+		}
+	}
 	if (GetModuleFileName(NULL, winvncFolder, MAX_PATH))
 	{
 		char* p = strrchr(winvncFolder, '\\');

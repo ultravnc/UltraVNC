@@ -1037,7 +1037,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 			if (!MessageBoxSecure(NULL, sz_ID_UNINSTALL_SERVICE_QUESTION, sz_ID_SERVICE_CAPTION, MB_YESNO))
 				return 0;
 			HWND hwnd = postHelper::FindWinVNCWindow(true);
-			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE, 0);
+			if (hwnd) SendMessage(hwnd, WM_COMMAND, ID_CLOSE_SILENT, 0);
 			HANDLE hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
 			if (!hPToken) {
 				serviceHelpers::Set_uninstall_service_as_admin();

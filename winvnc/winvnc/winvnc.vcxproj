@@ -502,8 +502,9 @@
       <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/winvnc.pdb</ProgramDatabaseFile>
@@ -553,8 +554,9 @@
       <Command>cl /nologo /MTd /Fo..\Debug\ /Fd..\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/winvnc.pdb</ProgramDatabaseFile>
@@ -605,8 +607,9 @@
       <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -655,8 +658,9 @@
       <Command>cl /nologo /MTd /Fo..\x64\Debug\ /Fd..\x64\Debug\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -709,8 +713,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -774,8 +779,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -836,8 +842,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -896,8 +903,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -955,8 +963,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -1017,8 +1026,9 @@
     </PreLinkEvent>
     <Link>
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -1081,8 +1091,9 @@
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1145,8 +1156,9 @@
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1204,8 +1216,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1263,8 +1276,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1322,8 +1336,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1383,8 +1398,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <Command>cl /nologo /MT /Fo..\x64\Release\ /Fd..\x64\Release\ /c buildtime.cpp</Command>
     </PreLinkEvent>
     <Link>
-      <DependentLoadFlag>0x800</DependentLoadFlag>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DependentLoadFlags>0x800</DependentLoadFlags>
+      <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
