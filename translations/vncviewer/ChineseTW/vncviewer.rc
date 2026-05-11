@@ -18,7 +18,7 @@
 // Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -173,7 +173,7 @@ END
 
 IDD_OPTIONDIALOG DIALOGEX 0, 0, 335, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTERMOUSE | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 连接设置"
+CAPTION "UltraVNC 檢視器 - 連線設定"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "自动选择最佳设置",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,12,136,12
@@ -250,7 +250,7 @@ END
 IDD_FILETRANSFER_DLG DIALOGEX 0, 0, 555, 414
 STYLE DS_SYSMODAL | DS_SETFONT | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - 文件传输"
+CAPTION "UltraVNC 檢視器 - 檔案傳送"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "历史",IDC_HS_STATIC,4,378,26,8
@@ -291,7 +291,7 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 290, 297
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer 1.4.4.0-dev - 连接"
+CAPTION "UltraVNC 檢視器 1.4.4.0-dev - 連線"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     COMBOBOX        IDC_HOSTNAME_EDIT,91,30,103,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -318,7 +318,7 @@ END
 
 IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - RFB服务器信息"
+CAPTION "UltraVNC 檢視器 - 遠端桌面協定伺服器訊息"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,167,149,50,14
@@ -328,7 +328,7 @@ END
 IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - 身份验证"
+CAPTION "UltraVNC 檢視器 - 驗證"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDD_USER_NAME,104,6,96,14,ES_AUTOHSCROLL
@@ -343,7 +343,7 @@ END
 IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - Authentication - Unsecured Transmission"
+CAPTION "UltraVNC 檢視器 - 驗證 - 非安全傳送"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "With the current UltraVNC Viewer version, the password you provide is not transferred securely, except if you are using the encryption DSMPlugin.\r\nPlease update the UltraVNC Server on the remote computer to v1.0.2 or above for secure password transmission.",IDC_STATIC,8,6,196,44
@@ -359,7 +359,7 @@ END
 IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - Send Custom Key (Experimental...)"
+CAPTION "UltraVNC 檢視器 - 送出自定快速鍵 (測試階段...)"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "键码（十进制）",IDC_STATIC,7,9,87,12
@@ -374,7 +374,7 @@ END
 
 IDD_STATUS DIALOGEX 0, 0, 214, 201
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 连接状态"
+CAPTION "UltraVNC 檢視器 - 連線狀態"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "关闭",IDCLOSE,157,180,50,14
@@ -406,7 +406,7 @@ END
 IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - WARNING: Upgrade server..."
+CAPTION "UltraVNC 檢視器 - 警告: 升級服務器..."
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,108,13,110,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -418,7 +418,7 @@ END
 
 IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - File Transfer Param Dialog"
+CAPTION "UltraVNC 檢視器 - 傳送檔案參數對話盒"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
@@ -429,7 +429,7 @@ END
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 聊天"
+CAPTION "UltraVNC 檢視器 - 聊天"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,136,255,36,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
@@ -442,7 +442,7 @@ END
 
 IDD_APP_ABOUT DIALOGEX 0, 0, 264, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 关于"
+CAPTION "關於 UltraVNC 檢視器"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,198,48,62,14
@@ -458,7 +458,7 @@ END
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer"
+CAPTION "UltraVNC 檢視器"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Confirm message here",IDC_FTPCONFIRMCOMMENT,4,8,163,53
@@ -470,7 +470,7 @@ END
 
 IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 136
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 信息"
+CAPTION "UltraVNC 檢視器 - 訊息"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "关闭",IDOK,213,114,54,15
@@ -492,7 +492,7 @@ END
 IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - 身份验证"
+CAPTION "UltraVNC 檢視器 - 驗證"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,118,13,100,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -505,7 +505,7 @@ END
 IDD_AUTH_DIALOG4 DIALOGEX 101, 66, 215, 91
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - 身份验证"
+CAPTION "UltraVNC 檢視器 - 驗證"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDD_USER_NAME,96,7,110,14,ES_AUTOHSCROLL
@@ -524,7 +524,7 @@ END
 IDD_AUTH_DIALOG5 DIALOGEX 101, 66, 235, 79
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Viewer - 身份验证"
+CAPTION "UltraVNC 檢視器 - 驗證"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,107,6,117,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -540,7 +540,7 @@ END
 
 IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer - 会话选择器"
+CAPTION "UltraVNC 檢視器 - 進程選擇"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,205,162,50,14
@@ -551,7 +551,7 @@ END
 IDD_SAVEIMAGE DIALOGEX 0, 0, 316, 59
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | DS_CENTERMOUSE | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
-CAPTION "UltraVNC Viewer - 截图"
+CAPTION "UltraVNC 檢視器 - 萤幕截图"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
@@ -1183,15 +1183,15 @@ BEGIN
     ID_BUTTON_DBUTTON       "禁用服务器鼠标/键盘"
     ID_BUTTON_SW            "选择 SW"
     ID_BUTTON_DESKTOP       "选择桌面"
-    IDS_WARNING             "警告: 在预设中, 此阶段还未能使用任何加密处理. 请不要传送一些重要资料除非能确定连线是有足够的保安性.\n\n"
+    IDS_WARNING             "警告: 在預設中, 此階段還未能使用任何加密處理. 請不要傳送一些重要資料除非能確定連線是有足夠的保安性.\n\n"
     IDS_A1                  "停止查看器系统托盘"
     IDS_A2                  "UltraVNC 信息"
-    IDS_A3                  "错误建立状态守候法则:\n\r"
-    IDS_A4                  "或许其他 VNC 检视器 早已执行吗?"
-    IDS_A5                  "VNC 检视器错误 "
-    IDS_B1                  "接口资料库初始化错误 "
-    IDS_B2                  "客户端列表过多!"
-    IDS_B3                  "VNC 错误 "
+    IDS_A3                  "錯誤建立狀態守候法則:\n\r"
+    IDS_A4                  "或許其他 VNC 檢視器 早已執行嗎?"
+    IDS_A5                  "VNC 檢視器錯誤 "
+    IDS_B1                  "接口資料庫初始化錯誤 "
+    IDS_B2                  "客戶端列表過多!"
+    IDS_B3                  "VNC 錯誤 "
 END
 
 STRINGTABLE
@@ -1205,40 +1205,40 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_H101                "资料夹传送警告"
-    IDS_H102                "档案或资料夹名称早已存在."
-    IDS_L94                 "伺服器已关闭连结"
-    IDS_STRING50275         "登入者要求检视加密但伺服器不支援."
-    IDS_STRING50276         "你是否想继续?"
-    IDS_STRING50277         "接受不安全连线"
-    IDS_STRING50278         "拒绝不安全连线"
-    IDS_STRING50279         "不用再询问，始终容许不安全连线."
-    IDS_STRING50280         "接受登入者连线"
-    IDS_STRING50281         "拒绝登入者连线"
-    IDS_STRING50282         "登入者连线"
-    IDS_STRING50283         "伺服器未有进行身份验证设定. 可被信任吗?"
-    IDS_STRING50284         "你是否信任未被身份验证的情况下连线"
-    IDS_STRING50285         "不要建立连线"
+    IDS_H101                "資料夾傳送警告"
+    IDS_H102                "檔案或資料夾名稱早已存在."
+    IDS_L94                 "伺服器已關閉連結"
+    IDS_STRING50275         "登入者要求檢視加密但伺服器不支援."
+    IDS_STRING50276         "你是否想繼續?"
+    IDS_STRING50277         "接受不安全連線"
+    IDS_STRING50278         "拒絕不安全連線"
+    IDS_STRING50279         "不用再詢問，始終容許不安全連線."
+    IDS_STRING50280         "接受登入者連線"
+    IDS_STRING50281         "拒絕登入者連線"
+    IDS_STRING50282         "登入者連線"
+    IDS_STRING50283         "伺服器未有進行身份驗證設定. 可被信任嗎?"
+    IDS_STRING50284         "你是否信任未被身份驗證的情況下連線"
+    IDS_STRING50285         "不要建立連線"
     IDS_STRING50286         "安全性"
-    IDS_STRING50287         "需要储存密码"
+    IDS_STRING50287         "需要儲存密碼"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_STRING50288         "不储存密码"
-    IDS_STRING50289         "伺服器使用过多记忆体缓冲, 这显示可能存在安全漏洞."
-    IDS_STRING50290         "错误"
-    IDS_STRING50293         "尝试继续"
-    IDS_STRING50294         "离开"
-    IDS_STRING50295         "档案传送中断: 与伺服器中断连接"
+    IDS_STRING50288         "不儲存密碼"
+    IDS_STRING50289         "伺服器使用過多記憶體緩衝, 這顯示可能存在安全漏洞."
+    IDS_STRING50290         "錯誤"
+    IDS_STRING50293         "嘗試繼續"
+    IDS_STRING50294         "離開"
+    IDS_STRING50295         "檔案傳送中斷: 與伺服器中斷連接"
     IDS_STRING50296         "警告"
-    IDS_STRING50297         "伺服器传送的萤幕尺寸超出限制"
-    IDS_TLS1                "已关闭连接"
+    IDS_STRING50297         "伺服器傳送的螢幕尺寸超出限制"
+    IDS_TLS1                "已關閉連接"
     IDS_TLS2                "AcquireCredentialsHandle 失效"
     IDS_TLS3                "QueryContextAttributes 失效"
-    IDS_TLS4                "I/O 缓冲区不足"
+    IDS_TLS4                "I/O 緩衝區不足"
     IDS_TLS5                "握手已中止"
-    IDS_TLS6                "握手无法完成"
+    IDS_TLS6                "握手無法完成"
 END
 
 STRINGTABLE
@@ -1248,341 +1248,341 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_C1                  "未能打开剪贴簿\n"
-    IDS_C2                  "未能打开空的剪贴簿\n"
-    IDS_C3                  "未能关闭剪贴簿\n"
-    IDS_D1                  "论据错误 "
-    IDS_D2                  "比例系数无效 - 重置於一般比例"
-    IDS_D3                  "指定的守候模式埠位无效"
-    IDS_D4                  "未有指定的比例系数"
-    IDS_D5                  "指定的比例无效"
-    IDS_D6                  "未有指定的时限"
-    IDS_D7                  "指定的时限无效"
-    IDS_D8                  "未有指定的范围"
-    IDS_D9                  "指定的范围无效"
-    IDS_D10                 "未有指定的延迟"
-    IDS_D11                 "指定的延迟无效"
-    IDS_D12                 "未有指定的水平记录"
-    IDS_D13                 "指定的记录水平无效"
+    IDS_C1                  "未能打開剪貼簿\n"
+    IDS_C2                  "未能打開空的剪貼簿\n"
+    IDS_C3                  "未能關閉剪貼簿\n"
+    IDS_D1                  "論據錯誤 "
+    IDS_D2                  "比例系數無效 - 重置於一般比例"
+    IDS_D3                  "指定的守候模式埠位無效"
+    IDS_D4                  "未有指定的比例系數"
+    IDS_D5                  "指定的比例無效"
+    IDS_D6                  "未有指定的時限"
+    IDS_D7                  "指定的時限無效"
+    IDS_D8                  "未有指定的範圍"
+    IDS_D9                  "指定的範圍無效"
+    IDS_D10                 "未有指定的延遲"
+    IDS_D11                 "指定的延遲無效"
+    IDS_D12                 "未有指定的水平記錄"
+    IDS_D13                 "指定的記錄水平無效"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_D14                 "未有指定的记录档案"
-    IDS_D15                 "指定的记录档案无效"
-    IDS_D16                 "未有指定的设置档案"
-    IDS_D17                 "未能打开指定的设置档案来读取."
+    IDS_D14                 "未有指定的記錄檔案"
+    IDS_D15                 "指定的記錄檔案無效"
+    IDS_D16                 "未有指定的設置檔案"
+    IDS_D17                 "未能打開指定的設置檔案來讀取."
     IDS_D18                 "未有指定的加密"
-    IDS_D19                 "指定的加密无效"
-    IDS_D20                 "未有指定的压缩水平"
-    IDS_D21                 "指定的压缩水平无效"
-    IDS_D22                 "未有指定的图像品质水平"
-    IDS_D23                 "指定的图像品质水平无效"
-    IDS_D24                 "未有指定的密码"
+    IDS_D19                 "指定的加密無效"
+    IDS_D20                 "未有指定的壓縮水平"
+    IDS_D21                 "指定的壓縮水平無效"
+    IDS_D22                 "未有指定的圖像品質水平"
+    IDS_D23                 "指定的圖像品質水平無效"
+    IDS_D24                 "未有指定的密碼"
     IDS_D25                 "未有指定的伺服器比例定命"
-    IDS_D26                 "未有指定的快速选项号码 "
+    IDS_D26                 "未有指定的快速選項號碼 "
     IDS_D27                 "未有指定的 DSM 插件('PluginName.dsm')"
-    IDS_D28                 "指定的VNC 伺服器无效."
-    IDS_E1                  "未有法载入 Rich Edit (RICHED32.DLL) 控制!"
+    IDS_D28                 "指定的VNC 伺服器無效."
+    IDS_E1                  "未有法載入 Rich Edit (RICHED32.DLL) 控制!"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_E2                  "Rich Edit Dll 载入中"
-    IDS_F1                  "插件未能载入.\n\r请完整检查清楚."
-    IDS_F3                  "插件启动作用."
-    IDS_F4                  "无密码,检视器"
-    IDS_F5                  "插件无法载入.\n\r请完整检查名称."
-    IDS_F6                  "插件载入中"
-    IDS_F7                  "插件未能初始化.\n\r请完整检查名称"
-    IDS_F8                  "指定的 VNC 伺服器无效.\n\r伺服器应该以此型式为 主机:埠号."
-    IDS_F10                 "连接设定 "
-    IDS_F11                 "未有插件检测到..."
-    IDS_G1                  "建立快写插口错误 "
-    IDS_G2                  "锁定快写插口错误 "
-    IDS_G3                  "尝试守候快写时错误 "
-    IDS_H1                  " > 警告: 远端电脑巳取消档案传送功能"
+    IDS_E2                  "Rich Edit Dll 載入中"
+    IDS_F1                  "插件未能載入.\n\r請完整檢查清楚."
+    IDS_F3                  "插件啟動作用."
+    IDS_F4                  "無密碼,檢視器"
+    IDS_F5                  "插件無法載入.\n\r請完整檢查名稱."
+    IDS_F6                  "插件載入中"
+    IDS_F7                  "插件未能初始化.\n\r請完整檢查名稱"
+    IDS_F8                  "指定的 VNC 伺服器無效.\n\r伺服器應該以此型式為 主機:埠號."
+    IDS_F10                 "連接設定 "
+    IDS_F11                 "未有插件檢測到..."
+    IDS_G1                  "建立快寫插口錯誤 "
+    IDS_G2                  "鎖定快寫插口錯誤 "
+    IDS_G3                  "嘗試守候快寫時錯誤 "
+    IDS_H1                  " > 警告: 遠端電腦巳取消檔案傳送功能"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H2                  " > 警告: 远端电脑巳取消档案传送功能"
-    IDS_H3                  "伺服器未能受权档案传送功能"
-    IDS_H4                  " 连接..."
-    IDS_H5                  "使用者中断传送"
-    IDS_H6                  "已传送完成"
-    IDS_H7                  "使用者中断传送"
-    IDS_H8                  " > 浏览本地目录. 请等待..."
-    IDS_H9                  " > 错误: 媒体不存在於本地磁碟上."
-    IDS_H10                 " > 错误: 媒体不存在於远端磁碟上."
-    IDS_H11                 " > 浏览遥端目录. 请等待..."
-    IDS_H12                 " 错误: 档案"
-    IDS_H13                 " 未能进入远端电脑"
-    IDS_H14                 "错误: 未有足够空间於远端磁碟之"
-    IDS_H15                 "接收档案中"
-    IDS_H16                 "未能建立在本地电脑"
-    IDS_H17                 "档案"
+    IDS_H2                  " > 警告: 遠端電腦巳取消檔案傳送功能"
+    IDS_H3                  "伺服器未能受權檔案傳送功能"
+    IDS_H4                  " 連接..."
+    IDS_H5                  "使用者中斷傳送"
+    IDS_H6                  "已傳送完成"
+    IDS_H7                  "使用者中斷傳送"
+    IDS_H8                  " > 瀏覽本地目錄. 請等待..."
+    IDS_H9                  " > 錯誤: 媒體不存在於本地磁碟上."
+    IDS_H10                 " > 錯誤: 媒體不存在於遠端磁碟上."
+    IDS_H11                 " > 瀏覽遙端目錄. 請等待..."
+    IDS_H12                 " 錯誤: 檔案"
+    IDS_H13                 " 未能進入遠端電腦"
+    IDS_H14                 "錯誤: 未有足夠空間於遠端磁碟之"
+    IDS_H15                 "接收檔案中"
+    IDS_H16                 "未能建立在本地電腦"
+    IDS_H17                 "檔案"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_M1                  "个档案或资料夹可同时更名"
-    IDS_M2                  "个档案及资料夹更名警告"
-    IDS_M3                  "个档案及资料夹更名"
-    IDS_M4                  "请输入新名称:"
-    IDS_M5                  "错误: 更名失败为 "
+    IDS_M1                  "個檔案或資料夾可同時更名"
+    IDS_M2                  "個檔案及資料夾更名警告"
+    IDS_M3                  "個檔案及資料夾更名"
+    IDS_M4                  "請輸入新名稱:"
+    IDS_M5                  "錯誤: 更名失敗為 "
     IDS_M6                  "本地已更名"
-    IDS_M7                  "为 "
-    IDS_M8                  "远端已更名"
-    IDS_H94                 "资料夹删除警告"
-    IDS_H95                 "你确定要删除本地资料夹"
-    IDS_H96                 "你确定要删除远端资料夹"
-    IDS_H97                 "未能删除本地资料夹"
-    IDS_H98                 "未能删除远端资料夹"
-    IDS_H99                 "未能删除资料夹"
-    IDS_H100                "建立新资料夹"
-    IDS_L93                 "只限检视... \tCtrl+Alt+F3"
+    IDS_M7                  "為 "
+    IDS_M8                  "遠端已更名"
+    IDS_H94                 "資料夾刪除警告"
+    IDS_H95                 "你確定要刪除本地資料夾"
+    IDS_H96                 "你確定要刪除遠端資料夾"
+    IDS_H97                 "未能刪除本地資料夾"
+    IDS_H98                 "未能刪除遠端資料夾"
+    IDS_H99                 "未能刪除資料夾"
+    IDS_H100                "建立新資料夾"
+    IDS_L93                 "衹限檢視... \tCtrl+Alt+F3"
 END
 
 STRINGTABLE
 BEGIN
     IDS_H18                 "已成功地接受..."
-    IDS_H19                 "错误: 传送的档案"
-    IDS_H20                 "远端电脑无效.已取消."
-    IDS_H21                 "错误: 档案存取有问题"
-    IDS_H22                 "传送档案中"
-    IDS_H23                 "错误: 档案存取有问题"
-    IDS_H24                 "远端电脑未能建立 "
-    IDS_H25                 "错误: -> 此档案"
-    IDS_H26                 "可能电脑已锁定或者远端电脑磁碟空间不足 "
-    IDS_H27                 "已成功地传送..."
-    IDS_H28                 "本地电脑无效.已取消."
-    IDS_H29                 "未能建立资料夹"
-    IDS_H30                 "在远端电脑"
-    IDS_H31                 "资料夹"
-    IDS_H32                 "已建立在远端电脑"
-    IDS_H33                 "未能删除档案"
+    IDS_H19                 "錯誤: 傳送的檔案"
+    IDS_H20                 "遠端電腦無效.已取消."
+    IDS_H21                 "錯誤: 檔案存取有問題"
+    IDS_H22                 "傳送檔案中"
+    IDS_H23                 "錯誤: 檔案存取有問題"
+    IDS_H24                 "遠端電腦未能建立 "
+    IDS_H25                 "錯誤: -> 此檔案"
+    IDS_H26                 "可能電腦已鎖定或者遠端電腦磁碟空間不足 "
+    IDS_H27                 "已成功地傳送..."
+    IDS_H28                 "本地電腦無效.已取消."
+    IDS_H29                 "未能建立資料夾"
+    IDS_H30                 "在遠端電腦"
+    IDS_H31                 "資料夾"
+    IDS_H32                 "已建立在遠端電腦"
+    IDS_H33                 "未能刪除檔案"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H34                 "已从远端电脑中删除"
-    IDS_H35                 "档案传送与"
-    IDS_H36                 "已连接 "
-    IDS_H37                 "连接中. 请等待..."
-    IDS_H38                 "早已存在於远端电脑中.\n\n 你确定要覆写它吗 ?\n"
-    IDS_H39                 "档案传送警告"
-    IDS_H40                 "个档案/资料夹 已选择传送"
-    IDS_H41                 "开始传送. 传送中"
-    IDS_H42                 "档案/资料夹 到远端电脑"
-    IDS_H43                 "早已存在於本地电脑中.\n\n 你确定要覆写它吗 ?\n"
-    IDS_H44                 "开始传送. 接收中"
-    IDS_H45                 "档案/资料夹 从远端电脑"
-    IDS_H46                 "请选择一个档案来删除. \n但每次只可删除一个档案."
-    IDS_H47                 "档案删除警告"
-    IDS_H48                 "你确定要删除本地档案"
-    IDS_H49                 "未能删除本地档案"
+    IDS_H34                 "已從遠端電腦中刪除"
+    IDS_H35                 "檔案傳送與"
+    IDS_H36                 "已連接 "
+    IDS_H37                 "連接中. 請等待..."
+    IDS_H38                 "早已存在於遠端電腦中.\n\n 你確定要覆寫它嗎 ?\n"
+    IDS_H39                 "檔案傳送警告"
+    IDS_H40                 "個檔案/資料夾 已選擇傳送"
+    IDS_H41                 "開始傳送. 傳送中"
+    IDS_H42                 "檔案/資料夾 到遠端電腦"
+    IDS_H43                 "早已存在於本地電腦中.\n\n 你確定要覆寫它嗎 ?\n"
+    IDS_H44                 "開始傳送. 接收中"
+    IDS_H45                 "檔案/資料夾 從遠端電腦"
+    IDS_H46                 "請選擇一個檔案來刪除. \n但每次衹可刪除一個檔案."
+    IDS_H47                 "檔案刪除警告"
+    IDS_H48                 "你確定要刪除本地檔案"
+    IDS_H49                 "未能刪除本地檔案"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H50                 "已删除"
-    IDS_H51                 "你确定要删除远端档案"
-    IDS_H52                 "请输入一个新的本地资料夹名称:"
-    IDS_H53                 "未能建立本地资料夹"
-    IDS_H54                 "本地资料夹"
+    IDS_H50                 "已刪除"
+    IDS_H51                 "你確定要刪除遠端檔案"
+    IDS_H52                 "請輸入一個新的本地資料夾名稱:"
+    IDS_H53                 "未能建立本地資料夾"
+    IDS_H54                 "本地資料夾"
     IDS_H55                 "已建立 "
-    IDS_H56                 "请输入一个新的远端资料夹名称:"
-    IDS_H57                 "档案传送"
-    IDS_I1                  "建立受保护的插口错误 "
-    IDS_I2                  "锁定受保护的插口错误 "
-    IDS_I3                  "尝试受保护守候错误 "
-    IDS_J1                  "要离开全萤幕模式, 可使用 Ctrl-Esc Esc 按键或在\r\nVNC 检视器工作列图示按右键选单亦可."
-    IDS_J2                  "UltraVNC 检视器全萤幕模式"
-    IDS_K2                  "错误储存档案"
-    IDS_K1                  "无效的档案名称"
-    IDS_K3                  "你想将密码储存到此档案吗 ? \n\r将密码储存到档案中是不安全的."
+    IDS_H56                 "請輸入一個新的遠端資料夾名稱:"
+    IDS_H57                 "檔案傳送"
+    IDS_I1                  "建立受保護的插口錯誤 "
+    IDS_I2                  "鎖定受保護的插口錯誤 "
+    IDS_I3                  "嘗試受保護守候錯誤 "
+    IDS_J1                  "要離開全螢幕模式, 可使用 Ctrl-Esc Esc 按鍵或在\r\nVNC 檢視器工作列圖示按右鍵選單亦可."
+    IDS_J2                  "UltraVNC 檢視器全螢幕模式"
+    IDS_K2                  "錯誤儲存檔案"
+    IDS_K1                  "無效的檔案名稱"
+    IDS_K3                  "你想將密碼儲存到此檔案嗎 ? \n\r將密碼儲存到檔案中是不安全的."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_N12                 "记忆体不足无法分配 zlib 缓冲区. "
-    IDS_N13                 "无效的探索式程式码\n"
-    IDS_N14                 "无法再使用 IDEA 认证 !"
-    IDS_LANGUAGE_NAME       "简体中文"
-    IDS_I4                  "守候程式错误"
+    IDS_N12                 "記憶體不足無法分配 zlib 緩衝區. "
+    IDS_N13                 "無效的探索式程式碼\n"
+    IDS_N14                 "無法再使用 IDEA 認證 !"
+    IDS_LANGUAGE_NAME       "繁體中文"
+    IDS_I4                  "守候程式錯誤"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H58                 "个档案/资料夹"
-    IDS_H59                 "解压资料夹"
-    IDS_H60                 "接收中. 请等待..."
-    IDS_H61                 "远端资料夹"
-    IDS_H62                 "当接收远端资料夹解压时发生错误 "
-    IDS_H63                 "已放弃."
-    IDS_H64                 "压缩本地资料夹"
-    IDS_H65                 "传送中. 请等待..."
-    IDS_H66                 "本地资料夹"
-    IDS_H67                 "已成功地压缩."
-    IDS_H68                 "当压缩本地资料夹时发生错误 (部分档案受保护)"
-    IDS_H69                 "已放弃传送."
-    IDS_H70                 "已成功地传送."
-    IDS_H71                 "远端资料夹"
-    IDS_H72                 "早已存在.\n\n 你确定要覆写所有档案与及资料夹吗 ?"
-    IDS_H73                 "本地资料夹"
+    IDS_H58                 "個檔案/資料夾"
+    IDS_H59                 "解壓資料夾"
+    IDS_H60                 "接收中. 請等待..."
+    IDS_H61                 "遠端資料夾"
+    IDS_H62                 "當接收遠端資料夾解壓時發生錯誤 "
+    IDS_H63                 "已放棄."
+    IDS_H64                 "壓縮本地資料夾"
+    IDS_H65                 "傳送中. 請等待..."
+    IDS_H66                 "本地資料夾"
+    IDS_H67                 "已成功地壓縮."
+    IDS_H68                 "當壓縮本地資料夾時發生錯誤 (部分檔案受保護)"
+    IDS_H69                 "已放棄傳送."
+    IDS_H70                 "已成功地傳送."
+    IDS_H71                 "遠端資料夾"
+    IDS_H72                 "早已存在.\n\n 你確定要覆寫所有檔案與及資料夾嗎 ?"
+    IDS_H73                 "本地資料夾"
 END
 
 STRINGTABLE
 BEGIN
     IDS_K4                  "安全性警告"
-    IDS_K5                  "错误从档案读取主机名称"
-    IDS_K6                  "设定档案错误 "
-    IDS_K7                  "错误从档案读取埠号"
+    IDS_K5                  "錯誤從檔案讀取主機名稱"
+    IDS_K6                  "設定檔案錯誤 "
+    IDS_K7                  "錯誤從檔案讀取埠號"
     IDS_L1                  "未知 "
-    IDS_L2                  "送出 Ctrl+Alt+Del 到主机"
-    IDS_L3                  "设换全萤幕显示模式(开/关)"
-    IDS_L4                  "显示连接选项..."
-    IDS_L5                  "更新萤幕"
-    IDS_L6                  "送出 '开始' (Ctrl+Esc) 到主机"
-    IDS_L7                  "送出自定热键"
-    IDS_L8                  "显示状态视窗"
-    IDS_L9                  "关闭连接 "
-    IDS_L10                 "隐藏工具列按钮"
-    IDS_L11                 "设换远端输入和远端的空白萤幕(开/关)"
-    IDS_L12                 "开启档案传送..."
+    IDS_L2                  "送出 Ctrl+Alt+Del 到主機"
+    IDS_L3                  "設換全螢幕顯示模式(開/關)"
+    IDS_L4                  "顯示連接選項..."
+    IDS_L5                  "更新螢幕"
+    IDS_L6                  "送出 '開始' (Ctrl+Esc) 到主機"
+    IDS_L7                  "送出自定熱鍵"
+    IDS_L8                  "顯示狀態視窗"
+    IDS_L9                  "關閉連接 "
+    IDS_L10                 "隱藏工具列按鈕"
+    IDS_L11                 "設換遠端輸入和遠端的空白螢幕(開/關)"
+    IDS_L12                 "開啟檔案傳送..."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L13                 "萤幕截图"
-    IDS_L14                 "选择全桌面"
-    IDS_L15                 "开启聊天..."
-    IDS_L16                 "档案传送... \tCtrl+Alt+F7"
+    IDS_L13                 "螢幕截圖"
+    IDS_L14                 "選擇全桌面"
+    IDS_L15                 "開啟聊天..."
+    IDS_L16                 "檔案傳送... \tCtrl+Alt+F7"
     IDS_L17                 "聊天... \tCtrl+Alt+F8"
-    IDS_L18                 "显示工具列 \tCtrl+Alt+F9"
-    IDS_L19                 "取消远端 输入/显示器"
-    IDS_L20                 "启动远端 输入/显示器 "
-    IDS_L21                 "连接选项(&O)... \tCtrl+Alt+F6"
-    IDS_L22                 "连接讯息(&I)..\tCtrl+Alt+Shift+I"
-    IDS_L23                 "要求萤幕更新(&R)..\tCtrl+Alt+Shift+R"
-    IDS_L24                 "全萤幕(&F) \tCtrl+Alt+F12"
-    IDS_L25                 "自动萤幕比例(&A) \tCtrl+Alt+F10"
-    IDS_L26                 "半萤幕显示(&H) \tCtrl+Alt+F11"
-    IDS_L27                 "模糊显示(&F)"
-    IDS_L28                 "一般显示(&N) \tCtrl+F11"
+    IDS_L18                 "顯示工具列 \tCtrl+Alt+F9"
+    IDS_L19                 "取消遠端 輸入/顯示器"
+    IDS_L20                 "啟動遠端 輸入/顯示器 "
+    IDS_L21                 "連接選項(&O)... \tCtrl+Alt+F6"
+    IDS_L22                 "連接訊息(&I)..\tCtrl+Alt+Shift+I"
+    IDS_L23                 "要求螢幕更新(&R)..\tCtrl+Alt+Shift+R"
+    IDS_L24                 "全螢幕(&F) \tCtrl+Alt+F12"
+    IDS_L25                 "自動螢幕比例(&A) \tCtrl+Alt+F10"
+    IDS_L26                 "半螢幕顯示(&H) \tCtrl+Alt+F11"
+    IDS_L27                 "模糊顯示(&F)"
+    IDS_L28                 "一般顯示(&N) \tCtrl+F11"
 END
 
 STRINGTABLE
 BEGIN
     IDS_L29                 "全彩(&F)"
-    IDS_L30                 "256 颜色(&2)"
+    IDS_L30                 "256 顏色(&2)"
     IDS_L31                 "送出 Ctrl+Alt+Del \tCtrl+Alt+F4"
-    IDS_L32                 "送出 Ctrl+Esc (开始选单)"
-    IDS_L33                 "Ctrl 键 下"
-    IDS_L34                 "Ctrl 键 上"
-    IDS_L35                 "Alt 键 下"
-    IDS_L36                 "Alt 键 上"
-    IDS_L37                 "新增连接(&W)...\tCtrl+Alt+Shift+N"
-    IDS_L38                 "储存连接讯息於 (&A)... \tCtrl+Alt+F5"
-    IDS_L39                 "关於 UltraVNC 检视器(&A)..."
-    IDS_L40                 "关闭守候模式(&D)"
-    IDS_L41                 "DSM 插件未能设定 "
+    IDS_L32                 "送出 Ctrl+Esc (開始選單)"
+    IDS_L33                 "Ctrl 鍵 下"
+    IDS_L34                 "Ctrl 鍵 上"
+    IDS_L35                 "Alt 鍵 下"
+    IDS_L36                 "Alt 鍵 上"
+    IDS_L37                 "新增連接(&W)...\tCtrl+Alt+Shift+N"
+    IDS_L38                 "儲存連接訊息於 (&A)... \tCtrl+Alt+F5"
+    IDS_L39                 "關於 UltraVNC 檢視器(&A)..."
+    IDS_L40                 "關閉守候模式(&D)"
+    IDS_L41                 "DSM 插件未能設定 "
     IDS_L42                 "使用者已取消 "
-    IDS_L43                 "连接中 ..."
-    IDS_L44                 "错误建立接口 !"
+    IDS_L43                 "連接中 ..."
+    IDS_L44                 "錯誤建立接口 !"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L45                 "寻找伺服器位址..."
+    IDS_L45                 "尋找伺服器位址..."
     IDS_L46                 "未能找到伺服器位址 !"
-    IDS_L47                 "连接到伺服器..."
-    IDS_L48                 "未能连接到伺服器 !"
-    IDS_L49                 "已连接 "
-    IDS_L50                 "取消 Nagle's 算法错误 "
-    IDS_L51                 "很抱歉- 这台伺服器使用旧的认证方案\n但早已不再支援."
-    IDS_L52                 "通讯协议版本错误 "
-    IDS_L53                 "无密码"
-    IDS_L54                 "已取消认证"
-    IDS_L55                 "已接受密码 "
-    IDS_L56                 "密码错误 "
-    IDS_L57                 "VNC 认证无效 !"
-    IDS_L58                 "VNC 认证无效 - 已尝试多次 !"
-    IDS_L59                 "未知的 VNC 认证结果 !"
-    IDS_L60                 "未知的认证方案 !"
+    IDS_L47                 "連接到伺服器..."
+    IDS_L48                 "未能連接到伺服器 !"
+    IDS_L49                 "已連接 "
+    IDS_L50                 "取消 Nagle's 算法錯誤 "
+    IDS_L51                 "很抱歉- 這台伺服器使用舊的認證方案\n但早已不再支援."
+    IDS_L52                 "通訊協議版本錯誤 "
+    IDS_L53                 "無密碼"
+    IDS_L54                 "已取消認證"
+    IDS_L55                 "已接受密碼 "
+    IDS_L56                 "密碼錯誤 "
+    IDS_L57                 "VNC 認證無效 !"
+    IDS_L58                 "VNC 認證無效 - 已嘗試多次 !"
+    IDS_L59                 "未知的 VNC 認證結果 !"
+    IDS_L60                 "未知的認證方案 !"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L61                 "错误建立本地萤幕影像."
-    IDS_L62                 "请等待 - 初始化萤幕载入中..."
-    IDS_L63                 "已收到未能处理的色彩设定讯息!\n"
-    IDS_L64                 "已收到未能处理的讯息!\n"
-    IDS_L65                 "正确写入: DSM插件-容许回存缓冲错误."
-    IDS_L66                 "正确写入: DSM插件-回存缓冲错误."
-    IDS_L67                 "已关闭连接 "
-    IDS_L68                 "正确写入: DSM插件-转换缓冲错误."
-    IDS_L69                 "伺服器已关闭连线\n\r -您的连线已被拒绝\n\r -网络已中断\n\r -防火墙"
-    IDS_L70                 "记忆体分配网路缓冲不足."
-    IDS_L71                 "记忆体分配 zlib 缓冲不足."
-    IDS_L72                 "UltraVNC 检视器状态为 "
-    IDS_L73                 "UltraVNC 检视器状态"
-    IDS_L74                 "没有连接 "
-    IDS_L75                 "你确定要离开吗 ?"
-    IDS_L76                 "关闭 UltraVNC 检视器"
+    IDS_L61                 "錯誤建立本地螢幕影像."
+    IDS_L62                 "請等待 - 初始化螢幕載入中..."
+    IDS_L63                 "已收到未能處理的色彩設定訊息!\n"
+    IDS_L64                 "已收到未能處理的訊息!\n"
+    IDS_L65                 "正確寫入: DSM插件-容許回存緩衝錯誤."
+    IDS_L66                 "正確寫入: DSM插件-回存緩衝錯誤."
+    IDS_L67                 "已關閉連接 "
+    IDS_L68                 "正確寫入: DSM插件-轉換緩衝錯誤."
+    IDS_L69                 "伺服器已關閉連線\n\r -您的連線已被拒絕\n\r -網絡已中斷\n\r -防火牆"
+    IDS_L70                 "記憶體分配網路緩衝不足."
+    IDS_L71                 "記憶體分配 zlib 緩衝不足."
+    IDS_L72                 "UltraVNC 檢視器狀態為 "
+    IDS_L73                 "UltraVNC 檢視器狀態"
+    IDS_L74                 "沒有連接 "
+    IDS_L75                 "你確定要離開嗎 ?"
+    IDS_L76                 "關閉 UltraVNC 檢視器"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L77                 "连接的 VNC 伺服器不支援 UltraVNC 档案传送 !"
-    IDS_L78                 "UltraVNC 检视器 - 无法执行此功能"
-    IDS_L79                 "档案传送视窗早已开启 !"
-    IDS_L80                 "档案传送警告"
-    IDS_L81                 "连接的 VNC 伺服器不支援 UltraVNC 文字聊天 !"
-    IDS_L82                 "UltraVNC 检视器 - 无法执行此功能"
-    IDS_L83                 "文字聊天视窗早已开启 !"
+    IDS_L77                 "連接的 VNC 伺服器不支援 UltraVNC 檔案傳送 !"
+    IDS_L78                 "UltraVNC 檢視器 - 無法執行此功能"
+    IDS_L79                 "檔案傳送視窗早已開啟 !"
+    IDS_L80                 "檔案傳送警告"
+    IDS_L81                 "連接的 VNC 伺服器不支援 UltraVNC 文字聊天 !"
+    IDS_L82                 "UltraVNC 檢視器 - 無法執行此功能"
+    IDS_L83                 "文字聊天視窗早已開啟 !"
     IDS_L84                 "文字聊天警告"
-    IDS_L85                 "请先关闭档案传送视窗"
-    IDS_L86                 "请先关闭文字聊天视窗"
-    IDS_L87                 "请先关闭连接选项视窗"
-    IDS_L88                 "UltraVNC 检视器 - 警告"
-    IDS_L89                 "判断协议版本..."
-    IDS_L90                 "已查询密码"
-    IDS_L91                 "未能连接上"
-    IDS_L92                 "无需认证要求"
+    IDS_L85                 "請先關閉檔案傳送視窗"
+    IDS_L86                 "請先關閉文字聊天視窗"
+    IDS_L87                 "請先關閉連接選項視窗"
+    IDS_L88                 "UltraVNC 檢視器 - 警告"
+    IDS_L89                 "判斷協議版本..."
+    IDS_L90                 "已查詢密碼"
+    IDS_L91                 "未能連接上"
+    IDS_L92                 "無需認證要求"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_TLS7                "加密讯息失效"
-    IDS_TLS8                "解密讯息失失效"
-    IDS_TLS9                "异常的解密讯息结果"
+    IDS_TLS7                "加密訊息失效"
+    IDS_TLS8                "解密訊息失失效"
+    IDS_TLS9                "異常的解密訊息結果"
     IDS_TLS10               "ApplyControlToken 失效"
     IDS_TLS11               "CertGetCertificateChain 失效"
-    IDS_N1                  "没有项目在检视清单中"
-    IDS_N2                  "VNC 伺服器未有选择"
-    IDS_N3                  "TCVNC 多点触控设备"
-    IDS_N4                  "此功能只支援在 1:1 模式下"
-    IDS_N5                  "UltraVNC 检视器 - 萤幕截图"
-    IDS_N6                  "UltraVNC 检视器 - 连接讯息"
-    IDS_N7                  "UltraVNC 检视器 - 连接已断开, 正在尝试重新连接"
-    IDS_N8                  "UltraVNC 检视器 - 与 <%s> 聊天"
-    IDS_N9                  "UltraVNC 检视器 -"
-    IDS_N10                 "所有显示器"
-    IDS_N11                 "预设显示器"
+    IDS_N1                  "沒有項目在檢視清單中"
+    IDS_N2                  "VNC 伺服器未有選擇"
+    IDS_N3                  "TCVNC 多點觸控設備"
+    IDS_N4                  "此功能祇支援在 1:1 模式下"
+    IDS_N5                  "UltraVNC 檢視器 - 螢幕截圖"
+    IDS_N6                  "UltraVNC 檢視器 - 連接訊息"
+    IDS_N7                  "UltraVNC 檢視器 - 連接已斷開, 正在嘗試重新連接"
+    IDS_N8                  "UltraVNC 檢視器 - 與 <%s> 聊天"
+    IDS_N9                  "UltraVNC 檢視器 -"
+    IDS_N10                 "所有顯示器"
+    IDS_N11                 "預設顯示器"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_TAB_ENCODERS        "编码"
-    IDS_TAB_INPUT           "输入"
-    IDS_TAB_DISPLAY         "显示"
-    IDS_TAB_MISC            "杂项"
+    IDS_TAB_ENCODERS        "編碼"
+    IDS_TAB_INPUT           "輸入"
+    IDS_TAB_DISPLAY         "顯示"
+    IDS_TAB_MISC            "雜項"
     IDS_TAB_SECURITY        "安全性"
-    IDS_TAB_QUICKENC        "快速编码"
+    IDS_TAB_QUICKENC        "快速編碼"
     IDS_TAB_LISTEN          "守候"
-    IDS_TAB_CONF            "设定"
+    IDS_TAB_CONF            "設定"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

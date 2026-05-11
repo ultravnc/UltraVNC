@@ -16,7 +16,7 @@
 // Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ IDB_EXPAND              BITMAP                  "res/down.bmp"
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 308, 177
 STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION "UltraVNC Server - Chat"
+CAPTION "UltraVNC 伺服器 - 聊天"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
@@ -58,7 +58,7 @@ END
 
 IDD_LIST_DLG DIALOGEX 0, 0, 298, 123
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - VNC客户端列表"
+CAPTION "UltraVNC 伺服器 - 登入者列表"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "关闭",IDOK,118,94,62,14
@@ -73,7 +73,7 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 274, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 关于"
+CAPTION "關於 UltraVNC 伺服器"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,215,56,54,16
@@ -89,7 +89,7 @@ END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 发起连接"
+CAPTION "UltraVNC 伺服器 - 反向連線初始化"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
@@ -104,7 +104,7 @@ END
 IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Server - 接受连接"
+CAPTION "UltraVNC 伺服器 - 接受連線"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "接受(&A)",IDACCEPT,7,74,53,14
@@ -118,7 +118,7 @@ END
 
 IDD_DIALOGCLOUD DIALOGEX 0, 0, 311, 103
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 云连接"
+CAPTION "UltraVNC 伺服器 - 雲連線"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "保存",IDOK,253,82,50,14
@@ -157,7 +157,7 @@ END
 
 IDD_MSLOGON DIALOGEX 0, 0, 186, 166
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - MS-Logon设置"
+CAPTION "UltraVNC 伺服器 - MS 登入設定"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
@@ -481,7 +481,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_WARNING             "警告: 在预设中, 此阶段还未能使用任何加密处理. 请不要传送一些重要资料除非能确定连线是有足够的保安性.\n\n"
+    IDS_WARNING             "警告: 在預設中, 此階段還未能使用任何加密處理. 請不要傳送一些重要資料除非能確定連線是有足夠的保安性.\n\n"
 END
 
 STRINGTABLE
@@ -570,49 +570,49 @@ END
 
 STRINGTABLE 
 BEGIN 
-    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP 需要特别版本" 
+    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP 需要特別版本" 
     IDS_WARNING_CAPTION             "警告" 
-    IDS_ERROR_OS_NOT_SUPPORTED      "错误: 不支援的操作系统" 
-    IDS_UNSUPPORTED_OS_CAPTION      "不支援的操作系统" 
+    IDS_ERROR_OS_NOT_SUPPORTED      "錯誤: 不支援的操作系統" 
+    IDS_UNSUPPORTED_OS_CAPTION      "不支援的操作系統" 
     IDS_AUTHADMIN_DLL_NOT_FOUND     "找不到 authadmin.dll" 
     IDS_WORKGRPDOMNT4_DLL_NOT_FOUND "找不到 workgrpdomnt4.dll" 
     IDS_LDAPAUTH_DLL_NOT_FOUND      "找不到 ldapauth.dll" 
     IDS_LDAPAUTHNT4_DLL_NOT_FOUND   "找不到 ldapauthnt4.dll" 
     IDS_LDAPAUTH9X_DLL_NOT_FOUND    "找不到 ldapauth9x.dll" 
-    IDS_KILL_VIEWERS_QUESTION       "你想中止所有已连接的检视器吗 ?" 
-    IDS_RESTART_SERVER_QUESTION     "你想重新启动 UltraVNC 伺服器吗？" 
-    IDS_CLOSE_SERVER_QUESTION       "你想关闭 UltraVNC 伺服器吗？" 
-    IDS_REBOOT_SYSTEM_QUESTION      "你想重新启动系统吗？" 
-    IDS_FORCE_REBOOT_QUESTION       "你想强迫重新启动系统吗？" 
-    IDS_UNINSTALL_SERVICE_QUESTION  "你想反安装 UltraVNC 服务吗？" 
-    IDS_INSTALL_SERVICE_QUESTION    "你想将 UltraVNC 安装为服务吗？" 
-    IDS_STOP_SERVICE_QUESTION       "你想停止 UltraVNC 服务吗？" 
-    IDS_START_SERVICE_QUESTION      "你想启动 UltraVNC 服务吗？" 
-    IDS_SYSTEM_CAPTION               "系统" 
-    IDS_SERVICE_CAPTION              "服务" 
-    IDS_CURRENT_DRIVER_OLD          "现时的驱动程式版本太旧\n请更新驱动程式或在伺服器\n设定内停用 Video hook 驱动程式" 
-    IDS_DRIVER_NOT_FOUND_REBOOT     "找不到驱动程式: 需要安装後再重新启动" 
-    IDS_DRIVER_INFO_REQUIRED_VERSION "驱动程式讯息: 需要版本为 1.00.22" 
-    IDS_FAILED_OPEN_SVC_MGR         "无法开启服务控制管理员" 
-    IDS_FAILED_PERMISSION_DENIED    "失效: 权限被拒" 
-    IDS_FAILED_CREATE_SVC           "无法建立新的服务" 
-    IDS_FAILED_SVC_NOT_INSTALLED    "失效: 服务没有安装" 
-    IDS_FAILED_OPEN_SVC             "无法开启服务" 
-    IDS_FAILED_QUERY_SVC_STATUS     "无法查询服务状态" 
-    IDS_FAILED_DELETE_SVC           "无法删除服务" 
-    IDS_WRONG_PASSWORD_RETRY        "密码错误, 你想重试吗？" 
-    IDS_ERROR_CAPTION                "错误" 
-    IDS_UAC_DISABLED_REGISTRY        "UAC 已停用，请修改登录档允许执行 CAD" 
-    IDS_VERIFY_SAME_FOLDER           "请确认 winvnc.exe 舆 uvnc_settings 在同一个资料夹内\n否则无法建立 uvnc_service"
-    IDS_DRIVER_FOUND                 "找到驱动程式." 
-    IDS_DRIVER_VERSION_OK            "驱动程式版本正确 " 
-    IDS_DRIVER_VERSION_NOT_OK        "驱动程式版本不是 1.00.22 " 
-    IDS_DRIVER_NOT_ACTIVATED         "驱动程式未启动，已有检视器正在连接中吗？" 
-    IDS_DRIVER_ONLY_SERVICE_ADMIN    "当 UltraVNC 伺服器服务已启动或以管理员身份执行时才能启动镜像驱动程式" 
-    IDS_DRIVER_ACTIVE                " 驱动程式已启动" 
-    IDS_DRIVER_ACCESS_OK             " 存取正确" 
-    IDS_DRIVER_ACCESS_DENIED         " 存取被拒绝, 权限问题"
-    IDS_LANGUAGE_NAME                "簡体中文"
+    IDS_KILL_VIEWERS_QUESTION       "你想中止所有已連接的檢視器嗎 ?" 
+    IDS_RESTART_SERVER_QUESTION     "你想重新啟動 UltraVNC 伺服器嗎？" 
+    IDS_CLOSE_SERVER_QUESTION       "你想關閉 UltraVNC 伺服器嗎？" 
+    IDS_REBOOT_SYSTEM_QUESTION      "你想重新啟動系統嗎？" 
+    IDS_FORCE_REBOOT_QUESTION       "你想強迫重新啟動系統嗎？" 
+    IDS_UNINSTALL_SERVICE_QUESTION  "你想反安裝 UltraVNC 服務嗎？" 
+    IDS_INSTALL_SERVICE_QUESTION    "你想將 UltraVNC 安裝為服務嗎？" 
+    IDS_STOP_SERVICE_QUESTION       "你想停止 UltraVNC 服務嗎？" 
+    IDS_START_SERVICE_QUESTION      "你想啟動 UltraVNC 服務嗎？" 
+    IDS_SYSTEM_CAPTION               "系統" 
+    IDS_SERVICE_CAPTION              "服務" 
+    IDS_CURRENT_DRIVER_OLD          "現時的驅動程式版本太舊\n請更新驅動程式或在伺服器\n設定内停用 Video hook 驅動程式" 
+    IDS_DRIVER_NOT_FOUND_REBOOT     "找不到驅動程式: 需要安裝後再重新啟動" 
+    IDS_DRIVER_INFO_REQUIRED_VERSION "驅動程式訊息: 需要版本為 1.00.22" 
+    IDS_FAILED_OPEN_SVC_MGR         "無法開啟服務控制管理員" 
+    IDS_FAILED_PERMISSION_DENIED    "失效: 權限被拒" 
+    IDS_FAILED_CREATE_SVC           "無法建立新的服務" 
+    IDS_FAILED_SVC_NOT_INSTALLED    "失效: 服務没有安裝" 
+    IDS_FAILED_OPEN_SVC             "無法開啟服務" 
+    IDS_FAILED_QUERY_SVC_STATUS     "無法查詢服務狀態" 
+    IDS_FAILED_DELETE_SVC           "無法刪除服務" 
+    IDS_WRONG_PASSWORD_RETRY        "密碼錯誤, 你想重試嗎？" 
+    IDS_ERROR_CAPTION                "錯誤" 
+    IDS_UAC_DISABLED_REGISTRY        "UAC 已停用，請修改登錄檔允許執行 CAD" 
+    IDS_VERIFY_SAME_FOLDER           "請確認 winvnc.exe 舆 uvnc_settings 在同一個資料夾内\n否則無法建立 uvnc_service"
+    IDS_DRIVER_FOUND                 "找到驅動程式." 
+    IDS_DRIVER_VERSION_OK            "驅動程式版本正確 " 
+    IDS_DRIVER_VERSION_NOT_OK        "驅動程式版本不是 1.00.22 " 
+    IDS_DRIVER_NOT_ACTIVATED         "驅動程式未啟動，已有檢視器正在連接中嗎？" 
+    IDS_DRIVER_ONLY_SERVICE_ADMIN    "當 UltraVNC 伺服器服務已啟動或以管理員身份執行時才能啟動鏡像驅動程式" 
+    IDS_DRIVER_ACTIVE                " 驅動程式已啟動" 
+    IDS_DRIVER_ACCESS_OK             " 存取正確" 
+    IDS_DRIVER_ACCESS_DENIED         " 存取被拒絕, 權限問題"
+    IDS_LANGUAGE_NAME                "繁體中文"
 END 
 
 #endif    // Chinese (Simplified, PRC) resources
@@ -623,7 +623,7 @@ END
 // Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_TRADITIONAL
 #pragma code_page(65001)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -633,7 +633,7 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 
 IDD_PROPERTIESDIALOG DIALOGEX 0, 0, 380, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 设置"
+CAPTION "UltraVNC 伺服器 - 設定"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "确定",IDOK,204,232,50,14
@@ -753,7 +753,7 @@ END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Edit IPv4 Access Rule"
+CAPTION "UltraVNC 伺服器 - 編輯 IPv4 登入者規則"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "IPv4 地址",IDC_STATIC,0,5,223,58,WS_GROUP
@@ -861,7 +861,7 @@ END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 输入管理员密码"
+CAPTION "UltraVNC 伺服器 - 輸入 UltraVNC 伺服器管理員密碼"
 FONT 11, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
@@ -872,7 +872,7 @@ END
 
 IDD_CHANGE_PASSWORD DIALOGEX 0, 0, 182, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - 更改密码"
+CAPTION "UltraVNC 伺服器 - 更改密碼"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "保存",IDOK,68,84,50,14
