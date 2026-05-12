@@ -24,7 +24,7 @@
     <ProjectGuid>{CCDDEE11-2345-6789-BCDE-BBCCDDEEFF00}</ProjectGuid>
     <RootNamespace>UltraVNCServerlanguagechinese</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>UltraVNC_Server_language_chinese</ProjectName>
+    <ProjectName>UltraVNC_Server_language_chinese_tw</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
