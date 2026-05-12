@@ -611,8 +611,6 @@ BEGIN
     BEGIN
         MENUITEM "&Settings",                   ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "Copy bridge code",            ID_COPY_BRIDGE_CODE
-        MENUITEM SEPARATOR
         MENUITEM "&About UltraVNC Server...",   ID_ABOUT
         POPUP "Visit our links"
         BEGIN
