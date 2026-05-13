@@ -110,10 +110,10 @@ void ClientConnection::SaveConnection()
 		}
 	} else
 		buf[0] = '\0';
-	// Password uses ANSI API for special encoding
-	char fnameA[_MAX_PATH];
-	WideCharToMultiByte(CP_UTF8, 0, fname, -1, fnameA, _MAX_PATH, NULL, NULL);
-	WritePrivateProfileStringA("connection", "password", buf, fnameA);
+	// Password stored as hex string, use Unicode API for correct filename handling
+	wchar_t bufW[32];
+	MultiByteToWideChar(CP_UTF8, 0, buf, -1, bufW, 32);
+	WritePrivateProfileStringW(L"connection", L"password", bufW, fname);
 	m_opts->SaveOptions(fname);
 	//m_opts->Register();
 }
@@ -193,12 +193,12 @@ int ClientConnection::LoadConnection(const wchar_t *fname, bool fFromDialog, boo
 	m_proxyport = GetPrivateProfileInt(_T("connection"), _T("proxyport"), 0, fname);
     m_connectionType = (ConnectionType)GetPrivateProfileInt(_T("options"), _T("UseProxy"), DIRECT_TCP, fname);
 
-	// Password uses ANSI API for special encoding
-	char buf[32];
-	char fnameA[_MAX_PATH];
-	WideCharToMultiByte(CP_UTF8, 0, fname, -1, fnameA, _MAX_PATH, NULL, NULL);
+	// Password stored as hex string, use Unicode API for correct filename handling
+	wchar_t bufW[32];
 	m_encPasswd[0] = '\0';
-	if (GetPrivateProfileStringA("connection", "password", "", buf, 32, fnameA) > 0) {
+	if (GetPrivateProfileStringW(L"connection", L"password", L"", bufW, 32, fname) > 0) {
+		char buf[32];
+		WideCharToMultiByte(CP_UTF8, 0, bufW, -1, buf, 32, NULL, NULL);
 		for (int i = 0; i < MAXPWLEN; i++)	{
 			int x = 0;
 			sscanf_s(buf+i*2, "%2x", &x);
