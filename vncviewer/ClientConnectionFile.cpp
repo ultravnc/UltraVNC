@@ -111,9 +111,9 @@ void ClientConnection::SaveConnection()
 	} else
 		buf[0] = '\0';
 	// Password stored as hex string, use Unicode API for correct filename handling
-	wchar_t bufW[32];
-	MultiByteToWideChar(CP_UTF8, 0, buf, -1, bufW, 32);
-	WritePrivateProfileStringW(L"connection", L"password", bufW, fname);
+	wchar_t wbuf[32];
+	MultiByteToWideChar(CP_UTF8, 0, buf, -1, wbuf, 32);
+	WritePrivateProfileStringW(L"connection", L"password", wbuf, fname);
 	m_opts->SaveOptions(fname);
 	//m_opts->Register();
 }
