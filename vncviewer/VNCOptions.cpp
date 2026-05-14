@@ -188,6 +188,7 @@ VNCOptions::VNCOptions()
 	m_logToConsole = false;
 	m_logToFile = false;
 	m_logFilename[0] = '\0';
+	m_ClassName[0] = '\0';
 	m_delay = 0;
 	m_connectionSpecified = false;
 	m_configSpecified = false;

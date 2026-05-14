@@ -40,7 +40,7 @@ void AuthDialog::SetStatusWindow(HWND hwndStatus, const wchar_t* className)
 {
 	m_hwndStatus = hwndStatus;
 	if (className)
-		wcscpy_s(m_className, className);
+		wcscpy_s(m_className, _countof(m_className), className);
 	else
 		m_className[0] = L'\0';
 }
