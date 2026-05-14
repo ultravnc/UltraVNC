@@ -851,6 +851,7 @@ public:
 	PFN_AdjustWindowRectExForDpi adjustWindowRectExForDpi;
 
 	// RFB settings
+	VNCOptions m_optsCopy; // Per-connection copy of options; m_opts points here so each connection is independent
 	VNCOptions *m_opts;
 	bool m_FullScreenNotDone;
 	int m_autoReconnect;
