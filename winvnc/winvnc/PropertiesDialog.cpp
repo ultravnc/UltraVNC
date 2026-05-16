@@ -415,7 +415,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
 			int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
 			for (int i = 0; i < count; i++) {
-				char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
+				wchar_t* langCode = (wchar_t*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
 				if (langCode) free(langCode);
 			}
 		}
@@ -895,74 +895,77 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		SendMessage(hCombo, CB_RESETCONTENT, 0, 0);
 		
 		// Add English as default (always available, no DLL needed)
-		int idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)"English");
-		SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup("en"));
+		int idx = (int)SendMessageW(hCombo, CB_ADDSTRING, 0, (LPARAM)L"English");
+		SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(L"en"));
 		
-		// Get exe path to find languages folder
-		char exePath[MAX_PATH];
-		char languagesPath[MAX_PATH];
-		char dllPath[MAX_PATH];
-		GetModuleFileName(NULL, exePath, MAX_PATH);
-		char* lastSlash = strrchr(exePath, '\\');
-		if (lastSlash) *lastSlash = '\0';
+		// Get exe path to find languages folder (use Unicode for proper international support)
+		wchar_t exePathW[MAX_PATH];
+		wchar_t languagesPathW[MAX_PATH];
+		wchar_t dllPathW[MAX_PATH];
+		GetModuleFileNameW(NULL, exePathW, MAX_PATH);
+		wchar_t* lastSlashW = wcsrchr(exePathW, L'\\');
+		if (lastSlashW) *lastSlashW = L'\0';
 		
 		// Search for winvnclang_*.dll in languages subfolder
-		sprintf_s(languagesPath, "%s\\languages\\winvnclang_*.dll", exePath);
+		swprintf_s(languagesPathW, L"%s\\languages\\winvnclang_*.dll", exePathW);
 		
-		WIN32_FIND_DATA findData;
-		HANDLE hFind = FindFirstFile(languagesPath, &findData);
+		WIN32_FIND_DATAW findDataW;
+		HANDLE hFind = FindFirstFileW(languagesPathW, &findDataW);
 		
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				// Extract language code from filename (winvnclang_XX.dll)
-				char* underscore = strstr(findData.cFileName, "_");
-				char* dot = strstr(findData.cFileName, ".");
+				wchar_t* underscoreW = wcsstr(findDataW.cFileName, L"_");
+				wchar_t* dotW = wcsstr(findDataW.cFileName, L".");
 				
-				if (underscore && dot && dot > underscore) {
-					char langCode[32] = {0};
-					size_t len = (size_t)(dot - underscore - 1);
+				if (underscoreW && dotW && dotW > underscoreW) {
+					wchar_t langCodeW[32] = {0};
+					size_t len = (size_t)(dotW - underscoreW - 1);
 					if (len > 31) len = 31;
-					strncpy_s(langCode, underscore + 1, len);
+					wcsncpy_s(langCodeW, underscoreW + 1, len);
 					
 					// Build full path to DLL
-					sprintf_s(dllPath, "%s\\languages\\%s", exePath, findData.cFileName);
+					swprintf_s(dllPathW, L"%s\\languages\\%s", exePathW, findDataW.cFileName);
 					
 					// Load DLL temporarily to read language name
-					HMODULE hLangDll = LoadLibraryEx(dllPath, NULL, LOAD_LIBRARY_AS_DATAFILE);
-					char displayName[64] = {0};
+					HMODULE hLangDll = LoadLibraryExW(dllPathW, NULL, LOAD_LIBRARY_AS_DATAFILE);
+					wchar_t displayNameW[64] = {0};
 					
 					if (hLangDll) {
-						// Try to load IDS_LANGUAGE_NAME string resource from DLL
-						if (LoadString(hLangDll, IDS_LANGUAGE_NAME, displayName, sizeof(displayName)) > 0) {
+						// Try to load IDS_LANGUAGE_NAME string resource from DLL using Unicode
+						if (LoadStringW(hLangDll, IDS_LANGUAGE_NAME, displayNameW, _countof(displayNameW)) > 0) {
 							// Successfully loaded language name from DLL
-							idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
-							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+							idx = (int)SendMessageW(hCombo, CB_ADDSTRING, 0, (LPARAM)displayNameW);
+							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCodeW));
 						}
 						else {
 							// Fallback: use language code if string not found
-							sprintf_s(displayName, "Language (%s)", langCode);
-							idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
-							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+							swprintf_s(displayNameW, _countof(displayNameW), L"Language (%s)", langCodeW);
+							idx = (int)SendMessageW(hCombo, CB_ADDSTRING, 0, (LPARAM)displayNameW);
+							SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCodeW));
 						}
 						FreeLibrary(hLangDll);
 					}
 					else {
 						// DLL couldn't be loaded, use code as fallback
-						sprintf_s(displayName, "Language (%s)", langCode);
-						idx = (int)SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
-						SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_strdup(langCode));
+						swprintf_s(displayNameW, _countof(displayNameW), L"Language (%s)", langCodeW);
+						idx = (int)SendMessageW(hCombo, CB_ADDSTRING, 0, (LPARAM)displayNameW);
+						SendMessage(hCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCodeW));
 					}
 				}
-			} while (FindNextFile(hFind, &findData));
+			} while (FindNextFileW(hFind, &findDataW));
 			FindClose(hFind);
 		}
 		
 		// Select current language
 		const char* currentLang = settings->getLanguage();
+		wchar_t currentLangW[32] = {0};
+		MultiByteToWideChar(CP_UTF8, 0, currentLang, -1, currentLangW, 32);
+		
 		int count = (int)SendMessage(hCombo, CB_GETCOUNT, 0, 0);
 		for (int i = 0; i < count; i++) {
-			char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
-			if (langCode && _stricmp(langCode, currentLang) == 0) {
+			wchar_t* langCodeW = (wchar_t*)SendMessage(hCombo, CB_GETITEMDATA, i, 0);
+			if (langCodeW && _wcsicmp(langCodeW, currentLangW) == 0) {
 				SendMessage(hCombo, CB_SETCURSEL, i, 0);
 				break;
 			}
@@ -1760,9 +1763,11 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		HWND hCombo = GetDlgItem(hwnd, IDC_LANGUAGE_COMBO);
 		int sel = (int)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
 		if (sel >= 0) {
-			char* langCode = (char*)SendMessage(hCombo, CB_GETITEMDATA, sel, 0);
-			if (langCode) {
-				settings->setLanguage(langCode);
+			wchar_t* langCodeW = (wchar_t*)SendMessage(hCombo, CB_GETITEMDATA, sel, 0);
+			if (langCodeW) {
+				char langCodeA[32] = {0};
+				WideCharToMultiByte(CP_UTF8, 0, langCodeW, -1, langCodeA, sizeof(langCodeA), NULL, NULL);
+				settings->setLanguage(langCodeA);
 			}
 		}
 	}
