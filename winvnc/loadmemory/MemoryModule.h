@@ -1,12 +1,10 @@
-// This file is part of UltraVNC
+// MemoryModule - Load DLLs from memory without writing to disk
+// Original author: Joachim Bauch <mail@joachim-bauch.de>
+// https://github.com/fancycode/MemoryModule
+// Licensed under Mozilla Public License 2.0
+//
+// Used in UltraVNC - https://uvnc.com/
 // https://github.com/ultravnc/UltraVNC
-// https://uvnc.com/
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-//
-// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
-// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
-//
 
 
 /*

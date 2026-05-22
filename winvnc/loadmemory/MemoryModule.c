@@ -1,13 +1,10 @@
-// This file is part of UltraVNC
+// MemoryModule - Load DLLs from memory without writing to disk
+// Original author: Joachim Bauch <mail@joachim-bauch.de>
+// https://github.com/fancycode/MemoryModule
+// Licensed under Mozilla Public License 2.0
+//
+// Used in UltraVNC - https://uvnc.com/
 // https://github.com/ultravnc/UltraVNC
-// https://uvnc.com/
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-//
-// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
-// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
-//
-
 
 /*
  * Memory DLL loading code
@@ -974,9 +971,8 @@ static PIMAGE_RESOURCE_DIRECTORY_ENTRY _MemorySearchResourceEntry(
         // using a pre-allocated array.
         wchar_t _searchKeySpace[MAX_LOCAL_KEY_LENGTH+1];
         LPWSTR _searchKey;
-        size_t _searchKeySize = 0;
         if (searchKeyLen > MAX_LOCAL_KEY_LENGTH) {
-            _searchKeySize = (searchKeyLen + 1) * sizeof(wchar_t);
+            size_t _searchKeySize = (searchKeyLen + 1) * sizeof(wchar_t);
             _searchKey = (LPWSTR) malloc(_searchKeySize);
             if (_searchKey == NULL) {
                 SetLastError(ERROR_OUTOFMEMORY);
@@ -985,8 +981,8 @@ static PIMAGE_RESOURCE_DIRECTORY_ENTRY _MemorySearchResourceEntry(
         } else {
             _searchKey = &_searchKeySpace[0];
         }
-        size_t returnvalue;
-        mbstowcs_s(&returnvalue, _searchKey, _searchKeySize, key, searchKeyLen);
+
+        mbstowcs(_searchKey, key, searchKeyLen);
         _searchKey[searchKeyLen] = 0;
         searchKey = _searchKey;
 #endif
@@ -1145,8 +1141,7 @@ MemoryLoadStringEx(HMEMORYMODULE module, UINT id, LPTSTR buffer, int maxsize, WO
 #if defined(UNICODE)
     wcsncpy(buffer, data->NameString, size);
 #else
-    size_t returnvalue;
-    wcstombs_s(&returnvalue, buffer, maxsize, data->NameString, size);
+    wcstombs(buffer, data->NameString, size);
 #endif
     return size;
 }

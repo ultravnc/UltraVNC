@@ -33,8 +33,8 @@ class LoadDllFromMemory
 private:
 	BYTE* dDengineBuf;
 	HMEMORYMODULE handleDDengine;
-	BYTE* dsmpluginBuf;
-	HMEMORYMODULE handleDsmpluginBuf;
+	HMODULE hDsmpluginDll;
+	char szTempDsmPlugin[MAX_PATH];
 public:
 	LoadDllFromMemory();
 	~LoadDllFromMemory();

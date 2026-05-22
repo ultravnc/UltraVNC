@@ -18,8 +18,8 @@ LoadDllFromMemory::LoadDllFromMemory()
 {
 	dDengineBuf = NULL;
 	handleDDengine = NULL;
-	dsmpluginBuf = NULL;
-	handleDsmpluginBuf = NULL;
+	hDsmpluginDll = NULL;
+	szTempDsmPlugin[0] = '\0';
 };
 
 LoadDllFromMemory::~LoadDllFromMemory()
@@ -28,10 +28,14 @@ LoadDllFromMemory::~LoadDllFromMemory()
 		free(dDengineBuf);
 	if (handleDDengine != NULL)
 		MemoryFreeLibrary(handleDDengine);
-	if (dsmpluginBuf != NULL)
-		free(dsmpluginBuf);
-	if (handleDsmpluginBuf != NULL)
-		MemoryFreeLibrary(handleDsmpluginBuf);
+	if (hDsmpluginDll != NULL) {
+		FreeLibrary(hDsmpluginDll);
+		hDsmpluginDll = NULL;
+	}
+	if (szTempDsmPlugin[0] != '\0') {
+		DeleteFileA(szTempDsmPlugin);
+		szTempDsmPlugin[0] = '\0';
+	}
 }
 
 void LoadDllFromMemory::loadDDengine(StartW8Fn& StartW8, StartW8V2Fn& StartW8V2, StopW8Fn& StopW8, LockW8Fn& LockW8, UnlockW8Fn& UnlockW8, ShowCursorW8Fn& ShowCursorW8, HideCursorW8Fn& HideCursorW8)
@@ -69,21 +73,38 @@ void LoadDllFromMemory::LoadPlugin(DESCRIPTION& m_PDescription, SHUTDOWN& m_PShu
 	// Open and map this to a disk file
 	LPVOID lpFile = LockResource(hFileResource);
 	DWORD dwSize = SizeofResource(hInstResDLL, hResource);
-	dsmpluginBuf = new BYTE[dwSize];
-	CopyMemory(dsmpluginBuf, lpFile, dwSize);
-	handleDsmpluginBuf = MemoryLoadLibrary(dsmpluginBuf, dwSize);
 
-	m_PDescription = (DESCRIPTION)MemoryGetProcAddress(handleDsmpluginBuf, "Description");
-	m_PStartup = (STARTUP)MemoryGetProcAddress(handleDsmpluginBuf, "Startup");
-	m_PShutdown = (SHUTDOWN)MemoryGetProcAddress(handleDsmpluginBuf, "Shutdown");
-	m_PSetParams = (SETPARAMS)MemoryGetProcAddress(handleDsmpluginBuf, "SetParams");
-	m_PGetParams = (GETPARAMS)MemoryGetProcAddress(handleDsmpluginBuf, "GetParams");
-	m_PTransformBuffer = (TRANSFORMBUFFER)MemoryGetProcAddress(handleDsmpluginBuf, "TransformBuffer");
-	m_PRestoreBuffer = (RESTOREBUFFER)MemoryGetProcAddress(handleDsmpluginBuf, "RestoreBuffer");
-	m_PFreeBuffer = (FREEBUFFER)MemoryGetProcAddress(handleDsmpluginBuf, "FreeBuffer");
-	m_PReset = (RESET)MemoryGetProcAddress(handleDsmpluginBuf, "Reset");
-	m_PCreatePluginInterface = (CREATEPLUGININTERFACE)MemoryGetProcAddress(handleDsmpluginBuf, "CreatePluginInterface");
-	m_PCreateIntegratedPluginInterface = (CREATEINTEGRATEDPLUGININTERFACE)MemoryGetProcAddress(handleDsmpluginBuf, "CreateIntegratedPluginInterface");
-	m_PConfig = (CONFIG)MemoryGetProcAddress(handleDsmpluginBuf, "Config");
+	// Extract embedded plugin to a temp file and load via LoadLibraryA.
+	// MemoryLoadLibrary cannot handle static TLS (__declspec(thread)) used by OpenSSL 3.x.
+	char szTempPath[MAX_PATH];
+	char szTempBase[MAX_PATH];
+	GetTempPathA(MAX_PATH, szTempPath);
+	GetTempFileNameA(szTempPath, "vnc", 0, szTempBase);
+	DeleteFileA(szTempBase);
+	strcpy_s(szTempDsmPlugin, MAX_PATH, szTempBase);
+	strcat_s(szTempDsmPlugin, MAX_PATH, ".dsm");
+
+	HANDLE hFile = CreateFileA(szTempDsmPlugin, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		DWORD dwWritten = 0;
+		WriteFile(hFile, lpFile, dwSize, &dwWritten, NULL);
+		CloseHandle(hFile);
+	}
+
+	hDsmpluginDll = LoadLibraryA(szTempDsmPlugin);
+	if (!hDsmpluginDll) return;
+
+	m_PDescription = (DESCRIPTION)GetProcAddress(hDsmpluginDll, "Description");
+	m_PStartup = (STARTUP)GetProcAddress(hDsmpluginDll, "Startup");
+	m_PShutdown = (SHUTDOWN)GetProcAddress(hDsmpluginDll, "Shutdown");
+	m_PSetParams = (SETPARAMS)GetProcAddress(hDsmpluginDll, "SetParams");
+	m_PGetParams = (GETPARAMS)GetProcAddress(hDsmpluginDll, "GetParams");
+	m_PTransformBuffer = (TRANSFORMBUFFER)GetProcAddress(hDsmpluginDll, "TransformBuffer");
+	m_PRestoreBuffer = (RESTOREBUFFER)GetProcAddress(hDsmpluginDll, "RestoreBuffer");
+	m_PFreeBuffer = (FREEBUFFER)GetProcAddress(hDsmpluginDll, "FreeBuffer");
+	m_PReset = (RESET)GetProcAddress(hDsmpluginDll, "Reset");
+	m_PCreatePluginInterface = (CREATEPLUGININTERFACE)GetProcAddress(hDsmpluginDll, "CreatePluginInterface");
+	m_PCreateIntegratedPluginInterface = (CREATEINTEGRATEDPLUGININTERFACE)GetProcAddress(hDsmpluginDll, "CreateIntegratedPluginInterface");
+	m_PConfig = (CONFIG)GetProcAddress(hDsmpluginDll, "Config");
 }
 #endif
