@@ -39,8 +39,10 @@ using namespace std::chrono;
 
 CloudServerProxy::CloudServerProxy(const std::string& code,
                                    uint16_t vncPort,
-                                   const std::string& matchmakerHost)
+                                   const std::string& matchmakerHost,
+                                   const std::string& token)
     : code_(code)
+    , token_(token)
     , vncPort_(vncPort)
     , matchmakerHost_(matchmakerHost)
     , udpSocket_(INVALID_SOCKET)
@@ -107,8 +109,8 @@ bool CloudServerProxy::Announce() {
     hostent* host = gethostbyname(hostname);
 
     CloudServerPacket pkt;
+    pkt.contype = 0;  // ConnType::ANNOUNCE
     strncpy_s(pkt.name, code_.c_str(), sizeof(pkt.name) - 1);
-    strncpy_s(pkt.group, "uvnc", sizeof(pkt.group) - 1);
     strncpy_s(pkt.ident, CLOUD_SERVER_PROTOCOL_IDENT, sizeof(pkt.ident) - 1);
 
     if (host && host->h_addr_list[0]) {
@@ -118,6 +120,7 @@ bool CloudServerProxy::Announce() {
 
     pkt.localport = localUdpPort_;
     pkt.serverviewer = true;  // true = server
+    SignCloudServerPacket(pkt, token_);
 
     { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Announce: code=%s port=%d\n", pkt.name, localUdpPort_); PushLog(_buf); }
     int sent = sendto(udpSocket_, (char*)&pkt, sizeof(pkt), 0,

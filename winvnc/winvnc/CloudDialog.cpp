@@ -95,8 +95,10 @@ CloudDialog::DialogProc(HWND hwnd,
 			ShowWindow(GetDlgItem(hwnd, IDOK), false);
 		}
 		SetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer());
+		SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, settings->getCloudToken());
 		SetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code);
 		SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_SETCHECK, settings->getUseBridge(), 0);
+
 		if (_this->m_server->isBridgeStarted()) {
 			SetDlgItemText(hwnd, IDC_STARTCLOUD, "Stop");
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), SW_SHOW);
@@ -238,6 +240,11 @@ CloudDialog::DialogProc(HWND hwnd,
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, cloudServer, MAX_HOST_NAME_LEN);
 			settings->setCloudServer(cloudServer);
 			GetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code, 18);
+			{
+				char tok[256]{};
+				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tok, sizeof(tok));
+				settings->setCloudToken(tok);
+			}
 			BOOL autoStart = SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED;
 			settings->setCloudEnabled(autoStart);
 			settings->setUseBridge(autoStart);
@@ -250,6 +257,11 @@ CloudDialog::DialogProc(HWND hwnd,
 		case IDC_STARTCLOUD:
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer(), MAX_HOST_NAME_LEN);
+			{
+				char tok[256]{};
+				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tok, sizeof(tok));
+				settings->setCloudToken(tok);
+			}
 			if (!_this->m_server->isCloudThreadRunning()) {
 				_this->m_server->cloudConnect(true, settings->getCloudServer());
 			}

@@ -137,6 +137,7 @@ public:
     TCHAR m_host[MAX_HOST_NAME_LEN];
 	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
 	TCHAR m_cloudMatchmakerHost[MAX_HOST_NAME_LEN];
+	char  m_cloudToken[MAX_HOST_NAME_LEN];
 	ConnectionType m_connectionType;
 //	TCHAR m_remotehost[MAX_HOST_NAME_LEN];
 	int  LoadConnection(const wchar_t *fname, bool fFromDialog, bool defaultOption = false);
