@@ -15,6 +15,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <windows.h>  // For OutputDebugStringA
 
 using namespace std::chrono;
 
@@ -32,8 +33,11 @@ CloudProxyServer::~CloudProxyServer() {
 
 bool CloudProxyServer::Connect(const std::string& code,
                                 const std::string& matchmakerHost,
-                                CloudStatusCallback statusCb) {
+                                CloudStatusCallback statusCb,
+                                const std::string& token) {
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Connect: code=%s token='%s' (len=%zu)\n", code.c_str(), token.c_str(), token.size()); OutputDebugStringA(_buf); }
     code_ = code;
+    token_ = token;
 
     // Resolve matchmaker
     addrinfo hints{}, *result = nullptr;
@@ -117,7 +121,6 @@ bool CloudProxyServer::Announce(const std::string& code) {
 
     CloudPacket pkt;
     strncpy_s(pkt.name, code.c_str(), sizeof(pkt.name) - 1);
-    strncpy_s(pkt.group, "uvnc", sizeof(pkt.group) - 1);
     strncpy_s(pkt.ident, CLOUD_PROTOCOL_IDENT, sizeof(pkt.ident) - 1);
 
     if (host && host->h_addr_list[0]) {
@@ -127,9 +130,12 @@ bool CloudProxyServer::Announce(const std::string& code) {
 
     pkt.localport = localUdpPort_;
     pkt.serverviewer = false;  // false = viewer
+    SignCloudPacket(pkt, token_);
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] AnnounceViewer: group='%s' ts=%u token_='%s'\n", pkt.group, pkt.timestamp, token_.c_str()); OutputDebugStringA(_buf); }
 
     int sent = sendto(udpSocket_, (char*)&pkt, sizeof(pkt), 0,
                      (sockaddr*)&matchmakerAddr_, sizeof(matchmakerAddr_));
+    { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] AnnounceViewer: sent %d bytes\n", sent); OutputDebugStringA(_buf); }
     return sent == sizeof(pkt);
 }
 
@@ -374,15 +380,20 @@ void CloudProxyServer::Stop() {
 
 bool CloudProxyServer::Probe(const std::string& code,
                               const std::string& matchmakerHost,
-                              int timeoutMs) {
+                              int timeoutMs,
+                              const std::string& token) {
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: code=%s token='%s' (len=%zu)\n", code.c_str(), token.c_str(), token.size()); OutputDebugStringA(_buf); }
+    
     // Resolve matchmaker address
     addrinfo hints{}, *result = nullptr;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
     char portStr[8];
     sprintf_s(portStr, "%u", (unsigned)CLOUD_MATCHMAKER_PORT);
-    if (getaddrinfo(matchmakerHost.c_str(), portStr, &hints, &result) != 0 || !result)
+    if (getaddrinfo(matchmakerHost.c_str(), portStr, &hints, &result) != 0 || !result) {
+        OutputDebugStringA("[CloudNAT] Probe: getaddrinfo failed\n");
         return false;
+    }
 
     sockaddr_in mmAddr{};
     memcpy(&mmAddr, result->ai_addr, sizeof(mmAddr));
@@ -405,7 +416,10 @@ bool CloudProxyServer::Probe(const std::string& code,
     strncpy_s(pkt.ident, CLOUD_PROTOCOL_IDENT, sizeof(pkt.ident) - 1);
     pkt.serverviewer = false;
     pkt.contype = 3; // ConnType::PROBE
-    sendto(sock, (char*)&pkt, sizeof(pkt), 0, (sockaddr*)&mmAddr, sizeof(mmAddr));
+    SignCloudPacket(pkt, token);
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: pkt.group='%s' ts=%u\n", pkt.group, pkt.timestamp); OutputDebugStringA(_buf); }
+    int sent = sendto(sock, (char*)&pkt, sizeof(pkt), 0, (sockaddr*)&mmAddr, sizeof(mmAddr));
+    { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: sent %d bytes\n", sent); OutputDebugStringA(_buf); }
 
     // Wait for PROBE_ONLINE(4) or PROBE_OFFLINE(5) response
     fd_set fds;
@@ -421,8 +435,12 @@ bool CloudProxyServer::Probe(const std::string& code,
         sockaddr_in from{};
         int fromLen = sizeof(from);
         int r = recvfrom(sock, (char*)&resp, sizeof(resp), 0, (sockaddr*)&from, &fromLen);
-        if (r == sizeof(resp) && resp.IsValid())
+        if (r == sizeof(resp) && resp.IsValid()) {
             online = (resp.contype == 4); // ConnType::PROBE_ONLINE
+            { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe response: contype=%d -> %s\n", resp.contype, online ? "ONLINE" : "OFFLINE"); OutputDebugStringA(_buf); }
+        } else {
+            { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: invalid response r=%d\n", r); OutputDebugStringA(_buf); }
+        }
     }
 
     closesocket(sock);

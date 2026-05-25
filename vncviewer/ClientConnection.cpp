@@ -1933,6 +1933,8 @@ void ClientConnection::GetConnectDetails()
 				_tcsncpy_s(m_proxyhost, sessdlg.m_proxyhost, MAX_HOST_NAME_LEN);
 				m_proxyport = sessdlg.m_proxyport;
 				_tcsncpy_s(m_cloudMatchmakerHost, sessdlg.m_cloudMatchmakerHost, MAX_HOST_NAME_LEN);
+				strncpy_s(m_cloudToken, sessdlg.m_cloudToken, sizeof(m_cloudToken) - 1);
+				strncpy_s(m_opts->m_cloudToken, sessdlg.m_cloudToken, sizeof(m_opts->m_cloudToken) - 1);
 				m_connectionType = sessdlg.m_connectionType;
 				if (m_opts->autoDetect)
 					m_opts->m_Use8Bit = rfbPFFullColors;
@@ -2032,7 +2034,8 @@ void ClientConnection::ConnectBridge()
 	};
 
 	// Connect: announce -> wait for match -> UDT rendezvous -> TCP proxy
-	bool ok = m_cloudProxy->Connect(code, matchmakerHost, statusCb);
+	std::string token = m_opts->m_cloudToken;
+	bool ok = m_cloudProxy->Connect(code, matchmakerHost, statusCb, token);
 
 	if (Pressed_Cancel) {
 		m_cloudProxy->Stop();

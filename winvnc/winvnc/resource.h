@@ -331,6 +331,8 @@
 #define IDC_LANGUAGE_COMBO              1292
 #define IDC_LANGUAGE_LABEL              1293
 #define IDC_FORCE_SHAPE                 1294
+#define IDC_CLOUDTOKEN                  1295
+#define IDC_CLOUDTOKEN_LABEL            1296
 #define IDC_TLS                         1297
 #define IDC_STATIC_HTTPPORT             1298
 #define IDR_WEBVIEWER_CORE_BASE64_JS    1300

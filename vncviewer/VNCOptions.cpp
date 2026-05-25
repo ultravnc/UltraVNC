@@ -213,6 +213,7 @@ VNCOptions::VNCOptions()
 	m_oldplugin = false;
 	//g_disable_sponsor= false;
 	m_connectionType = DIRECT_TCP;
+	m_cloudToken[0] = '\0';
 	m_allowMonitorSpanning = 0;
 	m_ChangeServerRes = 0;
 	m_extendDisplay = 0;

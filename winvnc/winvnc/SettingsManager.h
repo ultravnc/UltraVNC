@@ -263,6 +263,9 @@ public:
 	void setCloudServer(TCHAR* value) { strcpy_s(m_pref_cloudServer, value); };
 	TCHAR* getCloudServer() { return m_pref_cloudServer; };
 
+	void setCloudToken(const char* value) { strncpy_s(m_pref_cloudToken, value, sizeof(m_pref_cloudToken) - 1); };
+	const char* getCloudToken() { return m_pref_cloudToken; };
+
 
 	// Whether or not to allow connections from the local machine
 	void setIPV6(BOOL ok) { m_pref_ipv6_allowed = ok; };
@@ -404,6 +407,7 @@ private:
 	BOOL m_pref_locdom3;
 
 	TCHAR m_pref_cloudServer[MAX_HOST_NAME_LEN];
+	char m_pref_cloudToken[256];
 	char m_pref_alternateShell[1024];
 	bool m_pref_cloudEnabled;
 	bool m_pref_AllowUserSettingsWithPassword;
