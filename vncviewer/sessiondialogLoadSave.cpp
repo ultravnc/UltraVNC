@@ -188,6 +188,11 @@ void SessionDialog::SaveToFile(wchar_t *fname, bool asDefault)
 
 
 	WritePrivateProfileStringW(L"connection", L"cloudMatchmakerHost", m_cloudMatchmakerHost, fname);
+	{
+		wchar_t wToken[256]{};
+		MultiByteToWideChar(CP_UTF8, 0, m_cloudToken, -1, wToken, 256);
+		WritePrivateProfileStringW(L"cloud", L"token", wToken, fname);
+	}
 	WritePrivateProfileStringW(L"options", L"DSMPlugin",	szDSMPluginFilename, fname);
 	WritePrivateProfileStringW(L"options", L"folder",		folder, fname);
 	WritePrivateProfileStringW(L"options", L"prefix",		prefix, fname);
@@ -308,6 +313,11 @@ void SessionDialog::LoadFromFile(wchar_t *fname)
   GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, fname);
   m_proxyport = GetPrivateProfileIntW(L"connection", L"proxyport", 0, fname);
   GetPrivateProfileStringW(L"connection", L"cloudMatchmakerHost", L"", m_cloudMatchmakerHost, MAX_HOST_NAME_LEN, fname);
+  {
+    wchar_t wToken[256]{};
+    GetPrivateProfileStringW(L"cloud", L"token", L"", wToken, 256, fname);
+    WideCharToMultiByte(CP_UTF8, 0, wToken, -1, m_cloudToken, sizeof(m_cloudToken), NULL, NULL);
+  }
   overwriteCommandLine();
 
 }
