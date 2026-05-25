@@ -124,6 +124,7 @@ public:
 	TCHAR   m_proxyhost[MAX_HOST_NAME_LEN];
 	int     m_proxyport;
 	TCHAR   m_cloudMatchmakerHost[MAX_HOST_NAME_LEN];
+	char    m_cloudToken[256];
 	ConnectionType	m_connectionType;
 	bool	m_allowMonitorSpanning;
 	bool	m_ChangeServerRes;

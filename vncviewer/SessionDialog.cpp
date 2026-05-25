@@ -56,6 +56,9 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	TCHAR tmphost2[256];
 	_tcscpy_s(m_proxyhost, m_pOpt->m_proxyhost);
 	_tcscpy_s(m_cloudMatchmakerHost, _countof(m_cloudMatchmakerHost), m_pOpt->m_cloudMatchmakerHost);
+	{ char _buf[256]; snprintf(_buf, sizeof(_buf), "[SessionDialog] m_pOpt->m_cloudToken='%s' (len=%zu)\n", m_pOpt->m_cloudToken, strlen(m_pOpt->m_cloudToken)); OutputDebugStringA(_buf); }
+	strncpy_s(m_cloudToken, m_pOpt->m_cloudToken, sizeof(m_cloudToken) - 1);
+	{ char _buf[256]; snprintf(_buf, sizeof(_buf), "[SessionDialog] m_cloudToken='%s' (len=%zu)\n", m_cloudToken, strlen(m_cloudToken)); OutputDebugStringA(_buf); }
 	if (_tcscmp(m_proxyhost, _T("")) != 0) {
 		_tcscat_s(m_proxyhost, _countof(m_proxyhost), _T(":"));
 		_itot_s(m_pOpt->m_proxyport, tmphost2, _countof(tmphost2), 10);
@@ -289,8 +292,13 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								WideCharToMultiByte(CP_UTF8, 0, _this->m_cloudMatchmakerHost, -1, tmp, MAX_HOST_NAME_LEN, NULL, NULL);
 								mmHost = (tmp[0] != '\0') ? tmp : CLOUD_MATCHMAKER_HOST;
 							}
-							std::thread([hwnd, hStatus, code, mmHost]() {
-								bool online = CloudProxyServer::Probe(code, mmHost);
+							// Read token from edit box (user may have typed it)
+							char tokenBuf[256]{};
+							GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tokenBuf, sizeof(tokenBuf));
+							std::string token = tokenBuf;
+							std::thread([hwnd, hStatus, code, mmHost, token]() {
+								{ char _buf[256]; snprintf(_buf, sizeof(_buf), "[SessionDialog] Probe lambda token='%s' (len=%zu)\n", token.c_str(), token.size()); OutputDebugStringA(_buf); }
+								bool online = CloudProxyServer::Probe(code, mmHost, 3000, token);
 								SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
 								EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
 							}).detach();
@@ -494,8 +502,12 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						char mmHostBuf[MAX_HOST_NAME_LEN]{};
 						WideCharToMultiByte(CP_UTF8, 0, _this->m_cloudMatchmakerHost, -1, mmHostBuf, MAX_HOST_NAME_LEN, NULL, NULL);
 						std::string mmHost102 = (mmHostBuf[0] != '\0') ? mmHostBuf : CLOUD_MATCHMAKER_HOST;
-						std::thread([hwnd, hStatus, code, mmHost102]() {
-							bool online = CloudProxyServer::Probe(code, mmHost102);
+						// Read token from edit box
+						char tokenBuf102[256]{};
+						GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tokenBuf102, sizeof(tokenBuf102));
+						std::string token102 = tokenBuf102;
+						std::thread([hwnd, hStatus, code, mmHost102, token102]() {
+							bool online = CloudProxyServer::Probe(code, mmHost102, 3000, token102);
 							SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
 							EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
 						}).detach();
@@ -876,6 +888,12 @@ bool SessionDialog::connect(HWND hwnd)
 	wcscat_s(buffer, _countof(buffer), fname);
 	SaveToFile(buffer);
 
+	// Save token if in bridge mode
+	if (GetDlgItem(hwnd, IDC_CLOUDTOKEN)) {
+		GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), m_cloudToken, sizeof(m_cloudToken));
+		strncpy_s(m_pOpt->m_cloudToken, m_cloudToken, sizeof(m_pOpt->m_cloudToken) - 1);
+	}
+
 	TCHAR hostname[256];
 	GetDlgItemText(hwnd, IDC_HOSTNAME_EDIT, hostname, 256);		
 	m_pMRU->AddItem(hostname);
@@ -902,6 +920,12 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		SetDlgItemText(hwnd, IDC_LINE1, sz_ID);
 		SetDlgItemText(hwnd, IDC_LINE2, sz_Port);
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), TRUE);
+		// Hide token field when leaving bridge mode - SAVE token first
+		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN)) {
+			GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), m_cloudToken, sizeof(m_cloudToken));
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_HIDE);
+		}
+		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -912,6 +936,12 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		SetDlgItemText(hwnd, IDC_LINE1, sz_Computer);
 		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), TRUE);
+		// Hide token field when leaving bridge mode - SAVE token first
+		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN)) {
+			GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), m_cloudToken, sizeof(m_cloudToken));
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_HIDE);
+		}
+		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
 		break;
 	case IDC_RADIOBRIDGE:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -922,6 +952,12 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
 		SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T(""));
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_SHOW);
+		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_SHOW);
+		SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, m_cloudToken);
+		// Trigger probe if there's a valid code
+		PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE), 
+			(LPARAM)GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
 		break;
 	}
 }
