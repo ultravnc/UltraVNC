@@ -34,6 +34,7 @@ public:
 	TCHAR m_host_dialog[MAX_HOST_NAME_LEN];
 	TCHAR m_proxyhost[MAX_HOST_NAME_LEN];
 	TCHAR m_cloudMatchmakerHost[MAX_HOST_NAME_LEN];
+	char  m_cloudToken[256];
    	virtual ~SessionDialog();
 
 	ClientConnection *m_pCC;

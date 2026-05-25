@@ -16,6 +16,8 @@
 #include <cstring>
 
 #pragma comment(lib, "ws2_32.lib")
+#include <bcrypt.h>
+#pragma comment(lib, "bcrypt.lib")
 
 // Protocol constants - must match matchmaker server and cloud_connect.h
 #define CLOUD_SERVER_PROTOCOL_IDENT "uvnc677"
@@ -33,9 +35,11 @@ struct CloudServerPacket {
     int32_t externport;
     int32_t contype;
     bool serverviewer;
-    bool dummy0;
-    bool dummy1;
-    bool dummy2;
+    uint8_t _pad0;
+    uint8_t _pad1;
+    uint8_t _pad2;
+    uint32_t timestamp;   // unix time (UTC) when packet was created
+    uint8_t hmac[32];     // HMAC-SHA256 over packet body (hmac field zeroed)
 
     CloudServerPacket() { memset(this, 0, sizeof(*this)); }
 
@@ -44,6 +48,71 @@ struct CloudServerPacket {
     }
 };
 #pragma pack(pop)
+
+// Sign a CloudServerPacket using HMAC-SHA256 (token as group key derivation input).
+// If token is empty, group = "uvnc" and packet is sent unsigned.
+inline bool SignCloudServerPacket(CloudServerPacket& pkt, const std::string& token) {
+    if (token.empty()) {
+        strncpy_s(pkt.group, "uvnc", sizeof(pkt.group) - 1);
+        pkt.timestamp = 0;
+        return true;
+    }
+    strncpy_s(pkt.group, token.c_str(), sizeof(pkt.group) - 1);
+    pkt.timestamp = (uint32_t)time(nullptr);
+
+    // Derive group key: HMAC-SHA256(token, group)
+    uint8_t groupKey[32] = {};
+    {
+        BCRYPT_ALG_HANDLE hAlg = nullptr;
+        BCRYPT_HASH_HANDLE hHash = nullptr;
+        DWORD hashObjSize = 0, cbData = 0;
+        uint8_t* hashObj = nullptr;
+        bool ok = false;
+        if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, nullptr, BCRYPT_ALG_HANDLE_HMAC_FLAG) == 0 &&
+            BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH, (PBYTE)&hashObjSize, sizeof(DWORD), &cbData, 0) == 0) {
+            hashObj = new uint8_t[hashObjSize];
+            size_t groupLen = strnlen(pkt.group, 32);
+            if (BCryptCreateHash(hAlg, &hHash, hashObj, hashObjSize,
+                                 (PBYTE)token.data(), (ULONG)token.size(), 0) == 0 &&
+                BCryptHashData(hHash, (PBYTE)pkt.group, (ULONG)groupLen, 0) == 0 &&
+                BCryptFinishHash(hHash, groupKey, 32, 0) == 0) ok = true;
+        }
+        if (hHash) BCryptDestroyHash(hHash);
+        if (hAlg)  BCryptCloseAlgorithmProvider(hAlg, 0);
+        delete[] hashObj;
+        if (!ok) return false;
+    }
+
+    // Zero fields filled by server before signing
+    uint8_t buf[sizeof(CloudServerPacket)];
+    memcpy(buf, &pkt, sizeof(CloudServerPacket));
+    CloudServerPacket* tmp = (CloudServerPacket*)buf;
+    memset(tmp->externip, 0, sizeof(tmp->externip));
+    tmp->externport = 0;
+    memset(tmp->hmac, 0, sizeof(tmp->hmac));
+
+    // HMAC-SHA256(groupKey, buf) -> pkt.hmac
+    {
+        BCRYPT_ALG_HANDLE hAlg = nullptr;
+        BCRYPT_HASH_HANDLE hHash = nullptr;
+        DWORD hashObjSize = 0, cbData = 0;
+        uint8_t* hashObj = nullptr;
+        bool ok = false;
+        if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, nullptr, BCRYPT_ALG_HANDLE_HMAC_FLAG) == 0 &&
+            BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH, (PBYTE)&hashObjSize, sizeof(DWORD), &cbData, 0) == 0) {
+            hashObj = new uint8_t[hashObjSize];
+            if (BCryptCreateHash(hAlg, &hHash, hashObj, hashObjSize,
+                                 groupKey, 32, 0) == 0 &&
+                BCryptHashData(hHash, buf, sizeof(CloudServerPacket), 0) == 0 &&
+                BCryptFinishHash(hHash, pkt.hmac, 32, 0) == 0) ok = true;
+        }
+        if (hHash) BCryptDestroyHash(hHash);
+        if (hAlg)  BCryptCloseAlgorithmProvider(hAlg, 0);
+        delete[] hashObj;
+        if (!ok) return false;
+    }
+    return true;
+}
 
 enum CloudStatus {
     csOffline = 0,
@@ -64,7 +133,8 @@ class CloudServerProxy {
 public:
     CloudServerProxy(const std::string& code,
                      uint16_t vncPort,
-                     const std::string& matchmakerHost = CLOUD_SERVER_MATCHMAKER_HOST);
+                     const std::string& matchmakerHost = CLOUD_SERVER_MATCHMAKER_HOST,
+                     const std::string& token = "");
     ~CloudServerProxy();
 
     // Start: announces to matchmaker and enters wait+serve loop
@@ -96,6 +166,7 @@ private:
     void ProxyViewerSession(int udtSock);                               // int == UDTSOCKET
 
     std::string code_;
+    std::string token_;
     uint16_t vncPort_;
     std::string matchmakerHost_;
 
