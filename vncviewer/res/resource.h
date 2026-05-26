@@ -153,7 +153,7 @@
 #define IDC_REMOTE_STATUS               1073
 #define IDC_GLOBAL_STATUS               1075
 #define IDC_HISTORY_CB                  1077
-#define IDC_REFRESH               1078
+#define IDC_REFRESH                     1078
 #define IDC_REFRESH_REMOTE              1079
 #define IDC_PLUGIN_CHECK                1090
 #define IDC_COMBO1                      1091
@@ -264,7 +264,6 @@
 #define IDC_FOLDER                      1179
 #define IDC_COMBO2                      1180
 #define IDC_SCREEN                      1181
-#define IDC_EDIT2                       1182
 #define IDC_SERVER_RECON_TIME           1183
 #define IDC_PREFIX                      1184
 #define IDC_RADIO3                      1185
@@ -293,7 +292,6 @@
 #define IDC_CHECK4                      2023
 #define IDC_HIDEMENU                    2023
 #define IDC_SAVESIZE                    2024
-#define IDC_EDIT3                       2025
 #define IDC_FTTIMEOUT                   2026
 #define IDC_FPS                         2027
 #define IDC_SNAPSHOTFOLDER              2028
