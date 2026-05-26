@@ -49,7 +49,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_INPUTAREA_EDIT,4,135,255,39,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL,WS_EX_STATICEDGE
     PUSHBUTTON      "Envoyer",IDC_SEND_B,264,135,39,16,BS_MULTILINE
-    PUSHBUTTON      "RÈduire",IDC_HIDE_B,264,152,39,11
+    PUSHBUTTON      "R√©duire",IDC_HIDE_B,264,152,39,11
     PUSHBUTTON      "Fermer",IDCANCEL,264,164,39,11
     CONTROL         "",IDC_CHATAREA_EDIT,"RICHEDIT",TCS_HOTTRACK | TCS_RAGGEDRIGHT | TCS_FOCUSONBUTTONDOWN | TCS_MULTISELECT | WS_VSCROLL | WS_TABSTOP,4,4,300,122,WS_EX_STATICEDGE
     PUSHBUTTON      "",IDOK,303,0,6,6,NOT WS_VISIBLE
@@ -63,9 +63,9 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Fermer",IDOK,118,94,62,14
     PUSHBUTTON      "Annuler",IDCANCEL,118,78,62,14,NOT WS_VISIBLE
-    LTEXT           "Clients connectÈs",IDC_STATIC,5,4,105,8
+    LTEXT           "Clients connect√©s",IDC_STATIC,5,4,105,8
     LISTBOX         IDC_VIEWERS_LISTBOX,7,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
-    PUSHBUTTON      "DÈconnecter",IDC_KILL_B,118,17,62,14
+    PUSHBUTTON      "D√©connecter",IDC_KILL_B,118,17,62,14
     PUSHBUTTON      "Chat",IDC_TEXTCHAT_B,118,35,62,14,BS_MULTILINE
     LTEXT           "Clients en attente",IDC_STATIC,185,4,105,8
     LISTBOX         IDC_PENDING_LISTBOX,187,16,103,93,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_STATICEDGE
@@ -73,29 +73,29 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 274, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - ¿ propos"
+CAPTION "UltraVNC Server - √Ä propos"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright (C) 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
-    LTEXT           "Website:",IDC_WWW2,15,65,31,9
-    LTEXT           "CompilÈ",IDC_BUILDTEXT,49,16,20,10
+    LTEXT           "Site web :",IDC_WWW2,15,65,31,9
+    LTEXT           "Compil√© le",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
     LTEXT           "https://uvnc.com/",IDC_WWW,47,65,61,8
-    LTEXT           "Fichier de configuration: ",IDC_CONFIG_FILE,17,44,250,8
+    LTEXT           "Fichier de configuration : ",IDC_CONFIG_FILE,17,44,250,8
 END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - …tablir une connexion"
+CAPTION "UltraVNC Server - √âtablir une connexion"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
-    LTEXT           "Nom d'hÙte[:port]",IDC_HOSTNAME_STATIC,7,25,58,8,SS_CENTERIMAGE
+    LTEXT           "Nom d'h√¥te[:port]",IDC_HOSTNAME_STATIC,7,25,58,8,SS_CENTERIMAGE
     EDITTEXT        IDC_HOSTNAME_EDIT,90,22,121,14,ES_AUTOHSCROLL
-    LTEXT           "ID: (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,74,8
+    LTEXT           "ID : (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,74,8
     EDITTEXT        IDC_IDCODE,90,43,121,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,90,67,46,14
     PUSHBUTTON      "Annuler",IDCANCEL,165,67,46,14
@@ -109,10 +109,10 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "&Accepter",IDACCEPT,7,74,53,14
     DEFPUSHBUTTON   "&Refuser",IDREJECT,130,74,49,14
-    LTEXT           "UltraVNC Server a reÁu une connexion entrante de",IDC_STATIC_TEXT1,7,7,107,36
-    CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
-    CTEXT           "Voulez-vous accepter ou refuser la connexion?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
-    CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
+    LTEXT           "UltraVNC Server a re√ßu une connexion entrante de",IDC_STATIC_TEXT1,7,7,107,36
+    CTEXT           "<h√¥te inconnu>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
+    CTEXT           "Voulez-vous accepter ou refuser la connexion ?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
+    CTEXT           "Rejet automatique :",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
     CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
@@ -122,11 +122,11 @@ CAPTION "UltraVNC Server - Connexion Cloud"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Enregistrer",IDOK,253,82,50,14
-    CONTROL         "DÈmarrage auto",IDC_CHECKCLOUD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,15,48,10
+    CONTROL         "D√©marrage auto",IDC_CHECKCLOUD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,15,48,10
     EDITTEXT        IDC_CLOUDSERVER,97,38,93,14,ES_AUTOHSCROLL
     LTEXT           "Code de connexion Cloud",IDC_STATIC,18,60,67,8
     LTEXT           "",IDC_CLOUDCODE,97,59,94,15
-    PUSHBUTTON      "DÈmarrer",IDC_STARTCLOUD,97,15,53,12
+    PUSHBUTTON      "D√©marrer",IDC_STARTCLOUD,97,15,53,12
     LTEXT           "Serveur Cloud",IDC_STATIC,18,40,72,8
     LTEXT           "Adresse IP externe",IDC_STATIC,18,83,66,8
     LTEXT           "",IDC_EXTERNALIPADDRESS,97,83,97,8
@@ -173,11 +173,11 @@ BEGIN
     EDITTEXT        IDC_GROUP3,21,53,93,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
-    GROUPBOX        "RËgles",IDC_STATIC,5,77,178,68
-    LTEXT           "Groupe 1, 2 = AccËs complet   Groupe 3 = Lecture seule",IDC_STATIC,16,88,162,8
-    LTEXT           "Les administrateurs locaux ont toujours accËs.",IDC_STATIC,8,100,174,41
+    GROUPBOX        "R√®gles",IDC_STATIC,5,77,178,68
+    LTEXT           "Groupes 1 et 2 = Acc√®s complet   Groupe 3 = Affichage seul",IDC_STATIC,16,88,162,8
+    LTEXT           "Les administrateurs locaux ont toujours acc√®s.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
-    PUSHBUTTON      "ANNULER",IDCANCEL,132,148,50,14
+    PUSHBUTTON      "Annuler",IDCANCEL,132,148,50,14
     LTEXT           "1",IDC_STATIC,11,22,8,8
     LTEXT           "2",IDC_STATIC,11,38,8,8
     LTEXT           "3",IDC_STATIC,11,56,8,8
@@ -316,12 +316,12 @@ IDR_TRAYMENU MENU
 BEGIN
     POPUP "tray"
     BEGIN
-        MENUITEM "&ParamËtres",                   ID_ADMIN_PROPERTIES
+        MENUITEM "&Param√®tres",                       ID_ADMIN_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "&¿ propos de UltraVNC Server...",   ID_ABOUT
+        MENUITEM "&√Ä propos d'UltraVNC Server...",    ID_ABOUT
         POPUP "Visiter nos liens"
         BEGIN
-            MENUITEM "Homepage",                    ID_VISITUSONLINE_HOMEPAGE
+            MENUITEM "Page d'accueil",              ID_VISITUSONLINE_HOMEPAGE
             MENUITEM "Forum",                       ID_VISITUSONLINE_FORUM
             MENUITEM "GitHub",                      ID_VISITUSONLINE_GITHUB
             MENUITEM "Mastodon",                    ID_VISITUSONLINE_MASTODON
@@ -332,19 +332,19 @@ BEGIN
             MENUITEM "OpenHub",                     ID_VISITUSONLINE_OPENHUB
         END
         MENUITEM SEPARATOR
-        MENUITEM "Ajouter un nouveau client",             ID_OUTGOING_CONN
-        MENUITEM "&DÈconnecter tous les clients",           ID_KILLCLIENTS
+        MENUITEM "Ajouter un nouveau client",              ID_OUTGOING_CONN
+        MENUITEM "&D√©connecter tous les clients",          ID_KILLCLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "&Lister tous les clients",           ID_LISTCLIENTS
+        MENUITEM "&Lister tous les clients",               ID_LISTCLIENTS
         MENUITEM SEPARATOR
-        MENUITEM "Installer le service",             ID_RUNASSERVICE
-        MENUITEM "DÈsinstaller le service",           ID_UNINSTALL_SERVICE
-        MENUITEM "ArrÍter le service",                ID_CLOSE_SERVICE
-        MENUITEM "DÈmarrer le service (doit Ítre installÈ)", ID_START_SERVICE
-        MENUITEM "RedÈmarrer en mode sans Èchec",         ID_REBOOTSAFEMODE
-        MENUITEM "Forcer le redÈmarrage (dangereux)",       ID_REBOOT_FORCE
+        MENUITEM "Installer le service",                   ID_RUNASSERVICE
+        MENUITEM "D√©sinstaller le service",                ID_UNINSTALL_SERVICE
+        MENUITEM "Arr√™ter le service",                     ID_CLOSE_SERVICE
+        MENUITEM "D√©marrer le service (doit √™tre install√©)", ID_START_SERVICE
+        MENUITEM "Red√©marrer en mode sans √©chec",          ID_REBOOTSAFEMODE
+        MENUITEM "Forcer le red√©marrage (dangereux)",      ID_REBOOT_FORCE
         MENUITEM SEPARATOR
-        MENUITEM "&Fermer connexions VNC",      ID_CLOSE
+        MENUITEM "&Fermer les connexions VNC",             ID_CLOSE
     END
 END
 
@@ -352,9 +352,9 @@ IDR_TRAYMENU1 MENU
 BEGIN
     POPUP "tray"
     BEGIN
-        MENUITEM "&¿ propos de UltraVNC Server...",   ID_ABOUT
+        MENUITEM "&√Ä propos d'UltraVNC Server...",    ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Fermer connexions VNC",      ID_CLOSE
+        MENUITEM "&Fermer les connexions VNC",         ID_CLOSE
     END
 END
 
@@ -479,51 +479,51 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_WARNING             "WARNING: By default, this session do not use any encryption whatsoever. Please do not use it to send sensitive data unless you are sure your connection is secure.\n\n"
+    IDS_WARNING             "AVERTISSEMENT : Par d√©faut, cette session n'utilise aucun chiffrement. Ne l'utilisez pas pour transmettre des donn√©es sensibles, sauf si vous √™tes certain que votre connexion est s√©curis√©e.\n\n"
 END
 
 STRINGTABLE
 BEGIN
-    ID_CURRENT_USER_PROP    "UltraVNC Server: PropriÈtÈs de l'utilisateur actuel"
-    ID_DEFAULT_SYST_PROP    "UltraVNC Server: PropriÈtÈs systËme par dÈfaut"
+    ID_CURRENT_USER_PROP    "UltraVNC Server : Propri√©t√©s de l'utilisateur actuel"
+    ID_DEFAULT_SYST_PROP    "UltraVNC Server : Propri√©t√©s syst√®me par d√©faut"
     ID_DESKTOP_BITBLT_MEM   "vncDesktop: Memory device doesn't support GetDIBits\nUltraVNC Server cannot be used with this graphics device driver"
     ID_DESKTOP_BITBLT_ROOT  "vncDesktop: Root device doesn't support BitBlt\nUltraVNC Server cannot be used with this graphics device driver"
     ID_DESKTOP_PLANAR_NOTC  "vncDesktop: Current display is PLANAR, not CHUNKY!\nUltraVNC Server cannot be used with this graphics device driver"
-    ID_FAILED_CONNECT_LISTING_VIEW "…chec de connexion au VNC Viewer en Ècoute"
-    ID_FAILED_INIT          "…chec d'initialisation du systËme socket"
+    ID_FAILED_CONNECT_LISTING_VIEW "√âchec de connexion au client VNC en √©coute"
+    ID_FAILED_INIT          "√âchec d'initialisation du syst√®me socket"
     ID_MB1                  "MB1"
-    ID_NO_CURRENT_USER_ERR  "Les paramËtres UltraVNC Server pour l'utilisateur actuel sont actuellement indisponibles."
-    ID_NO_EXIST_INST        "Aucune instance existante de UltraVNC Server n'a pu Ítre contactÈe"
+    ID_NO_CURRENT_USER_ERR  "Les param√®tres UltraVNC Server pour l'utilisateur actuel sont actuellement indisponibles."
+    ID_NO_EXIST_INST        "Aucune instance existante d'UltraVNC Server n'a pu √™tre contact√©e"
 END
 
 STRINGTABLE
 BEGIN
     ID_WARNING              "AVERTISSEMENT"
     ID_WINVNC_ERROR         "UltraVNC Server - Erreur"
-    ID_WINVNC_USAGE         "UltraVNC Server Usage"
+    ID_WINVNC_USAGE         "Utilisation d'UltraVNC Server"
     ID_WINVNC_WARNIN        "UltraVNC Server - Avertissement"
     ID_WVNC                 "WVNC"
 END
 
 STRINGTABLE
 BEGIN
-    ID_ANOTHER_INST         "Une autre instance de UltraVNC Server est dÈj‡ en cours d'exÈcution"
-    ID_AUTHAD_NOT_FO        "Vous avez sÈlectionnÈ MS-Logon, mais authad.dll\nn'a pas ÈtÈ trouvÈ. VÈrifiez votre installation"
-    ID_AUTH_NOT_FO          "Vous avez sÈlectionnÈ MS-Logon, mais auth.dll\nn'a pas ÈtÈ trouvÈ. VÈrifiez votre installation"
-    ID_AUTOACCEPT_U         "Acceptation auto: %u"
-    ID_AUTOREJECT_U         "Rejet auto: %u"
-    ID_CADERROR             "Ctrl-Alt-Suppr nÈcessite le service, pas de permission"
-    ID_CADERRORFILE         "Le fichier cad.exe n'a pas ÈtÈ trouvÈ dans le mÍme dossier que winvnc.exe"
+    ID_ANOTHER_INST         "Une autre instance d'UltraVNC Server est d√©j√† en cours d'ex√©cution"
+    ID_AUTHAD_NOT_FO        "Vous avez s√©lectionn√© MS-Logon, mais authad.dll\nn'a pas √©t√© trouv√©. V√©rifiez votre installation"
+    ID_AUTH_NOT_FO          "Vous avez s√©lectionn√© MS-Logon, mais auth.dll\nn'a pas √©t√© trouv√©. V√©rifiez votre installation"
+    ID_AUTOACCEPT_U         "Acceptation automatique : %u"
+    ID_AUTOREJECT_U         "Rejet automatique : %u"
+    ID_CADERROR             "Ctrl+Alt+Suppr n√©cessite le service ‚Äî permission insuffisante"
+    ID_CADERRORFILE         "Le fichier cad.exe n'a pas √©t√© trouv√© dans le m√™me dossier que winvnc.exe"
     ID_CADPERMISSION        "Permission denied on cad.exe, UltraVNC must be installed in ""program files"" else special cad permission is refused."
-    ID_CANNOT_EDIT_DEFAULT_PREFS 
-                            "You do not have sufficient privileges to edit the default local UltraVNC Server settings."
-    ID_CHAT_WITH_S_ULTRAVNC "UltraVNC Server - Chat with <%s>"
+    ID_CANNOT_EDIT_DEFAULT_PREFS
+                            "Vous ne disposez pas des privil√®ges suffisants pour modifier les param√®tres locaux par d√©faut d'UltraVNC Server."
+    ID_CHAT_WITH_S_ULTRAVNC "UltraVNC Server - Chat avec <%s>"
 END
 
 STRINGTABLE
 BEGIN
-    ID_SERV_SUCCESS_UNREG   "Le service UltraVNC Server a ÈtÈ dÈsinscrit"
-    ID_ULTRAVNC_TEXTCHAT    "The selected client is not an UltraVNC Viewer!\nIt presumably does not support Text Chat\n"
+    ID_SERV_SUCCESS_UNREG   "Le service UltraVNC Server a √©t√© d√©sinscrit"
+    ID_ULTRAVNC_TEXTCHAT    "Le client s√©lectionn√© n'est pas un client UltraVNC !\nIl ne supporte probablement pas le chat texte.\n"
     ID_ULTRAVNC_WARNING     "Avertissement UltraVNC"
     ID_UNABLE_INST          "Impossible d'installer le service UltraVNC Server"
     ID_UNABLE_PROC_MSLOGON  "Impossible de traiter MS-Logon"
@@ -532,85 +532,85 @@ END
 STRINGTABLE
 BEGIN
     ID_SCM_NOT_HERE         "The SCM could not be contacted - the UltraVNC Server service was not installed"
-    ID_SERVHELP_NREM        "AVERTISSEMENT: L'entrÈe ServiceHelper n'a pas pu Ítre supprimÈe du registre"
-    ID_SERVHELP_UNAB        "AVERTISSEMENT: Impossible d'installer le hook ServiceHelper\nLes paramËtres de registre utilisateur ne seront pas chargÈs"
+    ID_SERVHELP_NREM        "AVERTISSEMENT : L'entr√©e ServiceHelper n'a pas pu √™tre supprim√©e du registre"
+    ID_SERVHELP_UNAB        "AVERTISSEMENT : Impossible d'installer le hook ServiceHelper\nLes param√®tres de registre utilisateur ne seront pas charg√©s"
     ID_SERV_CT_MISS         "The Service Control Manager could not be contacted - the UltraVNC Server service was not registered"
     ID_SERV_CT_UNREG        "The Service Control Manager could not be contacted - the UltraVNC Server service was not unregistered"
-    ID_SERV_FAIL_ST         "Le service UltraVNC Server n'a pas pu dÈmarrer"
-    ID_SERV_MK_UNREG        "Le service UltraVNC Server est dÈj‡ marquÈ pour dÈsinscription"
-    ID_SERV_NCONTACT        "Le service UltraVNC Server n'a pas pu Ítre contactÈ"
-    ID_SERV_NOT_REG         "Le service UltraVNC Server n'a pas pu Ítre enregistrÈ"
-    ID_SERV_NOT_STOP        "Le service UltraVNC Server n'a pas pu Ítre arrÍtÈ"
-    ID_SERV_NOT_UNRG        "Le service UltraVNC Server n'a pas pu Ítre dÈsinscrit"
-    ID_SERV_NT_FOUND        "Le service UltraVNC Server n'a pas ÈtÈ trouvÈ"
-    ID_SERV_OLD_REG         "Le service UltraVNC Server est dÈj‡ enregistrÈ"
-    ID_SERV_SUCCESS_INST    "The UltraVNC Server service was successfully installed\nThe service will start now and will automatically\nbe run the next time this machine is rebooted"
-    ID_SERV_SUCCESS_REG     "The UltraVNC Server service was successfully registered\nThe service may be started from the Control Panel, and will\nautomatically be run the next time this machine is rebooted"
+    ID_SERV_FAIL_ST         "Le service UltraVNC Server n'a pas pu d√©marrer"
+    ID_SERV_MK_UNREG        "Le service UltraVNC Server est d√©j√† marqu√© pour d√©sinscription"
+    ID_SERV_NCONTACT        "Le service UltraVNC Server n'a pas pu √™tre contact√©"
+    ID_SERV_NOT_REG         "Le service UltraVNC Server n'a pas pu √™tre enregistr√©"
+    ID_SERV_NOT_STOP        "Le service UltraVNC Server n'a pas pu √™tre arr√™t√©"
+    ID_SERV_NOT_UNRG        "Le service UltraVNC Server n'a pas pu √™tre d√©sinscrit"
+    ID_SERV_NT_FOUND        "Le service UltraVNC Server n'a pas √©t√© trouv√©"
+    ID_SERV_OLD_REG         "Le service UltraVNC Server est d√©j√† enregistr√©"
+    ID_SERV_SUCCESS_INST    "Le service UltraVNC Server a √©t√© install√© avec succ√®s.\nIl va d√©marrer maintenant et sera lanc√© automatiquement\nau prochain red√©marrage de cette machine."
+    ID_SERV_SUCCESS_REG     "Le service UltraVNC Server a √©t√© enregistr√© avec succ√®s.\nIl peut √™tre d√©marr√© depuis le Panneau de configuration et sera\nlanc√© automatiquement au prochain red√©marrage de cette machine."
 END
 
 STRINGTABLE
 BEGIN
-    ID_NO_OVERRIDE_ERR      "This machine has been preconfigured with UltraVNC Server settings, which cannot be overridden by individual users. The preconfigured settings may be modified only by a System Administrator."
-    ID_NO_PASSWD_NO_LOGON_WARN 
-                            "WARNING: This machine has no default password set. UltraVNC Server will present the Default Properties dialog now to allow one to be entered."
-    ID_NO_PASSWD_NO_OVERRIDE_ERR 
-                            "No password has been set & this machine has been preconfigured to prevent users from setting their own.\nYou must contact a System Administrator to configure UltraVNC Server properly."
-    ID_NO_PASSWD_NO_OVERRIDE_WARN 
-                            "WARNING: This machine has been preconfigured to allow unauthenticated\nconnections to be accepted and to prevent users from enabling authentication."
-    ID_NO_PASSWORD_WARN     "WARNING: Running UltraVNC Server without setting a password is a dangerous security risk!\nUntil you set a password, UltraVNC Server will not accept incoming connections."
-    ID_NO_PLUGIN_DETECT     "Aucun plugin dÈtectÈ..."
+    ID_NO_OVERRIDE_ERR      "Cette machine a √©t√© pr√©configur√©e avec des param√®tres UltraVNC Server qui ne peuvent pas √™tre modifi√©s par les utilisateurs. Seul un administrateur syst√®me peut modifier ces param√®tres."
+    ID_NO_PASSWD_NO_LOGON_WARN
+                            "AVERTISSEMENT : Aucun mot de passe par d√©faut n'est d√©fini sur cette machine. UltraVNC Server va afficher la bo√Æte de dialogue des propri√©t√©s par d√©faut pour vous permettre d'en saisir un."
+    ID_NO_PASSWD_NO_OVERRIDE_ERR
+                            "Aucun mot de passe n'a √©t√© d√©fini et cette machine a √©t√© pr√©configur√©e pour emp√™cher les utilisateurs d'en d√©finir un.\nVeuillez contacter un administrateur syst√®me pour configurer UltraVNC Server correctement."
+    ID_NO_PASSWD_NO_OVERRIDE_WARN
+                            "AVERTISSEMENT : Cette machine a √©t√© pr√©configur√©e pour accepter les connexions sans authentification et emp√™cher les utilisateurs d'activer l'authentification."
+    ID_NO_PASSWORD_WARN     "AVERTISSEMENT : Faire fonctionner UltraVNC Server sans mot de passe repr√©sente un risque de s√©curit√© grave !\nTant qu'aucun mot de passe n'est d√©fini, UltraVNC Server n'acceptera pas de connexions entrantes."
+    ID_NO_PLUGIN_DETECT     "Aucun plugin d√©tect√©..."
     ID_OUTGOING_CONNECTION  "Connexion sortante"
     ID_PLUGIN_LOADIN        "Chargement du plugin"
-    ID_PLUGIN_NOT_LOAD      "Le plugin ne peut pas Ítre chargÈ.\n\rVeuillez vÈrifier son intÈgritÈ."
+    ID_PLUGIN_NOT_LOAD      "Le plugin ne peut pas √™tre charg√©.\n\rVeuillez v√©rifier son int√©grit√©."
     ID_RICHED32_DLL_LD      "Chargement de la DLL Rich Edit"
-    ID_RICHED32_UNLOAD      "Impossible de charger le contrÙle Rich Edit (RICHED32.DLL)!"
+    ID_RICHED32_UNLOAD      "Impossible de charger le contr√¥le Rich Edit (RICHED32.DLL) !"
 END
 
 STRINGTABLE 
 BEGIN 
-    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP nÈcessite une version spÈciale" 
+    IDS_WINDOWS_XP_SPECIAL_BUILD    "Windows XP n√©cessite une version sp√©ciale" 
     IDS_WARNING_CAPTION             "Avertissement" 
-    IDS_ERROR_OS_NOT_SUPPORTED      "Erreur: SystËme d'exploitation non supportÈ" 
-    IDS_UNSUPPORTED_OS_CAPTION      "SystËme non supportÈ" 
+    IDS_ERROR_OS_NOT_SUPPORTED      "Erreur : Syst√®me d'exploitation non support√©" 
+    IDS_UNSUPPORTED_OS_CAPTION      "Syst√®me non support√©" 
     IDS_AUTHADMIN_DLL_NOT_FOUND     "authadmin.dll introuvable" 
     IDS_WORKGRPDOMNT4_DLL_NOT_FOUND "workgrpdomnt4.dll introuvable" 
     IDS_LDAPAUTH_DLL_NOT_FOUND      "ldapauth.dll introuvable" 
     IDS_LDAPAUTHNT4_DLL_NOT_FOUND   "ldapauthnt4.dll introuvable" 
     IDS_LDAPAUTH9X_DLL_NOT_FOUND    "ldapauth9x.dll introuvable" 
-    IDS_KILL_VIEWERS_QUESTION       "Voulez-vous dÈconnecter tous les Viewers connectÈs?" 
-    IDS_RESTART_SERVER_QUESTION     "Voulez-vous redÈmarrer le UltraVNC Server?" 
-    IDS_CLOSE_SERVER_QUESTION       "Voulez-vous fermer le UltraVNC Server?" 
-    IDS_REBOOT_SYSTEM_QUESTION      "Voulez-vous redÈmarrer le systËme?" 
-    IDS_FORCE_REBOOT_QUESTION       "Voulez-vous forcer le redÈmarrage du systËme?" 
-    IDS_UNINSTALL_SERVICE_QUESTION  "Voulez-vous dÈsinstaller le service UltraVNC?" 
-    IDS_INSTALL_SERVICE_QUESTION    "Voulez-vous installer UltraVNC en tant que service?" 
-    IDS_STOP_SERVICE_QUESTION       "Voulez-vous arrÍter le service UltraVNC?" 
-    IDS_START_SERVICE_QUESTION      "Voulez-vous dÈmarrer le service UltraVNC?" 
-    IDS_SYSTEM_CAPTION               "SystËme" 
-    IDS_SERVICE_CAPTION              "Service" 
-    IDS_CURRENT_DRIVER_OLD          "Le pilote actuel est trop ancien pour cette version\nMettez ‡ jour le pilote ou dÈsactivez le pilote Video hook\n dans les paramËtres du serveur" 
-    IDS_DRIVER_NOT_FOUND_REBOOT     "Pilote introuvable: Un redÈmarrage aprËs installation est peut-Ítre nÈcessaire" 
-    IDS_DRIVER_INFO_REQUIRED_VERSION "Info pilote: Version requise 1.00.22" 
-    IDS_FAILED_OPEN_SVC_MGR         "…chec d'ouverture du gestionnaire de services" 
-    IDS_FAILED_PERMISSION_DENIED    "…chec: Permission refusÈe" 
-    IDS_FAILED_CREATE_SVC           "…chec de crÈation du service" 
-    IDS_FAILED_SVC_NOT_INSTALLED    "…chec: Le service n'est pas installÈ" 
-    IDS_FAILED_OPEN_SVC             "…chec d'ouverture du service" 
-    IDS_FAILED_QUERY_SVC_STATUS     "…chec de requÍte du statut du service" 
-    IDS_FAILED_DELETE_SVC           "…chec de suppression du service" 
-    IDS_WRONG_PASSWORD_RETRY        "Mot de passe incorrect, voulez-vous rÈessayer?" 
-    IDS_ERROR_CAPTION                "Erreur" 
-    IDS_UAC_DISABLED_REGISTRY        "UAC dÈsactivÈ, modifiez le registre pour autoriser CAD" 
-    IDS_VERIFY_SAME_FOLDER           "VÈrifiez que winvnc.exe et uvnc_settings sont dans le mÍme dossier\n impossible de crÈer uvnc_service"
-    IDS_DRIVER_FOUND                 "Pilote trouvÈ. " 
-    IDS_DRIVER_VERSION_OK            "Version du pilote OK " 
-    IDS_DRIVER_VERSION_NOT_OK        "La version du pilote n'est pas 1.00.22 " 
-    IDS_DRIVER_NOT_ACTIVATED         "Pilote non activÈ, le viewer est-il connectÈ?" 
-    IDS_DRIVER_ONLY_SERVICE_ADMIN    "Un pilote Mirror ne peut Ítre dÈmarrÈ que si UltraVNC Server est un service ou exÈcutÈ en admin" 
-    IDS_DRIVER_ACTIVE                " pilote actif" 
-    IDS_DRIVER_ACCESS_OK             " accËs OK" 
-    IDS_DRIVER_ACCESS_DENIED         " accËs refusÈ, problËme de permission"
-    IDS_LANGUAGE_NAME                "FranÁais"
+    IDS_KILL_VIEWERS_QUESTION       "Voulez-vous d√©connecter tous les clients connect√©s ?" 
+    IDS_RESTART_SERVER_QUESTION     "Voulez-vous red√©marrer UltraVNC Server ?" 
+    IDS_CLOSE_SERVER_QUESTION       "Voulez-vous fermer UltraVNC Server ?" 
+    IDS_REBOOT_SYSTEM_QUESTION      "Voulez-vous red√©marrer le syst√®me ?" 
+    IDS_FORCE_REBOOT_QUESTION       "Voulez-vous forcer le red√©marrage du syst√®me ?" 
+    IDS_UNINSTALL_SERVICE_QUESTION  "Voulez-vous d√©sinstaller le service UltraVNC ?" 
+    IDS_INSTALL_SERVICE_QUESTION    "Voulez-vous installer UltraVNC en tant que service ?" 
+    IDS_STOP_SERVICE_QUESTION       "Voulez-vous arr√™ter le service UltraVNC ?" 
+    IDS_START_SERVICE_QUESTION      "Voulez-vous d√©marrer le service UltraVNC ?" 
+    IDS_SYSTEM_CAPTION              "Syst√®me" 
+    IDS_SERVICE_CAPTION             "Service" 
+    IDS_CURRENT_DRIVER_OLD          "Le pilote actuel est trop ancien pour cette version.\nMettez √† jour le pilote ou d√©sactivez le pilote Video Hook\ndans les param√®tres du serveur." 
+    IDS_DRIVER_NOT_FOUND_REBOOT     "Pilote introuvable : un red√©marrage apr√®s installation est peut-√™tre n√©cessaire" 
+    IDS_DRIVER_INFO_REQUIRED_VERSION "Info pilote : version requise 1.00.22" 
+    IDS_FAILED_OPEN_SVC_MGR         "√âchec d'ouverture du gestionnaire de services" 
+    IDS_FAILED_PERMISSION_DENIED    "√âchec : permission refus√©e" 
+    IDS_FAILED_CREATE_SVC           "√âchec de cr√©ation du service" 
+    IDS_FAILED_SVC_NOT_INSTALLED    "√âchec : le service n'est pas install√©" 
+    IDS_FAILED_OPEN_SVC             "√âchec d'ouverture du service" 
+    IDS_FAILED_QUERY_SVC_STATUS     "√âchec de la requ√™te du statut du service" 
+    IDS_FAILED_DELETE_SVC           "√âchec de suppression du service" 
+    IDS_WRONG_PASSWORD_RETRY        "Mot de passe incorrect, voulez-vous r√©essayer ?" 
+    IDS_ERROR_CAPTION               "Erreur" 
+    IDS_UAC_DISABLED_REGISTRY       "UAC d√©sactiv√© ‚Äî modifiez le registre pour autoriser CAD" 
+    IDS_VERIFY_SAME_FOLDER          "V√©rifiez que winvnc.exe et uvnc_settings se trouvent dans le m√™me dossier.\nImpossible de cr√©er uvnc_service."
+    IDS_DRIVER_FOUND                "Pilote trouv√©." 
+    IDS_DRIVER_VERSION_OK           "Version du pilote OK." 
+    IDS_DRIVER_VERSION_NOT_OK       "La version du pilote n'est pas 1.00.22." 
+    IDS_DRIVER_NOT_ACTIVATED        "Pilote non activ√© ‚Äî un client est-il connect√© ?" 
+    IDS_DRIVER_ONLY_SERVICE_ADMIN   "Un pilote Mirror ne peut √™tre d√©marr√© que si UltraVNC Server fonctionne en tant que service ou est ex√©cut√© en administrateur" 
+    IDS_DRIVER_ACTIVE               " pilote actif" 
+    IDS_DRIVER_ACCESS_OK            " acc√®s OK" 
+    IDS_DRIVER_ACCESS_DENIED        " acc√®s refus√© ‚Äî probl√®me de permission"
+    IDS_LANGUAGE_NAME               "Fran√ßais"
 END 
 
 #endif    // French resources
@@ -630,7 +630,7 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 
 IDD_PROPERTIESDIALOG DIALOGEX 0, 0, 380, 253
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - ParamËtres"
+CAPTION "UltraVNC Server - Param√®tres"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,204,232,50,14
@@ -644,7 +644,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Mot de passe VNC",IDC_PASSWORD_LABEL,11,17,50,11,SS_CENTERIMAGE
-    LTEXT           "Mot de passe lecture seule",IDC_PASSWORD_LABEL2,11,38,69,11,SS_CENTERIMAGE
+    LTEXT           "Mot de passe affichage seul",IDC_PASSWORD_LABEL2,11,38,69,11,SS_CENTERIMAGE
     CONTROL         "Mot de passe non portable",IDC_SAVEPASSWORDSECURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,189,10
     GROUPBOX        "Authentification",IDC_STATIC,7,4,344,76
     CONTROL         "MS-Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,95,67,10
@@ -657,11 +657,11 @@ BEGIN
     GROUPBOX        "Chiffrement",IDC_STATIC,7,129,344,33
     CONTROL         "Mot de passe requis",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,175,68,9
     LTEXT           "Compte administrateur requis",IDC_STATIC,200,90,77,8
-    LTEXT           "DISABLING THE PASSWORD IS \nNOT RECOMMENDED",IDC_STATIC,87,172,115,19
-    LTEXT           "Le mot de passe chiffrÈ ne peut Ítre dÈchiffrÈ que sur ce systËme",IDC_STATIC,20,67,251,8
-    PUSHBUTTON      "D…FINIR/MODIFIER...",IDC_CHANGEPASSWORD,83,15,64,14
+    LTEXT           "D√âSACTIVER LE MOT DE PASSE EST\nD√âCONSEILL√â",IDC_STATIC,87,172,115,19
+    LTEXT           "Le mot de passe chiffr√© ne peut √™tre d√©chiffr√© que sur ce syst√®me",IDC_STATIC,20,67,251,8
+    PUSHBUTTON      "D√âFINIR/MODIFIER...",IDC_CHANGEPASSWORD,83,15,64,14
     PUSHBUTTON      "Effacer",IDC_CLEARPASSWORD,161,15,50,14
-    PUSHBUTTON      "D…FINIR/MODIFIER...",IDC_CHANGEPASSWORDVO,83,37,64,14
+    PUSHBUTTON      "D√âFINIR/MODIFIER...",IDC_CHANGEPASSWORDVO,83,37,64,14
     PUSHBUTTON      "Effacer",IDC_CLEARPASSWORDVO,161,37,50,14
 END
 
@@ -669,15 +669,15 @@ IDD_FORM_Network DIALOGEX 0, 0, 361, 207
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Se connecter ‡ un viewer en Ècoute",IDC_STATIC,13,19,103,8
-    PUSHBUTTON      "DÈmarrer",IDC_STARTREP,285,18,36,12
+    LTEXT           "Se connecter √† un client en √©coute",IDC_STATIC,13,19,103,8
+    PUSHBUTTON      "D√©marrer",IDC_STARTREP,285,18,36,12
     LTEXT           "Le service initie une connexion inverse",IDC_STATIC,13,32,134,8
     EDITTEXT        IDC_SERVICE_COMMANDLINE,13,43,308,14,ES_AUTOHSCROLL
     LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,13,59,157,8
-    CONTROL         "Authentification requise pour les connexions initiÈes par le serveur",IDC_REVERSEAUTH,
+    CONTROL         "Authentification requise pour les connexions initi√©es par le serveur",IDC_REVERSEAUTH,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,266,16
     GROUPBOX        "Connexion inverse",IDC_STATIC,7,7,344,88
-    CONTROL         "Autoriser connexions Bridge (dÈconnexion 5s)",IDC_CHECKBRIDGE,
+    CONTROL         "Autoriser les connexions Bridge (d√©connexion apr√®s 5s)",IDC_CHECKBRIDGE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,161,10
     GROUPBOX        "Bridge",IDC_STATIC,7,101,314,29
 END
@@ -686,8 +686,8 @@ IDD_FORM_Log DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Enregistrer infos debug dans WinVNC.log",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
-    CONTROL         "Enregistrer en vidÈo",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
+    CONTROL         "Enregistrer les infos de d√©bogage dans WinVNC.log",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
+    CONTROL         "Enregistrer en vid√©o",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
     PUSHBUTTON      "EFFACER ENCODEUR AVI",IDC_CLEAR,79,47,75,9
     LTEXT           "Chemin",IDC_STATIC,13,33,18,8
     EDITTEXT        IDC_EDIT_PATH,37,30,286,14,ES_AUTOHSCROLL
@@ -702,10 +702,10 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Administration",IDC_STATIC,7,7,324,195,BS_LEFT
     LTEXT           "Mot de passe administration",IDC_STATIC,12,44,78,8
-    CONTROL         "Autoriser les utilisateurs ‡ voir et modifier les paramËtres avec ce mot de passe",IDC_ALLOWUSERSSETTINGS,
+    CONTROL         "Autoriser les utilisateurs √† voir et modifier les param√®tres avec ce mot de passe",IDC_ALLOWUSERSSETTINGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
-    LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,312,15
-    PUSHBUTTON      "D…FINIR/MODIFIER...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
+    LTEXT           "En tant qu'administrateur, vous pouvez d√©finir un mot de passe pour permettre aux non-administrateurs de consulter et modifier les param√®tres.",IDC_STATIC_ADMIN,12,20,312,15
+    PUSHBUTTON      "D√âFINIR/MODIFIER...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
     PUSHBUTTON      "EFFACER",IDC_ADMINCLEAR,171,41,50,14
 END
 
@@ -715,7 +715,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Autoriser les connexions Loopback",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,43,104,10
     CONTROL         "Loopback uniquement",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,43,58,10
-    CONTROL         "Autoriser le mode IPv6 (redÈmarrage requis)",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,56,130,10
+    CONTROL         "Autoriser le mode IPv6 (red√©marrage requis)",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,56,130,10
     GROUPBOX        "Connexion entrante",IDC_STATIC,7,7,344,195
     CONTROL         "Activer le port entrant",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,16,75,11
     CONTROL         "Manuel",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,271,30,37,10
@@ -729,40 +729,40 @@ BEGIN
     CONTROL         "Verrouiller le poste (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
     CONTROL         "Fermer la session",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,240,82,72,11
-    CONTROL         "DÈconnecter toutes les connexions existantes",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,111,127,10
+    CONTROL         "D√©connecter toutes les connexions existantes",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,111,127,10
     CONTROL         "Conserver les connexions existantes",IDC_MV2,"Button",BS_AUTORADIOBUTTON,20,121,104,10
     CONTROL         "Refuser la nouvelle connexion",IDC_MV3,"Button",BS_AUTORADIOBUTTON,183,111,103,10
     CONTROL         "Refuser toutes les nouvelles connexions",IDC_MV4,"Button",BS_AUTORADIOBUTTON,183,121,102,10
     EDITTEXT        IDC_KINTERVAL,92,160,19,12,ES_AUTOHSCROLL
     LTEXT           "Intervalle keepalive",IDC_STATIC,15,162,75,9
-    LTEXT           "DÈlai d'inactivitÈ: (entrÈe)",IDC_STATIC,15,142,75,9
+    LTEXT           "D√©lai d'inactivit√© (entr√©e)",IDC_STATIC,15,142,75,9
     EDITTEXT        IDC_IDLETIMEINPUT,92,141,19,12,ES_AUTOHSCROLL
     LTEXT           "Envoyer keepalive toutes les x secondes",IDC_STATIC,139,162,115,8
-    LTEXT           "Instruct viewer to disconnect when idle for x sec.  0 = disabled",IDC_STATIC,139,139,122,15
+    LTEXT           "Demander au client de se d√©connecter apr√®s x sec. d'inactivit√©. 0 = d√©sactiv√©",IDC_STATIC,139,139,122,15
     EDITTEXT        IDC_MAXVIEWERS,62,187,18,12,ES_AUTOHSCROLL
-    LTEXT           "Viewers max",IDC_STATIC,15,188,46,8
+    LTEXT           "Clients max",IDC_STATIC,15,188,46,8
     CONTROL         "Refuser",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,38,10
-    CONTROL         "DÈconnecter le plus ancien",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,73,10
+    CONTROL         "D√©connecter le plus ancien",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,73,10
     LTEXT           "Action",IDC_STATIC,98,188,43,10
-    LTEXT           "¿ la derniËre dÈconnexion viewer",IDC_STATIC,15,71,83,8
+    LTEXT           "√Ä la derni√®re d√©connexion client",IDC_STATIC,15,71,83,8
     LTEXT           "Lors de connexions multiples",IDC_STATIC,15,100,87,8
 END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Edit IPv4 Access Rule"
+CAPTION "UltraVNC Server - Modifier une r√®gle d'acc√®s IPv4"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Adresses IPv4",IDC_STATIC,0,5,223,58,WS_GROUP
-    LTEXT           "ModËle correspondant",IDC_STATIC,15,17,59,8
+    LTEXT           "Mod√®le correspondant",IDC_STATIC,15,17,59,8
     EDITTEXT        IDC_FIRST_IP,80,16,64,12,ES_AUTOHSCROLL | WS_GROUP
     GROUPBOX        "Action",IDC_STATIC,0,65,223,56
     DEFPUSHBUTTON   "OK",IDOK,110,127,50,15,WS_GROUP
-    PUSHBUTTON      "ANNULER",IDCANCEL,169,127,50,15
+    PUSHBUTTON      "Annuler",IDCANCEL,169,127,50,15
     CONTROL         "Autoriser",IDC_ALLOW,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,12,78,33,10
     CONTROL         "Refuser",IDC_DENY,"Button",BS_AUTORADIOBUTTON,12,91,37,10
-    CONTROL         "Demander ‡ l'utilisateur local",IDC_QUERY,"Button",BS_AUTORADIOBUTTON,12,104,59,10
-    LTEXT           "IPv4 address format template:\na.b.c.d or a.b.c. or a.b or a or empty\na.b.c = range from a.b.c.1 to a.b.c.254",IDC_STATIC,8,39,209,28
+    CONTROL         "Demander √† l'utilisateur local",IDC_QUERY,"Button",BS_AUTORADIOBUTTON,12,104,59,10
+    LTEXT           "Format d'adresse IPv4 :\na.b.c.d ou a.b.c. ou a.b ou a ou vide\na.b.c = plage de a.b.c.1 √† a.b.c.254",IDC_STATIC,8,39,209,28
     LTEXT           "",IDC_ERROR_TEXT,7,130,97,8
 END
 
@@ -770,26 +770,26 @@ IDD_FORM_capture DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Interroger plein Ècran",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,112,13
-    CONTROL         "Interroger fenÍtre au premier plan",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,34,89,15
-    CONTROL         "Interroger fenÍtre sous le curseur",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,50,104,12
-    CONTROL         "Interroger fenÍtres console seul.",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,34,99,15
-    CONTROL         "Interroger uniquement sur ÈvÈnement",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,50,78,12
-    CONTROL         "Hook systËme (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,110,10
+    CONTROL         "Interroger plein √©cran",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,112,13
+    CONTROL         "Interroger la fen√™tre au premier plan",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,34,89,15
+    CONTROL         "Interroger la fen√™tre sous le curseur",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,50,104,12
+    CONTROL         "Interroger les fen√™tres console uniquement",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,34,99,15
+    CONTROL         "Interroger uniquement sur √©v√©nement",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,50,78,12
+    CONTROL         "Hook syst√®me (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,110,10
     CONTROL         "Mirror Driver (<= Windows 7)",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,205,10
-    CONTROL         "Faible prÈcision (Vitesse turbo)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,112,10
-    PUSHBUTTON      "V…RIFIER PILOTE MIRROR",IDC_CHECKDRIVER,13,156,92,11
+    CONTROL         "Faible pr√©cision (mode turbo)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,112,10
+    PUSHBUTTON      "V√âRIFIER PILOTE MIRROR",IDC_CHECKDRIVER,13,156,92,11
     EDITTEXT        IDC_MAXCPU,54,176,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Max CPU",IDC_STATIC,13,178,34,8
-    LTEXT           "AccËs ÈlevÈ requis: Service ou exÈcuter en admin",IDC_STATICELEVATED,185,154,166,19
+    LTEXT           "CPU max",IDC_STATIC,13,178,34,8
+    LTEXT           "Acc√®s √©lev√© requis : service ou ex√©cution en administrateur",IDC_STATICELEVATED,185,154,166,19
     CONTROL         "Auto",IDC_AUTOCAPT1,"Button",BS_AUTORADIOBUTTON,97,116,31,10
     CONTROL         "Pixel",IDC_AUTOCAPT2,"Button",BS_AUTORADIOBUTTON,161,116,31,10
     CONTROL         "Blit",IDC_AUTOCAPT3,"Button",BS_AUTORADIOBUTTON,225,116,25,10
-    LTEXT           "Capture hÈritÈe",IDC_STATIC,13,116,54,8
+    LTEXT           "Capture h√©rit√©e",IDC_STATIC,13,116,54,8
     CONTROL         "",IDC_SLIDERFPS,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOP | WS_TABSTOP,71,130,133,12
-    LTEXT           "Max FPS",IDC_STATICFPS5,13,133,29,8
+    LTEXT           "FPS max",IDC_STATICFPS5,13,133,29,8
     LTEXT           "60",IDC_STATICFPS,214,134,9,8
-    GROUPBOX        "Capture d'Ècran",IDC_STATIC,7,7,344,195
+    GROUPBOX        "Capture d'√©cran",IDC_STATIC,7,7,344,195
 END
 
 IDD_FORM_Rules DIALOGEX 0, 0, 361, 209
@@ -797,43 +797,43 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,19,8,8
-    LTEXT           "DurÈe d'affichage du message (s)",IDC_STATIC,36,48,134,8
+    LTEXT           "Dur√©e d'affichage du message (s)",IDC_STATIC,36,48,134,8
     EDITTEXT        IDQUERYTIMEOUT,12,46,19,12,ES_AUTOHSCROLL
-    LTEXT           "Action de requÍte par dÈfaut",IDC_STATIC,13,88,64,8
+    LTEXT           "Action par d√©faut de la requ√™te",IDC_STATIC,13,88,64,8
     CONTROL         "Refuser",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,87,87,39,10
     CONTROL         "Accepter",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,140,87,39,10
-    CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,193,87,88,10
+    CONTROL         "Refuser (autoriser si verrouill√©)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,193,87,88,10
     EDITTEXT        IDC_QUERYDISABLETIME,12,61,19,12,ES_AUTOHSCROLL
-    LTEXT           "DÈlai avant affichage du message (s)",IDC_STATIC,36,63,158,8
+    LTEXT           "D√©lai avant affichage du message (s)",IDC_STATIC,36,63,158,8
     EDITTEXT        IDC_EDITQUERYTEXT,12,30,206,12,ES_AUTOHSCROLL
-    LTEXT           "Message popup personnalisÈ",IDC_STATIC,225,32,99,8
-    CONTROL         "Show messagebox when no user is logged or screen is locked",IDC_QNOLOGON,
+    LTEXT           "Message popup personnalis√©",IDC_STATIC,225,32,99,8
+    CONTROL         "Afficher la bo√Æte de message si aucun utilisateur n'est connect√© ou si l'√©cran est verrouill√©",IDC_QNOLOGON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,76,206,10
-    GROUPBOX        "RËgles",IDC_STATIC,7,7,344,195,WS_GROUP
+    GROUPBOX        "R√®gles",IDC_STATIC,7,7,344,195,WS_GROUP
     CONTROL         "",IDC_IP_ACCESS_CONTROL_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_GROUP | WS_TABSTOP,12,119,244,61
     DEFPUSHBUTTON   "Ajouter...",IDC_ADD_BUTTON,274,119,57,10,WS_GROUP
     PUSHBUTTON      "Modifier...",IDC_EDIT_BUTTON,274,132,57,10
     PUSHBUTTON      "Supprimer",IDC_REMOVE_BUTTON,274,145,57,10
     PUSHBUTTON      "Monter",IDC_MOVE_UP_BUTTON,274,158,57,10
     PUSHBUTTON      "Descendre",IDC_MOVE_DOWN_BUTTON,274,171,57,10
-    LTEXT           "Check the rules above:",IDC_STATIC,16,187,52,8
+    LTEXT           "Tester les r√®gles ci-dessus :",IDC_STATIC,16,187,52,8
     EDITTEXT        IDC_IP_FOR_CHECK_EDIT,72,186,44,12,ES_AUTOHSCROLL | WS_GROUP
-    LTEXT           "[check result]",IDC_IP_CHECK_RESULT_LABEL,177,188,46,8
-    PUSHBUTTON      "VÈrifier",IDC_CHECKIP,125,186,44,12
-    LTEXT           "Popup a timed messagebox to allow the user to allow/reject an incoming connect",IDC_STATIC,24,19,264,11
-    LTEXT           "Allow locked: no messagebox when screen is locked",IDC_STATIC,87,99,180,12
+    LTEXT           "[r√©sultat du test]",IDC_IP_CHECK_RESULT_LABEL,177,188,46,8
+    PUSHBUTTON      "V√©rifier",IDC_CHECKIP,125,186,44,12
+    LTEXT           "Afficher une bo√Æte de message minut√©e pour permettre √† l'utilisateur d'accepter ou refuser une connexion entrante",IDC_STATIC,24,19,264,11
+    LTEXT           "Autoriser si verrouill√© : pas de bo√Æte de message si l'√©cran est verrouill√©",IDC_STATIC,87,99,180,12
 END
 
 IDD_FORM_Notifications DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Cadre indicateur autour de l'Ècran partagÈ",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,167,10
-    CONTROL         "Afficher notification popup lors de connexion viewer",IDC_NOTIFOCATION,
+    CONTROL         "Cadre indicateur autour de l'√©cran partag√©",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,167,10
+    CONTROL         "Afficher une notification popup lors de la connexion d'un client",IDC_NOTIFOCATION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,160,10
-    CONTROL         "Toujours afficher notification, utiliser celle du client si disponible",IDC_RADIONOTIFICATIONON,
+    CONTROL         "Toujours afficher la notification, utiliser celle du client si disponible",IDC_RADIONOTIFICATIONON,
                     "Button",BS_AUTORADIOBUTTON,39,45,250,10
-    CONTROL         "Afficher uniquement si le client fournit info notification",IDC_RADIONOTIFICATIONIFPROVIDED,
+    CONTROL         "Afficher uniquement si le client fournit une info de notification",IDC_RADIONOTIFICATIONIFPROVIDED,
                     "Button",BS_AUTORADIOBUTTON,39,57,182,10
     CONTROL         "Utiliser OSD au lieu d'un popup",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,120,10
     GROUPBOX        "Notification",IDC_STATIC,7,7,344,78
@@ -844,14 +844,14 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Clavier && Souris",IDC_STATIC,7,7,344,49,BS_LEFT
-    CONTROL         "DÈsactiver les entrÈes Viewer",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
-    CONTROL         "DÈsactiver les entrÈes locales",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
+    CONTROL         "D√©sactiver le clavier et la souris du client",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
+    CONTROL         "D√©sactiver le clavier et la souris du serveur",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
     CONTROL         "Clavier alternatif",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
     CONTROL         "Assistant clavier Windows 8",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,110,10
     CONTROL         "Touches internationales",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,74,10
     CONTROL         "Collaboratif",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,58,10
     CONTROL         "Activer",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,67,36,10
-    CONTROL         "Usurpation utilisateur (pour Service seul.)",IDC_FTUSERIMPERSONATION_CHECK,
+    CONTROL         "Emprunt d'identit√© (service uniquement)",IDC_FTUSERIMPERSONATION_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,79,133,10
     GROUPBOX        "Transfert de fichiers",IDC_STATIC,7,56,344,41
 END
@@ -885,27 +885,27 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Divers",IDC_STATIC,7,7,344,197,BS_LEFT
-    CONTROL         "Supprimer le fond d'Ècran lors de la connexion",IDC_REMOVE_WALLPAPER,
+    CONTROL         "Supprimer le fond d'√©cran lors de la connexion",IDC_REMOVE_WALLPAPER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,134,10
-    CONTROL         "Activer Ècran noir sur demande viewer",IDC_BLANK,
+    CONTROL         "Activer l'√©cran noir sur demande du client",IDC_BLANK,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,144,10
-    CONTROL         "DÈsactiver entrÈes seul. sur demande Ècran noir",IDC_BLANK2,
+    CONTROL         "D√©sactiver le clavier et la souris uniquement sur demande d'√©cran noir",IDC_BLANK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
-    CONTROL         "DÈsactiver icÙne barre des t‚ches",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
-    CONTROL         "DÈsactiver options clients dans menu icÙne",IDC_ALLOWEDITCLIENTS,
+    CONTROL         "D√©sactiver l'ic√¥ne de la barre des t√¢ches",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
+    CONTROL         "D√©sactiver les options clients dans le menu ic√¥ne",IDC_ALLOWEDITCLIENTS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
-    CONTROL         "Interdire ‡ l'utilisateur de fermer UltraVNC Server",IDC_ALLOWSHUTDOWN,
+    CONTROL         "Interdire √† l'utilisateur de fermer UltraVNC Server",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
-    LTEXT           "…chelle d'Ècran par dÈfaut",IDC_STATIC,14,116,100,8
+    LTEXT           "√âchelle d'√©cran par d√©faut",IDC_STATIC,14,116,100,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
-    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
-    CONTROL         "EmpÍcher Èconomiseur d'Ècran",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
-    LTEXT           "…cran par dÈfaut",IDC_STATIC,14,129,47,8
+    CONTROL         "Mode RDP",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
+    CONTROL         "Emp√™cher l'√©conomiseur d'√©cran",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
+    LTEXT           "√âcran par d√©faut",IDC_STATIC,14,129,47,8
     CONTROL         "Principal",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
     CONTROL         "Secondaire",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
     LTEXT           "Langue",IDC_LANGUAGE_LABEL,14,145,40,8
     COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "(redÈmarrage requis)",IDC_STATIC,180,145,80,8
+    LTEXT           "(red√©marrage requis)",IDC_STATIC,180,145,80,8
 END
 
 IDD_FORM_Service DIALOGEX 0, 0, 362, 209
@@ -913,9 +913,9 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     PUSHBUTTON      "Installer le service",IDC_INSTALL_SERVICE,17,7,84,14
-    PUSHBUTTON      "DÈsinstaller le service",IDC_UNINSTALL_SERVICE,17,28,84,14
-    PUSHBUTTON      "DÈmarrer le service",IDC_START_SERVICE,17,49,84,14
-    PUSHBUTTON      "ArrÍter le service",IDC_STOP_SERVICE,17,70,84,14
+    PUSHBUTTON      "D√©sinstaller le service",IDC_UNINSTALL_SERVICE,17,28,84,14
+    PUSHBUTTON      "D√©marrer le service",IDC_START_SERVICE,17,49,84,14
+    PUSHBUTTON      "Arr√™ter le service",IDC_STOP_SERVICE,17,70,84,14
     LTEXT           "Static",IDC_SERVICE_STATUS,17,100,217,31
 END
 
@@ -1160,4 +1160,4 @@ END
 //
 #include "version.rc2"
 /////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED 
+#endif    // not APSTUDIO_INVOKED
