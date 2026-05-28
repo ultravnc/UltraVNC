@@ -1294,6 +1294,8 @@ void VNCOptions::LoadOptions(const wchar_t* fname)
 	m_quickoption = readInt(L"QuickOption", m_quickoption, fname);
 	m_fUseDSMPlugin = readInt(L"UseDSMPlugin", m_fUseDSMPlugin, fname) != 0;
 	m_connectionType = (ConnectionType)readInt(L"UseProxy", (int)m_connectionType, fname);
+	GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, fname);
+	m_proxyport = GetPrivateProfileIntW(L"connection", L"proxyport", 0, fname);
 	m_allowMonitorSpanning = readInt(L"allowMonitorSpanning", m_allowMonitorSpanning, fname);
 	m_ChangeServerRes = readInt(L"ChangeServerRes", m_ChangeServerRes, fname);
 	m_extendDisplay = readInt(L"extendDisplay", m_extendDisplay, fname);

@@ -577,6 +577,9 @@ void SessionDialog::InitDlgProc(bool loadhost, bool initMruNeeded)
 		_tcscat_s(tmphost, _countof(tmphost), tmphost2);
 		SetDlgItemText(hwnd, IDC_PROXY_EDIT, tmphost);
 	}
+	else {
+		SetDlgItemText(hwnd, IDC_PROXY_EDIT, _T(""));
+	}
 
 	SendMessage(GetDlgItem(hwnd, IDC_RADIOREPEATER), BM_SETCHECK, false, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_RADIODIRECT), BM_SETCHECK, false, 0);
