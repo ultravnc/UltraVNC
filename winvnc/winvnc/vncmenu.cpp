@@ -952,7 +952,7 @@ LRESULT CALLBACK vncMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 					return 0;
 			}
 #ifndef SC_20
-			else {
+			else if (!settings->getScExit()) {
 				if (!MessageBoxSecure(NULL, sz_ID_CLOSE_SERVER_QUESTION, "", MB_YESNO))
 					return 0;
 			}
