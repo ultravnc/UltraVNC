@@ -31,8 +31,7 @@ static LRESULT CALLBACK MessageDlgProc2(HWND hwnd, UINT iMsg,
 			HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_TRAY));
 			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-			//CentreWindow(hwnd);
-			SetForegroundWindow(hwnd);            
+			//CentreWindow(hwnd);         
 			SetForegroundWindow(hwnd);
 			extern char buildtime[];
 			char isoTime[20];  // Buffer for ISO output

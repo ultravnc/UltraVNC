@@ -123,7 +123,7 @@ static LRESULT CALLBACK AboutDlgProc(HWND hwnd, UINT iMsg,
             ConvertStaticToHyperlink(hwnd, IDC_UVNCCOM);
             char version[50]{};
             char title[256]{};
-            strcpy_s(title, "UltraVNC Viewer - ");
+            strcpy_s(title, "UltraVNC Viewer -");
             strcat_s(title, GetVersionFromResource(version));
             { wchar_t _wtitle[256]; MultiByteToWideChar(CP_UTF8,0,title,-1,_wtitle,256); SetDlgItemTextW(hwnd, IDC_UVVERSION, _wtitle); }
 
