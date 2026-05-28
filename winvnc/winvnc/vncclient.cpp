@@ -1772,9 +1772,14 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	if (!m_socket->SendExactQueue(gen, sizeof(gen))) return FALSE;
 	if (!m_socket->SendExactQueue(mod, sizeof(mod))) return FALSE;
 	if (!m_socket->SendExact(pub, sizeof(pub))) return FALSE;
+	// Give the user time to type credentials (raise timeout for interactive wait)
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
 	if (!m_socket->ReadExact(resp, sizeof(resp))) return FALSE;
 	if (!m_socket->ReadExact(user, sizeof(user))) return FALSE;
 	if (!m_socket->ReadExact(passwd, sizeof(passwd))) return FALSE;
+	// Restore handshake timeout after interactive wait
+	m_socket->SetTimeout(30000);
 
 	int64ToBytes(dh.createEncryptionKey(bytesToInt64(resp)), (char*)key);
 	vnclog.Print(0, "After DH: g=%I64u, m=%I64u, i=%I64u, key=%I64u\n", bytesToInt64(gen), bytesToInt64(mod), bytesToInt64(pub), bytesToInt64((char*)key));
@@ -1819,12 +1824,17 @@ BOOL vncClientThread::AuthVnc(std::string& auth_message)
 				return FALSE;
 			}
 
+			// Give the user time to type the password (raise timeout for interactive wait)
+			m_socket->SetTimeout(120000);
+			m_client->authAttempted = true;
 			// Read the response
 			if (!m_socket->ReadExact(response, sizeof(response)))
 			{
 				vnclog.Print(LL_SOCKERR, VNCLOG("Failed to receive challenge response from client\n"));
 				return FALSE;
 			}
+			// Restore handshake timeout after the interactive wait
+			m_socket->SetTimeout(30000);
 			// Encrypt the challenge bytes
 			vncEncryptBytes((BYTE*)&challenge, plain);
 
@@ -1886,11 +1896,16 @@ BOOL vncClientThread::AuthSCPrompt(std::string& auth_message)
 		return FALSE;
 	if (!m_socket->SendExact((char*)mytext, size))
 		return FALSE;
+	// Give the user time to respond to the SC prompt (raise timeout for interactive wait)
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
 	int nummer = 0;
 	if (!m_socket->ReadExact((char*)&nummer, sizeof(int)))
 	{
+		m_socket->SetTimeout(30000);
 		return FALSE;
 	}
+	m_socket->SetTimeout(30000);
 	if (nummer == 0)
 	{
 		auth_message = "Viewer refused connection";
@@ -2217,6 +2232,8 @@ vncClientThread::run(void* arg)
 	// GET PROTOCOL VERSION
 	if (!InitVersion())
 	{
+		// Version negotiation failed before any auth attempt — undo pre-emptive blacklist entry.
+		m_server->RemAuthHostsBlacklist(m_client->GetClientNameAddress());
 		// wa@2005 - AutoReconnection attempt if required
 		if (m_client->m_Autoreconnect && !fShutdownOrdered)
 		{
@@ -2246,6 +2263,10 @@ vncClientThread::run(void* arg)
 	// AUTHENTICATE LINK
 	if (!InitAuthenticate())
 	{
+		// If the connection was dropped/cancelled before credentials were ever submitted,
+		// undo the pre-emptive blacklist entry — no wrong password was entered.
+		if (!m_client->forceBlacklist && !m_client->authAttempted)
+			m_server->RemAuthHostsBlacklist(m_client->GetClientNameAddress());
 		m_server->RemoveClient(m_client->GetClientId());
 		if (!fShutdownOrdered) {
 			if (m_client->m_Autoreconnect)
@@ -4895,6 +4916,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	ask_mouse = false;
 	simulateCursor = NULL;
 	forceBlacklist = false;
+	authAttempted = false;
 }
 
 vncClient::~vncClient()

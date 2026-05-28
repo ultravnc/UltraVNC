@@ -266,6 +266,7 @@ public:
 	void setTiming(DWORD value) {m_timing = value;}
 	DWORD getTiming() {return m_timing;}
 	bool forceBlacklist;
+	bool authAttempted;
 
 	// adzm 2009-07-05 - repeater IDs
 	void SetRepeaterID(char* szid)
