@@ -176,7 +176,8 @@ int ClientConnection::LoadConnection(const wchar_t *fname, bool fFromDialog, boo
 		ofn.Flags = OFN_HIDEREADONLY;
 		if (GetOpenFileName(&ofn) == 0)
 			return -1;
-		// Update fname pointer to point to tfname for subsequent use
+		// Copy selected filename back to caller's buffer and update local pointer
+		_tcscpy_s(const_cast<wchar_t*>(fname), _MAX_PATH, tfname);
 		fname = tfname;
 	}
 
