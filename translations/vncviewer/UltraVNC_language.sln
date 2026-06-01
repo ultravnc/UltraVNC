@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.34601.136
@@ -12,6 +12,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_chinese", "Chinese\UltraVNC_language_chinese.vcxproj", "{12345678-ABCD-4321-ABCD-1234567890AB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_chinese_tw", "ChineseTW\UltraVNC_language_chinese_tw.vcxproj", "{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_russian", "Russian\UltraVNC_language_russian.vcxproj", "{11111111-2222-3333-4444-555566667777}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,7 +55,7 @@ Global
 		{12345678-ABCD-4321-ABCD-1234567890AB}.Release|x64.Build.0 = Release|x64
 		{12345678-ABCD-4321-ABCD-1234567890AB}.Release|x86.ActiveCfg = Release|Win32
 		{12345678-ABCD-4321-ABCD-1234567890AB}.Release|x86.Build.0 = Release|Win32
-			{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Debug|x64.ActiveCfg = Debug|x64
+		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Debug|x64.ActiveCfg = Debug|x64
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Debug|x64.Build.0 = Debug|x64
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Debug|x86.ActiveCfg = Debug|Win32
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Debug|x86.Build.0 = Debug|Win32
@@ -61,6 +63,14 @@ Global
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Release|x64.Build.0 = Release|x64
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Release|x86.ActiveCfg = Release|Win32
 		{AABBCCDD-1234-5678-ABCD-AABBCCDDEEFF}.Release|x86.Build.0 = Release|Win32
+		{11111111-2222-3333-4444-555566667777}.Debug|x64.ActiveCfg = Debug|x64
+		{11111111-2222-3333-4444-555566667777}.Debug|x64.Build.0 = Debug|x64
+		{11111111-2222-3333-4444-555566667777}.Debug|x86.ActiveCfg = Debug|Win32
+		{11111111-2222-3333-4444-555566667777}.Debug|x86.Build.0 = Debug|Win32
+		{11111111-2222-3333-4444-555566667777}.Release|x64.ActiveCfg = Release|x64
+		{11111111-2222-3333-4444-555566667777}.Release|x64.Build.0 = Release|x64
+		{11111111-2222-3333-4444-555566667777}.Release|x86.ActiveCfg = Release|Win32
+		{11111111-2222-3333-4444-555566667777}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

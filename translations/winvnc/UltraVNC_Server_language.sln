@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.34601.136
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -18,9 +18,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_german", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_spanish", "..\vncviewer\Spanish\UltraVNC_language_spanish.vcxproj", "{FE4B551D-53DE-4822-8FC3-51B9BB08783A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_Server_language_chinese", "ChineseTW\UltraVNC_Server_language_chinese_tw.vcxproj", "{CCDDEE11-2345-6789-BCDE-BBCCDDEEFF00}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_Server_language_chinese_tw", "ChineseTW\UltraVNC_Server_language_chinese_tw.vcxproj", "{CCDDEE11-2345-6789-BCDE-BBCCDDEEFF00}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_chinese_tw", "..\vncviewer\ChineseTW\UltraVNC_language_chinese_tw.vcxproj", "{FBEAC877-59FF-457D-B6F4-06270E680C5E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_Server_language_russian", "Russian\UltraVNC_Server_language_russian.vcxproj", "{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UltraVNC_language_russian", "..\vncviewer\Russian\UltraVNC_language_russian.vcxproj", "{11111111-2222-3333-4444-555566667777}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +114,22 @@ Global
 		{FBEAC877-59FF-457D-B6F4-06270E680C5E}.Release|x64.Build.0 = Release|x64
 		{FBEAC877-59FF-457D-B6F4-06270E680C5E}.Release|x86.ActiveCfg = Release|Win32
 		{FBEAC877-59FF-457D-B6F4-06270E680C5E}.Release|x86.Build.0 = Release|Win32
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Debug|x64.ActiveCfg = Debug|x64
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Debug|x64.Build.0 = Debug|x64
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Debug|x86.ActiveCfg = Debug|Win32
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Debug|x86.Build.0 = Debug|Win32
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Release|x64.ActiveCfg = Release|x64
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Release|x64.Build.0 = Release|x64
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Release|x86.ActiveCfg = Release|Win32
+		{AAAABBBB-CCCC-DDDD-EEEE-FFFFAAAABBBB}.Release|x86.Build.0 = Release|Win32
+		{11111111-2222-3333-4444-555566667777}.Debug|x64.ActiveCfg = Debug|x64
+		{11111111-2222-3333-4444-555566667777}.Debug|x64.Build.0 = Debug|x64
+		{11111111-2222-3333-4444-555566667777}.Debug|x86.ActiveCfg = Debug|Win32
+		{11111111-2222-3333-4444-555566667777}.Debug|x86.Build.0 = Debug|Win32
+		{11111111-2222-3333-4444-555566667777}.Release|x64.ActiveCfg = Release|x64
+		{11111111-2222-3333-4444-555566667777}.Release|x64.Build.0 = Release|x64
+		{11111111-2222-3333-4444-555566667777}.Release|x86.ActiveCfg = Release|Win32
+		{11111111-2222-3333-4444-555566667777}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
