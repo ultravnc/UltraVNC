@@ -9,6 +9,23 @@
 //
 #include "afxres.h"
 
+#if defined(SC_20)
+/////////////////////////////////////////////////////////////////////////////
+//
+// DLL
+//
+
+IDR_DLL1                DLL                     "res/ddengine.dll"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// ENCRYPTIONDLL
+//
+
+IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -873,6 +890,23 @@ END
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
+    "\r\n"
+    "#if defined(SC_20)\r\n"
+    "/////////////////////////////////////////////////////////////////////////////\r\n"
+    "//\r\n"
+    "// DLL\r\n"
+    "//\r\n"
+    "\r\n"
+    "IDR_DLL1                DLL                     ""res/ddengine.dll""\r\n"
+    "\r\n"
+    "\r\n"
+    "/////////////////////////////////////////////////////////////////////////////\r\n"
+    "//\r\n"
+    "// ENCRYPTIONDLL\r\n"
+    "//\r\n"
+    "\r\n"
+    "IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           ""res/SecureVNCPlugin.dsm""\r\n"
+    "#endif\r\n"
     "\0"
 END
 
