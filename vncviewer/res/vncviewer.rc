@@ -560,7 +560,7 @@ EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
 CAPTION "UltraVNC Viewer - Snapshot"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_FOLDER,51,7,201,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
     EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
@@ -586,60 +586,60 @@ BEGIN
     CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,14,97,38,10
     CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,54,97,24,10
     CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,86,97,37,10
-    CONTROL         "Full colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,142,21,48,10
-    CONTROL         "256 colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,31,49,10
-    CONTROL         "64 colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,41,45,10
-    CONTROL         "8 colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,51,41,10
-    CONTROL         "8 Dark colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,61,54,10
-    CONTROL         "4 Grey colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,71,58,10
-    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,81,57,10
+    CONTROL         "Full colors",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,163,21,48,10
+    CONTROL         "256 colors",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,31,49,10
+    CONTROL         "64 colors",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,41,45,10
+    CONTROL         "8 colors",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,51,41,10
+    CONTROL         "8 Dark colors",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,61,54,10
+    CONTROL         "4 Grey colors",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,71,58,10
+    CONTROL         "Black && White",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,81,57,10
     CONTROL         "Zlib compression",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,68,10
     EDITTEXT        IDC_COMPRESSLEVEL,87,113,14,12,ES_AUTOHSCROLL
     CONTROL         "JPEG Quality",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,54,10
     EDITTEXT        IDC_QUALITYLEVEL,87,126,14,12,ES_AUTOHSCROLL
-    CONTROL         "Use Zstd instead of zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,100,90,10
-    CONTROL         "Use CopyRect encoding",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
-    CONTROL         "Use Cache Encoding",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,120,90,10
-    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,130,81,10
-    LTEXT           "High CPU lower bandwidth ",IDC_STATIC,8,87,87,8
-    LTEXT           "Low CPU high bandwidth",IDC_STATIC,8,17,80,8
-    LTEXT           "High CPU middle bandwidth (lossless)",IDC_STATIC,8,41,119,8
-    LTEXT           "Middle CPU low bandwidth (lossy)",IDC_STATIC,8,64,108,8
+    CONTROL         "Use Zstd instead of zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,100,90,10
+    CONTROL         "Use CopyRect encoding",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,110,94,10
+    CONTROL         "Use Cache Encoding",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,120,90,10
+    CONTROL         "Preemptive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,130,81,10
+    LTEXT           "High CPU lower bandwidth ",IDC_STATIC,8,87,144,8
+    LTEXT           "Low CPU high bandwidth",IDC_STATIC,8,17,144,8
+    LTEXT           "High CPU middle bandwidth (lossless)",IDC_STATIC,8,41,144,8
+    LTEXT           "Middle CPU low bandwidth (lossy)",IDC_STATIC,8,64,144,8
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Change server resolution",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
-    LTEXT           "Small",IDC_STATIC,19,12,19,8
+    CONTROL         "Change server resolution",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,167,10
+    LTEXT           "Small",IDC_STATIC,12,12,31,8
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CTEXT           "",IDC_RES,181,12,47,8
     CONTROL         "Use all my monitors for the remote session",IDC_ALLMONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,157,10
-    CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,90,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,244,10
+    CONTROL         "Main screen resolution",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,244,10
     CONTROL         "Use only virtual displays  (win 10 1903 >=)",IDC_RADIO_ONLY_VIRTUAL,
-                    "Button",BS_AUTORADIOBUTTON,22,45,157,10
+                    "Button",BS_AUTORADIOBUTTON,22,45,244,10
     CONTROL         "Extend main display  (win 10 1903 >=)",IDC_RADIO_EXTEND,
-                    "Button",BS_AUTORADIOBUTTON,22,55,143,10
+                    "Button",BS_AUTORADIOBUTTON,22,55,244,10
     CONTROL         "Show only extend ( portable as extra display)",IDC_SHOW_EXTEND,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,164,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,233,10
     CONTROL         "Allow Full screen multi monitor spanning",IDC_ALLOWSPAN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,141,10
-    CONTROL         "Fit to screen: no scrollbars",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,103,10
-    CONTROL         "Show tool bar",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
-    CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
-    COMBOBOX        IDC_SCALE_CB,69,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,102,107,8,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,262,10
+    CONTROL         "Fit to screen: no scrollbars",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,141,10
+    CONTROL         "Show tool bar",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,141,10
+    CONTROL         "Auto scale by",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,70,10
+    COMBOBOX        IDC_SCALE_CB,73,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,106,107,8,8
     LTEXT           "Server Screen Scale by",IDC_STATIC,12,119,80,8
-    LTEXT           "1  /",IDC_STATIC,99,119,12,8
-    EDITTEXT        IDC_SERVER_SCALE,115,117,14,12,ES_AUTOHSCROLL
-    CONTROL         "Save position on exit",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
-    CONTROL         "Start in full screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,87,90,10
-    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,98,65,10
-    CONTROL         "",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,110,8,11
-    CONTROL         "Save size on exit",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
-    LTEXT           "GNOME Remote Desttop \nQEMU",IDC_STATIC,148,111,82,17
+    LTEXT           "1  /",IDC_STATIC,104,119,12,8
+    EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
+    CONTROL         "Save position on exit",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
+    CONTROL         "Start in full screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,89,112,10
+    CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,98,112,10
+    CONTROL         "",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,110,12,11
+    CONTROL         "Save size on exit",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,129,112,10
+    LTEXT           "GNOME Remote Desttop \nQEMU",IDC_STATIC,163,111,103,18
 END
 
 IDD_MISC DIALOGEX 0, 0, 270, 145
@@ -654,10 +654,10 @@ BEGIN
     EDITTEXT        IDC_SERVER_RECON_TIME,169,59,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,100,79,16,14,ES_AUTOHSCROLL
     CONTROL         "Do not display the sponsor advertisement",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,164,10
-    CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,128,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,262,10
+    CONTROL         "Hide status window",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,262,10
     CONTROL         "Hide End of Stream error",IDC_HIDEENDOFSTREAMERROR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,262,10
     LTEXT           "Folder:",IDC_STATIC,4,18,25,9
     LTEXT           "Prefix:",IDC_STATIC,4,36,25,8
     LTEXT           "Snapshot folder and prefix",IDC_STATIC,4,4,262,8
@@ -675,17 +675,17 @@ BEGIN
     PUSHBUTTON      "CONFIGURE ENCRYPTION",IDC_PLUGIN_BUTTON,74,20,138,12
     CONTROL         "Only allow encrypted servers.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,112,10
     CONTROL         "Share the Server, allow other to connect.",IDC_SHARED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,163,10
-    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,171,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,262,10
+    CONTROL         "Disable clipboard transfer",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,262,10
     CONTROL         "Auto accept incoming (listener mode)",IDC_AUTOACCEPT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,178,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,262,10
     CONTROL         "Ignore no encryption warning (listener mode)",IDC_AUTOACCEPTNOWARN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,201,10
-    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,49,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,262,10
+    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,262,10
     EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,262,25,ES_MULTILINE
-    LTEXT           "Notification on connect",IDC_STATIC,4,108,75,8
-    CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,35,104,10
-    CONTROL         "Use IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,44,10
+    LTEXT           "Notification on connect",IDC_STATIC,4,108,262,8
+    CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,35,131,10
+    CONTROL         "Use IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,262,10
 END
 
 IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 270, 145
@@ -693,35 +693,35 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Track remote cursor locally",IDC_CSHAPE_ENABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,144,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,260,10
     CONTROL         "Let remote server deal with mouse cursor",IDC_CSHAPE_DISABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,19,147,10
+                    "Button",BS_AUTORADIOBUTTON,6,19,260,10
     CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,30,142,10
-    CONTROL         "View only, no input",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,129,10
-    CONTROL         "Disable hockeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,66,10
+                    "Button",BS_AUTORADIOBUTTON,6,30,260,10
+    CONTROL         "View only, no input",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,260,10
+    CONTROL         "Disable hockeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
     CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,139,10
-    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,126,10
-    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,78,10
-    LTEXT           "Mouse event throttle (ms)",IDC_STATIC,6,106,89,11
-    EDITTEXT        IDC_MOUSE_THROTTLE,106,104,42,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,24,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,260,10
+    CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,260,10
+    CONTROL         "Japanese keyboard",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,260,10
+    LTEXT           "Mouse event throttle (ms)",IDC_STATIC,6,106,100,11
+    EDITTEXT        IDC_MOUSE_THROTTLE,111,104,42,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,105,10
 END
 
 IDD_QUICKOPTIONS DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "AUTO    (Auto-select best settings)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,177,10
-    CONTROL         "VIDEO   (> 2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
-    CONTROL         "LAN     (> 1Mbit/s) - Max colors",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,176,10
+    CONTROL         "AUTO    (Auto-select best settings)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,257,10
+    CONTROL         "VIDEO   (> 2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,257,10
+    CONTROL         "LAN     (> 1Mbit/s) - Max colors",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,257,10
     CONTROL         "MEDIUM  (128 - 256Kbit/s) - 256 colors",IDC_MEDIUM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,56,153,10
+                    "Button",BS_AUTORADIOBUTTON,9,56,257,10
     CONTROL         "MODEM   (19 - 128Kbit/s) - 64 colors",IDC_MODEM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,70,148,10
-    CONTROL         "SLOW    (< 19kKbit/s) - 8 colors",IDC_SLOW_RB,"Button",BS_AUTORADIOBUTTON,9,84,128,10
-    CONTROL         "MANUAL  (Use options button)",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,123,10
+                    "Button",BS_AUTORADIOBUTTON,9,70,257,10
+    CONTROL         "SLOW    (< 19kKbit/s) - 8 colors",IDC_SLOW_RB,"Button",BS_AUTORADIOBUTTON,9,84,257,10
+    CONTROL         "MANUAL  (Use options button)",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,257,10
 END
 
 IDD_LISTEN DIALOGEX 0, 0, 270, 145
@@ -730,7 +730,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Start Listening",IDC_STARTLISTEN,76,24,61,14
-    LTEXT           "Listen mode",IDC_STATIC,4,10,39,8
+    LTEXT           "Listen mode",IDC_STATIC,4,10,133,8
     LTEXT           "Port",IDC_STATIC,4,27,17,8
 END
 
@@ -991,7 +991,8 @@ BEGIN
         VERTGUIDE, 4
         VERTGUIDE, 8
         VERTGUIDE, 14
-        VERTGUIDE, 142
+        VERTGUIDE, 152
+        VERTGUIDE, 163
         BOTTOMMARGIN, 141
         HORZGUIDE, 4
     END
@@ -1000,6 +1001,9 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 266
         VERTGUIDE, 4
+        VERTGUIDE, 12
+        VERTGUIDE, 145
+        VERTGUIDE, 154
         BOTTOMMARGIN, 141
     END
 
@@ -1020,6 +1024,7 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 266
         VERTGUIDE, 4
+        VERTGUIDE, 135
         BOTTOMMARGIN, 141
         HORZGUIDE, 5
     END
@@ -1033,7 +1038,7 @@ BEGIN
 
     IDD_QUICKOPTIONS, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
         BOTTOMMARGIN, 141
         HORZGUIDE, 5
