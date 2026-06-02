@@ -409,6 +409,20 @@ wi_sockaccept()
 	  return WIE_SOCKET;
    }
 
+   /* Limit concurrent sessions to prevent DoS via heap exhaustion */
+#define WI_MAX_SESSIONS  8
+   {
+      int sesscount = 0;
+      wi_sess * tmp;
+      for(tmp = wi_sessions; tmp; tmp = tmp->ws_next)
+         sesscount++;
+      if(sesscount >= WI_MAX_SESSIONS)
+      {
+         closesocket(newsock);
+         return 0;   /* not an error, just drop */
+      }
+   }
+
    /* now that we have a new socket connection, make a session 
     * object for it 
     */
@@ -492,6 +506,19 @@ wi_parseheader( wi_sess * sess )
       wi_senderr(sess, 400);  /* Bad request */
       return WIE_CLIENT;
    }
+   /* Reject URIs that exceed the safe limit before storing them.
+    * This prevents oversized attacker input from ever reaching wi_senderr(). */
+   {
+      char * uri_end = strchr(cp, ' ');
+      size_t uri_len = uri_end ? (size_t)(uri_end - cp) : strlen(cp);
+      if(uri_len > WI_MAXURLSIZE)
+      {
+         sess->ws_uri = NULL;
+         wi_senderr(sess, 414);
+         return WIE_CLIENT;
+      }
+   }
+
    if(*cp == '/')
    {
       if(*(cp+1) == ' ')

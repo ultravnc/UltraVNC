@@ -11,15 +11,46 @@
 
 #include <stdio.h>
 #include <setjmp.h>
+#include <limits.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <shellapi.h>
 #include <string.h>
+#include <time.h>
 #include "websys.h"
 #include "webio.h"
 #include "webfs.h"
 #include "wsfdata.h"
 #include "webgui.h"
+
+/* Generate a random password for first-run setup */
+static void GenerateRandomPassword(char* password, int length)
+{
+    static const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    HCRYPTPROV hProv;
+    BYTE randomByte;
+    int i;
+    
+    /* Try to use Windows CryptoAPI for secure randomness */
+    if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+        for (i = 0; i < length; i++) {
+            if (CryptGenRandom(hProv, 1, &randomByte)) {
+                password[i] = charset[randomByte % (sizeof(charset) - 1)];
+            } else {
+                /* Fallback to rand() if CryptoGenRandom fails */
+                password[i] = charset[rand() % (sizeof(charset) - 1)];
+            }
+        }
+        CryptReleaseContext(hProv, 0);
+    } else {
+        /* Fallback to rand() seeded with time */
+        srand((unsigned int)time(NULL));
+        for (i = 0; i < length; i++) {
+            password[i] = charset[rand() % (sizeof(charset) - 1)];
+        }
+    }
+    password[length] = '\0';
+}
 
 extern int saved_mode2;
 extern int saved_mode1;
@@ -194,7 +225,7 @@ Read_settings()
 		strcpy_s(saved_sample1, 1024, "");
 		strcpy_s(saved_sample2, 1024,"");
 		strcpy_s(saved_sample3, 1024,"");
-		strcpy_s(saved_password, 64, "adminadmi2");
+		GenerateRandomPassword(saved_password, 12);
 		saved_portHTTP=80;
 		saved_usecom=0;
 		Save_settings();
@@ -228,6 +259,7 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
+		if (len >= 25) len = 24;
 		strncpy_s(temp1[rule1], 25, pos,len);
 		temp1[rule1][len]=0;
 		rule1++;
@@ -244,6 +276,7 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
+		if (len >= 16) len = 15;
 		strncpy_s(temp2[rule2], 16, pos,len);
 		temp2[rule2][len]=0;
 		rule2++;
@@ -260,6 +293,7 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
+		if (len >= 16) len = 15;
 		strncpy_s(temp3[rule3], 16,pos,len);
 		temp3[rule3][len]=0;
 		rule3++;
@@ -332,10 +366,16 @@ void win_log(char *line) {
     int len;
     static int log_len=0;
 	EnterCriticalSection(&cs);
-    len=strlen(line);
-    curr=(struct LIST *)malloc(sizeof(struct LIST)+len);
+    len=(int)strlen(line);
+    if(len > 512) len = 512;   /* cap log line length */
+    /* Defensive: ensure malloc size doesn't overflow */
+    if (len > INT_MAX - (int)sizeof(struct LIST) - 1) {
+        LeaveCriticalSection(&cs);
+        return;
+    }
+    curr=(struct LIST *)malloc(sizeof(struct LIST)+len+1);  /* +1 for null terminator */
     curr->len=len;
-    strcpy(curr->txt, line);
+    strcpy_s(curr->txt, len+1, line);
     curr->next=NULL;
 
     if(tail)

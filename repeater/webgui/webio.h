@@ -183,6 +183,7 @@ extern char hdrbuf[HDRBUFSIZE];   /* For building HTTP headers */
 
 extern   char *      wi_servername;
 
+extern   int         wi_localhost;   /* set to 1 to restrict web GUI to local connections only */
 extern   int         wi_init(void);
 extern   int         wi_poll(void);
 extern   int         wi_thread(void);

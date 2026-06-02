@@ -428,27 +428,7 @@ testaction5_cgi(wi_sess * sess)
 }
 
 
-/* passwd_cgi
- *
- * Stub routine for form processing
- * 
- * Returns NULL if OK, else error message.
- */
-
-char *
-passwd_cgi(wi_sess * sess)
-{
-   char *   hidden;
-   char *   newpass;
-   char *   oldpass;
-
-   hidden = wi_formvalue(sess, "hidden");   /* default:  */
-   newpass = wi_formvalue(sess, "newpass");   /* default:  */
-   oldpass = wi_formvalue(sess, "oldpass");   /* default:  */
-
-
-   return NULL;
-}
+/* passwd_cgi is implemented in webtest.c */
 
 
 int

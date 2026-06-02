@@ -31,6 +31,7 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 // remains consistent on all systems.
 IDI_MYICON              ICON                    "winvnc.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
@@ -40,7 +41,7 @@ IDM_TRAYMENU MENU
 BEGIN
     POPUP "Ooops?"
     BEGIN
-        MENUITEM "&About UltraVNC Repeater...",                   IDM_ABOUT
+        MENUITEM "&About UltraVNC Repeater...", IDM_ABOUT
         MENUITEM "E&xit",                       IDM_EXIT
     END
 END
@@ -57,7 +58,7 @@ BEGIN
     BEGIN
         MENUITEM "&Settings",                   IDM_SETTINGS
     END
-    MENUITEM "&About UltraVNC Repeater...",                       IDM_ABOUT
+    MENUITEM "&About UltraVNC Repeater...", IDM_ABOUT
 END
 
 
@@ -175,8 +176,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,5,0,0
- PRODUCTVERSION 1,5,0,0
+ FILEVERSION 1,6,0,0
+ PRODUCTVERSION 1,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -193,12 +194,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", " "
             VALUE "FileDescription", "distributer"
-            VALUE "FileVersion", "1.5.0.0"
+            VALUE "FileVersion", "1.6.0.0"
             VALUE "InternalName", "distributer"
             VALUE "LegalCopyright", "Copyright © 2002-2025 UltraVNC Team Members. All Rights Reserved."
             VALUE "OriginalFilename", "distributer.exe"
             VALUE "ProductName", "  distributer"
-            VALUE "ProductVersion", "1.5.0.0"
+            VALUE "ProductVersion", "1.6.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -207,14 +208,18 @@ BEGIN
     END
 END
 
-#endif    // Dutch (Belgium) resources
-/////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Manifest
+// RT_MANIFEST
 //
-1 RT_MANIFEST "repeater.exe.manifest"
+
+1                       RT_MANIFEST             "repeater.exe.manifest"
+
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

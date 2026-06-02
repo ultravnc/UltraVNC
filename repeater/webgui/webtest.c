@@ -114,7 +114,17 @@ DWORD WINAPI ThreadStartWeb(LPVOID lpParam)
 
 
 
+		wi_localhost = 1;   /* admin interface is local-only */
 		error = wi_init();
+
+		/* Display web interface credentials on console */
+		printf("\n========================================\n");
+		printf("UltraVNC Repeater Web Interface\n");
+		printf("URL: http://localhost:%d/\n", saved_portHTTP);
+		printf("User: admin\n");
+		printf("Password: %s\n", saved_password);
+		printf("========================================\n\n");
+
 		old_port=saved_portHTTP;
 		while (error<0)
 		{
@@ -126,7 +136,7 @@ DWORD WINAPI ThreadStartWeb(LPVOID lpParam)
 		if (old_port!=saved_portHTTP)
 		{
 			char text[200];
-			sprintf_s(text, 200, "The defined web port is already in use. \nChanged to http://localhost:%i \nVerify settings!\n Default user and password is admin.",saved_portHTTP);
+			sprintf_s(text, 200, "The defined web port is already in use. \nChanged to http://localhost:%i \nVerify settings!\nUser: admin, Password shown in console.",saved_portHTTP);
 			MessageBox(NULL,text,"UltraVNC Repeater: Warning",MB_ICONEXCLAMATION);
 		}
 		/* Install our port-local authentication routine */

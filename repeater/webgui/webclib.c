@@ -62,12 +62,13 @@ wi_printf(wi_sess * sess, char * fmt, ...)
    }
 
    va_start(a, fmt);
-   vsprintf(output,  fmt, a);
+   vsnprintf(output, sizeof(output), fmt, a);
    va_end(a);
+   output[sizeof(output) - 1] = '\0';
 
    /* See if we overflowed the print buffer */
    len = strlen(output);
-   if((output[DDB_SIZE-1] != 0) || len >= sizeof(output))
+   if(len >= sizeof(output) - 1)
    {
       dprintf("wi_printf: overflow, output: %s\n", output);
       panic("wi_printf");
