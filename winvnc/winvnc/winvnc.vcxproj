@@ -3382,6 +3382,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   </ItemGroup>
   <ItemGroup>
     <Image Include="down.bmp" />
+    <Image Include="res\banner.jpg" />
     <Image Include="res\down.bmp" />
     <Image Include="res\LedGreen.bmp" />
     <Image Include="res\LedRed.bmp" />

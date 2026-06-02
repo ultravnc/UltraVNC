@@ -148,9 +148,9 @@
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -205,9 +205,9 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll mess
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll /MACHINE:X64 messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)\logmessages.dll /MACHINE:X64 messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -261,9 +261,9 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)\logmessages.dll /MAC
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -313,9 +313,9 @@ link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessa
     <CustomBuildStep>
       <Command>mc messages.mc
 rc -r -fo messages.res messages.rc
-link -dll -manifest:no -noentry -out:$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll messages.res
+link -dll -manifest:no -noentry -out:$(OutDir)\logmessages.dll messages.res
 </Command>
-      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)$(TargetName)$(TargetExt)\logmessages.dll;%(Outputs)</Outputs>
+      <Outputs>messages.res;messages.rc;messages.h;$(OutDir)\logmessages.dll;%(Outputs)</Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -564,6 +564,9 @@
     <Image Include="res\world3a.bmp">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="res\banner.jpg">
+      <Filter>resources</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="winvnc.exe.manifest" />

@@ -1,0 +1,1689 @@
+UltraVNC Changelog
+
+Changes 1.8.2.2
+Translation sync
+Fullscreen start
+Minor UI layout fixes
+
+Changes 1.8.2.1
+CVE-2026-3787  CWE-428
+remove creation empty foler for snapshots on init
+FT history change font setting
+
+Changes 1.8.2.0
+Bridge removed, not working moved to 1.9.x
+
+Changes 1.8.1.1
+FileTransfer fixes
+Use win7 zip/unzip option
+security fix
+
+Changes 1.8.1.0
+FileTransfer fixes
+
+Changes 1.8.0.9
+FileTransfer fixes
+
+Changes (1.8.0.7 / 1.8.0.8):
+
+Fixes:
+Fix logging: correct init order — log file now properly opened on startup (service + app mode)
+fix #340: logging not active on server startup
+fix #259: Desktop/Downloads show 'media not present' when running as service
+fix #189: file transfer fails after window close in kiosk/no-shell mode
+Fix: Prevent International keys and Alternate keyboard from being enabled simultaneously
+Fix new zip/unzip bug
+Fix FT: Refresh button misaligned on resize; stale !UVNCDIR- entry after folder receive
+Fix virtual key (virtKey!=69)
+
+Improvements:
+File Transfer: update zip/unzip with Unicode + long filename support
+File Transfer: add progress indication while folder is being zipped
+File Transfer: add Refresh button
+File Transfer: show file extension and date columns
+update CMake and Qt project files
+Installer and minor changes
+
+Version 1.8.0.6 – April 2026
+-Filetransfer fix folder transfer
+-openssel 3.6.2
+-libsodium 1.0.22
+-setpasswd/createpasswd write to %programdata% instead of current folder
+-fix path mslogon
+
+Version 1.8.0.5 – April 2026
+-Filetransfer needed bigger buffers for utf8/16
+-UI unicode fixes
+-unicode logging
+-baseline update
+	libjpeg-turbo 3.1.4.1
+	liblzma 5.8.3
+	libsodium 1.0.21#1
+	zlib 1.3.1
+	zstd 1.5.7
+	openssl 3.6.1#3 
+
+Version 1.8.0.4 – April 2026
+-unicode and encryption plugin
+-unicode UI
+
+Version 1.8.0.3 – March 2026
+Sync server and viewer keyboard handling, this should fix
+❌ Incorrectly handles Cyrillic (0x06a1-0x06ff) - treats as Unicode instead of X11 keysym
+❌ Incorrectly handles Greek (0x07a1-0x07f9)
+❌ Incorrectly handles Hebrew (0x0cdf-0x0cfa)
+❌ Incorrectly handles Arabic (0x05ac-0x05fe)
+❌ Incorrectly handles Thai (0x0da1-0x0df9)
+❌ Incorrectly handles Korean (0x0ea1-0x0eff)
+❌ Doesn't handle Unicode keysyms (0x01000000+)
+
+Version 1.8.0.2 – March 2026
+- unicode viewer fixes
+
+Version 1.8.0.0 – March 2026
+- FT, Chat, keyboard unicode
+- minor optimizations
+- vncviewer unicode build
+
+Version 1.7.1.10 – Feb 2026
+- FT unicode
+- FT fail on rdp fix
+- use system fonts for chat
+Version 1.7.1.9 – Feb 2026
+- FT unicode
+- FT flag unaccessible folders red
+- used secure copy_s functions
+- loadlibrary limit path search
+
+Version 1.7.1.7 – Feb 2026
+-copy paste remove
+-Dialog FT extended
+
+Version 1.7.1.6 – Feb 2026
+-longer hostfield
+-copy/paste 2 way
+-FT mark unaccessible red
+-save load config file fix
+-accept/refuse : default is now query
+
+Version 1.7.1.5 – Feb 2026
+-speedup FT
+-color cursors fix
+-FT and unreadable folders fix
+-viewer loadin/savinf settings, encryption saving, buffer overrun fix
+-viewer larger host field
+
+Version 1.7.1.1 – Jan 2026
+-UniChat
+-copy Paste Files
+-Listen fix
+
+Version 1.7.1.0 – Dec 2025
+-Filtransfer optimized ( minimum 2x faster)
+-bridge mode
+-translations (fr de es zh)
+-use proper ini path (ultravnc.ini) + portable
+-fix Accessibility enlarged cusor show a black rectangle
+-fix ipv6
+-fix Use Only Default ConfigFile
+-fix quickoptions
+-update libs
+	libjpeg-turbo: 3.1.2
+	liblzma: 5.8.1
+	openssl: 3.6.0#3
+	zlib  1.3.1
+	zstd: 1.5.7
+
+Version 1.6.4.1 – Okt 2025
+-fix -kill 
+-re-enable powermanager for screen blanking when layers are not supported
+-Viewer Windows7 not working fix leak
+-file association: if first arument is a filename, consider it as condfig file 
+-Renable QuickOption was commented out 
+-Fixed an issue where the client would not work properly if no authentication method was set on the server,  when the authentication method was RSAAES (#299) dev 
+-win7 x64 viewer fix 
+-Add exception handling when parsing image headers (#285) 
+-no focus on server field at launch #283 
+-enable vcpkg, fix cmake, adopt github actions (#284) 
+-SaveAllowUntrustedServers 
+
+Version 1.6.4.0 – June 2025
+-Update viewer layout
+-Viewer, SessionDialog wrong size after dpi change #278
+-Fix to small msg buffer size
+-Fix big border (ThomasLevering)
+-Update GNOME /QEMU display settings text + zlibbuffer was unneeded recrated
+-Fix vncviewer crash #58
+-FIX empty password detection, also for SC
+-Fix bug in undefer_input() that misplaced the input state. (#272)
+-Do not accept Anonymous TLS sub-types during VeNCrypt authentication (#274)
+But allow fallback to standard RFB types (e.g. rfbVncAuth)
+
+
+Version 1.6.2.0 – May 2025
+-FT win11 # 57212802
+-load config in listen mode
+-refactor default/server specific settings added option to disable/enable
+-msi better better silent mode
+
+Version 1.6.1.0 – May 2025
+- Fixed Chat Japanese chars
+- Fixed saving listenport
+- Fixed saving custom messages accept/reject
+- Fixed save settings should not reload defaults
+
+Version 1.6.0.0 – April 2025
+- Updated development version to release.
+
+Development Versions
+
+v1.5.0.18-dev – April 2025
+- Switched to using a single DLL (removed V2 version).
+
+v1.5.0.17-dev – April 2025
+- Fixed international keyboard support.
+
+v1.5.0.16-dev – April 2025
+- Fixed viewer defaults not loading.
+- Fixed keyboard issue with Czech-specific characters.
+- Renamed authSSPV2 loggingV2.dll to fix Event Viewer messages.
+- Fixed EchoServer and SC_20 build issues.
+
+Note:
+- International keyboard option must be enabled on the server.
+- Tested with virtual Czech keyboard.
+
+v1.5.0.15-dev – March 2025
+- Fixed file transfer buffer overflow and memory leak.
+- Added service to settings.
+- Fixed log file movement.
+
+v1.5.0.14-dev – March 2025
+- Fixed slider UI.
+- Fixed DSMPlugin/MS-Logon settings.
+- Logfile bugs fixed.
+
+v1.5.0.13-dev – March 2025
+- Moved log file to ultravnc.ini folder.
+
+v1.5.0.12-dev – March 2025
+- Fixed file transfer window size.
+- Fixed crash on Windows 7.
+- Installer improvements.
+
+v1.5.0.10-dev – March 2025
+- Fixed DSMPlugin config.
+- Save settings fix.
+- Clearing admin password clears VNC password.
+- Added ISO time to About window.
+
+v1.5.0.9-dev – March 2025
+- Removed installer popups.
+- Fixed incorrect settings save behavior.
+
+v1.5.0.8-dev – March 2025
+- Fixed settings save issue.
+- Corrected typos.
+- Added BlueSky feature.
+
+v1.5.0.7-dev – March 2025
+- Command-line overrides default settings.
+- Standalone settings dialog.
+- Improved viewer input focus.
+- Miscellaneous bug fixes.
+
+v1.5.0.5-dev – February 2025
+- Fallback to old folder if ini not found.
+- Viewer command-line options take priority.
+- Fixed encryption with view-only mode.
+- Settings dialog cosmetic fixes.
+- Plugin architecture check.
+- Allowed chunked TLS messages.
+
+v1.5.0.4-dev – February 2024
+- UI update.
+- Moved ini file to ProgramData.
+- General bug fixes.
+- Added administration password option.
+
+v1.5.0.3-dev
+- UI corrections.
+
+v1.5.0.2-dev
+- Merged IPv4/IPv6 into single EXE.
+- Fixed RealVNC UDP port usage.
+- Improved UI layout and icons.
+
+v1.5.0.1-dev
+- Reverted file transfer fonts.
+- Added chat and file transfer to fullscreen bar.
+
+v1.5.0.0-dev
+- Fixed DirectX reconnect issue.
+- Added extra links.
+- Replaced libraries with vcpkg.
+- Fixed stack corruption.
+
+v1.4.4.0-dev
+- Code cleanup.
+- UI spellcheck.
+- Switched to Arial.
+- TLS certificate verification.
+- VeNCrypt authentication.
+- RSA-AES encryption (WIP).
+- Fixed typos.
+- Improved Windows RE compatibility.
+- Improved snapshot naming.
+- Unified omnithread usage.
+- D3D re-init.
+- SC: UAC recovery fix.
+- Scrollbar added.
+- Group defaults.
+- SC UAC reset fix.
+- Debian 12 WayVNC support.
+
+UltraVNC 1.4.3.6
+- MSI installer fixes.
+- SC embedded encryption fix.
+
+UltraVNC 1.4.3.5
+- Inno Setup DLLs updated.
+- OpenSSL 3.1.2 update.
+- Fixed viewer position flags.
+- Viewer crash fix.
+
+UltraVNC 1.4.3.3-dev
+- Updated zlib.
+- Fixed logging crash.
+
+UltraVNC 1.4.3.2-dev
+- Fixed folder transfer.
+- Hardened screen size limits.
+- Fixed server crash on transfer disconnect.
+- Added viewer message logging.
+
+UltraVNC 1.4.3.1
+- Handle leak fix.
+
+UltraVNC 1.4.3.0
+- MRU patch.
+- GNOME RD screen fix.
+- Fixed Edge crash on Win11.
+- MS-Logon domain fix.
+- Updated DDEngine.
+- Installer and balloon fixes.
+- Memory leaks fixed.
+- File transfer security fix.
+
+UltraVNC 1.4.2.2-dev
+- SC Unicode support.
+- Security fixes.
+- Cursor fix on headless systems.
+
+UltraVNC 1.4.2.0
+- Updated zstd, lzma, libjpeg.
+- SC_20 international/UAC fix.
+- Fix for custom service install.
+
+UltraVNC 1.4.0.10
+- Security fix.
+- MS-Logon v1 fix.
+
+UltraVNC 1.4.0.9
+- Security fix.
+- SC2.0 INI loading fix.
+- Fixed zlib decompression bug.
+- Korean key mapping fix.
+- DNS fallback log.
+
+UltraVNC 1.4.0.8
+- Added patch logging.
+- Display fix on screen change.
+
+UltraVNC 1.4.0.7
+- Host filter fix.
+
+UltraVNC 1.4.0.6
+- Properties saving fix.
+
+UltraVNC 1.4.0.5
+- Installer file updated.
+
+UltraVNC 1.4.0.4
+- No changes.
+
+UltraVNC 1.4.0.3
+- Viewer hostname bug fix.
+
+UltraVNC 1.4.0.2
+- 64-bit plugin fix.
+
+UltraVNC 1.4.0.1
+- Notification fix.
+
+UltraVNC 1.4.0
+- Introduced SC2.0.
+- Backward compatibility improved.
+- Fix for many network cards.
+- Certificate update.
+- MinGW changes.
+
+UltraVNC 1.3.8.2:
+- sc_promt/sc_exit options cause connect failure
+- Viewer DPI fix
+
+UltraVNC 1.3.8.1:
+- Security fix
+
+UltraVNC 1.3.8.0:
+- Warning about untrusted Server can be disabled
+- Tray icon fix
+- Fix multiple cursors when not selected
+- Installer update
+- Fixed some installer issues:
+  - Silent is not needed
+  - Upgrade is not needed
+  - Plugins are installed with Server/Viewer
+  - The menu is always installed, desktop icons are optional (like other installers)
+- Revert "update zipunzip 6.0"
+- Notification as OSD
+- Border and black screen is not supported on all OSs, added OS check
+- Fix Tight color issue
+- Border with OSD
+- Update zipunzip 6.0
+- Fix border
+- XZ library update 5.2.5
+- Update libjpeg-turbo 2.1.2
+- Update SDK
+- Fix loading options
+
+UltraVNC 1.3.6.0:
+- Security update:
+  - Viewer without DSMPlugin can be tricked by a fake VNC Server
+- Warning popup lacked a cancel button for long server hostnames
+- Prevent memory overrun by encoders using bounds checking
+- Use LZO safe function calls
+- Optional notification added to accept/refuse query
+- Remote screen blanking works again on Windows 10
+- Optional notification popup on Server PC (can be set from Viewer)
+- Optional red band around the screen during session
+- TigerVNC cursor fix
+- Snapshot menu added
+- Viewonly mode has priority
+- Accept/Refuse prompt works when Windows is locked
+- Add custom INI to service with limitations:
+  1. No spaces in INI file path
+  2. Must include `-inifile` in `service_commandline` in the INI
+
+UltraVNC 1.3.4.2:
+- Service stop on restart/hibernate
+- GII crash fix
+
+UltraVNC 1.3.4.1:
+- Reverse connection requires authentication (default)
+
+UltraVNC 1.3.4:
+- RDP mode fix
+- Size/position/DPI updates
+- Security fixes
+- AdjustWindowRectExForDpi fix
+- Improved scaling (200%/300%)
+- Prevent VNC desktop restart during shutdown
+- Better delete/reset options (MRU, option files)
+- High DPI aware
+- Linux fixes:
+  - vnc4server patch
+  - 32-bit/24-bit/16-bit color depth issues fixed
+  - Mouse cursor, screen color fixes
+- Tight encoding fixes
+- TigerVNC compatibility
+- Code cleanup
+- Zstd updated to 1.5.0
+- Crash fixes via minidump
+- WinPE fix
+- zlib fix
+- Multi-mouse options
+- Max viewers
+- On remote resize, keep viewer top-left fixed
+- Viewer scale-to-window fix
+- Mouse click control logic improved
+- Singleton for OS version detection
+- Touchscreen input disabled when mouse is off
+- Build option: noacceleration
+- Scrollbar and DDEngine fixes
+- Viewer window state improvements (maximize/minimize/restore)
+- Fullscreen fixes (multi-monitor, spanned and non-spanned)
+- `createpasswd` secure mode added
+- Extended clipboard and TigerVNC compatibility
+
+UltraVNC 1.3.2:
+- Updated Viewer UI
+- Bug fixes:
+  - Extended desktop: show only extended, support multiple extended displays
+  - DDEngine performance update for multi-monitors
+  - Driver install moved to installer
+
+UltraVNC 1.3.0:
+- Updated Viewer UI
+- Bug fixes:
+  - Better multi-monitor support for extended desktop
+
+
+UltraVNC 1.2.5.1:
+- ZRLE + FileTransfer crash fix
+
+UltraVNC 1.2.5.0:
+- Chat crash fix
+- Memory leak fixed
+- Security fix
+- Zstd added [v] use Zstd instead of zlib
+- zlib update
+
+UltraVNC 1.2.4.0:
+- High DPI cursor offset fix
+- Reported 123 bugs fixed
+
+UltraVNC 1.2.3.0:
+- Incoming data from Server to Viewer and invers is extra checked for code injection by fake Viewer or Servers. Were possible, functions are replaced by there security enhanced counterpart.
+- Made international keyboard path option
+- JPG encoder use master frames
+- Prevent screen lock while connected
+- Viewer changes
+ - Settings are now Server based
+ - Tab option screen via expand button
+…
+
+UltraVNC 1.2.2.4:
+- Cleanup compiler warnings
+- Redraw full screen after fullscreen
+- Mouse position correction multi monitor
+- uvnc_settings.exe (check mirror driver)
+- Delete race condition invers connection
+- Using reconnect thread, better Repeater behaviour
+- DDEngine fix when screen resolution change online
+- SDK Windows 10 fix for VS 2017
+- Security fixes: Thanks to Pavel Cheremushkin.
+- DDEngine update flashing cursor + performance
+- Added performance mode, activated when max cpu is set to 100
+
+UltraVNC 1.2.2.3:
+- Update jpeglib to 2.0.0
+- Update zlib 1.2.11
+- Accept box and UAC fix
+- Header changes for gcc
+- Save query accept settings
+- Desktop size incorrect after service logon screen with multi monitors
+- Secondary from ini not handled correctly after login screen
+- Fixed File Transfer of mapped network drives. CreateFile called in different thread than ImpersonateLoggedOnUser
+- Hang by secondary=1 in ini
+- Window sizing by auto scaling correct
+- Window update after fullscreen
+- DDEngine systay hint, shows when when DDEngine isn't used
+
+UltraVNC 1.2.2.2:
+- Fixed driver activation (bug 1.2.2.1)
+- Mirror driver "check driver" button fixed 
+- OS detection always detected Windows 8 >= Windows 8, added new code to proper detect Windows 10
+- FileTransfer and Repeater bug fix (transfer broke on to slow connections)
+- Faster initialization
+- Multi monitor
+ - Change DDEngine for multimonitor on single video card
+ - Dual screen / triple screen with mirror/DDEngine/blit
+ - Mouse ccorinates
+- Added Delay query window after restart (to avoid multiple querywinodw accepts), Server option
+- Added Server option to enable/disable uvnckeyboardhelper.exe in Windows 8
+
+UltraVNC 1.2.2.1:
+- Windows 10 fixes
+- Single EXE for wp-win10
+- Better multi monitor support
+- Ultra2 encoder optimized
+- DDEngine for Windows 8 >=
+- Disconnect fixes
+
+UltraVNC 1.2.1.7 - January 2018:
+- Windows XP fixes
+- Repeater security fix
+- File Transfer fixes
+ - Temp path
+ - Windows XP libs
+ - Keepalive
+ - Seperated thread for FileTransfer
+
+UltraVNC 1.2.1.6 - September 2017:
+- Fixes
+ - Bad connection caused by clipboard transfer during connection
+ - Reconnect Viewer failed 
+
+UltraVNC 1.2.1.5 - June 2017:
+- Faster FileTransfer
+- Fixed FileTransfer from WinVNC to VNCViewer if WinVNC is running as service
+- Better Windows 10 support
+- JPEG lib update
+
+UltraVNC 1.2.1.2 - September 2016:
+- Grey screen on start lock
+- Don't balloon incoming non-RFB data
+- Added portrait mode 
+- Switch w8hook corrected
+- Reset correct polling after w8hook failure
+- DPI aware Viewer
+
+UltraVNC 1.2.1.1 - April 2016:
+- Vnchooks: make sure the correct versions are attached, some older crashed
+- Server: 
+ - Black screen on connection/ grey screen on connection and deadlock
+ - On disconnect Server icon stayed yellow, blocking new connections
+ - Black Viewer with icons without file transfer.
+ - Fixed mem leaks/resource leak
+- Viewer:
+ - Fix overrun crash
+ - Timeout reconnect fix
+ - Closing no reconnect fix
+ - Auto refresh after idle
+- Update JPEG lib
+
+UltraVNC 1.2.1.0 - January 2016:
+- Server: Added RDP session select
+- Server: Added alternate shell when you use another shell the explorer.exe it doesn’t work correct
+[admin]
+alternate_shell=myshell.exe
+rdpmode=1
+- Viewer: added remember last location (host based)
+- UVNC_LAUNCH: added
+- Fixes
+ - Artifacts on Windows 8 >
+ - Faster reconnect on session switch
+ - Repeater:reconnect, some port scanners could kick connections, stability
+
+UltraVNC 1.2.0.9 - November 2015:
+- Added XZ encoder (small bandwidth)
+- Crash fix
+- Auto mode: better initial settings to avoid coder switch on start
+- Fix 10 second delay Windows 8 with keyboardhelper
+- w8hook embedded
+- Option Gii encoder added
+- Memory leaks
+- Added Tight encoder patch from TurboVNC project
+- Reconnect timeout in invers mode was increasing on each try, max set to 3 minutes
+- Crashes detected by crashrpt fixed
+
+UltraVNC 1.2.0.6 - June 2015:
+- Fix timeout multiple Viewers
+- Scale Server window, also when DirectX is not available
+- Fix multiple initial screen sends
+- Fix Windows 8 and w8hook loop/hung high cpu
+- Added DPI aware for Viewer
+
+UltraVNC 1.2.0.5 - November 2014:
+- Add Viewer idle timer 
+- Add Server id to password box
+- Server deadlock fixed (existed already for 2 years)
+- Server tray install/uninstall/start stop service
+- Minimize Viewer and high cpu
+- Save plugin options corrected
+- Update uvnc_settings.exe (added new settings, help pages, service buttons)
+- Update Repeater (could be locked by port scans)
+
+UltraVNC 1.2.0.4 - November 2014:
+- Save config plugin fix
+- Clipboard deadlock
+- Allow FileTransfer when file is open
+
+UltraVNC 1.2.0.3 - October 2014:
+- Security update, local user can gain local admin access on Windows 8
+
+UltraVNC 1.2.0.2 - October 2014:
+- Viewer portable
+- You can set a single port Java/RFB
+- Server deadlock fixes for slower connections
+- Ignore cursor when not in view window (crashed JavaViewer)
+- Fast keyboard input could cause 100% cpu usahe on Windows 8, fixed
+
+UltraVNC 1.2.0.1 - August 2014:
+- Service, fix error 1314, Server sometimes failed to start desktop part and closed WinVNC.
+- Security: increase timeout after each wrong password to make brute force hacking harder
+- Color correction 16bit and mirror driver
+- Memory leak with mirror driver fixed in previous fix J
+- Save setting permission fix
+- Added support for new Repeater with keepalive
+- Tooltip buffer overrun fix, cause Server to fail when sting in systray was to long
+ (multiple ethernet card. Long hostnames etc.)
+
+UltraVNC 1.1.9.6 - December 2013:
+- Server fix bug that crashed Internet Explorer 8 "iexplorer"
+- Auto alpha blending based on OS
+- ZRLE deadlock fix
+- Tight encoding fixed
+- Show screenbuildup on first run
+
+UltraVNC 1.1.9.4 - October 2013:
+- Viewer mod for vmware (wrong colors)
+- Update libjpeg-turbo to 1.3.0
+
+UltraVNC 1.1.9.3 - August 2013:
+- Missing screen refresh (when driver selected but not used)
+- Factory reset (when temp was not writable)
+
+UltraVNC 1.1.9.2 - August 2013:
+- Mirror driver and begative screen coordinates (left secondary desktop)
+
+UltraVNC 1.1.9.1 - July 2013:
+- Viewer with more then 9 multimonitors fixed
+- Performance update Server
+- Add extra check to see if full and view only password differ
+
+UltraVNC 1.1.9.0 - May 2013:
+- Fixed change ip detection, sometimes Server was disconnected after a few seconds by a false positive
+
+UltraVNC 1.1.8.9 - April 2013:
+- Viewer timeout option grayscreen fix
+- Server leaks fixed
+
+UltraVNC 1.1.8.8 - March 2013:
+- Server crash
+- Server grayscreen
+
+UltraVNC 1.1.8.7 - March 2013:
+- FileTransfer bug fix (x64)
+
+UltraVNC 1.1.8.6 - March 2013:
+- Autoreconnect and auth fail fix
+- Viewer with option window open fails to close
+- Viewer messagebox sometimes hidden behind window
+
+UltraVNC 1.1.8.5 - March 2013:
+- Viewer deadlock with software cursor change.
+
+UltraVNC 1.1.8.4 - March 2013:
+Server
+- u2 encoder on 16color display crash
+Viewer
+- Fullscreen bar center
+- Reconnect set by default
+
+UltraVNC 1.1.8.3 - March 2013:
+- Fix Server /NULL crash
+- Fix radio button u2 Viewer
+
+UltraVNC 1.1.8.2 - March 2013:
+- Fix lock after gray screen
+
+UltraVNC 1.1.8.1 - February 2013:
+- Fix protocol error Server
+- Fix correct default options < Windows Vista
+
+UltraVNC 1.1.8 - November 2012:
+- Added support Windows 8 (new capture engine)
+- Several bug fixes
+- Better multi monitor support
+- New vncpasswd + encryption.
+  Instead of using the password as part of the encryption, we now check the password insite the encryption by the Server. This allow the Server to blacklist Servers after x fault password.
+  WARNING: If using encryption plugin + vncpassword you better upgrade. No protection against Brute force password hacking.
+
+UltraVNC 1.0.9.6.2 - February 2012:
+- Removed beeps
+- Capture alpha-Blending default value.
+- Viewer crash fixed
+- Grayscale fixed
+
+UltraVNC 1.0.9.6.1:
+- Crash chat x64
+- AuthRequired=0, passwd=NULL: Warning message block service
+- About x64 say win32
+- Viewer 1082 and Server 1096 with localcursor (no connect, 100% cpu)
+- Serversite scaling and multiple Viewers, framebuffer size get overwritten
+  (Scale is now lock when multiple Viewers are connected to avoid a
+  framebuffer change, first connected Viewer set scale. Site effect is that 
+  the Viewer report the unused, incorrect scale, but at least it doesn't crash anymore)
+ -connect ip: Passed to WinVNC running as service is not remembered for autoreconnect.
+ -stopreconnect: Stop the autoreconnect function of the Server.
+- Server mouse moves jump on Viewer when screen is idle.
+- Bug fixes:
+ - Old_plugin crash (zlib/ultra)
+ - Plugin (SecureVNCPlugin) used by Viewer
+   Server without plugin give incorrect Viewer message. And doesn't ask to reject the connection.
+- Monitor value is saved, but VNCViewer read it as bool (true/false)
+  Only 0/1 are correct imported 
+- Old plugins fail when ZRLE encoding is used
+- Old plugins give incorrect info in statusbox
+- -autoreconnect timeout, -reconnectcounter number (available from GUI and commandline)
+- autoreconnect timeout was incorrect, updated
+- old_plugin detection was incorrect
+- autoreconnect was indeed invers, corrected again
+- All Messagebox() replaced by a function that put it on the visable desktop (done for all messageboxes)
+- Auth Message DLL not found, name corrected and refuse access.
+- If all groups are empty check also admin.
+- If OS_SHUTDOWN initiated ingore all lock functions.
+
+UltraVNC 1.0.9.6:
+- FIX
+ - Server site scaling crash Server and/or Viewer
+   (This also solve situations where the resolution after reconnect differ from the original)
+ - Wallpaper fixed (aero/wallpaper +services crash seems also solved)
+ - Options GUI group
+ - Allowshutdown=0 service problems fixed
+ - Optimized memcpy function 1/1 scaling
+ - Optimized capture functions
+ - Recompiled addons for Windows 2000 (kernel pointer error)
+ - Minimize artifacts on window move
+ - Compatibility with other VNC flavors and old ultra versions
+ - VNCViewer -config
+- ADD
+ - Server systray (show ip/name/app or service) 
+ - Forced reboot
+ - Selectable display (prim/sec/3the/all) for showing the Viewer 
+ - u2 (LZO/JPEG) encoder
+
+UltraVNC 1.0.9.5:
+- Server optimized, faster.
+- Bug fix RFB3.7 Server and noauth
+- Move to zlib 125 with ASM 
+- CAD now use sas.dll from MS instead of cad.exe (Windows Vista)
+
+UltraVNC 1.0.9.3.3:
+- Changes
+ - uvnc close as last application, on reboot
+ - Reboot in safe mode with uvnc access after reboot.
+ - Fix SoftwareSas registry from systray (CTRL+ALT+DEL)
+ - CAD with and without UAC on Windows Vista/7
+ - Update installer start Server after installation (option)
+ - Viewer option DirectX
+ - If not running as service, the Viewer stay open on UAC (locked), message on Viewer screen
+ - Fix Viewer crash on startup
+- Safeboot
+ - On Windows XP -> boot.ini is changed, added /safemode:network
+ - On Windows Vista >= bcdedit is used to put the system in safemode
+   when uvnc start in safeboot, boot.ini /safeboot is removed and bcdedit corrected for normal boot.
+
+UltraVNC 1.0.9.1:
+- Server + Viewer: 
+ - Integrated support for SecureVNC plugin. 
+ - Fix recursive clipboard issues when several VNC, RDP, VM, etc sessions are nested. 
+ - Fix hangs in clipboard handling. 
+ - Support for HTML and RTF clipboard formats. 
+ - Support for Unicode clipboard text. 
+ - Clipboard text is compressed when transferring. 
+ - libjpeg library replaced with libjpeg-turbo which includes optimized assembly code for both x86 and x64. 
+ - zlib updated to latest version. 
+ - DSMPlugins no longer cause the Server/Viewer to send any additional messages or prefix bytes. This eliminates 41 bytes of network traffic per message. 
+ - Immediately subsequent socket writes are coalesced to minimize unnecessary packets. This eliminates 40 bytes of network overhead for most messages, and more in other cases. 
+ - RFB 3.8 
+- Viewer only: 
+ - Fix crash when changing framebuffer dimensions with cache encoding enabled. 
+ - Fix disconnect when changing framebuffer dimensions. 
+ - Some menu reorganization. 
+ - Throttling for mouse move messages to prevent saturating output buffer with pointer updates. 
+ - Queueing implemented for outgoing writes; this eliminates some overhead from every message. 
+ - Preemptive update requests. 
+ - Enable cache encoding from commandline, /enablecache 
+ - Fixed stability issue in Tight encoding (merged from TightVNC) 
+ - Fixed recovery / resynchronization attempts in update handler due to bypassing DSMPlugin when flushing input buffer, leading to unsynchronized encryption states..
+
+UltraVNC 1.0.8.2:
+- Server
+ - Deadlock fixes
+ - Windows Server 2003, Windows XP (all pre-Windows Vista) fast user and RDP fix
+ - Color error when using the driver in 16bit color mode. 
+ - Added multiple monitors for non-driver mode 
+ - Corrected mouse behaviour with multiple displays 
+ - Mirror driver was used on Windows Vista >= and color was 8/grey/b&w crash fix
+- Viewer
+ - Listen and add new client fail to connect fixed
+ - Skewed Viewer in 254 color mode fixed
+ - Scrollbar and resize fix
+ - Auto mode set to fix color to prevent crash
+ - Write exact error "replaced by" Server closed connection
+ - Cancel force socket close
+ - Viewer -listen also remember command lines
+- Installer
+ - Download files uncheck fix
+
+UltraVNC 1.0.8.1 (test):
+- No details
+
+UltraVNC 1.0.8.0:
+- DSMPlugin: 
+ - Multithreaded / interface support 
+ - Require Multithreaded plugins 
+- Viewer 
+ - Prompt to disable DSMPlugin and connect if an unencrypted session is detected. 
+ - Fallback to dibsection if video memory is low (black screen issue) 
+ - Keyboard hook fixed; no longer interferes with keyboard responsiveness. Also scroll lock is properly handled for special keys. 
+ - Repeater ID is shown in in the recent edit box when you connect along with the Repeater host. 
+ - Cmdline options to auto accept connections and another to auto accept unencrypted connections 
+ - Remember last local path in file transfer during a session 
+ - GUI lock fixed (Server disconnect without message could lock GUI) 
+- Server 
+ - Some mutex changes that were causing issues when there were multiple connections 
+ - Support for multiple connections using DSMPlugin 
+ - Support for new plugin interface 
+ - New Repeater cmdline option for simplicity 
+ - Some interface changes in the add new client dialog when using sc mode 
+ - Support balloon tip notifications, used in sc mode 
+ - Dialog to show pending or unauth clients such as those waiting with the Repeater or reverse connections 
+ - Also some crashes due to bad function pointer init in DSMPlugin handlers 
+ - If no incremental udate is requested (full update) the incremental rectangle is the full screen 
+ - Deadlock fixed (Server hang after desktop switch (logon-default-screensaver,taskmanager needed to kill) 
+ - Server mouse moves get faster processed 
+ - Driver is handled faster (there was a not needed 100ms wait in the code) 
+ - ultravnc.ini
+[admin] 
+sendbuffer=8192 <<<custom sendbuffer size
+
+UltraVNC 1.0.7 (test):
+- No details
+
+UltraVNC 1.0.6.5:
+- GUI RFB port lock fix 
+- Performance ; Mouse move a little faster 
+- Performance: Startuptime a little faster (first screen) 
+- Memory leak 
+- Driver and logon/UAC (black screen) 
+- Aero enable bug (service, not restored) 
+- Driver Windows 7 
+- Play sound if file exist, PGM solution is better and EXE smaller. 
+- Added (ultravnc.ini, [admin]) clearconsole=1 (winstationconnect bug) 
+- Double-click on trayicon behaviour show properties 
+- x64 installer should now install in program files 
+- x64 version does not longer show "win32 server"
+
+UltraVNC 1.0.6.4:
+- GUI fix
+- FileTransfer fix
+
+UltraVNC 1.0.6.3:
+- Viewer changes:
+ - GUI lock while reconnect fixed
+ - Removed flasher (unused code)
+ - Rab order fixed in dialogs
+ - Crash on exit fixed
+ - Cursor with scaling fixed
+- Server changes:
+ - Fixed unload video driver and xp64
+ - Fixed settings overwriting with default when tempfile was write protected
+ - Added messagebox uncheck for runas when ultravnc.ini is not writable
+ - Added sc_prompt as command line option
+ - Added sc_exit as command line option
+ - Removed some logging, to many messages
+ - Fixed locks when fast user switching between winlogon and desktop change
+ - Added back a timeout, service need to give OS time to switch the desktop
+ - Screen updates engine changed. Now uses events instead of windows messages
+ - Moved engine updates sink to seperate cpp file
+ - Tab order fixed in dialogs
+ - Fixed crash monitor switch when second monitor is bigger
+ - Added maxcpu setting
+
+UltraVNC 1.0.5.7.x:
+- Fixed locking issue
+- Screen updates engine partially rewritten
+
+UltraVNC 1.0.5.7:
+- Viewer changes:
+ - Fixed MS-Logon + DSMPlugin not asking user/passwd
+ - DSMPlugin reverse path for DSMPlugin set to %TEMP% (fixes Windows Vista error)
+- Server changes:
+ - Added -sc command line option
+ - Server exits on Viewer's disconnection fixed
+ - Server now remains connected on desktop change (like UAC)
+   Still can't be controled because WinVNC running as application
+   doesn't have permission, but the remote person can do
+   the task and get full control back when UAC popups or when
+   elevated window is closed.
+ - Added reverse connection accept (like in old sc)
+   Usage: winvnc.exe -sc -run
+- Performance changes:
+ - There was an issue that Viewer sometimes looked frozen. Fixed
+   But fixing this issue caused very fast Server/Viewer update requests,
+   pushing the cpu too high on Server.
+ - CPU throttle added, so WinVNC usage stay below 40%
+ - Idle detection added to lower cpu when desktop is static
+ - Tweaks for older cpu to keep the cpu lower
+ - vnclog fixed, was using cpu even when not enabled
+- Usage box updated:
+ -run needs to be the last uption
+- Connection:
+ - Reverse connection and running as service fixed
+ - Added service_commandline = -autoreconnect
+ - Dual logon box fixed
+ - XP64 mirror driver added
+ - Fixed mirror driver disabling on Viewer disconnection
+ - Added extra check
+   When changing settings the runas dialog asks for permission to make 
+   changes, default is NO.. a popup tells you this in case a permission 
+   is denied
+
+UltraVNC 1.0.5.6:
+- Driver activation bug fixed
+
+UltraVNC 1.0.5.5:
+- Performance adapted for low cpu systems
+- Autodetection speed is now lower to get a better average
+- EXEs signed until 2011
+- Various other fixes...
+
+UltraVNC 1.0.5.4:
+- Viewer security update
+
+UltraVNC 1.0.5.3:
+- Added settings editor (as a seperate application)
+- Added option to preset primary/secondary/both desktops as default
+- Terminal service dependency removed
+
+UltraVNC 1.0.5.2:
+- Unzip32.dll/zip32.dll are not longer needed for directory transfer
+- Logoff user ndoes not check the session number; restart is only done
+  when session != 0 (for Windows Vista or Windows XP with fast user switching)
+- DirectX Viewer (tabbed_viewer) compiled with the correct settings
+
+UltraVNC 1.0.5.1 (Bad):
+- Viewer changes:
+ - Fixed bug where screen frozen when file transfer or chat was open
+ - Close the chat dialog before deleting TextChat object.
+   Wait for thread to exit before returning from KillDialog()
+ - Fixed Server crash in KillAllClients when chat window was open
+ - Suppressed duplicate messages about lost communications
+ - Suppressed "File transfer completed" message if there's an error so 
+   the error is seen in the history dropdown
+ - Autoreconnect fix
+ - Unzip32 zip32 now always look in the installation folder
+- Server changes:
+ - Save option permission fixed
+ - Performance tweak for Server-side scaling
+ - Close the chat dialog before deleting TextChat object. Wait for thread 
+   to exit before returning from KillDialog()
+ - Fixed Server crash in KillAllClients when chat window was open
+ - Suppressed duplicate messages about lost communications
+ - Close textchat dialog if open before deleting textchat object to avoid 
+   crashing the Server
+ - Updated JavaViewer
+ - unzip32/zip32 embedded
+ - Drivers fixed clasic style (bad captionbar)
+
+UltraVNC 1.0.5:
+- 1.0.4 has never released. We have switched directly to 1.0.5
+
+UltraVNC - Update - 23 August 2008:
+- Driver + applications that change resolution (like pinpall in fullscreen)
+- vnclog: In some cases the standard path wasn't writable, now path can be set
+
+UltraVNC - Update - 13 August 2008:
+- FileTransfer crash when clipboard is used during transfer fix
+- Admin properties and domain user fix
+- Inputlock input fix
+
+UltraVNC - Update - 3 August 2008:
+- Exceptions thrown with no message cause access violations when Report called.
+- All message boxes are now properly parented to the Viewer window so that they
+  are modal.
+- Socket timeouts are now used during file transfer so that connections lost
+  while connected to a Repeater are detected
+- A small keepalive message is sent every 5 seconds after receiving a file chunk
+  to keep the Server or Viewer from timing out during a read.
+- The prompt for exit is now respects the m_fExitCheck setting if the 'x' in the
+  full screen titlebar is clicked
+- Another big change to the file transfer module is that a temporary file is used
+  to hold the file being transferred. When it is successfully completes, it is
+  moved to the original file name -- resume still works too. This was because
+  when a file transfer is interrupted, a user (ie, service tech) can't tell
+  if the file is complete.
+- The close button on the file transfer dialog is now enabled and disabled during
+  file transfers. You can't close the window with the 'x' during a transfer,
+  but you can otherwise
+- Many variables are now properly initialized.
+- The black layered window is now brought to the top every 20ms -- the start menu
+  is still visible on the remote system so this change makes it go away faster.
+- You can now register the service with a custom name.
+- Simplified Copy_to_temp and copy_to_secure_from_temp
+- When the network connection is lost, a message is shown "Connection lost due to
+  communication failure" instead of "writeexact: socket error while writing"
+- Socket read/write errors now break the while (connected) loop in vncclient.cpp
+- Simplified file handle cleanup
+- FileTransfer crash fix, lock screeen while transfer
+- quickoption fix: Was not saved correct
+
+UltraVNC - Update - 10 July 2008:
+- Repeater: found bug that required Server to be connected first.
+  Now you can connect Server or Viewer first
+- Viewer: option are now correct loaded.
+  The problem was the the presets didn't have "manual set", this cause the presets
+  always to be loaded on top of manual settings.
+- Server now take as commandline
+- Autoreconnect -id:???
+- Single Repeater connection Server had a possible error (reconnect couldn't
+  happen if shutdown by service is requested)
+
+UltraVNC - Update - 26 June 2008:
+- View Only, comment text: CTRL+ALT+F3
+- CTRL+SHIFT+ESC open Task Manager on WinVNC application and service
+- CTRL+ALT+F4 send CTRL+SHIFT+ESC if WinVNC run as application
+- Dead keys \' ^`"´ and € + winkey shortcuts (Windows Logo Key)
+- Scroll Lock ON, winkey + shortcuts sent to remote
+- Scroll Lock OFF, winkey + shortcuts are local (default)
+- 8bit (switching codec+colors) VNCViewer crash, fixed.
+- Auto scaling remote screen improved to fit to local screen
+- WinVNC with mirror driver 1.22 active only when Viewer connected, fixed
+- ExitCheck (default=false VNCViewer config file)(pgmoney)
+
+UltraVNC - Update - 16 June 2008:
+- VNCViewer: View Only (check box) and title bar
+- VNCViewer: command line encoding, added ZRLE and ZYWRLE
+- VNCViewer auto scaling big screen of remote Server to small video screen
+  local Viewer.
+- Windows Vista, uvnc_service already installed as service (WinVNC)
+- Start service (need to be previously installed) (Jeff for Windows 2000 fix)
+
+UltraVNC 1.0.4 RC16:
+- Handle leak service fix
+- Manifest update (asinvoker)
+- Projects updated for VS2005/2008
+- Only allows the Viewer that disabled remote input to reenable it
+- FileTransfer crash bug when the source file could not be read on the Server
+- Fullscreen: mode, make the tooltips for the toolbar visible
+- Fullscreen: multimon fix
+- FileTransfer: no media in remote driver fix
+- Confirm exit option
+
+UltraVNC 1.0.4 RC15:
+- Shared connections patch
+- Monitor blanking fix
+- Restore wallpaper fix
+- JavaViewer direcory detection
+- Title bar crash fix
+- Syncronize disable keyboard button with Server
+- Syncronize caplock state
+- Delete partial files after failed FileTransfer
+
+UltraVNC 1.0.4 RC14:
+- "\" Fix (keyboard)
+- Service_commandline Fix
+- Send Custom Key
+- Authentication fail speedup
+- Version RC13 was buggy
+- RC14 now use VS2005.
+- Run stable when no multiple connections are made.
+
+UltraVNC 1.0.4 RC13:
+- FIX plugin path
+- FIX crash after wrong RFBversion message
+
+UltraVNC 1.0.4 RC12BISII:
+- FIX Windows 2000 and service
+
+UltraVNC 1.0.4 RC12BIS:
+- FIX video driver popup
+
+UltraVNC 1.0.4 RC12:
+- Memory bounding error fixed
+- Serveral possible security risks fixed.. (added extra protection against
+  buffer overwrites that could be invoked by modified Server or Viewers.)
+- 32 / 64 Drivers
+- 32 / 64 Exectables
+- Driver mv2.dll changed // New Server require new driver.
+
+UltraVNC 1.0.4 RC10 & 1.0.4 RC11:
+- Windows Vista driver activation should be fixed
+- Keyboard fix, for international keyboards. Only tested with french and belgium
+  keyboard (dead keys)
+- commandline options added (same as in 102)
+
+UltraVNC 1.0.4 RC9:
+- Added extra info to check driver
+- Server -> poll properties -> check driver
+  (version, active, acces ok)(version, not active)
+- Multi monitors on Windows Vista
+  Driver need to be installed and working
+  WinVNC must be runnning as service or
+  WinVNC running as application must be started with "runasadmin"
+- MS-Logon II and group/user settings
+  Changed made, please check if it correct the problem
+
+UltraVNC 1.0.4 RC8:
+- Added previous (RC4) RDP kill via ultravnc.ini
+[admin]
+kickrdp=1
+
+UltraVNC 1.0.4 RC7:
+- Typo's fixed
+- runasadmin,vista,application mode menu fix
+
+UltraVNC 1.0.4 RC6:
+- Invisible query window fixed
+- Several JavaViewer bug fixes by TRiessner in the FileTransfer GUI
+  (files lists are now sorted, big directory/file names fixed, files seen
+  as directories fixed...)
+- Beep fixed
+- Windows Server 2003 install via RDP session fixed
+- The installer now should be able to correctly install/upgrade 1.0.2 and 1.0.4 RCX
+- Video Mirror Driver and Windows Vista Addons are now optionaly downloaded from the installer.
+
+UltraVNC 1.0.4 RC5:
+- Service mode is back in WinVNC.exe
+- Service can be installed/start/stop/uninstall from system tray menu
+- mouse shape fixed
+- DSMPlugin fixed (Windows Vista)
+  MSRC4 Plugin should work fine under Windows Vista
+  AESV2 plugin does not always work under Windows Vista
+  ARC4 plugin should work under Windows Vista
+- New commandline options:
+  -autoreconnect ID -connect host -run
+  -autoreconnect ID -connect host -service
+  "-service" or "-run" need to be the latest parameter
+
+UltraVNC 1.0.3 RC2:
+- Windows Vista support:
+ - New Viewer Autoreconnect feature
+ - New WinVNC special startup modes (used by uvnc_service), and WinVNC
+   autostop feature when necessary under Windows Vista/XP FUS
+ - CTRL+ALT+DEL using Viewer's "CAD" button should work (Windows Vista/XP)
+- FileTransfer window now allows files lists sorting by columns headers
+- WinVNC now stores its config parameters into ultravnc.ini file
+  (same directory as WinVNC.exe). This change was necessary for Windows Vista/XP FUS.
+  To use the registry instead, like in previous versions, do the following:
+  1. Before running the uvnc_service for the first time, create an
+     ultravnc.ini file in the UltravNC 1.0.3 RC2 install directory
+  2. Add to this ultravnc.ini file the 2 following lines:
+[Admin]
+UseRegistry=1
+- WinVNC contains bug fixes for connections init/stability issues
+  (1.0.2 Test2 patch code and more)
+- Please note that DSMPlugin (MSRC4) does not work very well under Windows Vista
+  The ARC4 plugin should work fine though
+
+UltraVNC 1.0.2:
+- Resizable FileTransfer window
+- Improved cursor handling in Viewer and JavaViewer
+- Improved Autoreconnect option in Server
+- Improved query-on-incoming-connection window in Server
+- MS-Logon improvements
+- MS-Logon weak challenge vulnerability fix with displayed
+  NOTE: MS-Logon backward compatibility is broken with versions
+  <= 1.0.1
+  Anyway, the new 1.0.2 Viewer can use MS-Logon with older Servers
+  but a warning is displayed recommending Server upgrade.
+- Server and Viewer logging functions vulnerability fix
+- Server configuration: AlphaBlending, FTUserImpersonation and
+  LockWorkstation options are allowed depending on the OS
+- MSRC4 DSMPlugin 1.2.0 embedded into the setup
+  ("plugin" subdirectory). The .dsm files must be manually copied
+  into the UltraVNC install directory, along Ultra binaries.
+  Many enhancements in this new plugin (session key salting, connection
+  still possible without key file...). Thanks Sean!
+
+UltraVNC 1.0.1:
+- Slow FileTransfer (Viewer -> Server) over LAN: fixed
+- Slow applications on Viewer machine during FileTransfer
+  (Viewer -> Server): fixed (other applications are now usable...)
+- JavaViewer applet is now displayed in an independant auto-sizable
+  windows that adapts itself to the remote screen size.
+- Viewer fullscreen titlebar is now 700 pixels large (instead of 500)
+- Version info in initial dialog box Viewer
+- Color info "check driver" in case color is not supported
+- Removed session switch running as application (disconnect as app RDP)
+- TextChat display corruption when lot of text was typed: fixed
+- FileTransfer temporization is no more used when main Viewer window is mimimized
+  (-> max. speed transfer)
+- Updated zlib library to 1.2.3
+- Changed Modem/Slow profile encoding in Auto mode, from ZRLE to Tight:
+  it should fix the occasional Viewer crash over slow connections in auto mode
+
+UltraVNC 1.0.0:
+- Cosmetics and language correction for Server and Viewer
+- Driver activation (v100)
+- Resources corrections (radio buttuns)
+- Manual close Viewer demaon
+
+UltraVNC 1.0.0 RC20.7:
+- New: Installer with several new options
+- Fix: vncdrv.dll had some text missing
+- Fix: Missing mouse pointer when Viewer in background
+- Fix: Manually select ports in Admin Properties
+- Fix: Black screen problem
+- Fix: Active scroll log error
+- Fix: Disable Admin properties
+
+UltraVNC 1.0.0 RC20.5:
+- Protocol error fix for non-UltraVNC Viewers
+- Windows XP look
+
+UltraVNC 1.0.0 RC20.4:
+- Internal test version
+
+UltraVNC 1.0.0 RC20.1, 1.0.0 RC20.2, 1.0.0 RC20.3:
+- FileTransfer bugs seem all fixed this time. All the regressions due to the
+  new asynchronous transfer mode + delta transfer should be solved.
+- New FileTransfer Impersonation mode.
+  Available only when WinVNC is run as a service.
+  A user that connects to WinVNC and that is not yet identified by
+  the Server (Windows authentication, so he can see the Windows login screen)
+  has no access to the Server's filesystem through UltraVNC FileTransfer GUI.
+  He must login into Windows first. Once identified, the user only has access
+  to the filesystem resources allowed by his Windows profile.
+  This mode can be desactivated by an admin if necessary:
+   "FTUserImpersonation=0" in the WinVNC registry branch. In this case, the
+   whole filesystem can be accessed by users, without restriction, like in
+   previous UltraVNC FileTransfer versions.
+- New color modes: 64 colors, 8 colors, 8 GreyScale, 4 GreyScale, 2 B&W
+- The JavaViewer also supports the new color modes
+- The WinVNC embedded HTML container for the JavaViewer now displays
+  a warning saying that the Java VM must be installed on the Web Browser machine
+  in order to get the JavaViewer working.
+- Various small bugs fixes:
+ - Forced X-cursor encoding sent to Viewers: fixed
+ - Bad minor version number sent causing Chat not supported (Server -> Viewer): fixed
+ - Command line ignored-options bug: fixed
+ - Windows NT4 Crash: fixed
+ - DSMPlugin mechanism: new Reset function added and bug fixed
+   (note that versions of MSRC4 Plugins > 1.1.4 must now be used with RC20)
+ - System resources and small memory leaks: fixed
+ - Some registry settings bugs: fixed
+- New "modern" dialog boxes look (Windows XP)
+- Slighlty redesigned and tweaked dialog boxes both in VNCViewer and WinVNC
+  so they are more readable and look better.
+- MS-Logon II: lot of new features and bug fixes (see whatsnew.txt for details)
+- Optional Alpha-Blending capture mode
+- Optional Alpha-Blending screen-blanking mode (see whatsnew.txt for details)
+- Last Viewer settings are automatically saved in a "latest.vnc" file in current
+  users's "local settings" Win directory. So next time the user runs the Viewer
+  these settings are automatically reloaded.
+- New single-http-connect port support. A separate WinVNC1P.exe is available
+  and necessary to get this functionnality. This new fonctionnality will be
+  included in the regular UltraVNC Server as soon as possible.
+- New Single-Click UltraVNC Server. The Setup can be customized and generated
+  online on the uVNC web site. Please see the Forum and Website for details.
+
+UltraVNC 1.0.0 RC19.7:
+- FileTransfer fixes
+- Registry (service) fixes
+- Blank screen now uses layered window (Windows 2000)
+- DSMPlugin fixes
+- AlphaBlending can be activated via the WinVNC admin option pannel
+- CPU Blank screen
+  CPU Screen Blanking is fixed by using a layered window.
+  (option admin pannel)
+  It only works on Windows 2000/XP/Server 2003
+  Doesn't work in combination with the driver
+  If Alpha blanking can not be used, the older DPMS method is used instead (auto)
+  The Screen Blanking with AlphaBlending can show some content on the screen,
+  if you create a "Background.bmp" file in WinVNC directory, this bitmap is used
+  instead of the default black background.
+  Alpha ScreenBlanking can not Hide the Cursor, and sometimes the menus go to the foreground.
+
+UltraVNC 1.0.0 RC19.6:
+- Extra registry parameter "CaptureAlphaBlending"
+- winvnc1P.exe (1 port for http, seperate version, don't now status with normal Viewer and plugins)
+- Viewonly Viewer command line
+
+UltraVNC 1.0.0 RC19.5:
+- FileTransfer fixes
+- Windows NT4 fixes
+- Viewer remembers last used options
+- Properties and port fix
+- JavaViewer recompiled using old Java 1.3
+- Documentation added for MS-Logon/Repeater/NAT2NAT
+
+UltraVNC 1.0.0 RC19.4:
+- Cursor shape first update
+- Install without previous password (i hope it is fixes this time)
+- Korean installer (é("&) replaced by Korean
+- MS-Logon II: Unicode support (special chars)
+- FileTransfer fixes
+
+UltraVNC 1.0.0 RC19.3:
+- MS-Logon I changes
+  logging.dll: needed, does event and file logging
+  authadmin.dll: if present, give localadmin access
+  workgrpnt4.dll: Workgroup and Windows NT4 domain checking
+  ldapauth.dll:Active directory Windows 2000 up
+  ldapauth9x.dll:Active Directory Windows 9X
+  ldapauthnt4.dll:Active Directory Windows NT4
+  Only the logging.dll is needed, If other DLL's do not exist,
+  that specific check is skipped.
+  If you remove authadmin -> Local admin has no access
+  If you have active directory,workgrpnt4 is not needed
+- Bug fixes:
+  Windows NT4 crash
+  FileTransfer fixes
+- Viewer use the selected language
+  To manually change the language of the Viewer, copy the correcponding
+  xxx.dll from the /lang directory as lang.dll in the Viewer directory
+
+UltraVNC 1.0.0 RC19:
+- Semi "Fast User switching support
+  For each user session you switch to, a seperate UltraVNC Server is started on the next port.
+  User session A on 5900, after user switch, Viewer get black.
+  User session B on 5901 gets active, after switching back to session A,
+  first user session Viewer get back active
+- Shutdown
+  Shutdown, VNC stops as last service. Needs to be tested,
+  because VNC is not stopped at all, service breaks when network become unavailable.
+- Bug fixes
+  Screensaver and lock screen caused Server hung running as application, fixed
+  logon blocks, and screensaver resolution changes are better handled.
+  Plugin had a realy bad network behaviour, fast small updates like in
+  "Starfield screensaver preview" could crash your network...
+  Manual update after logon/screensaver fixed
+  Fixed blank screen and Windows XP SP2
+  Cancel button in VNCViewer fixed (now it actually stop connection process)
+- Video Hook Driver mode
+  Extra driver version check on startup 1.018/1.017/1.017 for driver files,
+  else driver is disabled
+  Extra driver check button in properties menu. Gives driver status
+- Performance
+  Network traffic is send in 8k blocks (avoid flooding on wireless)
+  Local mouse handling react faster on cursor change
+- System shutdown
+  Viewer should now stay connected until you get the logoff screen
+- WinVNC Properties handling
+  User settings (only poll settings, access for all users)
+  Admin settings (all other critical settings, access for administrators only)
+  In service mode, no user settings are used, excepted polling ones
+  Only the primary session can open the Admin properties "FUS"
+- Multi-headed display (multi monitors support)
+  Without Video Driver: user can toggle between primary or secundary display
+  With Video Driver: switch toggle primary,secondary or both displays
+  Selection is done using the "Full Desktop" Toolbar Button (which is normally used
+  to toggle from Single Window to Desktop modes)
+  "Server cursor handle", not supported if secundary screen is left (with driver)
+  Tested on 2 card system
+- JavaViewer
+  Now supports FileTransfer (same kind of GUI than in win32 Viewer, but simpler...
+  more functions will be added gradually (multiselection of files, directory transfer..)
+   -> the JavaViewer now needs to access the viewing machine harddrive, so the user is
+      prompted for an "UltraVNC" signed applet certificate acceptance.
+  Support MS-Logon authentication method
+- FileTransfer
+  Now supports Delta Transfer for files (-> also provides Resume Interrupted transfer)
+  Now transfers are asynchronous if wanted:
+  When FileTransfer GUI is visible -> no screen updates, max speed for the transfer of files
+  When FileTransfer GUI is minimized -> screen updates and file transfering at the same time
+  Added multiselection for files deletion
+  Added Rename File/Directory command
+  Fixed some bugs with Directory Transfer (names with "(" or ")")
+  Fixed huge files transfers and progress gauge corrupted display (> 2GB files)
+  Added progress percentage value display
+  A lot of code cleaning and sanity checks (both in Viewer and Server)
+  New Viewer FileTransfer is still backward compatible with previous Servers (<= RC18)
+  Directory Names are now surrounded with "[ " and " ]" in the GUI lists
+- MS-Logon
+  MS-Logon II
+  Added a new MS-Logon authentication method (aka MS-Logon II).
+  Should work with Windows NT4/2000/XP/Server 2003.
+  (See mslogon.html for a detailed description)
+- Ability to authenticate cross-domain, i.e. the user account
+  can be in another domain than the computer account.
+- Stores access settings in an ACL:
+  Unlimited number of users/groups can be configured
+  Each user/group can have full access/viewonly
+- New UI: Standard MS Security Editor
+- MSLogonACL: Tool for exporting/importing ACL
+- Only one (1) Windows logon attempt is performed.
+- Bug fixes:
+ - Fixed: Usernames with spaces fail to load with MSLogonACL tool
+  (see https://forum.uvnc.com/viewtopic.php?t=1046&highlight=#4025)
+ - Fixed: Extended ASCII characters (ä/ö/ü/ç) lead to authentication failure
+  (see https://forum.uvnc.com/viewtopic.php?t=1259&highlight=#4702)
+ - Fixed: Certain passwords (e.g. Abc0DefG) lead to authentication failure
+  (see https://forum.uvnc.com/viewtopic.php?t=803)
+
+UltraVNC 1.0.0 RC18:
+- Optimized RC17
+- Code analysing to optimize performance
+- Driver bug fixed
+- Smoother moves
+- Cache fix
+- A lot of speed optimizations
+
+UltraVNC 1.0.0 RC17:
+- Driver
+ - Driver consist of 2 parts, the actual mirror driver and a memory manager service.
+ - Final driver version
+- Viewer/Server
+ - Fix cpu ghost issue on quiting Viewer
+ - Fix connecing failed if screensaver+lock screen was running
+ - Fix listening and multiple Viewers no longer quit when one Viewer is stopped
+
+UltraVNC 1.0.0 RC16:
+- Driver handling was changed again.
+- It's stable and high speed is back.
+- Scrolling bug fixed, driver was giving invers delta
+- Driver screen moves and standard screen Moves detection
+  can not be used together. Both where cumulated -> delta x2
+  Scrolling is handled by the driver, screen moves by the old method
+- Fixed sendmessage queuing problem.
+
+UltraVNC 1.0.0 RC15:
+- Tryout to make it stable again.
+- RC15 is stable, but terribly slow when driver used
+
+UltraVNC 1.0.0 RC14:
+- Server
+ - Memory leaks, resources leaks, array bounding, bug fixes, desktop thread fixes
+ - MS-Logon: Correction for global groups in local group detection + a lot of
+   others changes to take the max. use cases into account...
+ - FileTransfer is now forbidden when Viewers are forced to be "ViewOnly"
+ - FileTransfer bug fix (possible infinite loop during copy loop)
+ - Properties dialog tweaked
+ - Removed the "Home page" and "Online help" shortcuts in the WinVNC traymenu
+   (that were launching some Internet Explorer "iexplorer" processes) until we find a better solution.
+ - MS groups can be customized via options
+ - Hookdll is loaded dynamic, DLL does not longer need to exist to start WinVNC
+- Viewer
+ - Server Inputs/Screen-blanking bugfix
+ - Proxy support (via the "VNC Repeater" external program)
+ - FileTransfer: selection bar now takes full list's window width
+ - Several Listening Viewers can now be run on the same machine using
+   different ports numbers.
+ - Pressing ALT or CTRL send ALT/CTRL directly to the VNC Server, as if the user selected
+   "CTRL DOWN/CTRL UP/ALT DOWN/ALT UP" from the system menu.
+   When turning the SCROLL-LOCK on, the following things happen:
+   Pressing ALT+TAB DOES NOT switch applications on the client side. Instead, ALT+TAB is sent to
+   the VNC Server.
+   Pressing CTRL+ESC DOES NOT open the start menu on the client side. Instead, CTRL+ESC is sent to
+   the VNC Server.
+   Pressing ALT+SPACE DOES NOT open the system menu on the client side. Instead, ALT+SPACE is sent
+   to the VNC Server.
+   Pressing Break/Pause key toggles Full-Screen mode on or off.
+   Pressing PRINT-Screen key requests a full screen update (same as selecting "Request Screen
+   Refresh" from the system menu)
+   All the above can be disabled by turning the SCROLL-LOCK key off.
+   (written by Assaf Gordon)
+
+UltraVNC 1.0.0 RC13: never saw the light of day. 'wonder why... ;)
+
+UltraVNC 1.0.0 RC12:
+- Server
+ - DSMPlugin bug fixes (loopback mode, plugin changes, loading, config...).
+ - Strings moved to resource file (Server) + french translation
+ - Added back auto hook switching (only active the first 50
+   updates, to prevent switching while connected)
+ - Added -autoreconnect command line option and functionnality
+ - Prevented Chat to send messages during transfer of a file
+ - FileTransfer now handles Directory Transfer (using zip32.dll & unzip32.dll)
+ - Ultra Encoder bug fix
+ - New Video Hook driver
+ - Local cursor support for Driver and Hookdll
+ - Video Driver now uses events to notify the Server for changes, no more timer
+ - Auto full scan on idle time
+ - Added several locks for memory protection while driver
+   is disabled/enabled (resolution/logon)
+ - Too many little updates (driver). If more than 50 rects, combine regions.
+- Viewer
+ - FileTransfer now handles Directory Transfer (using zip32.dll & unzip32.dll)
+ - Chat window can be minimized (allowing screen updates) and restored
+ - FileTransfer Window can be minimized (allowing screen updates) and restored,
+   excepted during a transfer
+ - Toolbar Buttons changed... (thanks to Phoenity)
+ - Added back dotcursor as default in all quick options modes, excepted Ultra & Lan
+ - Added listening Port number to VNCViewer Taskbar icon tooltip, in listen mode
+ - Added some resync code... Server and Viewer sometimes were going out
+   of sync. This code tries to find new updates in network data and resync the Viewer.
+ - A listening Viewer using a DSMPlugin can now handle several connections with
+   different Servers without connection drops.
+
+UltraVNC 1.0.0 RC11c:
+- Auth DLL changed (Windows NT4 missing function)
+- Added winvnc -multi (disable single instance check)
+- File times now displayed in local time in FileTransfer
+- DSM bugs fixed:
+ - DSM+ZRLE now WORKS :)
+ - Fixed various crashes due to insufficent DSM working buffer size with 1200+ screen resolutions
+ - Fixed DSM+UltraEncoding crash (I now desativate Queuing when DSM is enabled).
+
+UltraVNC 1.0.0 RC11b:
+- messages.dll (nt event) was missing
+- New Windows XP style buttons
+- LDAP was only added to the testauth util....:)
+  made it also active in WinVNC
+- Plugin changes
+- A Viewer crash bug fixed
+- About etc...still have RC11 to little changes for new release number
+
+UltraVNC 1.0.0 RC11:
+- 8bit Colors regression fixed
+- Server PB fixed: WinVNC stalled when changing Server screen resolution during
+  connection.
+- Various bug fixes with Ultra encoding and mouse cursor updates.
+- Cosmetic fixes in Viewer and Server (multi-languages strings display,
+  dialog boxes, bitmaps, flashlogo...)
+- Auto Mode On/Off switching pb fixed (after a manuel options settings the
+  Auto Mode was no more available)
+- Added the /nohotkeys command line switch in VNCViewer (saved in .vnc files
+  like all the others VNCViewer options)
+- Modifs and bug fixes in french VNCViewer
+- Fixed Status display bug in Status Window when DSMPlugin is used
+- MS-Logon no support:worksgroups,NT4 domain,AD mixed and native domains
+  workgroup,NT4 Domain: group checking (Netapi), password checking (SPPI, and logonuser for Windows XP)
+  Open guest access is checked and MS-Logon is regused on systems where guest account=1 AND force guest=1
+  AD mixed and native: Group and password are checked using the ADSI SDK (LDAP)
+- added ConnectPriority=3: refuse multiple Viewer connections
+- Added even more memory controle functions
+- Users without HKLM access can run VNC as application
+- Added VNC loggons to system event logging (NT)
+- UltraEncoder isolated from other. This encoder is experimental and use a faster Viewer screen update
+  mechanism. When switching (manual) from or to this encoder some black rect can appear. Does not support
+  caching and local cursor shapes. This encoder is no longer part of the auto mechanism.
+
+UltraVNC 1.0.0 RC10:
+- Added secure memcopy/memcmp to prevent Server crash
+- Windows NT4 video driver does not exist..so put it always false
+- NewSWsize could cause problems, needed to be send from client thread
+  enablecache could cause delete cache to give memory error, fixed
+  some extra logging
+- Moved restart driver to vncDesktopThread check part.
+  Driver is not restarted middle of an update
+- Disabled detect slow encoder (the auto switch between hookdll and driver
+  does not work 100%)
+- DisableTrayIcon reg value added
+- MS-Logon passwd length fix
+- MS-Logon is moved to machine reg settings, no user setting
+- MS-Logon is moved to 2 seperated DLLs.
+  groups and nested groups (AD) should work know
+- MS-Logon added testutil
+- Added home page and online help menu items
+- String VNCViewer moved to table to be easy translated
+- Added Viewer flash window
+- New superfast Ultra Encoder using real time compression/latency reduction
+  and the faster Viewer screen updates
+
+UltraVNC 1.0.0 RC09:
+- Windows NT4 8bit crash fix
+- 24bit driver mode crash fix
+- "Unlock Server" crash detect and fixed
+- Windows Server 2003 driver support added to Server and drivers
+- Added new about box
+- Auto Check "Cache Encoding" when XORZlib encoding
+  is clicked in options dialog.
+- Fixed ".vnc" saving bug with some params
+  (ServerScale, EnableCache...)
+- Quick Options handling code cleanup
+- Added Test if Options Dialog is open while
+  terminating the Viewer (-> prevent a crash)
+- CTRL+ESC, ALT, CTRL, CTRL+ALT+DEL are now
+  forbidden in ViewOnly mode
+- Viewer menu simplified and completed
+- Added Accelerator Keys (Hot Keys). They are
+  displayed in the Viewer's menu.
+  (All are CTRL+ALT+Fxx keys)
+- Added AutoScaling: now the Viewer window can be
+  auto scaled/stretched so the Server's screen is
+  entirely visible (no scrollbars). The option is
+  available along Quick options.
+- Viewer Scaling factors is now percentage in the
+  Options window. More clear for users.
+- Hopefully fixed the screen refresh locking after a
+  FileTransfer occasionnal bug.
+- Simplified Viewer TitleBar display (removed "VNC
+  Viewer". Was useless and now we can directly see
+  the hostname in the task bar).
+- Added hostname in the FileTransfer window Title bar.
+- Hopefully fixed the scaling crash that occurs in
+  all others VNC distributions due to the StretchBlt()
+  function + hardware acceleration.
+  Visual quality remains equivalent when scaled.
+- Added a 30s delay between 2 encoding changes when
+  using Auto mode. It should prevent some problems
+  over slow connections...
+- Added ".vnc" load button in the "Connection" Dialog
+
+UltraVNC 1.0.0 RC08:
+- The last major memory leak has been fixed in WinVNC
+- WinVNC occasionnal crash under Windows NT4 during initial screen loading has been fixed
+- The CTRL,ALT,SHIFT keys locking bug has hopefully been fixed
+- The Viewer's authentication window has been renamed "VNC Authentication" instead
+  of "UltraVNC Authentication": now UltraVNC Viewer is compatible again with
+  the VNC-Quickdesk password transmission method...
+- Some additionnal tests have been added to prevent possible crashes:
+  - "MS-Logon + no domain + WinVNC under Windows 9X" case
+  - OS Version is better checked when Video Driver is required by user
+- Fixed the scaling factors corruption problem when using "AUTO" quickoption in
+  the Viewer.
+- The DSMPlugins know their loader: VNCViewer or WinVNC (application
+  or service). It should be now more easy for plugins writters to save their plugins
+  configuration at the good location in the registry, for instance.
+  TestPlugin example source code has been updated consequently.
+
+UltraVNC 1.0.0 RC07:
+- TextChat GUI improvements (colors, buttons)
+- Textchat scrolling under Windows 9X/ME fixed
+- Viewer refresh after Texchat fixed
+- TextChat & FileTransfer windows can be redisplayed on the foreground
+  when masked in Fullscreen mode by clicking on their corresponding buttons.
+- FileTransfer GUI double-click bug fixed
+- UltraVNC icon slightly changed
+- Toolbar tooltips now appear faster
+- Viewer "notoolbar" command line option replaces the stupid "showtoolbar"
+  option...
+- WinVNC "connect" option fixed (works with host, host:display and host::port)
+- Fixed "quickoption" command line option bug in VNCViewer
+- Added "Log Infos" and "Allow Loopback" options in WinVNC Property page
+- UltraVNC is now compatible with PalmVNC2.0 even at the Server screen
+  scaling level.
+- Fixed Viewer crash when aborting connection
+- Remove Wallpaper after disconnection bug fixed
+- NTML mechanism now checks Local and Remote for Group and Password.
+- Fixed a bug with changes detection in WINVNC under Windows 2000/XP: when the
+  "Video Hook Driver" option was checked and the Video Driver was not
+  actually available (not installed for instance...) then the default
+  "System HookDll" was not loaded (even if the option was checked).
+  The result was missing screen updates, especially with checkboxes,
+  low accuracy and low speed. The workaround was to uncheck the
+  "Video Hook Driver" option.
+- DSMPlugin action now starts BEFORE the RFB protocole handshaking
+  (-> 1.07 Viewer/Server DSM compatibility with 1.06 is broken
+  but existing Plugins remain compatible with 1.07)
+- Info messages are now displayed when connection fails with DSMPlugin
+  (Plugins incompatibility, missing etc...)
+- DSMPlugin now supports MS-Logon method
+- Slightly modified TestPlugin sample
+- Added "dsmplugin" command line option in VNCViewer
+- Video Driver handling:
+  - Auto switching to default system hooking when 24bit color depth is used
+    on Server (the driver not used in this case)
+  - 8bit color palette support
+  - WinVNC keeps the attached-to-desktop bit to 1 until VNC unloads the
+    driver -> No more crashes when an application changes the display
+    (ex: pinball). No more risk that color depth or screen resolution
+    switching crash the Server.
+- New Video Hook driver 1.0.7 (+ New separate Video Drivers Auto-Setup)
+

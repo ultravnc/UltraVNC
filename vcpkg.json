@@ -12,5 +12,5 @@
     "libsodium",
     "minizip-ng"
   ],
-  "builtin-baseline": "2f8d9f7d3f041e70643c18954cee799459e7eb75"
+  "builtin-baseline": "c1ce926ddf75f166cbdd444bbaf463410ac99b17"
 }
