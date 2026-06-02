@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English resources
+// English (Neutral) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
@@ -204,14 +204,14 @@ BEGIN
     GROUPBOX        "Authentication",IDC_STATIC,7,4,344,76
     CONTROL         "MS-Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,95,67,10
     CONTROL         "New MS-Logon, multiple domains",IDC_NEW_MSLOGON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,108,153,11
-    PUSHBUTTON      "CONFIGURE MS-LOGON GROUPS",IDC_MSLOGON,191,101,151,12
+    PUSHBUTTON      "CONFIGURE MS-LOGON GROUPS",IDC_MSLOGON,191,107,151,12
     GROUPBOX        "Windows authentication",IDC_STATIC,7,81,344,44
     CONTROL         "Use",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,144,27,10
     COMBOBOX        IDC_PLUGINS_COMBO,44,143,126,86,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "CONFIGURE ENCRYPTION",IDC_PLUGIN_BUTTON,191,143,151,12
     GROUPBOX        "Encryption",IDC_STATIC,7,129,344,33
     CONTROL         "Password required",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,175,68,9
-    LTEXT           "Admin account required",IDC_STATIC,200,90,77,8
+    LTEXT           "Admin account required",IDC_STATIC,192,96,150,8
     LTEXT           "DISABLING THE PASSWORD IS \nNOT RECOMMENDED",IDC_STATIC,87,172,115,19
     LTEXT           "Encrypted password can only be decrypted on this system",IDC_STATIC,20,67,251,8
     PUSHBUTTON      "SET/CHANGE...",IDC_CHANGEPASSWORD,83,15,64,14
@@ -224,13 +224,13 @@ IDD_FORM_Network DIALOGEX 0, 0, 361, 207
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Connect to a listening viewer",IDC_STATIC,13,19,103,8
+    LTEXT           "Connect to a listening viewer",IDC_STATIC,13,19,260,8
     PUSHBUTTON      "START",IDC_STARTREP,285,18,36,12
-    LTEXT           "service initiate inverse connection",IDC_STATIC,13,32,134,8
+    LTEXT           "service initiate inverse connection",IDC_STATIC,13,32,260,8
     EDITTEXT        IDC_SERVICE_COMMANDLINE,13,43,308,14,ES_AUTOHSCROLL
-    LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,13,59,157,8
+    LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,13,59,260,8
     CONTROL         "Authentication required for server initiated connections",IDC_REVERSEAUTH,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,266,16
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,260,16
     GROUPBOX        "Reverse connection",IDC_STATIC,7,7,344,88
 END
 
@@ -238,8 +238,8 @@ IDD_FORM_Log DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
-    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
+    CONTROL         "Log debug infos to the WinVNC.log file",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,217,10
+    CONTROL         "Log to video",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,65,10
     PUSHBUTTON      "CLEAR AVI ENCODER",IDC_CLEAR,79,47,75,9
     LTEXT           "Path",IDC_STATIC,13,33,18,8
     EDITTEXT        IDC_EDIT_PATH,37,30,286,14,ES_AUTOHSCROLL
@@ -255,7 +255,7 @@ BEGIN
     GROUPBOX        "Administration",IDC_STATIC,7,7,324,195,BS_LEFT
     LTEXT           "Administration password",IDC_STATIC,12,44,78,8
     CONTROL         "Allow users to view and make property changes using this password",IDC_ALLOWUSERSSETTINGS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,312,10
     LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,312,15
     PUSHBUTTON      "SET/CHANGE...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
     PUSHBUTTON      "CLEAR",IDC_ADMINCLEAR,171,41,50,14
@@ -265,38 +265,38 @@ IDD_FORM_Incoming DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,43,104,10
+    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,43,132,10
     CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,43,58,10
     CONTROL         "Allow IPv6 mode (restart required)",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,56,130,10
     GROUPBOX        "Incoming connection",IDC_STATIC,7,7,344,195
-    CONTROL         "Enable incoming port",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,16,75,11
+    CONTROL         "Enable incoming port",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,16,132,11
     CONTROL         "Manual",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,271,30,37,10
     CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,271,19,34,9
     LTEXT           "RFB port",IDC_STATIC,160,17,36,8
     EDITTEXT        IDC_PORTRFB,219,16,29,12,ES_AUTOHSCROLL
     LTEXT           "HTTP port",IDC_STATIC,160,31,38,8
     EDITTEXT        IDC_PORTHTTP,219,30,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
+    CONTROL         "Enable UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,122,10
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
     CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
     CONTROL         "Log-off Workstation",IDC_LOCKSETTING_LOGOFF,"Button",BS_AUTORADIOBUTTON,240,82,72,11
-    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,111,127,10
-    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,20,121,104,10
-    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,183,111,103,10
-    CONTROL         "Refuse all new connection",IDC_MV4,"Button",BS_AUTORADIOBUTTON,183,121,102,10
+    CONTROL         "Disconnect all existing connections",IDC_MV1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,111,140,10
+    CONTROL         "Keep existing connections",IDC_MV2,"Button",BS_AUTORADIOBUTTON,20,121,140,10
+    CONTROL         "Refuse the new connection",IDC_MV3,"Button",BS_AUTORADIOBUTTON,183,111,159,10
+    CONTROL         "Refuse all new connection",IDC_MV4,"Button",BS_AUTORADIOBUTTON,183,121,159,10
     EDITTEXT        IDC_KINTERVAL,92,160,19,12,ES_AUTOHSCROLL
     LTEXT           "Keepalive interval",IDC_STATIC,15,162,75,9
     LTEXT           "Idle timeout: (input)",IDC_STATIC,15,142,75,9
     EDITTEXT        IDC_IDLETIMEINPUT,92,141,19,12,ES_AUTOHSCROLL
-    LTEXT           "Send keepalive each x seconds",IDC_STATIC,139,162,115,8
-    LTEXT           "Instruct viewer to disconnect when idle for x sec.  0 = disabled",IDC_STATIC,139,139,122,15
+    LTEXT           "Send keepalive each x seconds",IDC_STATIC,139,162,166,8
+    LTEXT           "Instruct viewer to disconnect when idle for x sec.  0 = disabled",IDC_STATIC,139,139,163,15
     EDITTEXT        IDC_MAXVIEWERS,62,187,18,12,ES_AUTOHSCROLL
     LTEXT           "Max Viewers",IDC_STATIC,15,188,46,8
-    CONTROL         "Refuse",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,38,10
-    CONTROL         "Disconnect oldest",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,73,10
-    LTEXT           "Action",IDC_STATIC,98,188,43,10
-    LTEXT           "On last viewer disconnect",IDC_STATIC,15,71,83,8
+    CONTROL         "Refuse",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,46,10
+    CONTROL         "Disconnect oldest",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,101,10
+    LTEXT           "Action",IDC_STATIC,98,188,49,10
+    LTEXT           "On last viewer disconnect",IDC_STATIC,15,71,132,8
     LTEXT           "On multi viewer connection",IDC_STATIC,15,100,87,8
 END
 
@@ -322,18 +322,18 @@ IDD_FORM_capture DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Poll Full Screen",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,112,13
-    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,34,89,15
-    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,50,104,12
+    CONTROL         "Poll Full Screen",IDC_POLL_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,139,13
+    CONTROL         "Poll Foreground Window",IDC_POLL_FOREGROUND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,34,131,15
+    CONTROL         "Poll Window Under Cursor",IDC_POLL_UNDER_CURSOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,50,131,12
     CONTROL         "Poll Console Windows Only",IDC_CONSOLE_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,34,99,15
     CONTROL         "Poll On Event Only",IDC_ONEVENT_ONLY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,161,50,78,12
-    CONTROL         "System HookDll (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,110,10
-    CONTROL         "Mirror Driver (<= Windows 7)",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,205,10
-    CONTROL         "Low Accuracy (Turbo Speed)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,112,10
+    CONTROL         "System HookDll (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,139,10
+    CONTROL         "Mirror Driver (<= Windows 7)",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,139,10
+    CONTROL         "Low Accuracy (Turbo Speed)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,139,10
     PUSHBUTTON      "CHECK MIRROR DRIVER",IDC_CHECKDRIVER,13,156,92,11
     EDITTEXT        IDC_MAXCPU,54,176,40,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Max CPU",IDC_STATIC,13,178,34,8
-    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATICELEVATED,185,154,166,19
+    LTEXT           "Elevated access needed: Service or run as admin",IDC_STATICELEVATED,161,154,190,19
     CONTROL         "Auto",IDC_AUTOCAPT1,"Button",BS_AUTORADIOBUTTON,97,116,31,10
     CONTROL         "Pixel",IDC_AUTOCAPT2,"Button",BS_AUTORADIOBUTTON,161,116,31,10
     CONTROL         "Blit",IDC_AUTOCAPT3,"Button",BS_AUTORADIOBUTTON,225,116,25,10
@@ -349,18 +349,18 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,19,8,8
-    LTEXT           "The time the messagebox is shown (s)",IDC_STATIC,36,48,134,8
+    LTEXT           "The time the messagebox is shown (s)",IDC_STATIC,36,48,304,8
     EDITTEXT        IDQUERYTIMEOUT,12,46,19,12,ES_AUTOHSCROLL
     LTEXT           "Default query action",IDC_STATIC,13,88,64,8
     CONTROL         "Refuse",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,87,87,39,10
     CONTROL         "Accept",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,140,87,39,10
     CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,193,87,88,10
     EDITTEXT        IDC_QUERYDISABLETIME,12,61,19,12,ES_AUTOHSCROLL
-    LTEXT           "The delay time before the message is shown (s)",IDC_STATIC,36,63,158,8
+    LTEXT           "The delay time before the message is shown (s)",IDC_STATIC,36,63,304,8
     EDITTEXT        IDC_EDITQUERYTEXT,12,30,206,12,ES_AUTOHSCROLL
-    LTEXT           "Custom popup message",IDC_STATIC,225,32,99,8
+    LTEXT           "Custom popup message",IDC_STATIC,225,32,115,8
     CONTROL         "Show messagebox when no user is logged or screen is locked",IDC_QNOLOGON,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,76,206,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,76,327,10
     GROUPBOX        "Rules",IDC_STATIC,7,7,344,195,WS_GROUP
     CONTROL         "",IDC_IP_ACCESS_CONTROL_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_GROUP | WS_TABSTOP,12,119,244,61
     DEFPUSHBUTTON   "ADD...",IDC_ADD_BUTTON,274,119,57,10,WS_GROUP
@@ -372,22 +372,22 @@ BEGIN
     EDITTEXT        IDC_IP_FOR_CHECK_EDIT,72,186,44,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "[check result]",IDC_IP_CHECK_RESULT_LABEL,177,188,46,8
     PUSHBUTTON      "CHECK",IDC_CHECKIP,125,186,44,12
-    LTEXT           "Popup a timed messagebox to allow the user to allow/reject an incoming connect",IDC_STATIC,24,19,264,11
-    LTEXT           "Allow locked: no messagebox when screen is locked",IDC_STATIC,87,99,180,12
+    LTEXT           "Popup a timed messagebox to allow the user to allow/reject an incoming connect",IDC_STATIC,24,19,316,11
+    LTEXT           "Allow locked: no messagebox when screen is locked",IDC_STATIC,87,99,253,12
 END
 
 IDD_FORM_Notifications DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Indicator frame around shared screen",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,167,10
+    CONTROL         "Indicator frame around shared screen",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,331,10
     CONTROL         "Show popup notification on viewer connection",IDC_NOTIFOCATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,160,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,331,10
     CONTROL         "Always show notification, use client provided notification when available",IDC_RADIONOTIFICATIONON,
-                    "Button",BS_AUTORADIOBUTTON,39,45,250,10
+                    "Button",BS_AUTORADIOBUTTON,39,45,305,10
     CONTROL         "Show only if client provide notification information",IDC_RADIONOTIFICATIONIFPROVIDED,
-                    "Button",BS_AUTORADIOBUTTON,39,57,182,10
-    CONTROL         "Use OSD instead of a popup",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,120,10
+                    "Button",BS_AUTORADIOBUTTON,39,57,305,10
+    CONTROL         "Use OSD instead of a popup",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,305,10
     GROUPBOX        "Notification",IDC_STATIC,7,7,344,78
 END
 
@@ -396,17 +396,17 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Keyboard && Mouse",IDC_STATIC,7,7,344,58,BS_LEFT
-    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
-    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
-    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
-    CONTROL         "Windows 8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,110,10
-    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,74,10
-    CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,58,10
-    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,77,36,10
+    CONTROL         "Disable Viewers inputs",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,158,10
+    CONTROL         "Disable Local inputs",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,158,10
+    CONTROL         "Alternate keyboard",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,158,10
+    CONTROL         "Windows 8 keyboardhelper",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,158,10
+    CONTROL         "International keys",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,158,10
+    CONTROL         "Collaborative",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,158,10
+    CONTROL         "Enable",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,77,158,10
     CONTROL         "User impersonation (for Service only)",IDC_FTUSERIMPERSONATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,89,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,89,149,10
     GROUPBOX        "File Transfer",IDC_STATIC,7,66,344,41
-    CONTROL         "Force cursor shape",IDC_FORCE_SHAPE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,52,89,10
+    CONTROL         "Force cursor shape",IDC_FORCE_SHAPE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,52,158,10
 END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
@@ -439,24 +439,24 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Misc.",IDC_STATIC,7,7,344,197,BS_LEFT
     CONTROL         "Remove Wallpaper while connected",IDC_REMOVE_WALLPAPER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,134,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,227,10
     CONTROL         "Enable Blank Monitor on Viewer Request",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,144,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,227,10
     CONTROL         "Disable Only Inputs on Blanking Request",IDC_BLANK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
-    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,217,10
+    CONTROL         "DisableTrayIcon",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,227,10
     CONTROL         "Disable clients options in Tray icon menu",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,227,10
     CONTROL         "Forbid the user to close down UltraVNC Server",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,227,10
     LTEXT           "Default Server Screen Scale",IDC_STATIC,14,116,100,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
-    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
-    CONTROL         "Prevent screensaver",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
+    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,227,10
+    CONTROL         "Prevent screensaver",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,227,10
     LTEXT           "Default screen",IDC_STATIC,14,129,47,8
-    CONTROL         "Primary",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
-    CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
-    LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,40,8
+    CONTROL         "Primary",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,48,10
+    CONTROL         "Secondary",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,61,10
+    LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,53,8
     COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "(restart required)",IDC_STATIC,180,145,60,8
 END
@@ -567,7 +567,83 @@ BEGIN
     BEGIN
     END
 
+    IDD_PROPERTIESDIALOG, DIALOG
+    BEGIN
+    END
+
+    IDD_FORM_AUTHENTICATION, DIALOG
+    BEGIN
+        VERTGUIDE, 342
+        HORZGUIDE, 107
+        HORZGUIDE, 119
+        HORZGUIDE, 155
+    END
+
+    IDD_FORM_Network, DIALOG
+    BEGIN
+        VERTGUIDE, 273
+    END
+
+    IDD_FORM_Log, DIALOG
+    BEGIN
+        VERTGUIDE, 231
+    END
+
+    IDD_FORM_administration, DIALOG
+    BEGIN
+        VERTGUIDE, 324
+    END
+
+    IDD_FORM_Incoming, DIALOG
+    BEGIN
+        VERTGUIDE, 147
+        VERTGUIDE, 160
+        VERTGUIDE, 183
+        VERTGUIDE, 305
+        VERTGUIDE, 342
+    END
+
+    IDD_EDIT_IP_ACESS_CONTROL, DIALOG
+    BEGIN
+    END
+
+    IDD_FORM_capture, DIALOG
+    BEGIN
+        VERTGUIDE, 152
+        VERTGUIDE, 161
+    END
+
+    IDD_FORM_Rules, DIALOG
+    BEGIN
+        VERTGUIDE, 340
+    END
+
+    IDD_FORM_Notifications, DIALOG
+    BEGIN
+        VERTGUIDE, 344
+    END
+
     IDD_FORM_input_FT, DIALOG
+    BEGIN
+        VERTGUIDE, 172
+        VERTGUIDE, 184
+        VERTGUIDE, 342
+    END
+
+    IDD_ADMINPASSWORD, DIALOG
+    BEGIN
+    END
+
+    IDD_CHANGE_PASSWORD, DIALOG
+    BEGIN
+    END
+
+    IDD_FORM_Misc, DIALOG
+    BEGIN
+        VERTGUIDE, 240
+    END
+
+    IDD_FORM_Service, DIALOG
     BEGIN
     END
 END
@@ -661,21 +737,6 @@ IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
 
 IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
 
-#if defined(SC_20)
-/////////////////////////////////////////////////////////////////////////////
-//
-// DLL
-//
-
-IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1002,7 +1063,7 @@ BEGIN
     IDS_LANGUAGE_NAME       "English"
 END
 
-#endif    // English resources
+#endif    // English (Neutral) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
