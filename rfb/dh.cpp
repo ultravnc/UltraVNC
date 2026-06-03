@@ -199,9 +199,11 @@ unsigned __int64 bytesToInt64(const char* const bytes) {
 	return result;
 }
 
-bool vncWc2Mb(char* multibyte, WCHAR* widechar, int length) {
+bool vncWc2Mb(char* multibyte, WCHAR* widechar, int length, int widechar_count) {
 	multibyte[0] = '\0';
-	int origlen = wcslen(widechar);
+	/* Security fix: use wcsnlen with max length to prevent OOB read
+	 * if widechar is not properly null-terminated (FINDING-004) */
+	int origlen = wcsnlen(widechar, widechar_count);
 	if (origlen > length)
 		return false;
 	int newlen = WideCharToMultiByte(

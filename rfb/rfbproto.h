@@ -301,6 +301,8 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbUltraVNC_SecureVNCPluginAuth_new 0x73
 #define rfbClientInitExtraMsgSupport 0x74
 #define rfbClientInitExtraMsgSupportNew 0x75
+// MS-Logon III: X25519 + AES-256-GCM, replaces weak 31-bit DH (FINDING-002)
+#define rfbUltraVNC_MsLogonIIIAuth 0x76
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17

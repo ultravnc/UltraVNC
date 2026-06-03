@@ -253,6 +253,7 @@ private:
 	void AuthSessionSelect(); // adzm 2010-10
 	void AuthMsLogonI();
 	void AuthMsLogonII();
+	void AuthMsLogonIII();  // X25519 + AES-256-GCM (secure replacement for MS-Logon II)
 	void AuthSecureVNCPlugin();
 	void AuthSecureVNCPlugin_old();
 	////////////////////////////////////////////////

@@ -25,6 +25,11 @@
 #include <rfb/vncauth.h>
 #include "d3des.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <wincrypt.h>
+#endif
+
 
 /*
  * We use a fixed key to store passwords, since we assume that our local
@@ -119,12 +124,35 @@ vncDecryptPasswdFromFile(char *fname)
 void
 vncRandomBytes(unsigned char *bytes)
 {
-    int i;
-    unsigned int seed = (unsigned int) time(0) + getpid() + rand();
-
-    srand(seed);
-    for (i = 0; i < CHALLENGESIZE; i++) {
-	bytes[i] = (unsigned char)(rand() & 255);    
+#ifdef _WIN32
+    /* Use Windows CryptoAPI for cryptographically secure random bytes */
+    HCRYPTPROV hProv;
+    if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+        if (CryptGenRandom(hProv, CHALLENGESIZE, bytes)) {
+            CryptReleaseContext(hProv, 0);
+            return;
+        }
+        CryptReleaseContext(hProv, 0);
+    }
+    /* Fallback to /dev/urandom on Windows if CryptoAPI fails - unlikely */
+#endif
+    /* Fallback for non-Windows or CryptoAPI failure: use /dev/urandom */
+    FILE *fp = fopen("/dev/urandom", "rb");
+    if (fp) {
+        size_t read = fread(bytes, 1, CHALLENGESIZE, fp);
+        fclose(fp);
+        if (read == CHALLENGESIZE) {
+            return;
+        }
+    }
+    /* Last resort: weak fallback (should never reach here on modern systems) */
+    {
+        int i;
+        unsigned int seed = (unsigned int) time(0) + getpid() + clock();
+        srand(seed);
+        for (i = 0; i < CHALLENGESIZE; i++) {
+            bytes[i] = (unsigned char)(rand() & 255);
+        }
     }
 }
 

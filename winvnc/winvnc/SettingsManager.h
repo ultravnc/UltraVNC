@@ -100,6 +100,7 @@ public:
 	BOOL getLoopbackOnly() { return m_pref_LoopbackOnly; };
 	int getConnectPriority() { return m_pref_ConnectPriority; };
 	BOOL getRequireMSLogon() { return m_pref_RequireMSLogon; };
+	BOOL getRequireMSLogonIII() { return m_pref_RequireMSLogonIII; };
 	BOOL getNewMSLogon() { return m_pref_NewMSLogon; };
 	BOOL getReverseAuthRequired() { return m_pref_ReverseAuthRequired; };
 	int getftTimeout() { return m_pref_ftTimeout; };
@@ -154,6 +155,7 @@ public:
 	void setOSD(BOOL value) { m_pref_OSD = value; };
 
 	void setRequireMSLogon(BOOL value) { m_pref_RequireMSLogon = value; };
+	void setRequireMSLogonIII(BOOL value) { m_pref_RequireMSLogonIII = value; };
 	void setNewMSLogon(BOOL value) { m_pref_NewMSLogon = value; };
 	void setReverseAuthRequired(BOOL value) { m_pref_ReverseAuthRequired = value; };
 
@@ -324,6 +326,7 @@ private:
 	BOOL m_pref_BlankInputsOnly;
 	int  m_pref_DefaultScale;
 	BOOL m_pref_RequireMSLogon;
+	BOOL m_pref_RequireMSLogonIII;  // Enforce only MS-Logon III (no legacy II)
 	BOOL m_pref_Secure;
 	BOOL m_pref_NewMSLogon;
 	BOOL m_pref_ReverseAuthRequired;

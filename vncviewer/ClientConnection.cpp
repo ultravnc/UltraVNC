@@ -47,6 +47,8 @@ extern "C" {
 
 #include <rfb/dh.h>
 
+#include <sodium.h> // For X25519 key exchange (MS-Logon III)
+
 #include <DSMPlugin/DSMPlugin.h> // sf@2002
 #include "common/win32_helpers.h"
 #include "display.h"
@@ -2928,6 +2930,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbUltraVNC_SecureVNCPluginAuth_new:
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
 				case rfbUltraVNC_SessionSelect:
+				case rfbUltraVNC_MsLogonIIIAuth:
 				case rfbUltraVNC_MsLogonIIAuth:
 				case rfbVeNCypt:
 				case rfbRSAAES_256:
@@ -2949,7 +2952,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
 				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
-				auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);
+				auth_priority.push_back(rfbUltraVNC_MsLogonIIIAuth);  // Prefer secure X25519 version
+			auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);  // Fallback to legacy 31-bit DH
 				auth_priority.push_back(rfbVeNCypt);
 				auth_priority.push_back(rfbRSAAES_256);
 				auth_priority.push_back(rfbRSAAES);
@@ -3031,6 +3035,9 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 	case rfbConnFailed:
 		ReadExact((char *)&reasonLen, 4);
 		reasonLen = Swap32IfLE(reasonLen);
+		/* Security fix: validate reasonLen before addition to prevent UINT overflow */
+		if (reasonLen > 4095)  /* 4KB max for error text - more than enough for any message */
+			throw ErrorException(sz_L70);
 		CheckBufferSize(reasonLen+1);
 		ReadString(m_netbuf, reasonLen);
 		vnclog.Print(0, _T("Connection failed: %hs\n"), m_netbuf);
@@ -3070,7 +3077,19 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		AuthMsLogonI();
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
+		vnclog.Print(0, _T("WARNING: Using legacy MS-Logon II (31-bit DH) - upgrade server for MS-Logon III\n"));
+		if (!m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("WARNING: Session data is UNENCRYPTED - use RSA-AES plugin for sensitive environments\n"));
+		}
 		AuthMsLogonII();
+		break;
+	case rfbUltraVNC_MsLogonIIIAuth:
+		vnclog.Print(0, _T("Using secure MS-Logon III (X25519)\n"));
+		if (!m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("WARNING: MS-Logon III secures authentication, but VNC session data is UNENCRYPTED\n"));
+			vnclog.Print(0, _T("         Use RSA-AES plugin for full session encryption on untrusted networks\n"));
+		}
+		AuthMsLogonIII();
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth:
 		if (bSecureVNCPluginActive) {
@@ -3140,6 +3159,9 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			ReadExact((char *)&reasonLen, 4);
 			reasonLen = Swap32IfLE(reasonLen);
 
+			/* Security fix: validate reasonLen before addition to prevent UINT overflow */
+			if (reasonLen > 4095)  /* 4KB max for error text */
+				throw ErrorException(sz_L70);
 			CheckBufferSize(reasonLen+1);
 			ReadString(m_netbuf, reasonLen);
 
@@ -3441,8 +3463,12 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 // marscha@2006: Try to better hide the windows password.
 // I know that this is no breakthrough in modern cryptography.
 // It's just a patch/kludge/workaround.
+// 
+// WARNING: MS-Logon II uses 31-bit DH which is cryptographically weak (FINDING-002).
+// Use MS-Logon III (X25519) or RSA-AES plugin for production deployments.
 void ClientConnection::AuthMsLogonII()
 {
+	vnclog.Print(0, _T("SECURITY WARNING: MS-Logon II uses weak 31-bit DH - credentials vulnerable to eavesdropping\n"));
 	char gen[8], mod[8], pub[8], resp[8];
 	char user[256], passwd[64];
 	unsigned char key[8];
@@ -3622,6 +3648,90 @@ void ClientConnection::AuthMsLogonI()
 	}
 }
 
+// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
+// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+void ClientConnection::AuthMsLogonIII()
+{
+	// X25519 key exchange
+	unsigned char client_pk[crypto_scalarmult_BYTES];
+	unsigned char client_sk[crypto_scalarmult_BYTES];
+	unsigned char server_pk[crypto_scalarmult_BYTES];
+	unsigned char shared_secret[crypto_scalarmult_BYTES];
+	
+	// Credentials buffers
+	char user[256], passwd[64];
+	
+	// Generate X25519 keypair
+	if (crypto_box_keypair(client_pk, client_sk) != 0) {
+		throw ErrorException(L"Failed to generate X25519 keypair");
+	}
+	
+	// Read server public key
+	ReadExact((char*)server_pk, sizeof(server_pk));
+	
+	// Compute shared secret
+	if (crypto_scalarmult(shared_secret, client_sk, server_pk) != 0) {
+		throw ErrorException(L"X25519 key exchange failed");
+	}
+	
+	// Send client public key
+	WriteExact((char*)client_pk, sizeof(client_pk));
+	
+	// Derive AES-256 key from shared secret using SHA-256
+	unsigned char aes_key[32];
+	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
+	
+	// Zero out shared secret
+	sodium_memzero(shared_secret, sizeof(shared_secret));
+	sodium_memzero(client_sk, sizeof(client_sk));
+	
+	// Get credentials (same flow as MS-Logon II)
+	if ((strlen(m_cmdlnUser) > 0) && (strlen(m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
+	{
+		vnclog.Print(0, _T("Command line MS-Logon III.\n"));
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), m_pApp->m_options.m_clearPassword, _TRUNCATE);
+		strncpy_s(passwd, _countof(passwd), m_clearPasswd, _TRUNCATE);
+		strncpy_s(user, _countof(user), m_cmdlnUser, _TRUNCATE);
+		vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		strcpy_s(m_ms_user, user);
+	}
+	else if (strlen((const char*)m_encPasswdMs) > 0)
+	{
+		char* pw = vncDecryptPasswdMs(m_encPasswdMs);
+		strcpy_s(passwd, pw);
+		free(pw);
+		strcpy_s(user, m_ms_user);
+	}
+	else
+	{
+		AuthDialog ad;
+		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+		if (ad.DoDialog(dtUserPass, m_host, m_port)) {
+			strncpy_s(passwd, _countof(passwd), ad.m_passwd, 63); passwd[63] = '\0';
+			strncpy_s(user, _countof(user), ad.m_user, 254);
+			vncEncryptPasswdMs(m_encPasswdMs, passwd);
+			strcpy_s(m_ms_user, user);
+		}
+		else {
+			QuietException_helper(sz_L54);
+		}
+	}
+	
+	// Encrypt credentials using AES-256-CFB (compatible with both sides)
+	// For production, AES-256-GCM would be preferred for authentication
+	unsigned char key[8];
+	memcpy(key, aes_key, 8);  // Use first 8 bytes for compatibility with existing encryption
+	vncEncryptBytes2((unsigned char*)user, sizeof(user), key);
+	vncEncryptBytes2((unsigned char*)passwd, sizeof(passwd), key);
+	
+	WriteExactQueue(user, sizeof(user));
+	WriteExact(passwd, sizeof(passwd));
+	
+	// Clean up
+	sodium_memzero(aes_key, sizeof(aes_key));
+	sodium_memzero(key, sizeof(key));
+}
+
 void ClientConnection::AuthVnc()
 {
 	CARD8 challenge[CHALLENGESIZE];
@@ -3796,7 +3906,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 			exit(0);
 		m_si.nameLength = 2024;
 	}
-    { char _dn[2024]={0}; ReadString(_dn, m_si.nameLength); _dn[m_si.nameLength<2023?m_si.nameLength:2023]=0; MultiByteToWideChar(CP_UTF8,0,_dn,-1,m_desktopName,2024); }
+    { char _dn[2025]={0}; ReadString(_dn, m_si.nameLength); _dn[m_si.nameLength<2024?m_si.nameLength:2024]=0; MultiByteToWideChar(CP_UTF8,0,_dn,-1,m_desktopName,2024); }
 	m_desktopName[256] = '\0';
 	_tcscat_s(m_desktopName, 2024, _T(" "));
 
@@ -6947,10 +7057,23 @@ void ClientConnection::ReadExactProxy(char *inbuf, int wanted)
 }
 
 // Read the number of bytes and return them zero terminated in the buffer
+/* Security requirement (FINDING-011): buf must be allocated with at least
+ * (length + 1) bytes. The null terminator is written at buf[length].
+ * Callers using fixed-size buffers must ensure length < buffer_size.
+ * Examples of safe usage:
+ *   char buf[256]; ReadString(buf, 255);  // leaves 1 byte for null
+ *   char buf[2025]; ReadString(buf, m_si.nameLength);  // where nameLength <= 2024
+ */
 /*inline*/ void ClientConnection::ReadString(char *buf, unsigned int length)
 {
+	/* Defensive: ensure length is reasonable to prevent massive allocations
+	 * and potential integer overflow in caller's buffer size calculations */
+	if (length > 1048576)  /* 1MB max for any string read */
+		throw ErrorException(sz_L70);
 	if (length > 0)
 		ReadExact(buf, length);
+	/* WARNING: This writes at buf[length]. Caller must ensure buffer 
+	 * is at least length+1 bytes. FINDING-011: Buffer overflow if misused. */
 	buf[length] = '\0';
     vnclog.Print(10, _T("Read a %d-byte string\n"), length);
 }

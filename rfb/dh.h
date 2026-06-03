@@ -86,6 +86,6 @@ private:
 int bits(__int64 number);
 bool int64ToBytes(const unsigned __int64 integer, char* const bytes);
 unsigned __int64 bytesToInt64(const char* const bytes);
-bool vncWc2Mb(char* multibyte, WCHAR* widechar, int length);
+bool vncWc2Mb(char* multibyte, WCHAR* widechar, int length, int widechar_count);
 
 #endif // __RFB_DH_H__

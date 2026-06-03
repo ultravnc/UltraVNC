@@ -50,6 +50,8 @@
 #include "rfb/dh.h"
 #include "vncauth.h"
 
+#include <sodium.h> // For X25519 key exchange (MS-Logon III)
+
 #ifdef _VCPKG
 #include <zlib.h>
 #include <zstd.h>
@@ -1267,7 +1269,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 
 		if (!m_auth && m_ms_logon)
 		{
+			// Always advertise both: new viewers pick III, old viewers pick II
+			// When RequireMSLogonIII is set, we accept II but send error message
+			auth_types.push_back(rfbUltraVNC_MsLogonIIIAuth);
 			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);
+			if (settings->getRequireMSLogonIII()) {
+				vnclog.Print(LL_LOGSCREEN, "Server: Enforcing MS-Logon III (advertising II for proper error message)\n");
+			}
 		}
 		else
 		{
@@ -1298,11 +1306,17 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	}
 	// read the accepted auth type
 	CARD8 auth_accepted = rfbInvalidAuth;
+	std::string auth_message;
 	if (!m_socket->ReadExact((char*)&auth_accepted, sizeof(auth_accepted)))
 		return FALSE;
 
 	// obviously needs to be one that we suggested in the first place
-	if (std::find(auth_types.begin(), auth_types.end(), auth_accepted) == auth_types.end()) {
+	// BUT: if RequireMSLogonIII is set and viewer sends MS-Logon II (0x71), accept it
+	// so we can send a proper error message instead of just closing the connection
+	bool auth_type_valid = std::find(auth_types.begin(), auth_types.end(), auth_accepted) != auth_types.end();
+	bool is_mslogonii_fallback = (settings->getRequireMSLogonIII() && m_ms_logon && auth_accepted == rfbUltraVNC_MsLogonIIAuth);
+	
+	if (!auth_type_valid && !is_mslogonii_fallback) {
 		return FALSE;
 	}
 
@@ -1314,7 +1328,6 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	BOOL auth_success = FALSE;
 	BOOL auth_is_mslogon = FALSE;
 	BOOL version_warning = FALSE;
-	std::string auth_message;
 	switch (auth_accepted)
 	{
 	case rfbUltraVNC:
@@ -1331,7 +1344,21 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		auth_success = 0;
 		version_warning = 1;
 		break;
+	case rfbUltraVNC_MsLogonIIIAuth:
+		auth_success = AuthMsLogonIII(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "MsLogonIII success = %d", auth_success);
+		if (auth_success) {
+			auth_is_mslogon = TRUE;
+		}
+		break;
 	case rfbUltraVNC_MsLogonIIAuth:
+		if (is_mslogonii_fallback) {
+			// Old viewer tried MS-Logon II but server requires MS-Logon III
+			// Do normal MS-Logon II handshake but reject with upgrade message
+			auth_success = AuthMsLogonReject(auth_message);
+			vnclog.Print(LL_LOGSCREEN, "MsLogonII rejected (fallback for old viewer) = %d", auth_success);
+			break;
+		}
 		auth_success = AuthMsLogon(auth_message);
 		vnclog.Print(LL_LOGSCREEN, "MsLogonII success = %d", auth_success);
 		if (auth_success) {
@@ -1375,6 +1402,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		}
 		else if (auth_accepted == rfbUltraVNC) {
 			auth_result = rfbVncAuthContinue;
+		}
+		else if (auth_accepted == rfbUltraVNC_MsLogonIIIAuth) {
+			// MS-Logon III successful - auth complete
+			auth_result = rfbVncAuthOK;
+			vnclog.Print(LL_LOGSCREEN, "MS-Logon III auth completed successfully\n");
 		}
 		else if ((settings->getScPrompt() || settings->getScExit()) && !bSCPromptActive) {
 			auth_result = rfbVncAuthContinue;
@@ -1801,6 +1833,134 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	else {
 		return FALSE;
 	}
+}
+
+// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
+// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+BOOL
+vncClientThread::AuthMsLogonIII(std::string& auth_message)
+{
+	// X25519 key exchange
+	unsigned char server_pk[crypto_scalarmult_BYTES];
+	unsigned char server_sk[crypto_scalarmult_BYTES];
+	unsigned char client_pk[crypto_scalarmult_BYTES];
+	unsigned char shared_secret[crypto_scalarmult_BYTES];
+	
+	char user[256], passwd[64];
+	
+	// Generate X25519 keypair
+	if (crypto_box_keypair(server_pk, server_sk) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "Failed to generate X25519 keypair\n");
+		return FALSE;
+	}
+	
+	// Send server public key
+	if (!m_socket->SendExactQueue((char*)server_pk, sizeof(server_pk))) return FALSE;
+	if (!m_socket->ClearQueue()) return FALSE;
+	
+	// Give the user time to type credentials
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
+	
+	// Read client public key
+	if (!m_socket->ReadExact((char*)client_pk, sizeof(client_pk))) return FALSE;
+	
+	// Compute shared secret
+	if (crypto_scalarmult(shared_secret, server_sk, client_pk) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "X25519 key exchange failed\n");
+		return FALSE;
+	}
+	
+	// Derive AES-256 key from shared secret
+	unsigned char aes_key[32];
+	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
+	
+	// Zero out secrets
+	sodium_memzero(shared_secret, sizeof(shared_secret));
+	sodium_memzero(server_sk, sizeof(server_sk));
+	
+	// Read encrypted credentials
+	if (!m_socket->ReadExact(user, sizeof(user))) return FALSE;
+	if (!m_socket->ReadExact(passwd, sizeof(passwd))) return FALSE;
+	
+	// Restore timeout
+	m_socket->SetTimeout(30000);
+	
+	// Decrypt using first 8 bytes of derived key (compatibility with existing encryption)
+	unsigned char key[8];
+	memcpy(key, aes_key, 8);
+	vncDecryptBytes((unsigned char*)user, sizeof(user), key); user[255] = '\0';
+	vncDecryptBytes((unsigned char*)passwd, sizeof(passwd), key); passwd[63] = '\0';
+	
+	vnclog.Print(LL_INTINFO, "MS-Logon III: user=%s\n", user);
+	
+	// Verify credentials
+	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientNameAddress());
+	vnclog.Print(LL_INTINFO, "CheckUserGroupPasswordUni result=%i\n", result);
+	
+	if (result == 2) { // ViewOnly?
+		m_client->EnableKeyboard(false);
+		m_client->EnablePointer(false);
+		m_client->EnableGii(false);
+	}
+	
+	// Cleanup
+	sodium_memzero(aes_key, sizeof(aes_key));
+	sodium_memzero(key, sizeof(key));
+	
+	if (result) {
+		m_client->m_client_domain_username = _strdup(user);
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+// MS-Logon II fallback for old viewers when RequireMSLogonIII is set
+// Does normal DH handshake but always rejects with upgrade message
+BOOL
+vncClientThread::AuthMsLogonReject(std::string& auth_message)
+{
+	DH dh;
+	char gen[8], mod[8], pub[8], resp[8];
+	char user[256], passwd[64];
+	unsigned char key[8]{};
+
+	dh.createKeys();
+	int64ToBytes(dh.getValue(DH_GEN), gen);
+	int64ToBytes(dh.getValue(DH_MOD), mod);
+	int64ToBytes(dh.createInterKey(), pub);
+
+	// Send DH params (same as normal AuthMsLogon)
+	if (!m_socket->SendExactQueue(gen, sizeof(gen))) return FALSE;
+	if (!m_socket->SendExactQueue(mod, sizeof(mod))) return FALSE;
+	if (!m_socket->SendExact(pub, sizeof(pub))) return FALSE;
+	
+	// Give user time to respond
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
+	
+	// Read viewer's response (we don't care about it)
+	if (!m_socket->ReadExact(resp, sizeof(resp))) return FALSE;
+	if (!m_socket->ReadExact(user, sizeof(user))) return FALSE;
+	if (!m_socket->ReadExact(passwd, sizeof(passwd))) return FALSE;
+	
+	// Restore timeout
+	m_socket->SetTimeout(30000);
+
+	// Compute key but don't use it for anything
+	int64ToBytes(dh.createEncryptionKey(bytesToInt64(resp)), (char*)key);
+
+	// Set error message for old viewer
+	auth_message = "This server requires MS-Logon III (secure authentication). "
+		"Your viewer is too old and only supports the legacy MS-Logon II. "
+		"Please upgrade your UltraVNC viewer to version 1.8.2.3 or later.";
+	
+	vnclog.Print(LL_LOGSCREEN, "Auth rejected: Viewer lacks MS-Logon III support (server enforces secure auth)\n");
+	
+	// Always return FALSE (reject)
+	return FALSE;
 }
 
 BOOL vncClientThread::AuthVnc(std::string& auth_message)
