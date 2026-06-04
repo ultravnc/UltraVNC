@@ -229,6 +229,12 @@ Read_settings()
 		saved_portHTTP=80;
 		saved_usecom=0;
 		Save_settings();
+		/* Show password on first run - GUI app has no console */
+		{
+			char msg[512];
+			sprintf_s(msg, 512, "UltraVNC Repeater first run configuration saved.\n\nConnect to: http://localhost:%d/\nUser: admin\nPassword: %s\n\nPlease save this password. It will not be shown again.", saved_portHTTP, saved_password);
+			MessageBox(NULL, msg, "UltraVNC Repeater - Admin Password", MB_OK | MB_ICONINFORMATION);
+		}
 	}
 	else
 	{

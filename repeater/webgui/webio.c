@@ -586,7 +586,7 @@ wi_parseheader( wi_sess * sess )
    if (i ==38)
    {
 	  wi_senderr(sess, 333);
-      return error;
+      return WIE_BADFILE;
    }
 
 
