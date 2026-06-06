@@ -50,7 +50,7 @@ void UdpEchoServer(int port)
         char buffer[1024];
         sockaddr_in clientAddr;
         int clientAddrSize = sizeof(clientAddr);
-        int bytesReceived = recvfrom(serverSocket, buffer, sizeof(buffer), 0, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrSize);
+        int bytesReceived = recvfrom(serverSocket, buffer, sizeof(buffer) -1, 0, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrSize);
         if (bytesReceived == SOCKET_ERROR) {
             continue; // Continue to next iteration
         }
