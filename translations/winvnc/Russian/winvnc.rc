@@ -381,14 +381,14 @@ IDD_FORM_Notifications DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Рамка вокруг общего экрана",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,167,10
+    CONTROL         "Рамка вокруг общего экрана",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,331,10
     CONTROL         "Всплывающее уведомление при подключении viewer",IDC_NOTIFOCATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,160,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,331,10
     CONTROL         "Всегда показывать уведомление, использовать клиентское при наличии",IDC_RADIONOTIFICATIONON,
-                    "Button",BS_AUTORADIOBUTTON,39,45,250,10
+                    "Button",BS_AUTORADIOBUTTON,39,45,305,10
     CONTROL         "Показывать, только если клиент передал тест уведомления",IDC_RADIONOTIFICATIONIFPROVIDED,
-                    "Button",BS_AUTORADIOBUTTON,39,57,182,10
-    CONTROL         "Использовать OSD вместо окна",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,120,10
+                    "Button",BS_AUTORADIOBUTTON,39,57,305,10
+    CONTROL         "Использовать OSD вместо окна",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,305,10
     GROUPBOX        "Уведомление",IDC_STATIC,7,7,344,78
 END
 
@@ -397,17 +397,17 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Клавиатура и мышь",IDC_STATIC,7,7,344,58,BS_LEFT
-    CONTROL         "Откл. ввод viewer",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
-    CONTROL         "Откл. локальный ввод",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
-    CONTROL         "Национальная клавиатура",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
-    CONTROL         "Помощник клавиатуры Windows 8",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,110,10
-    CONTROL         "Междунар. клавиши",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,74,10
-    CONTROL         "Совместный",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,58,10
-    CONTROL         "Включить",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,77,36,10
+    CONTROL         "Откл. ввод viewer",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,158,10
+    CONTROL         "Откл. локальный ввод",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,158,10
+    CONTROL         "Национальная клавиатура",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,158,10
+    CONTROL         "Помощник клавиатуры Windows 8",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,158,10
+    CONTROL         "Междунар. клавиши",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,158,10
+    CONTROL         "Совместный",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,158,10
+    CONTROL         "Включить",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,77,158,10
     CONTROL         "Имперсонация пользователя (только служба)",IDC_FTUSERIMPERSONATION_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,89,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,89,149,10
     GROUPBOX        "Передача файлов",IDC_STATIC,7,66,344,41
-    CONTROL         "Фикс. форму курсора",IDC_FORCE_SHAPE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,52,89,10
+    CONTROL         "Фикс. форму курсора",IDC_FORCE_SHAPE,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,52,158,10
 END
 
 IDD_ADMINPASSWORD DIALOGEX 0, 0, 256, 52
@@ -440,24 +440,24 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Разное",IDC_STATIC,7,7,344,197,BS_LEFT
     CONTROL         "Убирать обои при подключении",IDC_REMOVE_WALLPAPER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,134,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,227,10
     CONTROL         "Гасить монитор по запросу viewer",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,144,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,227,10
     CONTROL         "При запросе гашения отключать только ввод",IDC_BLANK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
-    CONTROL         "Отключить значок в трее",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,217,10
+    CONTROL         "Отключить значок в трее",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,227,10
     CONTROL         "Откл. клиентские пункты в меню трея",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,227,10
     CONTROL         "Запретить пользователю закрывать UltraVNC Server",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,227,10
     LTEXT           "Масштаб экрана сервера по умолч.",IDC_STATIC,14,116,100,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
-    CONTROL         "Режим RDP",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
-    CONTROL         "Откл. заставку",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
+    CONTROL         "Режим RDP",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,227,10
+    CONTROL         "Откл. заставку",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,227,10
     LTEXT           "Экран по умолч.",IDC_STATIC,14,129,47,8
-    CONTROL         "Основной",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
-    CONTROL         "Вторичный",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
-    LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,40,8
+    CONTROL         "Основной",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,48,10
+    CONTROL         "Вторичный",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,61,10
+    LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,53,8
     COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "(restart required)",IDC_STATIC,180,145,60,8
 END

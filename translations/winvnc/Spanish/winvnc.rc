@@ -829,14 +829,14 @@ IDD_FORM_Notifications DIALOGEX 0, 0, 361, 211
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Marco indicador alrededor de pantalla compartida",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,167,10
+    CONTROL         "Marco indicador alrededor de pantalla compartida",IDC_FRAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,21,331,10
     CONTROL         "Mostrar notificación popup al conectar viewer",IDC_NOTIFOCATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,160,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,32,331,10
     CONTROL         "Siempre mostrar notificación, usar la del cliente si disponible",IDC_RADIONOTIFICATIONON,
-                    "Button",BS_AUTORADIOBUTTON,39,45,250,10
+                    "Button",BS_AUTORADIOBUTTON,39,45,305,10
     CONTROL         "Mostrar solo si el cliente proporciona info de notificación",IDC_RADIONOTIFICATIONIFPROVIDED,
-                    "Button",BS_AUTORADIOBUTTON,39,57,182,10
-    CONTROL         "Usar OSD en lugar de popup",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,120,10
+                    "Button",BS_AUTORADIOBUTTON,39,57,305,10
+    CONTROL         "Usar OSD en lugar de popup",IDC_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,39,69,305,10
     GROUPBOX        "Notificación",IDC_STATIC,7,7,344,78
 END
 
@@ -845,12 +845,12 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Teclado && Ratón",IDC_STATIC,7,7,344,49,BS_LEFT
-    CONTROL         "Deshabilitar entradas del Viewer",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,92,10
-    CONTROL         "Deshabilitar entradas locales",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,83,10
-    CONTROL         "Teclado alternativo",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,89,10
-    CONTROL         "Ayudante de teclado Windows 8",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,110,10
-    CONTROL         "Teclas internacionales",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,74,10
-    CONTROL         "Colaborativo",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,58,10
+    CONTROL         "Deshabilitar entradas del Viewer",IDC_DISABLE_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,17,158,10
+    CONTROL         "Deshabilitar entradas locales",IDC_DISABLE_LOCAL_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,29,158,10
+    CONTROL         "Teclado alternativo",IDC_JAP_INPUTS,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,41,158,10
+    CONTROL         "Ayudante de teclado Windows 8",IDC_WIN8_HELPER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,30,158,10
+    CONTROL         "Teclas internacionales",IDC_UNICODE_INPUTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,18,158,10
+    CONTROL         "Colaborativo",IDC_COLLABO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,42,158,10
     CONTROL         "Habilitar",IDC_FILETRANSFER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,67,36,10
     CONTROL         "Suplantación de usuario (solo para Servicio)",IDC_FTUSERIMPERSONATION_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,79,133,10
@@ -887,24 +887,24 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Varios",IDC_STATIC,7,7,344,197,BS_LEFT
     CONTROL         "Quitar fondo de pantalla durante conexión",IDC_REMOVE_WALLPAPER,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,134,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,17,227,10
     CONTROL         "Habilitar pantalla en negro a petición del viewer",IDC_BLANK,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,144,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,29,227,10
     CONTROL         "Deshabilitar solo entradas en petición de pantalla negra",IDC_BLANK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,142,10
-    CONTROL         "Deshabilitar icono de bandeja",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,67,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,41,217,10
+    CONTROL         "Deshabilitar icono de bandeja",IDC_DISABLETRAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,65,227,10
     CONTROL         "Deshabilitar opciones de clientes en menú de bandeja",IDC_ALLOWEDITCLIENTS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,141,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,227,10
     CONTROL         "Prohibir al usuario cerrar UltraVNC Server",IDC_ALLOWSHUTDOWN,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,194,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,227,10
     LTEXT           "Escala de pantalla predeterminada",IDC_STATIC,14,116,100,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
-    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
-    CONTROL         "Prevenir protector de pantalla",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
+    CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,227,10
+    CONTROL         "Prevenir protector de pantalla",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,227,10
     LTEXT           "Pantalla predeterminada",IDC_STATIC,14,129,47,8
-    CONTROL         "Principal",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,40,10
-    CONTROL         "Secundario",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,50,10
-    LTEXT           "Idioma",IDC_LANGUAGE_LABEL,14,145,40,8
+    CONTROL         "Principal",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,48,10
+    CONTROL         "Secundario",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,61,10
+    LTEXT           "Idioma",IDC_LANGUAGE_LABEL,14,145,53,8
     COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "(requiere reinicio)",IDC_STATIC,180,145,70,8
 END
