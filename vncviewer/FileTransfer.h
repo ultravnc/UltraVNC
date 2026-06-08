@@ -78,6 +78,8 @@ public:
 	char				m_szLastLocalPath[_MAX_PATH];
 	char				m_szLastRemotePath[_MAX_PATH];
 	WCHAR				m_szLastRemotePathW[_MAX_PATH];
+	WCHAR				m_szHeadlessRemotePathW[MAX_PATH * 4];
+	bool				m_fHeadlessUpload;
 	int                 m_nLastLocalAttemptItem;
 	char                m_szLastLocalAttemptName[MAX_PATH + 2];
 	WCHAR               m_szLastLocalAttemptNameW[MAX_PATH + 2];
@@ -145,6 +147,7 @@ public:
 	// Methods
 	FileTransfer(VNCviewerApp *pApp, ClientConnection *pCC);
 	int DoDialog();
+	void DoUploadFile(LPCWSTR szLocalPath, LPCWSTR szRemotePath);
    	virtual ~FileTransfer();
 	static BOOL CALLBACK FileTransferDlgProc(HWND hwndDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	static BOOL CALLBACK LFBWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -195,6 +198,7 @@ public:
 	void ListDrives(HWND hWnd);
 	void RequestRemoteDirectoryContentW(HWND hWnd, LPCWSTR szPathW); // Unicode wrapper
 	void CreateRemoteDirectory(LPSTR szDir);
+	void CreateRemoteDirectoryPath(LPCWSTR szFullPathW);
 	void CreateRemoteDirectoryW(LPCWSTR szDirW); // Unicode wrapper
     void DeleteRemoteFile(std::string szFile);
 	bool CreateRemoteDirectoryFeedback(long lSize, UINT nLen);

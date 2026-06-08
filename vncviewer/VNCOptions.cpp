@@ -235,6 +235,8 @@ VNCOptions::VNCOptions()
 	m_fRequireEncryption = false;
 	m_UseOnlyDefaultConfigFile = true;
 	m_preemptiveUpdates = true;
+	m_szUploadLocal[0] = L'\0';
+	m_szUploadRemote[0] = L'\0';
 	m_saved_scale_num = 100;
 	m_saved_scale_den = 100;
 	m_saved_scaling = false;
@@ -444,6 +446,8 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	//adzm 2010-07-04
 	m_preemptiveUpdates = s.m_preemptiveUpdates;
+	wcscpy_s(m_szUploadLocal, s.m_szUploadLocal);
+	wcscpy_s(m_szUploadRemote, s.m_szUploadRemote);
 
 	return *this;
 }
@@ -1003,6 +1007,22 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			//adzm 2010-07-04
 			m_preemptiveUpdates = true;
 		}
+		else if (SwitchMatch(args[j], _T("uploadlocal")))
+		{
+			if (++j == i) {
+				ArgError(_T("No local path specified for -uploadlocal"));
+				continue;
+			}
+			wcscpy_s(m_szUploadLocal, _countof(m_szUploadLocal), args[j]);
+		}
+		else if (SwitchMatch(args[j], _T("uploadremote")))
+		{
+			if (++j == i) {
+				ArgError(_T("No remote path specified for -uploadremote"));
+				continue;
+			}
+			wcscpy_s(m_szUploadRemote, _countof(m_szUploadRemote), args[j]);
+		}
 		else if (SwitchMatch(args[j], _T("enablecache")))
 		{
 			//adzm 2010-08
@@ -1370,6 +1390,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/autoacceptincoming] [/autoacceptnodsm] [/disablesponsor][/InfoMsg \"Messages need quotes\"]\r\n" //adzm 2009-06-21, adzm 2009-07-19
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
 			"      [/gnome] [/hideendofstreamerror]\r\n"
+			"      [/uploadlocal fullfilename /uploadremote path]\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_A2, MB_ICONINFORMATION);

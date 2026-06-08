@@ -172,6 +172,14 @@ typedef BOOL (WINAPI *PGETDISKFREESPACEEX)(LPCSTR,PULARGE_INTEGER, PULARGE_INTEG
 
 static FileTransfer* g_FileTransferSingleton = NULL;
 
+// Global headless-upload flag. Kept OUTSIDE the FileTransfer object because the
+// per-instance members (m_fHeadlessUpload / m_szHeadlessRemotePathW) get zeroed
+// by a memory corruption during the transfer. A file-scope global is immune to that.
+// Must be volatile: DoUploadFile runs on the main thread, but SendFileChunk /
+// FinishFileSending are called from the multimedia timer thread (timeSetEvent),
+// so without volatile the timer thread can read a stale cached value.
+static volatile bool g_fHeadlessUpload = false;
+
 HWND hFTWnd = 0;
 static std::string make_temp_filename(const char *szRemoteFileName)
 {
@@ -326,6 +334,8 @@ FileTransfer::FileTransfer(VNCviewerApp *l_pApp, ClientConnection *pCC)
 	{
 		yesUVNCMessageBox(m_hInstResDLL, NULL, sz_E1, sz_E2, MB_ICONEXCLAMATION );
     }
+	m_szHeadlessRemotePathW[0] = L'\0';
+	m_fHeadlessUpload = false;
 	InitializeCriticalSection(&crit);
 	rfbFileHeaderRequested = false;
 	rfbFileTransferOfferRequested = false;
@@ -793,6 +803,12 @@ bool FileTransfer::TestPermission(long lSize, int nVersion)
         StartFTSession();
 		RequestRemoteDrives();
 		SetStatus(sz_H4);
+		
+		// If headless upload mode, trigger auto-upload after permission granted
+		if (g_fHeadlessUpload && hWnd)
+		{
+			PostMessage(hWnd, WM_APP + 1, 0, 0);
+		}
 	}
 
 	return true;
@@ -968,6 +984,35 @@ bool FileTransfer::OfferNextFile()
 	}
 	else // All the files have been processed and hopefully received
 	{
+		// In headless mode, close dialog after completion
+		if (g_fHeadlessUpload)
+		{
+			if (m_fAbort)
+				SetStatus(sz_H7);
+			else if (!m_fFileUploadError)
+				SetStatus(sz_H6);
+			
+			Sleep(1000); // Brief delay to show final status
+			
+			m_fFileCommandPending = false;
+			KillFTTimer();
+			g_fHeadlessUpload = false;
+			
+			// Close the dialog
+			EndDialog(hWnd, TRUE);
+			
+			// Close the viewer window
+			if (m_pCC && m_pCC->m_hwndMain)
+			{
+				PostMessage(m_pCC->m_hwndMain, WM_CLOSE, 0, 0);
+			}
+			
+			// Disconnect viewer
+			PostQuitMessage(0);
+			return true;
+		}
+		
+		// Normal interactive mode continues...
 		// Refresh the remote list so new files are displayed and highlighted
 		FTListViewClear(hWndRemoteList);
 		RequestRemoteDirectoryContent(hWnd, L"");
@@ -3401,6 +3446,7 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 	if (!m_fFTAllowed) return false;
 
 #if DEBUG_FT
+	{ WCHAR _dbg[512]; _snwprintf_s(_dbg,512,_TRUNCATE,L"=== OfferLocalFile START: m_szHeadlessRemotePathW=[%s]\n",m_szHeadlessRemotePathW); OutputDebugStringW(_dbg); }
 	{wchar_t debugMsg[2048]; MultiByteToWideChar(CP_ACP,0,szSrcFileName,-1,debugMsg,2048);
 	 OutputDebugStringW(L"=== FT_UPLOAD: OfferLocalFile START ===\n");
 	 OutputDebugStringW(L"  szSrcFileName="); OutputDebugStringW(debugMsg); 
@@ -3529,13 +3575,20 @@ bool FileTransfer::OfferLocalFile(LPSTR szSrcFileName)
 
 	// Build destination path in Unicode to handle Chinese remote paths correctly.
 	WCHAR szDstFileNameW[MAX_PATH * 4];
-	GetDlgItemTextW(hWnd, IDC_CURR_REMOTE, szDstFileNameW, MAX_PATH);
-	if (!wcslen(szDstFileNameW)) return false; // no destination dir selected
-	// Append local filename from Unicode source path (avoids CP_ACP corruption)
+	if (hWnd != NULL)
 	{
+		GetDlgItemTextW(hWnd, IDC_CURR_REMOTE, szDstFileNameW, MAX_PATH);
+		if (!wcslen(szDstFileNameW)) return false; // no destination dir selected
+		// Append local filename from Unicode source path (avoids CP_ACP corruption)
 		const WCHAR* pSrcBasenameW = wcsrchr(m_szSrcFileNameW, L'\\');
 		if (pSrcBasenameW) pSrcBasenameW++; else pSrcBasenameW = m_szSrcFileNameW;
 		wcscat_s(szDstFileNameW, MAX_PATH * 4, pSrcBasenameW);
+	}
+	else
+	{
+		// Headless mode: full remote destination path is in m_szHeadlessRemotePathW
+		if (!m_szHeadlessRemotePathW[0]) return false;
+		wcscpy_s(szDstFileNameW, _countof(szDstFileNameW), m_szHeadlessRemotePathW);
 	}
 	// Convert full Unicode dest path to CP_ACP for legacy szDstFileName
 	char szDstFileName[MAX_PATH * 4];
@@ -4099,6 +4152,10 @@ bool FileTransfer::FinishFileSending()
 	if (!m_fFileUploadRunning) return false;
 
 #if DEBUG_FT
+	{ WCHAR _dbg[512]; _snwprintf_s(_dbg,512,_TRUNCATE,L"=== FinishFileSending: this=0x%p g_fHeadlessUpload=%d m_szHeadlessRemotePathW=[%s]\n",(void*)this,(int)g_fHeadlessUpload,m_szHeadlessRemotePathW); OutputDebugStringW(_dbg); }
+#endif
+
+#if DEBUG_FT
 	OutputDebugStringW(L"=== FT_UPLOAD: FinishFileSending ===\n");
 	{wchar_t debugMsg[256]; _snwprintf_s(debugMsg,256,_TRUNCATE,L"  m_fFileUploadError=%d, m_fEof=%d, TotalBytes=%I64d\n", m_fFileUploadError, m_fEof, m_dwTotalNbBytesRead);
 	 OutputDebugStringW(debugMsg);}
@@ -4128,11 +4185,31 @@ bool FileTransfer::FinishFileSending()
 		OutputDebugStringW(L"  rfbEndOfFile message sent successfully\n");
 #endif
 		// Flush the write queue to ensure rfbEndOfFile is sent before any subsequent messages
-		m_pCC->FlushWriteQueue();
+		// In headless mode, skip flush to avoid potential iterator crashes during cleanup
 #if DEBUG_FT
-		OutputDebugStringW(L"  Write queue flushed\n");
+		OutputDebugStringW(L"  About to check headless mode for FlushWriteQueue\n");
+		{ WCHAR _dbg[256]; _snwprintf_s(_dbg,256,_TRUNCATE,L"  m_szHeadlessRemotePathW[0]=%d\n",(int)m_szHeadlessRemotePathW[0]); OutputDebugStringW(_dbg); }
 #endif
-		sprintf_s(szStatus, " %ls < %s > %ls", sz_H17, m_szSrcFileName, sz_H27/*, (int)((lTotalComp * 100) / dwTotalNbBytesWritten), fCompress ? "C" : "N"*//*, szDstFileName*/); 
+		if (!g_fHeadlessUpload) {
+#if DEBUG_FT
+			OutputDebugStringW(L"  Calling FlushWriteQueue (non-headless mode)\n");
+#endif
+			m_pCC->FlushWriteQueue();
+#if DEBUG_FT
+			OutputDebugStringW(L"  Write queue flushed\n");
+#endif
+		} else {
+#if DEBUG_FT
+			OutputDebugStringW(L"  Skipping FlushWriteQueue in headless mode\n");
+#endif
+		}
+#if DEBUG_FT
+		OutputDebugStringW(L"  About to sprintf_s szStatus\n");
+#endif
+		sprintf_s(szStatus, " %ls < %s > %ls", sz_H17, m_szSrcFileName, sz_H27/*, (int)((lTotalComp * 100) / dwTotalNbBytesWritten), fCompress ? "C" : "N"*//*, szDstFileName*/);
+#if DEBUG_FT
+		OutputDebugStringW(L"  sprintf_s completed\n");
+#endif 
 	}
 	else // Error during File Transfer loop
 	{
@@ -4149,6 +4226,9 @@ bool FileTransfer::FinishFileSending()
 		sprintf_s(szStatus, " %ls < %s > %ls", sz_H19, m_szSrcFileName, sz_H28); 
 	}
 
+#if DEBUG_FT
+	OutputDebugStringW(L"  After error/success block, about to check directory zip\n");
+#endif
 	// If the transfered file is a Directory zip, we delete it locally, whatever the result of the transfer
 	if (!strncmp(strrchr(m_szSrcFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
 	{
@@ -4157,30 +4237,68 @@ bool FileTransfer::FinishFileSending()
 		DeleteFileW(szSrcFileNameW);
 		if (!m_fFileUploadError)
 		{
-			char szDirectoryName[MAX_PATH * 3];
-			char *p = strrchr(m_szSrcFileName, '\\');
-			char *p1 = strchr(p, '-');
-			strcpy_s(szDirectoryName, p1 + 1);
-			szDirectoryName[strlen(szDirectoryName) - 4] = '\0'; // Remove '.zip'
-			// sprintf_s(szStatus, " %s < %s > %s - Not really sent: %ld", sz_H66, szDirectoryName, sz_H70, m_nNotSent);
-			{ wchar_t _wdn5[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirectoryName,-1,_wdn5,MAX_PATH * 4); wchar_t szStatusW13[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW13, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H66,_wdn5,sz_H70); SetStatus(szStatusW13); }
+			// Only update GUI in non-headless mode
+			if (!g_fHeadlessUpload) {
+				char szDirectoryName[MAX_PATH * 3];
+				char *p = strrchr(m_szSrcFileName, '\\');
+				char *p1 = strchr(p, '-');
+				strcpy_s(szDirectoryName, p1 + 1);
+				szDirectoryName[strlen(szDirectoryName) - 4] = '\0'; // Remove '.zip'
+				// sprintf_s(szStatus, " %s < %s > %s - Not really sent: %ld", sz_H66, szDirectoryName, sz_H70, m_nNotSent);
+				{ wchar_t _wdn5[MAX_PATH * 4]; MultiByteToWideChar(CP_ACP,0,szDirectoryName,-1,_wdn5,MAX_PATH * 4); wchar_t szStatusW13[MAX_PATH * 4 + 64]; _snwprintf_s(szStatusW13, MAX_PATH * 4 + 64,_TRUNCATE,L" %s < %s > %s",sz_H66,_wdn5,sz_H70); SetStatus(szStatusW13); }
+			}
 		}
 	}
 	else
 	{
-		wchar_t szStatusW13[512]; _snwprintf_s(szStatusW13,512,_TRUNCATE,L" (status not set)"); SetStatus(szStatusW13);
+		// Only update GUI in non-headless mode
+		if (!g_fHeadlessUpload) {
+			wchar_t szStatusW13[512]; _snwprintf_s(szStatusW13,512,_TRUNCATE,L" (status not set)"); SetStatus(szStatusW13);
+		}
 	}
-	UpdateWindow(hWnd);
 
-    // hide the stop button
-    ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_HIDE);
-	ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B2), SW_HIDE);
-	// Sound notif
-	//MessageBeep(-1);
+#if DEBUG_FT
+	OutputDebugStringW(L"  After directory/status block, about to check GUI operations\n");
+#endif
+	// Only perform GUI operations in non-headless mode
+	if (!g_fHeadlessUpload) {
+#if DEBUG_FT
+		OutputDebugStringW(L"  Performing GUI operations (non-headless)\n");
+#endif
+		UpdateWindow(hWnd);
 
-	// Send next file in the list, if any
-	OfferNextFile();
+		// hide the stop button
+		ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B), SW_HIDE);
+		ShowWindow(GetDlgItem(hWnd, IDC_ABORT_B2), SW_HIDE);
+		// Sound notif
+		//MessageBeep(-1);
 
+		// Send next file in the list, if any
+		OfferNextFile();
+	} else {
+		// In headless mode, close dialog after upload completes
+		Sleep(1000); // Brief delay to show final status
+		
+		m_fFileCommandPending = false;
+		KillFTTimer();
+		g_fHeadlessUpload = false;
+		
+		// Close the dialog
+		EndDialog(hWnd, TRUE);
+		
+		// Close the viewer window
+		if (m_pCC && m_pCC->m_hwndMain)
+		{
+			PostMessage(m_pCC->m_hwndMain, WM_CLOSE, 0, 0);
+		}
+		
+		// Disconnect viewer
+		PostQuitMessage(0);
+	}
+
+#if DEBUG_FT
+	OutputDebugStringW(L"  FinishFileSending about to return\n");
+#endif
 	// if (nRet) return true; else return false;
 	// return !m_fFileUploadError;
 	return true;
@@ -4189,6 +4307,39 @@ bool FileTransfer::FinishFileSending()
 
 
 //
+// Create all path components of szFullPathW on the remote server.
+// e.g. "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup\"
+// sends rfbCDirCreate for each successive component.
+//
+void FileTransfer::CreateRemoteDirectoryPath(LPCWSTR szFullPathW)
+{
+	// Work on a mutable copy, strip trailing backslash
+	WCHAR szPath[MAX_PATH * 2];
+	wcscpy_s(szPath, szFullPathW);
+	size_t nLen = wcslen(szPath);
+	if (nLen > 0 && szPath[nLen - 1] == L'\\')
+		szPath[--nLen] = L'\0';
+
+	// Walk each component from root and create progressively deeper dirs.
+	// Start after the drive letter (e.g. skip "C:")
+	WCHAR* p = szPath;
+	if (nLen >= 2 && szPath[1] == L':')
+		p = szPath + 2; // skip "C:"
+
+	while ((p = wcschr(p + 1, L'\\')) != NULL)
+	{
+		*p = L'\0';
+		char szDirUTF8[MAX_PATH * 3];
+		WideCharToMultiByte(CP_UTF8, 0, szPath, -1, szDirUTF8, _countof(szDirUTF8), NULL, NULL);
+		CreateRemoteDirectory(szDirUTF8);
+		*p = L'\\';
+	}
+	// Create the full path itself
+	char szDirUTF8[MAX_PATH * 3];
+	WideCharToMultiByte(CP_UTF8, 0, szPath, -1, szDirUTF8, _countof(szDirUTF8), NULL, NULL);
+	CreateRemoteDirectory(szDirUTF8);
+}
+
 // Request the creation of a directory on the remote machine
 //
 void FileTransfer::CreateRemoteDirectory(LPSTR szDir)
@@ -4799,9 +4950,133 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			}
 
             l_this->CheckButtonState(hWnd);
+
+			// Mark headless mode if command-line upload parameters present
+			if (l_this->m_pCC->m_opts->m_szUploadLocal[0] != L'\0' && l_this->m_pCC->m_opts->m_szUploadRemote[0] != L'\0')
+			{
+				g_fHeadlessUpload = true;
+			}
+
             return TRUE;
 		}
 		break;
+
+	case WM_APP + 1:
+		// Auto-setup FT dialog from command line paths, then trigger upload
+		{
+			FileTransfer *_this = helper::SafeGetWindowUserData<FileTransfer>(hWnd);
+			if (!_this) return 0;
+			LPCWSTR szLocalPath = _this->m_pCC->m_opts->m_szUploadLocal;
+			LPCWSTR szRemotePath = _this->m_pCC->m_opts->m_szUploadRemote;
+			if (szLocalPath[0] == L'\0' || szRemotePath[0] == L'\0') return 0;
+
+			// Verify local file exists
+			if (GetFileAttributesW(szLocalPath) == INVALID_FILE_ATTRIBUTES)
+			{
+				WCHAR szError[512];
+				_snwprintf_s(szError, 512, _TRUNCATE, L"Local file not found:\n%s", szLocalPath);
+				MessageBoxW(hWnd, szError, L"Upload Error", MB_OK | MB_ICONERROR);
+				g_fHeadlessUpload = false;
+				EndDialog(hWnd, FALSE);
+				PostQuitMessage(1);
+				return 0;
+			}
+
+			// Minimize viewer window NOW (after dialog is shown)
+			if (_this->m_pCC->m_hwndMain)
+				ShowWindow(_this->m_pCC->m_hwndMain, SW_MINIMIZE);
+
+			// Extract local folder and filename
+			WCHAR szLocalDir[MAX_PATH * 2];
+			WCHAR szFileName[MAX_PATH];
+			wcscpy_s(szLocalDir, szLocalPath);
+			WCHAR* pSlash = wcsrchr(szLocalDir, L'\\');
+			if (pSlash) {
+				wcscpy_s(szFileName, pSlash + 1);
+				*(pSlash + 1) = L'\0'; // Keep trailing backslash in dir
+			} else {
+				wcscpy_s(szFileName, szLocalPath);
+				szLocalDir[0] = L'.'; szLocalDir[1] = L'\\'; szLocalDir[2] = L'\0';
+			}
+
+			// Extract remote folder (without trailing backslash for creation)
+			WCHAR szRemoteDir[MAX_PATH * 2];
+			WCHAR szRemoteDisplay[MAX_PATH * 2];
+			wcscpy_s(szRemoteDir, szRemotePath);
+			pSlash = wcsrchr(szRemoteDir, L'\\');
+			if (pSlash) {
+				*pSlash = L'\0'; // Remove backslash for clean dir path
+				swprintf_s(szRemoteDisplay, L"%s\\", szRemoteDir); // Add back for display
+			} else {
+				szRemoteDir[0] = L'\0';
+				wcscpy_s(szRemoteDisplay, szRemotePath);
+			}
+			// Set local path and populate list
+			SetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szLocalDir);
+			_this->PopulateLocalListBoxW(hWnd, szLocalDir);
+
+			// Find and select the file in the local list
+			HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
+			int nCount = ListView_GetItemCount(hWndLocalList);
+			for (int i = 0; i < nCount; i++) {
+				LVITEMW ItemW;
+				memset(&ItemW, 0, sizeof(ItemW));
+				ItemW.mask = LVIF_PARAM;
+				ItemW.iItem = i;
+				SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
+				std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
+				if (pNameW && _wcsicmp(pNameW->c_str(), szFileName) == 0) {
+					ListView_SetItemState(hWndLocalList, i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+					ListView_EnsureVisible(hWndLocalList, i, FALSE);
+					break;
+				}
+			}
+
+			// Set remote path display (with backslash)
+			SetDlgItemTextW(hWnd, IDC_CURR_REMOTE, szRemoteDisplay);
+
+			// Create remote directory if it doesn't exist
+			if (szRemoteDir[0] != L'\0')
+			{
+				_this->CreateRemoteDirectoryPath(szRemoteDir);
+				
+				// Wait for directory creation
+				DWORD dwStart = GetTickCount();
+				while (_this->m_fFileCommandPending && (GetTickCount() - dwStart < 3000))
+				{
+					MSG msg;
+					while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+					{
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
+					}
+					Sleep(50);
+				}
+			}
+
+			// Navigate to remote folder and wait for response
+			_this->m_fFileCommandPending = true;
+			_this->RequestRemoteDirectoryContent(hWnd, szRemoteDisplay);
+
+			// Wait for remote directory content to arrive
+			DWORD dwStart = GetTickCount();
+			while (_this->m_fFileCommandPending && (GetTickCount() - dwStart < 5000))
+			{
+				MSG msg;
+				while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+				Sleep(50);
+			}
+
+			// Trigger upload
+			_this->CheckButtonState(hWnd);
+			EnableWindow(GetDlgItem(hWnd, IDC_UPLOAD_B), TRUE);
+			PostMessage(hWnd, WM_COMMAND, MAKEWPARAM(IDC_UPLOAD_B, BN_CLICKED), (LPARAM)GetDlgItem(hWnd, IDC_UPLOAD_B));
+		}
+		return 0;
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
@@ -4817,7 +5092,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 		// Send selected files
 		case IDC_UPLOAD_B:
 			{
-			if (_this->m_fFileCommandPending) break;
+			OutputDebugStringW(L"IDC_UPLOAD_B: handler entered\n");
+			if (_this->m_fFileCommandPending) { OutputDebugStringW(L"IDC_UPLOAD_B: FileCommandPending, breaking\n"); break;}
 
 			int nSelected = -1;
 			int nCount = 0;
@@ -4827,7 +5103,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			// If no destination is set, nothing to do.
 			WCHAR szDstFileW[MAX_PATH + 32];
 			GetDlgItemTextW(hWnd, IDC_CURR_REMOTE, szDstFileW, MAX_PATH + 32);
-			if (!wcslen(szDstFileW)) break;
+			{WCHAR dbg[256]; _snwprintf_s(dbg,256,_TRUNCATE,L"IDC_UPLOAD_B: szDstFileW=[%s] len=%d\n",szDstFileW,(int)wcslen(szDstFileW)); OutputDebugStringW(dbg);}
+			if (!wcslen(szDstFileW)) { OutputDebugStringW(L"IDC_UPLOAD_B: empty dest, breaking\n"); break;}
 
 			// Build [..] mask for up-dir detection
 			WCHAR szUpDirMaskW[16];
@@ -4839,11 +5116,14 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 			// Get all selected files, check if they already exist on remote side
 			_this->m_FilesList.clear();
 			nCount = ListView_GetItemCount(hWndLocalList);
+			{WCHAR dbg[256]; _snwprintf_s(dbg,256,_TRUNCATE,L"IDC_UPLOAD_B: nCount=%d\n",nCount); OutputDebugStringW(dbg);}
 			_this->m_nConfirmAnswer = CONFIRM_YES;
+			int nSelCount = 0;
 			for (nSelected = 0; nSelected < nCount; nSelected++)
 			{
 				if(ListView_GetItemState(hWndLocalList, nSelected, LVIS_SELECTED) & LVIS_SELECTED)
 				{
+					nSelCount++;
 					// Get Unicode filename from lParam
 					LVITEMW ItemW;
 					memset(&ItemW, 0, sizeof(ItemW));
@@ -4851,8 +5131,9 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					ItemW.iItem = nSelected;
 					SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
 					std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
-					if (!pNameW) continue;
+					if (!pNameW) { OutputDebugStringW(L"IDC_UPLOAD_B: pNameW is NULL, skipping\n"); continue; }
 					const WCHAR* szSelW = pNameW->c_str();
+					{WCHAR dbg[256]; _snwprintf_s(dbg,256,_TRUNCATE,L"IDC_UPLOAD_B: selected item %d=[%s]\n",nSelected,szSelW); OutputDebugStringW(dbg);}
 
 					if (_wcsicmp(szSelW, szUpDirMaskW) != 0)
 					{
@@ -4877,6 +5158,7 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					}
 				}
 			}
+			{WCHAR dbg[256]; _snwprintf_s(dbg,256,_TRUNCATE,L"IDC_UPLOAD_B: m_FilesList.size()=%d (nSelCount=%d)\n",(int)_this->m_FilesList.size(),nSelCount); OutputDebugStringW(dbg);}
 			if (_this->m_FilesList.size() == 0) break;
 
 			// Display Status
@@ -6047,6 +6329,136 @@ BOOL CALLBACK FileTransfer::FTConfirmDlgProc(  HWND hwnd,  UINT uMsg, WPARAM wPa
 }
 
 //
+// DoUploadFile: generic headless upload of a single file.
+// Uploads szLocalPath to szRemotePath on the remote server, then disconnects.
+// Works against any old UltraVNC server with file transfer enabled.
+//
+void FileTransfer::DoUploadFile(LPCWSTR szLocalPath, LPCWSTR szRemotePath)
+{
+	// Set IMMEDIATELY - before any network I/O or message pumping.
+	// The MM timer (started by SendFiles on the receive thread) may fire
+	// before we reach the permission-wait loop, so the flag must be set here.
+	g_fHeadlessUpload = true;
+
+	if (!szLocalPath || szLocalPath[0] == L'\0') {
+		g_fHeadlessUpload = false;
+		MessageBoxW(NULL, L"Local path is empty", L"Upload Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+	if (!szRemotePath || szRemotePath[0] == L'\0') {
+		g_fHeadlessUpload = false;
+		MessageBoxW(NULL, L"Remote path is empty", L"Upload Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	// Verify the local file exists
+	if (GetFileAttributesW(szLocalPath) == INVALID_FILE_ATTRIBUTES) {
+		g_fHeadlessUpload = false;
+		WCHAR msg[512];
+		_snwprintf_s(msg, 512, _TRUNCATE, L"Local file not found:\n%s", szLocalPath);
+		MessageBoxW(NULL, msg, L"Upload Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	// --- Phase 1: Request FT permission and wait for server grant ---
+	// When called from WM_APP+1 (after dialog init), permission is already granted
+	// by the dialog's own initialization flow. Only request if not yet granted.
+	if (!m_fFTAllowed)
+	{
+		m_fFileCommandPending = false;
+		RequestPermission();
+
+		DWORD dwPermStart = GetTickCount();
+		while (!m_fFTAllowed && !m_fAbort)
+		{
+			MSG msg;
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			if (GetTickCount() - dwPermStart > 10000) break;
+			Sleep(50);
+		}
+
+		if (!m_fFTAllowed) {
+			g_fHeadlessUpload = false;
+			MessageBoxW(NULL, L"File transfer permission not granted by server.\nTimeout after 10 seconds.", L"Upload Error", MB_OK | MB_ICONERROR);
+			return;
+		}
+	}
+
+	// Ensure remote directory exists (extract parent directory from full file path)
+	WCHAR szRemoteDir[MAX_PATH * 2];
+	wcscpy_s(szRemoteDir, szRemotePath);
+	WCHAR* pLastSlash = wcsrchr(szRemoteDir, L'\\');
+	if (pLastSlash != NULL)
+	{
+		*pLastSlash = L'\0';
+		CreateRemoteDirectoryPath(szRemoteDir);
+	}
+
+	// --- Phase 2: Upload the file ---
+	wcscpy_s(m_szHeadlessRemotePathW, szRemotePath);
+	m_fHeadlessUpload = true;
+	// g_fHeadlessUpload already set to true above before message pumping started
+#if DEBUG_FT
+	{ WCHAR _dbg[512]; _snwprintf_s(_dbg,512,_TRUNCATE,L"=== DoUploadFile: this=0x%p Set g_fHeadlessUpload=true m_szHeadlessRemotePathW=[%s]\n",(void*)this,m_szHeadlessRemotePathW); OutputDebugStringW(_dbg); }
+#endif
+
+	m_fFileCommandPending = true;
+	m_fAbort = false;
+	m_fAborted = false;
+	m_fUserAbortedFileTransfer = false;
+	m_fFileUploadError = false;
+
+#if DEBUG_FT
+	{ WCHAR _dbg[512]; _snwprintf_s(_dbg,512,_TRUNCATE,L"=== DoUploadFile: About to call OfferLocalFileW, m_szHeadlessRemotePathW=[%s]\n",m_szHeadlessRemotePathW); OutputDebugStringW(_dbg); }
+#endif
+	if (OfferLocalFileW(szLocalPath))
+	{
+		DWORD dwStart = GetTickCount();
+		while (m_fFileUploadRunning && !m_fAbort)
+		{
+			MSG msg;
+			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			if (GetTickCount() - dwStart > 300000) break; // 5 min timeout
+			Sleep(50);
+		}
+	}
+
+	// Give server time to process rfbEndOfFile and rename the file from !UVNCPFT-filename to filename
+	// The server renames the file in FinishFileReception() after receiving rfbEndOfFile
+	// We need to wait long enough for the server to complete this operation before disconnecting
+	// Note: Don't pump messages here as it can cause crashes during cleanup
+	if (!m_fAbort && !m_fFileUploadError)
+	{
+		Sleep(2000);
+	}
+
+	// Clean up
+	m_szHeadlessRemotePathW[0] = L'\0';
+	m_fHeadlessUpload = false;
+	g_fHeadlessUpload = false;
+	EndFTSession();
+
+	// Show completion status
+	if (m_fAbort) {
+		MessageBoxW(NULL, L"Upload was aborted.", L"Upload Status", MB_OK | MB_ICONWARNING);
+	} else if (m_fFileUploadError) {
+		MessageBoxW(NULL, L"Upload failed with errors.", L"Upload Status", MB_OK | MB_ICONERROR);
+	} else {
+		WCHAR msg[512];
+		_snwprintf_s(msg, 512, _TRUNCATE, L"Upload completed successfully!\n\nLocal: %s\nRemote: %s", szLocalPath, szRemotePath);
+		MessageBoxW(NULL, msg, L"Upload Complete", MB_OK | MB_ICONINFORMATION);
+	}
+	// Caller will disconnect
+}
+
 //
 //
 void FileTransfer::DisableButtons(HWND hWnd, bool X)

@@ -5488,6 +5488,10 @@ void* ClientConnection::run_undetached(void* arg) {
 	m_running = true;
 	UpdateWindow(m_hwndcn);
 
+	// Auto-trigger file transfer for headless -uploadlocal/-uploadremote mode
+	if (m_opts->m_szUploadLocal[0] != L'\0' && m_opts->m_szUploadRemote[0] != L'\0' && m_fServerKnowsFileTransfer)
+		PostMessage(m_hwndMain, WM_SYSCOMMAND, (WPARAM)ID_FILETRANSFER, 0);
+
 	// sf@2002 - Attempt to speed up the thing
 	// omni_thread::set_priority(omni_thread::PRIORITY_LOW);
 
@@ -8496,6 +8500,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 							return 0;
 						}
 
+						// Headless upload mode: -uploadlocal <local> -uploadremote <remote>
 						// Call File Transfer Dialog
 						_this->m_pFileTransfer->m_fFileTransferRunning = true;
 						_this->m_pFileTransfer->m_fFileCommandPending = false;

@@ -147,6 +147,8 @@ public:
 	bool m_fRequireEncryption;
 	bool m_UseOnlyDefaultConfigFile;
 	bool m_preemptiveUpdates;
+	WCHAR m_szUploadLocal[MAX_PATH * 2];
+	WCHAR m_szUploadRemote[MAX_PATH * 2];
 	void CheckProxyAndHost();
 #ifdef _Gii
 	bool m_giiEnable;
