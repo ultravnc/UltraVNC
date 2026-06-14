@@ -5,7 +5,6 @@
 #define MyAppPublisherURL  "https://uvnc.com/"
 #define MyAppSupportURL    "https://forum.uvnc.com/"
 #define MyAppUpdatesURL    "https://uvnc.com/"
-
 #define Major
 #define Minor
 #define Rev
@@ -212,10 +211,8 @@ Source: "bmp\isdonate.bmp"; Flags: dontcopy
 ; component independent files
 Source: "download\isxdl.dll"; Flags: dontcopy
 ; Add the ISSkin DLL used for skinning Inno Setup installations.
-//Source: "style\ISSkin.dll"; DestDir: "{app}"; Flags: dontcopy
 ; Add the Visual Style resource contains resources used for skinning,
 ; you can also use Microsoft Visual Styles (*.msstyles) resources.
-//Source: "style\Vista.cjstyles"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "icon\UltraVNC.ico"; Flags: dontcopy
 Source: "bmp\WizModernSmallImage-IS.bmp"; Flags: dontcopy
 
@@ -225,7 +222,7 @@ Source: "text\Changes.txt"; DestDir: "{app}"
 Source: "text\Licence.txt"; DestDir: "{app}"
 Source: "text\Info.txt"; DestDir: "{app}"
 
-Source: "ultravnc.cer"; DestDir: "{app}"
+Source: "ultravnc.cer"; DestDir: "{app}"; Flags: deleteafterinstall
 
 ; server files
 ; winvnc.exe needs to be first here because it triggers stopping UltraVNC Server service/app.
@@ -235,7 +232,6 @@ Source: "64\xp\ddengine64.dll"; DestDir: "{app}"; Flags: ignoreversion restartre
 Source: "64\xp\UVncVirtualDisplay64\*"; DestDir: "{app}\UVncVirtualDisplay64"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\repeater.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Repeater
 Source: "64\xp\SecureVNCPlugin64.dsm"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
-//Source: "64\xp\MSRC4Plugin_for_sc.dsm"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer UltraVNC_Server
 Source: "64\xp\uvnckeyboardhelper.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ; MS-Logon I files
 Source: "64\xp\logging.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
@@ -258,14 +254,8 @@ Source: "64\xp\createpassword.exe"; DestDir: "{app}"; Flags: ignoreversion resta
 Source: "64\xp\testauth.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ;Source: "preconfig\ultravnc.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist; MinVersion: 0,5.01; Components: UltraVNC_Server
 
-Source: "64\xp\languages\vnclang_de.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Source: "64\xp\languages\vnclang_es.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Source: "64\xp\languages\vnclang_fr.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Source: "64\xp\languages\vnclang_zh.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Source: "64\xp\languages\winvnclang_de.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
-Source: "64\xp\languages\winvnclang_es.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
-Source: "64\xp\languages\winvnclang_fr.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
-Source: "64\xp\languages\winvnclang_zh.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
+Source: "64\xp\languages\*.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+
 
 ; Vista doesn't have a sas.dll
 Source: "64\xp\sas.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,6.0; OnlyBelowVersion: 0,6.1; Components: UltraVNC_Server
@@ -287,7 +277,7 @@ Name: "{group}\UltraVNC Launcher"; Filename: "{app}\UVNC_Launch.exe"; WorkingDir
 
 Name: "{group}\UltraVNC Server - Settings"; Filename: "{app}\WinVNC.exe"; WorkingDir: "{app}"; Parameters: "-settings"; IconIndex: 0; AfterInstall: SetElevationBit('{group}\UltraVNC Server - Settings.lnk'); Components: UltraVNC_Server
 Name: "{group}\UltraVNC Viewer\UltraVNC Viewer (Listen Mode)"; Filename: "{app}\vncviewer.exe"; WorkingDir: "{app}"; Parameters: "-listen"; Components: UltraVNC_Viewer
-Name: "{group}\UltraVNC Viewer\UltraVNC Viewer (Listen Mode Encrypt))"; Filename: "{app}\vncviewer.exe"; WorkingDir: "{app}"; Parameters: "-dsmplugin SecureVNCPlugin.dsm -listen 5500"; Components: UltraVNC_Viewer
+Name: "{group}\UltraVNC Viewer\UltraVNC Viewer (Listen Mode Encrypt)"; Filename: "{app}\vncviewer.exe"; WorkingDir: "{app}"; Parameters: "-dsmplugin SecureVNCPlugin.dsm -listen 5500"; Components: UltraVNC_Viewer
 
 [Registry]
 Root: HKCR; Subkey: .vnc; ValueType: string; ValueName: ; ValueData: VncViewer.Config; Flags: uninsdeletevalue; Tasks: associate
@@ -319,7 +309,6 @@ Filename: "https://uvnc.com/downloads/ultravnc.html"; Flags: nowait postinstall 
 
 [UninstallRun]
 Filename: "pnputil.exe"; Parameters: "/delete-driver ""{app}\UVncVirtualDisplay64\UVncVirtualDisplay.inf"" /uninstall"; WorkingDir: "{app}\UVncVirtualDisplay64"; Flags: 64bit runhidden; StatusMsg: "{cm:UninstallingVirtualDriver}"
-Filename: "pnputil.exe"; Parameters: "/delete-driver ""{app}\UVncVirtualDisplay\UVncVirtualDisplay.inf"" /uninstall"; WorkingDir: "{app}\UVncVirtualDisplay"; Flags: 64bit runhidden; StatusMsg: "{cm:UninstallingVirtualDriver}"
 Filename: "certutil.exe"; Parameters: "-delstore trustedpublisher 01302f6c9f56b5a7b00d148510a5a59e"; Flags: runhidden; StatusMsg: "{cm:RemovingTrustedPublisher}"
 Filename: "net"; Parameters: "stop uvnc_service"; Flags: runhidden; StatusMsg: "{cm:Stopping, UltraVNC}"; RunOnceId: "StopVncService"; Components: UltraVNC_Server
 Filename: "{app}\WinVNC.exe"; Parameters: "-uninstall"; Flags: runhidden; StatusMsg: "{cm:Removing,UltraVNC}"; RunOnceId: "RemoveVncService"; Components: UltraVNC_Server
@@ -327,6 +316,7 @@ Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name
 Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Server UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
 Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer TCP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+
 [_ISTool]
 UseAbsolutePaths=true
 
@@ -451,6 +441,55 @@ begin
   DonateImage.Cursor := crHand;
   DonateImage.OnClick := @DonateImageOnClick;
   DonateImage.Parent := WizardForm;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  SourceFile, TargetDir, TargetFile: String;
+begin
+  // Check if we're at the "PostInstall" step
+  if CurStep = ssInstall then
+  begin
+    SourceFile := ExpandConstant('{app}\ultravnc.ini');
+    TargetDir := ExpandConstant('{commonappdata}\UltraVNC');
+    TargetFile := TargetDir + '\ultravnc.ini';
+
+    // Check if the source file exists
+    if FileExists(SourceFile) then
+    begin
+      // Check if the target file already exists
+      if not FileExists(TargetFile) then
+      begin
+        // Ensure the target directory exists
+        if not DirExists(TargetDir) then
+        begin
+          if not CreateDir(TargetDir) then
+          begin
+            //MsgBox('Failed to create target directory: ' + TargetDir, mbError, MB_OK);
+            Exit;
+          end;
+        end;
+
+        // Copy the file to the destination
+        if not FileCopy(SourceFile, TargetFile, False) then
+        begin
+          //MsgBox('Failed to copy "' + SourceFile + '" to "' + TargetFile + '".', mbError, MB_OK);
+        end
+        else
+        begin
+          //MsgBox('File "' + SourceFile + '" successfully copied to "' + TargetFile + '".', mbInformation, MB_OK);
+        end;
+      end
+      else
+      begin
+        //MsgBox('Target file "' + TargetFile + '" already exists. Skipping copy.', mbInformation, MB_OK);
+      end;
+    end
+    else
+    begin
+      //MsgBox('Source file "' + SourceFile + '" does not exist.', mbInformation, MB_OK);
+    end;
+  end;
 end;
 
 procedure SetupDefaultConfig;
@@ -599,3 +638,5 @@ end;
 
 [InnoIDE_Settings]
 LogFileOverwrite=false
+
+
