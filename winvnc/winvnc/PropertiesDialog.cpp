@@ -2302,7 +2302,8 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_AUTHREQUIRED))
 		settings->setAuthRequired(SendMessage(GetDlgItem(hwnd, IDC_AUTHREQUIRED), BM_GETCHECK, 0, 0) == BST_CHECKED);
 
-	settings->setAuthhosts(rulesListView->getAuthHost());
+	if (GetDlgItem(hwnd, IDC_IP_ACCESS_CONTROL_LIST))
+		settings->setAuthhosts(rulesListView->getAuthHost());
 
 	if (GetDlgItem(hwnd, IDC_ALLOWUSERSSETTINGS)) {
 		settings->setAllowUserSettingsWithPassword(SendMessage(GetDlgItem(hwnd, IDC_ALLOWUSERSSETTINGS), BM_GETCHECK, 0, 0) == BST_CHECKED);
