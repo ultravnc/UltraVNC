@@ -226,13 +226,13 @@ BEGIN
     CONTROL         "Full-screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
     CONTROL         "Save Position",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
     CONTROL         "Save Size",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,147,47,10
-    LTEXT           "Viewer-Größe:",IDC_STATIC,179,161,38,8
+    LTEXT           "Viewer-Größe:",IDC_STATIC,179,161,39,8
     CONTROL         "Auto",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,160,27,11
     COMBOBOX        IDC_SCALE_CB,282,159,30,12,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Server-Bildschirmskalierung",IDC_STATIC,180,174,80,8
+    LTEXT           "Server-Bildschirmskalierung",IDC_STATIC,180,174,83,8
     EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
     CONTROL         "Scale to window",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
-    LTEXT           "Wiederverbindungsversuche",IDC_STATIC,195,202,75,8
+    LTEXT           "Wiederverbindungsversuche",IDC_STATIC,195,202,79,8
     EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,251,216,20,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,225,235,50,14
@@ -241,14 +241,14 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,9,22,72,94
     GROUPBOX        "Sonstiges",IDC_STATIC,4,188,160,52
     GROUPBOX        "Maus und Tastatur",IDC_STATIC,174,2,159,100
-    LTEXT           "Mausereignis-Drosselung (Millisekunden)",IDC_STATIC,205,88,116,11
+    LTEXT           "Mausereignis-Drosselung (Millisekunden)",IDC_STATIC,205,88,126,11
     GROUPBOX        "Anzeige",IDC_STATIC,174,104,159,93
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,317,161,8,8
-    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    LTEXT           "1  /",IDC_STATIC,265,175,15,8
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
-    LTEXT           "Zeitüberschreitung",IDC_STATIC,295,202,25,8
-    LTEXT           "Dateiübertragung Timeout",IDC_STATIC,177,219,65,8
+    LTEXT           "Zeitüberschreitung",IDC_STATIC,295,202,36,8
+    LTEXT           "Dateiübertragung Timeout",IDC_STATIC,177,219,72,8
     CONTROL         "Zstd statt Zlib verwenden",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,90,10
     CONTROL         "Gerade",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,160,27,11
 END
@@ -261,7 +261,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Verlauf",IDC_HS_STATIC,4,378,26,8
     COMBOBOX        IDC_HISTORY_CB,45,376,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Fortschritt",IDC_PR_STATIC,4,390,32,8
+    LTEXT           "Fortschritt",IDC_PR_STATIC,4,390,39,8
     CONTROL         "Progress1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,390,307,8
     CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,14,WS_EX_STATICEDGE
     CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,14,WS_EX_STATICEDGE
@@ -292,7 +292,7 @@ BEGIN
     LTEXT           "",IDC_GLOBAL_STATUS,484,391,65,8,SS_SUNKEN
     LTEXT           "",IDC_PERCENT,356,388,120,8
     PUSHBUTTON      "Erzwungener Stopp",IDC_ABORT_B2,246,160,66,14,BS_FLAT | NOT WS_VISIBLE
-    PUSHBUTTON      "Erzwungenes Schliessen",IDCANCEL2,246,340,66,14
+    PUSHBUTTON      "Erzwungenes Schliessen",IDCANCEL2,246,340,86,14
 END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 290, 278
@@ -340,7 +340,7 @@ BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,104,22,96,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Anmelden",IDOK,90,42,50,15
     PUSHBUTTON      "Abbrechen",IDCANCEL,150,42,50,15
-    LTEXT           "Benutzername",IDC_STATIC,58,10,42,8
+    LTEXT           "Benutzername",IDC_STATIC,58,10,44,8
     LTEXT           "Passwort",IDC_STATIC,58,26,37,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,10,44,41
 END
@@ -398,7 +398,7 @@ BEGIN
     LTEXT           "Verbindung geschlossen",IDC_STATUS,101,54,105,9
     RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Abbrechen",IDQUIT,7,180,50,14
-    LTEXT           "Geschwindigkeit",IDC_STATIC,12,85,31,8
+    LTEXT           "Geschwindigkeit",IDC_STATIC,12,85,60,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
     LTEXT           "kbit/s",IDC_STATIC,134,85,50,8
     LTEXT           "",IDC_ENCODER,101,40,101,9
@@ -454,10 +454,10 @@ BEGIN
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
     LTEXT           "Copyright (C) 2002-2024 UltraVNC Team Members",IDC_STATIC,44,31,184,13
-    LTEXT           "Erstellt",IDC_STATIC,44,18,15,11
+    LTEXT           "Erstellt",IDC_STATIC,44,18,32,11
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
-    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,55,8
-    LTEXT           "Webseite:",IDC_STATIC,7,54,29,8
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,64,8
+    LTEXT           "Webseite:",IDC_STATIC,7,54,30,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -482,12 +482,12 @@ BEGIN
     LTEXT           "Info Message",IDC_Message2,43,35,215,54
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,5,7,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,43,6,199,11
-    LTEXT           "Erstellt",IDC_STATIC,43,17,15,10
+    LTEXT           "Erstellt",IDC_STATIC,43,17,23,10
     LTEXT           "BuildTime",IDC_BUILDTIME,68,17,98,10
     LTEXT           "https://forum.uvnc.com",IDC_FORUMHYPERLINK,56,102,102,8
     LTEXT           "https://uvnc.com",IDC_WEBSITE,56,92,94,8
     LTEXT           "https://github.com/ultravnc/ultravnc",IDC_GIT,56,112,144,8
-    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,121,135,8
+    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,121,153,8
     LTEXT           "Webseite:",IDC_STATIC,10,92,38,8
     LTEXT           "Forum:",IDC_STATIC,10,102,38,8
     LTEXT           "Git:",IDC_STATIC,10,112,38,8
@@ -517,7 +517,7 @@ BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,96,25,110,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Anmelden",IDOK,91,71,54,15
     PUSHBUTTON      "Abbrechen",IDCANCEL,156,71,54,15
-    LTEXT           "Benutzername",IDC_STATIC,58,9,35,8
+    LTEXT           "Benutzername",IDC_STATIC,58,9,36,8
     LTEXT           "Passwort",IDC_STATIC,58,28,33,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,6,26,23
     LTEXT           "Catchphrase",IDC_STATIC,8,47,42,8
@@ -565,7 +565,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
     PUSHBUTTON      "Abbrechen",IDCANCEL,259,38,50,14
     LTEXT           "Ordner",IDC_STATIC,13,9,24,9
-    LTEXT           "Praefix",IDC_STATIC,13,28,22,8
+    LTEXT           "Praefix",IDC_STATIC,13,28,30,8
 END
 
 IDD_ENCODERS DIALOGEX 0, 0, 270, 145
@@ -601,10 +601,10 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
     CONTROL         "Cache-Kodierung verwenden",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,136,120,97,10
     CONTROL         "Präventive Updates",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,136,130,97,10
-    LTEXT           "Hohe CPU, geringere Bandbreite ",IDC_STATIC,8,87,87,8
-    LTEXT           "Wenig CPU, hohe Bandbreite",IDC_STATIC,8,17,80,8
-    LTEXT           "Hohe CPU, mittl. Bandbr. (verlustfrei)",IDC_STATIC,8,41,119,8
-    LTEXT           "Mittl. CPU, geringe Bandbr. (verlust.)",IDC_STATIC,8,64,108,8
+    LTEXT           "Hohe CPU, geringere Bandbreite ",IDC_STATIC,8,87,119,8
+    LTEXT           "Wenig CPU, hohe Bandbreite",IDC_STATIC,8,17,101,8
+    LTEXT           "Hohe CPU, mittl. Bandbr. (verlustfrei)",IDC_STATIC,8,41,132,8
+    LTEXT           "Mittl. CPU, geringe Bandbr. (verlust.)",IDC_STATIC,8,64,132,8
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 270, 145
@@ -627,8 +627,8 @@ BEGIN
     CONTROL         "Auto-Skalierung",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,70,10
     COMBOBOX        IDC_SCALE_CB,73,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,106,107,8,8
-    LTEXT           "Server-Bildschirmskalierung",IDC_STATIC,12,119,80,8
-    LTEXT           "1  /",IDC_STATIC,104,119,12,8
+    LTEXT           "Server-Bildschirmskalierung",IDC_STATIC,12,119,90,8
+    LTEXT           "1  /",IDC_STATIC,104,119,14,8
     EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
     CONTROL         "Position speichern",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
     CONTROL         "Start im Vollbild",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,89,112,10
@@ -656,9 +656,9 @@ BEGIN
     LTEXT           "Ordner",IDC_STATIC,4,18,36,9
     LTEXT           "Praefix",IDC_STATIC,4,36,36,8
     LTEXT           "Snapshot-Ordner und Präfix",IDC_STATIC,4,4,232,8
-    LTEXT           "Wiederverbindungsversuche",IDC_STATIC,4,62,89,8
-    LTEXT           "Zeitüberschreitung",IDC_STATIC,130,62,34,8
-    LTEXT           "Dateiübertragung Timeout",IDC_STATIC,4,82,87,8
+    LTEXT           "Wiederverbindungsversuche",IDC_STATIC,4,62,94,8
+    LTEXT           "Zeitüberschreitung",IDC_STATIC,130,62,37,8
+    LTEXT           "Dateiübertragung Timeout",IDC_STATIC,4,82,93,8
 END
 
 IDD_SECURITY DIALOGEX 0, 0, 270, 145
@@ -676,7 +676,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,201,10
     CONTROL         "Menü ausblenden",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,109,10
     EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,232,25,ES_MULTILINE
-    LTEXT           "Benachrichtigung bei Verbindung",IDC_STATIC,4,108,75,8
+    LTEXT           "Benachrichtigung bei Verbindung",IDC_STATIC,4,108,119,8
     CONTROL         "Nur Server mit Passwort",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,35,104,10
     CONTROL         "IPv6 verwenden",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,108,10
 END
@@ -722,7 +722,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Hoermodus starten",IDC_STARTLISTEN,169,121,61,14
+    DEFPUSHBUTTON   "Hoermodus starten",IDC_STARTLISTEN,169,121,67,14
     LTEXT           "Listen mode",IDC_STATIC,4,10,39,8
     LTEXT           "Port",IDC_STATIC,4,27,17,8
 END

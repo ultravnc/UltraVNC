@@ -82,9 +82,9 @@ BEGIN
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright © 2002-2024 участники команды UltraVNC",IDC_NAME,49,27,222,12
     LTEXT           "Сайт:",IDC_WWW2,15,65,31,9
-    LTEXT           "Сборка",IDC_BUILDTEXT,49,16,20,10
+    LTEXT           "Сборка",IDC_BUILDTEXT,49,16,21,10
     LTEXT           "Время сборки",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "https://uvnc.com/",IDC_WWW,47,65,61,8
+    LTEXT           "https://uvnc.com/",IDC_WWW,47,65,82,8
     LTEXT           "Файл конф.: ",IDC_CONFIG_FILE,17,44,250,8
 END
 
@@ -94,9 +94,9 @@ CAPTION "UltraVNC Server — начать соединение"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
-    LTEXT           "Имя узла[:порт]",IDC_HOSTNAME_STATIC,7,25,58,8,SS_CENTERIMAGE
+    LTEXT           "Имя узла[:порт]",IDC_HOSTNAME_STATIC,7,25,73,8,SS_CENTERIMAGE
     EDITTEXT        IDC_HOSTNAME_EDIT,90,22,121,14,ES_AUTOHSCROLL
-    LTEXT           "ID: (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,74,8
+    LTEXT           "ID: (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,81,8
     EDITTEXT        IDC_IDCODE,90,43,121,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,90,67,46,14
     PUSHBUTTON      "ОТМЕНА",IDCANCEL,165,67,46,14
@@ -125,11 +125,11 @@ BEGIN
     DEFPUSHBUTTON   "СОХРАНИТЬ",IDOK,253,82,50,14
     CONTROL         "Автозапуск",IDC_CHECKCLOUD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,15,48,10
     EDITTEXT        IDC_CLOUDSERVER,97,38,93,14,ES_AUTOHSCROLL
-    LTEXT           "Код облачного подключения",IDC_STATIC,18,60,67,8
+    LTEXT           "Код облачного подключения",IDC_STATIC,18,60,77,8
     LTEXT           "",IDC_CLOUDCODE,97,59,94,15
     PUSHBUTTON      "СТАРТ",IDC_STARTCLOUD,97,15,53,12
-    LTEXT           "Сервер облачного подключения",IDC_STATIC,18,40,72,8
-    LTEXT           "Внешний IP-адрес",IDC_STATIC,18,83,66,8
+    LTEXT           "Сервер облачного подключения",IDC_STATIC,18,40,77,8
+    LTEXT           "Внешний IP-адрес",IDC_STATIC,18,83,77,8
     LTEXT           "",IDC_EXTERNALIPADDRESS,97,83,97,8
     CONTROL         IDB_RED,IDC_RED,"Static",SS_BITMAP,167,18,9,8
     CONTROL         IDB_GREEN,IDC_GREEN,"Static",SS_BITMAP,167,18,9,8
@@ -162,9 +162,9 @@ CAPTION "UltraVNC Server — настройка MS-Logon"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
-    LTEXT           "Группа",IDC_STATIC,23,8,20,8
-    LTEXT           "Локальная",IDC_STATIC,127,8,18,8
-    LTEXT           "Доменная",IDC_STATIC,153,8,25,8
+    LTEXT           "Группа",IDC_STATIC,23,8,32,8
+    LTEXT           "Локальная",IDC_STATIC,127,8,24,8
+    LTEXT           "Доменная",IDC_STATIC,153,8,41,8
     EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_CHECKG1L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,20,13,10
     CONTROL         "",IDC_CHECKG1D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,22,16,8
@@ -175,7 +175,7 @@ BEGIN
     CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Правила",IDC_STATIC,5,77,178,68
-    LTEXT           "Группы 1, 2 = полный доступ; группа 3 = чтение",IDC_STATIC,16,88,162,8
+    LTEXT           "Группы 1, 2 = полный доступ; группа 3 = чтение",IDC_STATIC,16,88,184,8
     LTEXT           "Локальные администраторы всегда имеют доступ.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "ОТМЕНА",IDCANCEL,132,148,50,14
@@ -200,7 +200,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Пароль VNC",IDC_PASSWORD_LABEL,11,17,50,11,SS_CENTERIMAGE
-    LTEXT           "Пароль просмотра",IDC_PASSWORD_LABEL2,11,38,69,11,SS_CENTERIMAGE
+    LTEXT           "Пароль просмотра",IDC_PASSWORD_LABEL2,11,38,70,11,SS_CENTERIMAGE
     CONTROL         "Не-портабельный пароль",IDC_SAVEPASSWORDSECURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,189,10
     GROUPBOX        "Аутентификация",IDC_STATIC,7,4,344,76
     CONTROL         "MS-Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,95,67,10
@@ -212,9 +212,9 @@ BEGIN
     PUSHBUTTON      "НАСТР. ШИФРОВАНИЯ",IDC_PLUGIN_BUTTON,191,143,151,12
     GROUPBOX        "Шифрование",IDC_STATIC,7,129,344,33
     CONTROL         "Требуется пароль",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,175,68,9
-    LTEXT           "Нужна учётная запись админа",IDC_STATIC,200,90,77,8
+    LTEXT           "Нужна учётная запись админа",IDC_STATIC,200,90,127,8
     LTEXT           "ОТКЛЮЧАТЬ ПАРОЛЬ \nНЕ РЕКОМЕНДУЕТСЯ",IDC_STATIC,87,172,115,19
-    LTEXT           "Зашифрованный пароль расшифровывается только на этой системе",IDC_STATIC,20,67,251,8
+    LTEXT           "Зашифрованный пароль расшифровывается только на этой системе",IDC_STATIC,20,67,277,8
     PUSHBUTTON      "ЗАДАТЬ/ИЗМ...",IDC_CHANGEPASSWORD,83,15,64,14
     PUSHBUTTON      "ОЧИСТИТЬ",IDC_CLEARPASSWORD,161,15,50,14
     PUSHBUTTON      "ЗАДАТЬ/ИЗМ...",IDC_CHANGEPASSWORDVO,83,37,64,14
@@ -225,11 +225,11 @@ IDD_FORM_Network DIALOGEX 0, 0, 361, 207
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Подключиться к ожидающему viewer",IDC_STATIC,13,19,103,8
+    LTEXT           "Подключиться к ожидающему viewer",IDC_STATIC,13,19,150,8
     PUSHBUTTON      "СТАРТ",IDC_STARTREP,285,18,36,12
-    LTEXT           "служба инициирует обратное соединение",IDC_STATIC,13,32,134,8
+    LTEXT           "служба инициирует обратное соединение",IDC_STATIC,13,32,173,8
     EDITTEXT        IDC_SERVICE_COMMANDLINE,13,43,308,14,ES_AUTOHSCROLL
-    LTEXT           "-autoreconnect ID:1234 -connect [ip репитера]",IDC_STATIC,13,59,157,8
+    LTEXT           "-autoreconnect ID:1234 -connect [ip репитера]",IDC_STATIC,13,59,209,8
     CONTROL         "Требовать аутентификацию для соединений, инициированных сервером",IDC_REVERSEAUTH,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,266,16
     GROUPBOX        "Обратное соединение",IDC_STATIC,7,7,344,88
@@ -241,7 +241,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Писать отладку в WinVNC.log",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
     CONTROL         "Запись в видео",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
-    PUSHBUTTON      "ОЧИСТИТЬ AVI-КОДЕК",IDC_CLEAR,79,47,75,9
+    PUSHBUTTON      "ОЧИСТИТЬ AVI-КОДЕК",IDC_CLEAR,79,47,86,9
     LTEXT           "Путь",IDC_STATIC,13,33,18,8
     EDITTEXT        IDC_EDIT_PATH,37,30,286,14,ES_AUTOHSCROLL
     GROUPBOX        "Журналирование",IDC_STATIC,7,8,344,196
@@ -254,7 +254,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Администрирование",IDC_STATIC,7,7,324,195,BS_LEFT
-    LTEXT           "Пароль администратора",IDC_STATIC,12,44,78,8
+    LTEXT           "Пароль администратора",IDC_STATIC,12,44,82,8
     CONTROL         "Разрешить пользователям просмотр и изменение настроек по этому паролю",IDC_ALLOWUSERSSETTINGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
     LTEXT           "Как Админ вы можете задать пароль для просмотра и изменения настроек не-администраторами",IDC_STATIC_ADMIN,12,20,312,15
@@ -275,7 +275,7 @@ BEGIN
     CONTROL         "Авто",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,271,19,34,9
     LTEXT           "Порт RFB",IDC_STATIC,160,17,36,8
     EDITTEXT        IDC_PORTRFB,219,16,29,12,ES_AUTOHSCROLL
-    LTEXT           "Порт HTTP",IDC_STATIC,160,31,38,8
+    LTEXT           "Порт HTTP",IDC_STATIC,160,31,45,8
     EDITTEXT        IDC_PORTHTTP,219,30,29,12,ES_AUTOHSCROLL
     CONTROL         "Включить UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,111,10
     CONTROL         "Ничего не делать",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
@@ -290,15 +290,15 @@ BEGIN
     LTEXT           "Интервал keepalive",IDC_STATIC,15,162,75,9
     LTEXT           "Тайм-аут бездействия: (ввод)",IDC_STATIC,15,142,75,9
     EDITTEXT        IDC_IDLETIMEINPUT,92,141,19,12,ES_AUTOHSCROLL
-    LTEXT           "Отправлять keepalive каждые x секунд",IDC_STATIC,139,162,115,8
+    LTEXT           "Отправлять keepalive каждые x секунд",IDC_STATIC,139,162,168,8
     LTEXT           "Отключать viewer при бездействии x сек. 0 = выкл.",IDC_STATIC,139,139,122,15
     EDITTEXT        IDC_MAXVIEWERS,62,187,18,12,ES_AUTOHSCROLL
     LTEXT           "Макс. viewers",IDC_STATIC,15,188,46,8
     CONTROL         "Отклонить",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,38,10
     CONTROL         "Откл. старейшее",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,73,10
     LTEXT           "Действие",IDC_STATIC,98,188,43,10
-    LTEXT           "При отключении последнего viewer",IDC_STATIC,15,71,83,8
-    LTEXT           "При нескольких viewer",IDC_STATIC,15,100,87,8
+    LTEXT           "При отключении последнего viewer",IDC_STATIC,15,71,150,8
+    LTEXT           "При нескольких viewer",IDC_STATIC,15,100,100,8
 END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
@@ -331,16 +331,16 @@ BEGIN
     CONTROL         "System HookDll (vnchook.dll)",IDC_HOOK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,110,10
     CONTROL         "Mirror Driver (<= Windows 7)",IDC_DRIVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,205,10
     CONTROL         "Низкая точность (турбо)",IDC_TURBOMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,68,112,10
-    PUSHBUTTON      "ПРОВЕРИТЬ Mirror driver",IDC_CHECKDRIVER,13,156,92,11
+    PUSHBUTTON      "ПРОВЕРИТЬ Mirror driver",IDC_CHECKDRIVER,13,156,109,11
     EDITTEXT        IDC_MAXCPU,54,176,40,14,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Макс. CPU",IDC_STATIC,13,178,34,8
+    LTEXT           "Макс. CPU",IDC_STATIC,13,178,39,8
     LTEXT           "Нужны права: служба или запуск админом",IDC_STATICELEVATED,185,154,166,19
     CONTROL         "Авто",IDC_AUTOCAPT1,"Button",BS_AUTORADIOBUTTON,97,116,31,10
     CONTROL         "Пиксель",IDC_AUTOCAPT2,"Button",BS_AUTORADIOBUTTON,161,116,31,10
     CONTROL         "Blit",IDC_AUTOCAPT3,"Button",BS_AUTORADIOBUTTON,225,116,25,10
-    LTEXT           "Legacy-захват",IDC_STATIC,13,116,54,8
+    LTEXT           "Legacy-захват",IDC_STATIC,13,116,64,8
     CONTROL         "",IDC_SLIDERFPS,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOP | WS_TABSTOP,71,130,133,12
-    LTEXT           "Макс. FPS",IDC_STATICFPS5,13,133,29,8
+    LTEXT           "Макс. FPS",IDC_STATICFPS5,13,133,45,8
     LTEXT           "60",IDC_STATICFPS,214,134,9,8
     GROUPBOX        "Захват экрана",IDC_STATIC,7,7,344,195
 END
@@ -352,14 +352,14 @@ BEGIN
     CONTROL         "",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,19,8,8
     LTEXT           "Время показа сообщения (с)",IDC_STATIC,36,48,134,8
     EDITTEXT        IDQUERYTIMEOUT,12,46,19,12,ES_AUTOHSCROLL
-    LTEXT           "Действие по умолчанию для запроса",IDC_STATIC,13,88,64,8
+    LTEXT           "Действие по умолчанию для запроса",IDC_STATIC,13,88,72,8
     CONTROL         "Отклонить",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,87,87,39,10
     CONTROL         "Принять",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,140,87,39,10
     CONTROL         "Отклонить (разрешить блок.)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,193,87,88,10
     EDITTEXT        IDC_QUERYDISABLETIME,12,61,19,12,ES_AUTOHSCROLL
-    LTEXT           "Задержка перед показом сообщения (с)",IDC_STATIC,36,63,158,8
+    LTEXT           "Задержка перед показом сообщения (с)",IDC_STATIC,36,63,168,8
     EDITTEXT        IDC_EDITQUERYTEXT,12,30,206,12,ES_AUTOHSCROLL
-    LTEXT           "Текст всплывающего сообщения",IDC_STATIC,225,32,99,8
+    LTEXT           "Текст всплывающего сообщения",IDC_STATIC,225,32,132,8
     CONTROL         "Показывать сообщение на заблокированном экране",IDC_QNOLOGON,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,76,206,10
     GROUPBOX        "Правила",IDC_STATIC,7,7,344,195,WS_GROUP
@@ -369,12 +369,12 @@ BEGIN
     PUSHBUTTON      "УДАЛИТЬ",IDC_REMOVE_BUTTON,274,145,57,10
     PUSHBUTTON      "ВВЕРХ",IDC_MOVE_UP_BUTTON,274,158,57,10
     PUSHBUTTON      "ВНИЗ",IDC_MOVE_DOWN_BUTTON,274,171,57,10
-    LTEXT           "Проверить правила выше:",IDC_STATIC,16,187,52,8
+    LTEXT           "Проверить правила выше:",IDC_STATIC,16,187,54,8
     EDITTEXT        IDC_IP_FOR_CHECK_EDIT,72,186,44,12,ES_AUTOHSCROLL | WS_GROUP
-    LTEXT           "[результат]",IDC_IP_CHECK_RESULT_LABEL,177,188,46,8
+    LTEXT           "[результат]",IDC_IP_CHECK_RESULT_LABEL,177,188,54,8
     PUSHBUTTON      "ПРОВЕРИТЬ",IDC_CHECKIP,125,186,44,12
-    LTEXT           "Показать окно с таймером для принятия/отклонения входящего соединения",IDC_STATIC,24,19,264,11
-    LTEXT           "Разрешить блок.: не показывать окно при заблокированном экране",IDC_STATIC,87,99,180,12
+    LTEXT           "Показать окно с таймером для принятия/отклонения входящего соединения",IDC_STATIC,24,19,318,11
+    LTEXT           "Разрешить блок.: не показывать окно при заблокированном экране",IDC_STATIC,87,99,286,12
 END
 
 IDD_FORM_Notifications DIALOGEX 0, 0, 361, 211
@@ -418,7 +418,7 @@ BEGIN
     EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,31,50,14
     PUSHBUTTON      "ОТМЕНА",IDCANCEL,199,31,50,14
-    LTEXT           "Пароль админа",IDC_STATIC,7,10,55,8
+    LTEXT           "Пароль админа",IDC_STATIC,7,10,62,8
 END
 
 IDD_CHANGE_PASSWORD DIALOGEX 0, 0, 182, 105
@@ -450,16 +450,16 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,101,227,10
     CONTROL         "Запретить пользователю закрывать UltraVNC Server",IDC_ALLOWSHUTDOWN,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,77,227,10
-    LTEXT           "Масштаб экрана сервера по умолч.",IDC_STATIC,14,116,100,8
+    LTEXT           "Масштаб экрана сервера по умолч.",IDC_STATIC,14,116,102,8
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
     CONTROL         "Режим RDP",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,227,10
     CONTROL         "Откл. заставку",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,227,10
-    LTEXT           "Экран по умолч.",IDC_STATIC,14,129,47,8
+    LTEXT           "Экран по умолч.",IDC_STATIC,14,129,58,8
     CONTROL         "Основной",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,48,10
     CONTROL         "Вторичный",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,61,10
     LTEXT           "Language",IDC_LANGUAGE_LABEL,14,145,53,8
     COMBOBOX        IDC_LANGUAGE_COMBO,74,143,100,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "(restart required)",IDC_STATIC,180,145,60,8
+    LTEXT           "(restart required)",IDC_STATIC,180,145,86,8
 END
 
 IDD_FORM_Service DIALOGEX 0, 0, 362, 209

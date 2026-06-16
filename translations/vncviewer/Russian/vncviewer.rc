@@ -227,13 +227,13 @@ BEGIN
     CONTROL         "Полный экран",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
     CONTROL         "Сохр. позицию",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
     CONTROL         "Сохр. размер",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,147,47,10
-    LTEXT           "Размер окна:",IDC_STATIC,179,161,38,8
+    LTEXT           "Размер окна:",IDC_STATIC,179,161,39,8
     CONTROL         "Авто",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,160,27,11
     COMBOBOX        IDC_SCALE_CB,282,159,30,12,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Масштаб экрана сервера",IDC_STATIC,180,174,80,8
+    LTEXT           "Масштаб экрана сервера",IDC_STATIC,180,174,83,8
     EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
     CONTROL         "По размеру окна",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
-    LTEXT           "попыток переподключения",IDC_STATIC,195,202,75,8
+    LTEXT           "попыток переподключения",IDC_STATIC,195,202,79,8
     EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,251,216,20,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,225,235,50,14
@@ -245,11 +245,11 @@ BEGIN
     LTEXT           "Задержка событий мыши (мс)",IDC_STATIC,205,88,116,11
     GROUPBOX        "Экран",IDC_STATIC,174,104,159,93
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,317,161,8,8
-    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    LTEXT           "1  /",IDC_STATIC,265,175,15,8
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
-    LTEXT           "тайм-аут",IDC_STATIC,295,202,25,8
-    LTEXT           "Тайм-аут передачи",IDC_STATIC,177,219,65,8
+    LTEXT           "тайм-аут",IDC_STATIC,295,202,41,8
+    LTEXT           "Тайм-аут передачи",IDC_STATIC,177,219,72,8
     CONTROL         "Zstd вместо Zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,90,10
     CONTROL         "Выровнять",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,160,27,11
 END
@@ -262,7 +262,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Журнал",IDC_HS_STATIC,4,378,26,8
     COMBOBOX        IDC_HISTORY_CB,45,376,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Прогресс",IDC_PR_STATIC,4,390,32,8
+    LTEXT           "Прогресс",IDC_PR_STATIC,4,390,39,8
     CONTROL         "Прогресс1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,390,307,8
     CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,14,WS_EX_STATICEDGE
     CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,14,WS_EX_STATICEDGE
@@ -341,7 +341,7 @@ BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,104,22,96,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Войти",IDOK,90,42,50,15
     PUSHBUTTON      "Отмена",IDCANCEL,150,42,50,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,10,42,8
+    LTEXT           "Имя пользователя",IDC_STATIC,58,10,44,8
     LTEXT           "Пароль",IDC_STATIC,58,26,37,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,10,44,41
 END
@@ -357,7 +357,7 @@ BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,114,73,92,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Войти",IDOK,95,92,54,15
     PUSHBUTTON      "Отмена",IDCANCEL,156,92,50,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,60,46,8
+    LTEXT           "Имя пользователя",IDC_STATIC,58,60,54,8
     LTEXT           "Пароль",IDC_STATIC,58,76,42,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,8,60,44,41
 END
@@ -368,7 +368,7 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — отправить клавишу (эксперим.)"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Код клавиши (десят.)",IDC_STATIC,7,9,87,12
+    LTEXT           "Код клавиши (десят.)",IDC_STATIC,7,9,91,12
     EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
     CONTROL         "ALT GR",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
     CONTROL         "CTRL",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
@@ -387,7 +387,7 @@ BEGIN
     GROUPBOX        "Соединение",IDC_STATIC,7,0,199,112
     GROUPBOX        "Трафик",IDC_STATIC,7,112,199,42
     LTEXT           "Порт",IDC_STATIC,12,26,46,9
-    LTEXT           "Отправлено байт",IDC_STATIC,12,125,63,9
+    LTEXT           "Отправлено байт",IDC_STATIC,12,125,73,9
     RTEXT           "Получено байт",IDC_STATIC,117,125,68,9
     RTEXT           "Отправлено",IDC_SEND,11,141,64,9
     RTEXT           "Получено",IDC_RECEIVED,117,141,72,9
@@ -399,7 +399,7 @@ BEGIN
     LTEXT           "Соединение закрыто",IDC_STATUS,101,54,105,9
     RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Отмена",IDQUIT,7,180,50,14
-    LTEXT           "Скорость",IDC_STATIC,12,85,31,8
+    LTEXT           "Скорость",IDC_STATIC,12,85,41,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
     LTEXT           "кбит/с",IDC_STATIC,134,85,50,8
     LTEXT           "",IDC_ENCODER,101,40,101,9
@@ -430,7 +430,7 @@ BEGIN
     EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,128,42,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,184,42,50,14
-    LTEXT           "Комментарий параметров передачи файлов. Введите значение...",IDC_FTPARAMCOMMENT,9,7,225,8
+    LTEXT           "Комментарий параметров передачи файлов. Введите значение...",IDC_FTPARAMCOMMENT,9,7,239,8
 END
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
@@ -454,8 +454,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2026 участники команды UltraVNC",IDC_STATIC,44,31,184,13
-    LTEXT           "Сборка",IDC_STATIC,44,18,15,11
+    LTEXT           "Copyright © 2002-2026 участники команды UltraVNC",IDC_STATIC,44,31,223,13
+    LTEXT           "Сборка",IDC_STATIC,44,18,32,11
     LTEXT           "Время сборки",IDC_BUILDTIME,78,18,98,11
     LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,54,81,8
     LTEXT           "Сайт:",IDC_STATIC,7,54,29,8
@@ -483,12 +483,12 @@ BEGIN
     LTEXT           "Информационное сообщение",IDC_Message2,43,35,213,25
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,5,7,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,43,6,199,11
-    LTEXT           "Сборка",IDC_STATIC,43,17,15,10
+    LTEXT           "Сборка",IDC_STATIC,43,17,23,10
     LTEXT           "Время сборки",IDC_BUILDTIME,68,17,98,10
-    LTEXT           "https://forum.uvnc.com/",IDC_FORUMHYPERLINK,56,74,102,8
+    LTEXT           "https://forum.uvnc.com/",IDC_FORUMHYPERLINK,56,74,109,8
     LTEXT           "https://uvnc.com/",IDC_WEBSITE,56,64,94,8
-    LTEXT           "https://github.com/ultravnc/UltraVNC",IDC_GIT,56,84,144,8
-    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,156,8
+    LTEXT           "https://github.com/ultravnc/UltraVNC",IDC_GIT,56,84,168,8
+    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,186,8
     LTEXT           "Сайт:",IDC_STATIC,10,64,38,8
     LTEXT           "Форум:",IDC_STATIC,10,74,38,8
     LTEXT           "Git:",IDC_STATIC,10,84,38,8
@@ -518,10 +518,10 @@ BEGIN
     EDITTEXT        IDC_PASSWD_EDIT,96,25,110,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Войти",IDOK,91,71,54,15
     PUSHBUTTON      "Отмена",IDCANCEL,156,71,54,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,9,35,8
+    LTEXT           "Имя пользователя",IDC_STATIC,58,9,36,8
     LTEXT           "Пароль",IDC_STATIC,58,28,33,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,6,26,23
-    LTEXT           "Контр. фраза",IDC_STATIC,8,47,42,8
+    LTEXT           "Контр. фраза",IDC_STATIC,8,47,48,8
     LTEXT           "Подпись",IDC_STATIC,8,60,35,8
     LTEXT           "",IDC_CATCHPHRASE,58,47,148,8
     LTEXT           "",IDC_SIGNATURE,58,60,148,8
@@ -538,7 +538,7 @@ BEGIN
     PUSHBUTTON      "Отмена",IDCANCEL,174,59,50,15
     LTEXT           "Пароль",IDC_STATIC,65,9,33,8
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,6,-1,37,30
-    LTEXT           "Контр. фраза",IDC_STATIC,14,32,42,8
+    LTEXT           "Контр. фраза",IDC_STATIC,14,32,49,8
     LTEXT           "Подпись",IDC_STATIC,14,47,35,8
     LTEXT           "",IDC_CATCHPHRASE,65,32,159,8
     LTEXT           "",IDC_SIGNATURE,65,47,159,8
@@ -566,7 +566,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,259,38,50,14
     LTEXT           "Папка",IDC_STATIC,13,9,24,9
-    LTEXT           "Префикс",IDC_STATIC,13,28,22,8
+    LTEXT           "Префикс",IDC_STATIC,13,28,36,8
 END
 
 IDD_ENCODERS DIALOGEX 0, 0, 270, 145
@@ -601,10 +601,10 @@ BEGIN
     CONTROL         "Кодирование CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
     CONTROL         "Кодирование кеша",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,120,90,10
     CONTROL         "Опереж. обновления",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,130,81,10
-    LTEXT           "Больше CPU, меньше трафик ",IDC_STATIC,8,87,87,8
-    LTEXT           "Меньше CPU, больше трафик",IDC_STATIC,8,17,80,8
-    LTEXT           "Больше CPU, средний трафик (без потерь)",IDC_STATIC,8,41,119,8
-    LTEXT           "Средний CPU, малый трафик (с потерями)",IDC_STATIC,8,64,108,8
+    LTEXT           "Больше CPU, меньше трафик ",IDC_STATIC,8,87,123,8
+    LTEXT           "Меньше CPU, больше трафик",IDC_STATIC,8,17,118,8
+    LTEXT           "Больше CPU, средний трафик (без потерь)",IDC_STATIC,8,41,132,8
+    LTEXT           "Средний CPU, малый трафик (с потерями)",IDC_STATIC,8,64,132,8
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 270, 145
@@ -612,7 +612,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Менять разрешение сервера",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
-    LTEXT           "Малый",IDC_STATIC,19,12,19,8
+    LTEXT           "Малый",IDC_STATIC,19,12,22,8
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CTEXT           "",IDC_RES,181,12,47,8
     CONTROL         "Использовать все мониторы для удалённого сеанса",IDC_ALLMONS,
@@ -631,8 +631,8 @@ BEGIN
     CONTROL         "Автомасштаб",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
     COMBOBOX        IDC_SCALE_CB,73,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,106,107,8,8
-    LTEXT           "Масштаб экрана сервера",IDC_STATIC,12,119,80,8
-    LTEXT           "1  /",IDC_STATIC,104,119,12,8
+    LTEXT           "Масштаб экрана сервера",IDC_STATIC,12,119,90,8
+    LTEXT           "1  /",IDC_STATIC,104,119,14,8
     EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
     CONTROL         "Сохр. позицию при выходе",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
     CONTROL         "Запуск в полном экране",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,87,90,10
@@ -662,7 +662,7 @@ BEGIN
     LTEXT           "Префикс",IDC_STATIC,4,36,36,8
     LTEXT           "Папка и префикс скриншотов",IDC_STATIC,4,4,232,8
     LTEXT           "Попыток переподкл.",IDC_STATIC,4,62,89,8
-    LTEXT           "Тайм-аут",IDC_STATIC,130,62,34,8
+    LTEXT           "Тайм-аут",IDC_STATIC,130,62,37,8
     LTEXT           "Тайм-аут передачи",IDC_STATIC,4,82,87,8
 END
 
@@ -683,7 +683,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,201,10
     CONTROL         "Скрыть меню",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,49,10
     EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,232,25,ES_MULTILINE
-    LTEXT           "Уведомление при подключении",IDC_STATIC,4,108,75,8
+    LTEXT           "Уведомление при подключении",IDC_STATIC,4,108,127,8
     CONTROL         "Только серверы с паролем",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,35,104,10
     CONTROL         "Использовать IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,44,10
 END
@@ -729,8 +729,8 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Начать ожидание",IDC_STARTLISTEN,169,121,61,14
-    LTEXT           "Режим ожидания",IDC_STATIC,4,10,39,8
+    DEFPUSHBUTTON   "Начать ожидание",IDC_STARTLISTEN,169,121,73,14
+    LTEXT           "Режим ожидания",IDC_STATIC,4,10,68,8
     LTEXT           "Порт",IDC_STATIC,4,27,17,8
 END
 
@@ -741,7 +741,7 @@ BEGIN
     LTEXT           "1",IDC_DEFAULTCONFIG,4,49,232,13
     CONTROL         "Только options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,82,10
     LTEXT           "Файл конф. по умолч.",IDC_SLIDERRES,4,35,124,8
-    LTEXT           "Пользовательский файл конф.",IDC_STATIC,4,66,110,8
+    LTEXT           "Пользовательский файл конф.",IDC_STATIC,4,66,127,8
     LTEXT           "2",IDC_CUSTOMCONFIG,4,79,232,18
 END
 

@@ -81,9 +81,9 @@ BEGIN
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
     LTEXT           "Copyright (C) 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
-    LTEXT           "Compilé",IDC_BUILDTEXT,49,16,20,10
+    LTEXT           "Compilé",IDC_BUILDTEXT,49,16,21,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
-    LTEXT           "https://uvnc.com/",IDC_WWW,47,65,61,8
+    LTEXT           "https://uvnc.com/",IDC_WWW,47,65,67,8
     LTEXT           "Fichier de configuration: ",IDC_CONFIG_FILE,17,44,250,8
 END
 
@@ -93,7 +93,7 @@ CAPTION "UltraVNC Server - Établir une connexion"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
-    LTEXT           "Nom d'hôte[:port]",IDC_HOSTNAME_STATIC,7,25,58,8,SS_CENTERIMAGE
+    LTEXT           "Nom d'hôte[:port]",IDC_HOSTNAME_STATIC,7,25,67,8,SS_CENTERIMAGE
     EDITTEXT        IDC_HOSTNAME_EDIT,90,22,121,14,ES_AUTOHSCROLL
     LTEXT           "ID: (ID:1234546789)",IDC_CONNECTION_NUMBER_STATIC,7,46,74,8
     EDITTEXT        IDC_IDCODE,90,43,121,14,ES_AUTOHSCROLL
@@ -124,7 +124,7 @@ BEGIN
     DEFPUSHBUTTON   "Enregistrer",IDOK,253,82,50,14
     CONTROL         "Démarrage auto",IDC_CHECKCLOUD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,15,48,10
     EDITTEXT        IDC_CLOUDSERVER,97,38,93,14,ES_AUTOHSCROLL
-    LTEXT           "Code de connexion Cloud",IDC_STATIC,18,60,67,8
+    LTEXT           "Code de connexion Cloud",IDC_STATIC,18,60,77,8
     LTEXT           "",IDC_CLOUDCODE,97,59,94,15
     PUSHBUTTON      "Démarrer",IDC_STARTCLOUD,97,15,53,12
     LTEXT           "Serveur Cloud",IDC_STATIC,18,40,72,8
@@ -161,7 +161,7 @@ CAPTION "UltraVNC Server - Configuration MS-Logon"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "",IDC_STATIC,5,0,178,74
-    LTEXT           "Groupe",IDC_STATIC,23,8,20,8
+    LTEXT           "Groupe",IDC_STATIC,23,8,27,8
     LTEXT           "Local",IDC_STATIC,127,8,18,8
     LTEXT           "Domaine",IDC_STATIC,153,8,25,8
     EDITTEXT        IDC_GROUP1,21,19,93,13,ES_AUTOHSCROLL
@@ -174,7 +174,7 @@ BEGIN
     CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Règles",IDC_STATIC,5,77,178,68
-    LTEXT           "Groupe 1, 2 = Accès complet   Groupe 3 = Lecture seule",IDC_STATIC,16,88,162,8
+    LTEXT           "Groupe 1, 2 = Accès complet   Groupe 3 = Lecture seule",IDC_STATIC,16,88,184,8
     LTEXT           "Les administrateurs locaux ont toujours accès.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "ANNULER",IDCANCEL,132,148,50,14
@@ -643,8 +643,8 @@ IDD_FORM_AUTHENTICATION DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Mot de passe VNC",IDC_PASSWORD_LABEL,11,17,50,11,SS_CENTERIMAGE
-    LTEXT           "Mot de passe lecture seule",IDC_PASSWORD_LABEL2,11,38,69,11,SS_CENTERIMAGE
+    LTEXT           "Mot de passe VNC",IDC_PASSWORD_LABEL,11,17,64,11,SS_CENTERIMAGE
+    LTEXT           "Mot de passe lecture seule",IDC_PASSWORD_LABEL2,11,38,70,11,SS_CENTERIMAGE
     CONTROL         "Mot de passe non portable",IDC_SAVEPASSWORDSECURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,57,189,10
     GROUPBOX        "Authentification",IDC_STATIC,7,4,344,76
     CONTROL         "MS-Logon",IDC_MSLOGON_CHECKD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,95,67,10
@@ -656,12 +656,12 @@ BEGIN
     PUSHBUTTON      "CONFIGURER CHIFFREMENT",IDC_PLUGIN_BUTTON,191,143,151,12
     GROUPBOX        "Chiffrement",IDC_STATIC,7,129,344,33
     CONTROL         "Mot de passe requis",IDC_AUTHREQUIRED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,175,68,9
-    LTEXT           "Compte administrateur requis",IDC_STATIC,200,90,77,8
+    LTEXT           "Compte administrateur requis",IDC_STATIC,200,90,108,8
     LTEXT           "DISABLING THE PASSWORD IS \nNOT RECOMMENDED",IDC_STATIC,87,172,115,19
     LTEXT           "Le mot de passe chiffré ne peut être déchiffré que sur ce système",IDC_STATIC,20,67,251,8
-    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORD,83,15,64,14
+    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORD,83,15,75,14
     PUSHBUTTON      "Effacer",IDC_CLEARPASSWORD,161,15,50,14
-    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORDVO,83,37,64,14
+    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORDVO,83,37,75,14
     PUSHBUTTON      "Effacer",IDC_CLEARPASSWORDVO,161,37,50,14
 END
 
@@ -669,11 +669,11 @@ IDD_FORM_Network DIALOGEX 0, 0, 361, 207
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Se connecter à un viewer en écoute",IDC_STATIC,13,19,103,8
+    LTEXT           "Se connecter à un viewer en écoute",IDC_STATIC,13,19,130,8
     PUSHBUTTON      "Démarrer",IDC_STARTREP,285,18,36,12
-    LTEXT           "Le service initie une connexion inverse",IDC_STATIC,13,32,134,8
+    LTEXT           "Le service initie une connexion inverse",IDC_STATIC,13,32,149,8
     EDITTEXT        IDC_SERVICE_COMMANDLINE,13,43,308,14,ES_AUTOHSCROLL
-    LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,13,59,157,8
+    LTEXT           "-autoreconnect ID:1234 -connect [ip repeater]",IDC_STATIC,13,59,171,8
     CONTROL         "Authentification requise pour les connexions initiées par le serveur",IDC_REVERSEAUTH,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,13,74,266,16
     GROUPBOX        "Connexion inverse",IDC_STATIC,7,7,344,88
@@ -689,7 +689,7 @@ BEGIN
     CONTROL         "Enregistrer infos debug dans WinVNC.log",IDC_LOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,139,10
     CONTROL         "Enregistrer en vidéo",IDC_VIDEO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,46,58,10
     PUSHBUTTON      "EFFACER ENCODEUR AVI",IDC_CLEAR,79,47,75,9
-    LTEXT           "Chemin",IDC_STATIC,13,33,18,8
+    LTEXT           "Chemin",IDC_STATIC,13,33,22,8
     EDITTEXT        IDC_EDIT_PATH,37,30,286,14,ES_AUTOHSCROLL
     GROUPBOX        "Journalisation",IDC_STATIC,7,8,344,196
     EDITTEXT        IDC_EDIT_LOG,12,58,339,128,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
@@ -701,11 +701,11 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Administration",IDC_STATIC,7,7,324,195,BS_LEFT
-    LTEXT           "Mot de passe administration",IDC_STATIC,12,44,78,8
+    LTEXT           "Mot de passe administration",IDC_STATIC,12,44,82,8
     CONTROL         "Autoriser les utilisateurs à voir et modifier les paramètres avec ce mot de passe",IDC_ALLOWUSERSSETTINGS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,63,232,10
     LTEXT           "As admin you can set a password to allow non administrators to view and change the settings.",IDC_STATIC_ADMIN,12,20,312,15
-    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORDADMIN,96,41,64,14
+    PUSHBUTTON      "DÉFINIR/MODIFIER...",IDC_CHANGEPASSWORDADMIN,96,41,73,14
     PUSHBUTTON      "EFFACER",IDC_ADMINCLEAR,171,41,50,14
 END
 
@@ -737,15 +737,15 @@ BEGIN
     LTEXT           "Intervalle keepalive",IDC_STATIC,15,162,75,9
     LTEXT           "Délai d'inactivité: (entrée)",IDC_STATIC,15,142,75,9
     EDITTEXT        IDC_IDLETIMEINPUT,92,141,19,12,ES_AUTOHSCROLL
-    LTEXT           "Envoyer keepalive toutes les x secondes",IDC_STATIC,139,162,115,8
+    LTEXT           "Envoyer keepalive toutes les x secondes",IDC_STATIC,139,162,149,8
     LTEXT           "Instruct viewer to disconnect when idle for x sec.  0 = disabled",IDC_STATIC,139,139,122,15
     EDITTEXT        IDC_MAXVIEWERS,62,187,18,12,ES_AUTOHSCROLL
     LTEXT           "Viewers max",IDC_STATIC,15,188,46,8
     CONTROL         "Refuser",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,38,10
     CONTROL         "Déconnecter le plus ancien",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,73,10
     LTEXT           "Action",IDC_STATIC,98,188,43,10
-    LTEXT           "À la dernière déconnexion viewer",IDC_STATIC,15,71,83,8
-    LTEXT           "Lors de connexions multiples",IDC_STATIC,15,100,87,8
+    LTEXT           "À la dernière déconnexion viewer",IDC_STATIC,15,71,123,8
+    LTEXT           "Lors de connexions multiples",IDC_STATIC,15,100,108,8
 END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
@@ -754,7 +754,7 @@ CAPTION "UltraVNC Server - Edit IPv4 Access Rule"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "Adresses IPv4",IDC_STATIC,0,5,223,58,WS_GROUP
-    LTEXT           "Modèle correspondant",IDC_STATIC,15,17,59,8
+    LTEXT           "Modèle correspondant",IDC_STATIC,15,17,63,8
     EDITTEXT        IDC_FIRST_IP,80,16,64,12,ES_AUTOHSCROLL | WS_GROUP
     GROUPBOX        "Action",IDC_STATIC,0,65,223,56
     DEFPUSHBUTTON   "OK",IDOK,110,127,50,15,WS_GROUP
@@ -799,7 +799,7 @@ BEGIN
     CONTROL         "",IDQUERY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,19,8,8
     LTEXT           "Durée d'affichage du message (s)",IDC_STATIC,36,48,134,8
     EDITTEXT        IDQUERYTIMEOUT,12,46,19,12,ES_AUTOHSCROLL
-    LTEXT           "Action de requête par défaut",IDC_STATIC,13,88,64,8
+    LTEXT           "Action de requête par défaut",IDC_STATIC,13,88,72,8
     CONTROL         "Refuser",IDC_DREFUSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,87,87,39,10
     CONTROL         "Accepter",IDC_DACCEPT,"Button",BS_AUTORADIOBUTTON,140,87,39,10
     CONTROL         "Refuse (allow locked)",IDC_DRefuseOnly,"Button",BS_AUTORADIOBUTTON,193,87,88,10
@@ -816,11 +816,11 @@ BEGIN
     PUSHBUTTON      "Supprimer",IDC_REMOVE_BUTTON,274,145,57,10
     PUSHBUTTON      "Monter",IDC_MOVE_UP_BUTTON,274,158,57,10
     PUSHBUTTON      "Descendre",IDC_MOVE_DOWN_BUTTON,274,171,57,10
-    LTEXT           "Check the rules above:",IDC_STATIC,16,187,52,8
+    LTEXT           "Check the rules above:",IDC_STATIC,16,187,54,8
     EDITTEXT        IDC_IP_FOR_CHECK_EDIT,72,186,44,12,ES_AUTOHSCROLL | WS_GROUP
-    LTEXT           "[check result]",IDC_IP_CHECK_RESULT_LABEL,177,188,46,8
+    LTEXT           "[check result]",IDC_IP_CHECK_RESULT_LABEL,177,188,56,8
     PUSHBUTTON      "Vérifier",IDC_CHECKIP,125,186,44,12
-    LTEXT           "Popup a timed messagebox to allow the user to allow/reject an incoming connect",IDC_STATIC,24,19,264,11
+    LTEXT           "Popup a timed messagebox to allow the user to allow/reject an incoming connect",IDC_STATIC,24,19,293,11
     LTEXT           "Allow locked: no messagebox when screen is locked",IDC_STATIC,87,99,180,12
 END
 
@@ -864,7 +864,7 @@ BEGIN
     EDITTEXT        IDC_ADMINPASSWORD,71,7,178,14,ES_PASSWORD | ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,31,50,14
     PUSHBUTTON      "Annuler",IDCANCEL,199,31,50,14
-    LTEXT           "Mot de passe admin",IDC_STATIC,7,10,55,8
+    LTEXT           "Mot de passe admin",IDC_STATIC,7,10,62,8
 END
 
 IDD_CHANGE_PASSWORD DIALOGEX 0, 0, 182, 105
@@ -900,7 +900,7 @@ BEGIN
     EDITTEXT        IDC_SCALE,118,114,12,12,ES_AUTOHSCROLL
     CONTROL         "RDPmode",IDC_RDPMODE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,53,47,10
     CONTROL         "Empêcher économiseur d'écran",IDC_NOSCREENSAVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,89,84,10
-    LTEXT           "Écran par défaut",IDC_STATIC,14,129,47,8
+    LTEXT           "Écran par défaut",IDC_STATIC,14,129,58,8
     CONTROL         "Principal",IDC_PRIM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,128,48,10
     CONTROL         "Secondaire",IDC_SEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,128,61,10
     LTEXT           "Langue",IDC_LANGUAGE_LABEL,14,145,53,8

@@ -220,7 +220,7 @@ BEGIN
     CONTROL         "全屏模式",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
     CONTROL         "保存位置",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
     CONTROL         "保存大小",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,147,47,10
-    LTEXT           "查看器大小:",IDC_STATIC,179,161,38,8
+    LTEXT           "查看器大小:",IDC_STATIC,179,161,39,8
     CONTROL         "自动",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,160,27,11
     COMBOBOX        IDC_SCALE_CB,282,159,30,12,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     LTEXT           "服务器屏幕缩放",IDC_STATIC,180,174,80,8
@@ -238,7 +238,7 @@ BEGIN
     LTEXT           "鼠标事件节流（毫秒）",IDC_STATIC,205,88,116,11
     GROUPBOX        "显示",IDC_STATIC,174,104,159,93
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,317,161,8,8
-    LTEXT           "1  /",IDC_STATIC,265,175,12,8
+    LTEXT           "1  /",IDC_STATIC,265,175,15,8
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
     LTEXT           "超时",IDC_STATIC,295,202,25,8
@@ -386,7 +386,7 @@ BEGIN
     RTEXT           "已接收",IDC_RECEIVED,117,141,72,9
     LTEXT           "端口号",IDC_PORT,101,26,101,9
     ICON            IDI_NET,IDC_STATIC,93,121,20,20
-    LTEXT           "VNC 服务器",IDC_STATIC,11,12,46,9
+    LTEXT           "VNC 服务器",IDC_STATIC,11,12,54,9
     LTEXT           "服务器名称",IDC_VNCSERVER,101,12,101,9
     LTEXT           "状态",IDC_STATIC,12,54,46,9
     LTEXT           "连接已关闭",IDC_STATUS,101,54,105,9
@@ -423,7 +423,7 @@ BEGIN
     EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",IDOK,128,42,50,14
     PUSHBUTTON      "取消",IDCANCEL,184,42,50,14
-    LTEXT           "File Transfer Param comment. Please enter blah blah blah...",IDC_FTPARAMCOMMENT,9,7,225,8
+    LTEXT           "File Transfer Param comment. Please enter blah blah blah...",IDC_FTPARAMCOMMENT,9,7,239,8
 END
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
@@ -447,10 +447,10 @@ BEGIN
     DEFPUSHBUTTON   "确定",IDOK,198,48,62,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "版权所有 (C) 2002-2024 UltraVNC 团队成员",IDC_STATIC,44,31,184,13
-    LTEXT           "构建时间",IDC_STATIC,44,18,15,11
+    LTEXT           "版权所有 (C) 2002-2024 UltraVNC 团队成员",IDC_STATIC,44,31,233,13
+    LTEXT           "构建时间",IDC_STATIC,44,18,32,11
     LTEXT           "BuildTime",IDC_BUILDTIME,78,18,98,11
-    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,55,8
+    LTEXT           "https://uvnc.com",IDC_UVNCCOM,39,54,119,8
     LTEXT           "网站:",IDC_STATIC,7,54,29,8
 END
 
@@ -464,7 +464,7 @@ BEGIN
     DEFPUSHBUTTON   "是",IDC_YES_B,4,65,53,14
     PUSHBUTTON      "Yes for All",IDC_YESALL_B,58,65,53,14
     PUSHBUTTON      "否",IDC_NO_B,112,65,53,14
-    PUSHBUTTON      "No for all",IDC_NOALL_B,166,65,53,14
+    PUSHBUTTON      "No for all",IDC_NOALL_B,166,65,76,14
 END
 
 IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 109
@@ -476,12 +476,12 @@ BEGIN
     LTEXT           "Info Message",IDC_Message2,43,35,215,54
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,5,7,34,29
     LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,43,6,199,11
-    LTEXT           "构建时间",IDC_STATIC,43,17,15,10
+    LTEXT           "构建时间",IDC_STATIC,43,17,23,10
     LTEXT           "BuildTime",IDC_BUILDTIME,68,17,98,10
-    LTEXT           "https://forum.uvnc.com",IDC_FORUMHYPERLINK,56,102,102,8
-    LTEXT           "https://uvnc.com",IDC_WEBSITE,56,92,94,8
-    LTEXT           "https://github.com/ultravnc/ultravnc",IDC_GIT,56,112,144,8
-    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,121,135,8
+    LTEXT           "https://forum.uvnc.com",IDC_FORUMHYPERLINK,56,102,162,8
+    LTEXT           "https://uvnc.com",IDC_WEBSITE,56,92,119,8
+    LTEXT           "https://github.com/ultravnc/ultravnc",IDC_GIT,56,112,155,8
+    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,121,271,8
     LTEXT           "网站:",IDC_STATIC,10,92,38,8
     LTEXT           "论坛:",IDC_STATIC,10,102,38,8
     LTEXT           "Git:",IDC_STATIC,10,112,38,8
@@ -619,7 +619,7 @@ BEGIN
     COMBOBOX        IDC_SCALE_CB,73,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,106,107,8,8
     LTEXT           "服务器屏幕缩放",IDC_STATIC,12,119,80,8
-    LTEXT           "1  /",IDC_STATIC,104,119,12,8
+    LTEXT           "1  /",IDC_STATIC,104,119,14,8
     EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
     CONTROL         "保存位置",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
     CONTROL         "启动全屏",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,89,112,10
