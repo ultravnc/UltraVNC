@@ -51,7 +51,7 @@
 HINSTANCE	hAppInstance;
 const char	*szAppName = "WinVNC";
 DWORD		mainthreadId;
-char configFile[256] = { 0 };
+char configFile[MAX_PATH] = { 0 };
 int configfileskip = 0;
 bool showSettings = false;
 char winvncFolder[MAX_PATH];
@@ -288,7 +288,7 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, '"'); // Find the closing quote
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, MAX_PATH, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength + 1; // Move i past the closing quote
 					configfileskip += pathLength + 1;
@@ -300,14 +300,14 @@ void extractConfig(char* szCmdLine)
 				const char* end = strchr(start, ' '); // Find the next space
 				if (end) {
 					pathLength = end - start; // Calculate the length of the path
-					strncpy_s(configFile, start, pathLength); // Copy the path into the char array
+					strncpy_s(configFile, MAX_PATH, start, pathLength); // Copy the path into the char array
 					configFile[pathLength] = '\0'; // Null-terminate the path
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;
 				}
 				else {
 					// Path is the rest of the string
-					strcpy_s(configFile, &szCmdLine[i]); // Copy the rest of the string into the path
+					strcpy_s(configFile, MAX_PATH, &szCmdLine[i]); // Copy the rest of the string into the path
 					pathLength = strlen(&szCmdLine[i]);
 					i += pathLength; // Move i past the path
 					configfileskip += pathLength;

@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <fstream>
 #include "Localization.h"
+#include "SettingsManager.h"
 
 
 
@@ -197,6 +198,7 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 	}
 
 	iniFileService.setIniFile(inifile);
+	settings->Initialize(inifile);
 
     typedef SERVICE_STATUS_HANDLE (WINAPI * pfnRegisterServiceCtrlHandlerEx)(LPCTSTR, LPHANDLER_FUNCTION_EX, LPVOID);
     helper::DynamicFn<pfnRegisterServiceCtrlHandlerEx> pRegisterServiceCtrlHandlerEx("advapi32.dll","RegisterServiceCtrlHandlerExA");
@@ -914,8 +916,7 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	GetVersionEx(&OSversion);
 	char cmdline[MAX_PATH];
 	strcpy_s(app_path, exe_file_name);
-	strcat_s(app_path, " -config");
-	strcat_s(app_path, "\"");
+	strcat_s(app_path, " -config \"");
 	strcat_s(app_path, UltraVNCService::inifile);
 	strcat_s(app_path, "\"");
 	if (preconnect)
@@ -930,6 +931,9 @@ int UltraVNCService::createWinvncExeCall(bool preconnect, bool rdpselect)
 	iniFileService.ReadString("admin", "service_commandline", cmdline, 256);
 	if (strlen(cmdline) != 0) {
 		strcpy_s(app_path, exe_file_name);
+		strcat_s(app_path, " -config \"");
+		strcat_s(app_path, UltraVNCService::inifile);
+		strcat_s(app_path, "\"");
 		if (preconnect)
 			strcat_s(app_path, " -preconnect");
 		strcat_s(app_path, " ");
