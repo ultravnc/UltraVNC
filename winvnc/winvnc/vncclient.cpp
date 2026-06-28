@@ -1689,16 +1689,21 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 			}
 			if (bPassphrase == false)
 			{
-				if (strlen(plain) == 0 || memcmp(plain, pResponseData, strlen(plain))) 
+				size_t plainLen = strlen(plain);
+				if (plainLen == 0 || wResponseLength < plainLen || sodium_memcmp(plain, pResponseData, plainLen) != 0) 
 						auth_ok = false;
-				if (auth_ok == false && strlen(plainViewOnly) > 0 && !memcmp(plainViewOnly, pResponseData, strlen(plainViewOnly))) {
+				size_t voLen = strlen(plainViewOnly);
+				if (auth_ok == false && voLen > 0 && wResponseLength >= voLen && sodium_memcmp(plainViewOnly, pResponseData, voLen) == 0) {
 					m_client->EnableKeyboard(false); //PGM
 					m_client->EnablePointer(false); //PGM
 					m_client->EnableGii(false);
 					auth_ok = true;
 				}
 			}
-			else if (memcmp(ConfigHelpervar.m_szPassphrase, pResponseData, strlen(ConfigHelpervar.m_szPassphrase))) auth_ok = false;
+			else {
+				size_t ppLen = strlen(ConfigHelpervar.m_szPassphrase);
+				if (wResponseLength < ppLen || sodium_memcmp(ConfigHelpervar.m_szPassphrase, pResponseData, ppLen) != 0) auth_ok = false;
+			}
 			delete[] pResponseData;
 		}
 		nSequenceNumber++;
@@ -3108,6 +3113,11 @@ vncClientThread::run(void* arg)
 				/////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////////////////////////////////////////////////////////////////////
 				/////////////////////////////////////////////////////////////////////////////////////////
+				if (rfbGIIValutorEvent.first == 0 || rfbGIIValutorEvent.first > 254) {
+					vnclog.Print(LL_INTERR, VNCLOG("GII: invalid touch point count %u\n"), rfbGIIValutorEvent.first);
+					m_client->cl_connected = FALSE;
+					break;
+				}
 #ifdef _USE_DLL
 				if (DLL_PInjectTouch)
 #endif
@@ -3201,7 +3211,7 @@ vncClientThread::run(void* arg)
 
 						TI[j].pointerflag = POINTER_FLAG_NONE;
 
-						if (TI[j].TouchId < nr_points)  // protect point_status array, else wronf value crash
+						if (point_status && TI[j].TouchId < nr_points)  // protect point_status array, else wrong value crash
 						{
 							if (ValuatorFlag & PF_flag)
 							{
@@ -3243,7 +3253,7 @@ vncClientThread::run(void* arg)
 					MyTouchINfo* ti_array = TI;
 					BOOL value = FALSE;
 					POINTER_TOUCH_INFO *contact = NULL;
-					if (rfbGIIValutorEvent.first < 0 || rfbGIIValutorEvent.first >254) goto mydllend;
+					if (rfbGIIValutorEvent.first > 254) goto mydllend;  // early check above guarantees this, kept as defense-in-depth
 					contact = new POINTER_TOUCH_INFO[rfbGIIValutorEvent.first];
 					if (contact == NULL)  goto mydllend;
 					memset(contact, 0, sizeof(POINTER_TOUCH_INFO) * rfbGIIValutorEvent.first);
@@ -3405,13 +3415,20 @@ vncClientThread::run(void* arg)
 								break;
 							}
 
+							if (rfbGIIClientDeviceCreation.numButtons == 0 ||
+								rfbGIIClientDeviceCreation.numButtons >= 254) {
+								vnclog.Print(LL_INTERR, VNCLOG("GII: invalid numButtons %u\n"), rfbGIIClientDeviceCreation.numButtons);
+								m_client->cl_connected = FALSE;
+								break;
+							}
 #ifdef _USE_DLL
 							if (DLL_InitializeTouchInjection) DLL_InitializeTouchInjection(rfbGIIClientDeviceCreation.numButtons);
 #else
 							InitializeTouchInjectionUVNC(rfbGIIClientDeviceCreation.numButtons, TOUCH_FEEDBACK_DEFAULT);
 #endif
+							if (point_status) { delete[] point_status; point_status = NULL; }
 							nr_points = rfbGIIClientDeviceCreation.numButtons;
-							if (nr_points > 0 && nr_points < 254) point_status = new bool[nr_points];
+							point_status = new bool[nr_points]();  // value-initialized to false
 						}
 					}
 				}

@@ -65,9 +65,9 @@ extern int saved_portB;
 extern int saved_allow;
 extern int saved_refuse;
 extern int saved_refuse2;
-extern char saved_sample1[1024];
-extern char saved_sample2[1024];
-extern char saved_sample3[1024];
+extern char saved_sample1[1025];
+extern char saved_sample2[1025];
+extern char saved_sample3[1025];
 
 extern char temp1[50][25];
 extern char temp2[50][16];

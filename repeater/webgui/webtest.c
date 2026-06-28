@@ -58,10 +58,10 @@ int saved_usecom=0;
 int saved_allow;
 int saved_refuse;
 int saved_refuse2;
-char saved_sample1[1024];
-char saved_sample2[1024];
-char saved_sample3[1024];
-char saved_password[64]= {"admin"};
+char saved_sample1[1025];
+char saved_sample2[1025];
+char saved_sample3[1025];
+char saved_password[65]= {"admin"};
 void Save_settings();
 
 extern void	exit(int code);

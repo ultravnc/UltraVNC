@@ -109,13 +109,11 @@ WriteExact(int sock, char *buf, int len)
 int ReadExact(int sock, char *buf, int len)
 {
     int n;
-	Sleep(500);
     while (len > 0) {
 	n = recv(sock, buf, len, 0);
 	if (n > 0) {
 	    buf += n;
 	    len -= n;
-		if (len!=0) return -1;
         } else {
             return n;
 	}
@@ -205,7 +203,8 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 			sprintf_s(pv,rfbProtocolKeepAlive,rfbProtocolMajorVersion,rfbProtocolMinorVersion);
  			if (WriteExact(remote, pv, sz_rfbProtocolVersionMsg) < 0) goto error;
 			recvbytes=recvbytes-12;
-			rbuf_len=rbuf_len-12;
+			// rbuf_len must not be decremented here — keepalive was sent, not received
+			if (rbuf_len < 0) rbuf_len = 0;
 		}
 	    /* some error */
 	    //debug( "select() 0 \n");

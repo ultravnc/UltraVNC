@@ -64,16 +64,16 @@ extern int saved_usecom;
 extern int saved_allow;
 extern int saved_refuse;
 extern int saved_refuse2;
-extern char saved_sample1[1024];
-extern char saved_sample2[1024];
-extern char saved_sample3[1024];
+extern char saved_sample1[1025];
+extern char saved_sample2[1025];
+extern char saved_sample3[1025];
 extern char temp1[50][25];
 extern char temp2[50][16];
 extern char temp3[50][16];
 extern int rule1;
 extern int rule2;
 extern int rule3;
-extern char saved_password[64];
+extern char saved_password[65];
 CRITICAL_SECTION cs;
 
 void Save_settings();
@@ -253,9 +253,13 @@ Read_settings()
 		ReadFile(hFile,&saved_refuse2,sizeof(int),&readbytes,NULL);
 
 		ReadFile(hFile,saved_sample1,1024,&readbytes,NULL);
+		saved_sample1[readbytes < 1024 ? readbytes : 1024] = '\0';
 		ReadFile(hFile,saved_sample2,1024,&readbytes,NULL);
+		saved_sample2[readbytes < 1024 ? readbytes : 1024] = '\0';
 		ReadFile(hFile,saved_sample3,1024,&readbytes,NULL);
+		saved_sample3[readbytes < 1024 ? readbytes : 1024] = '\0';
 		ReadFile(hFile,saved_password,64,&readbytes,NULL);
+		saved_password[readbytes < 64 ? readbytes : 64] = '\0';
 		ReadFile(hFile,&saved_portHTTP,sizeof(int),&readbytes,NULL);
 		ReadFile(hFile,&saved_usecom,sizeof(int),&readbytes,NULL);
 		
