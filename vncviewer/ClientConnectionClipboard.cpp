@@ -267,9 +267,9 @@ void ClientConnection::UpdateLocalClipboard(char *buf, int len)
         HGLOBAL hglbCopy = GlobalAlloc(GMEM_DDESHARE, finalLen); // in bytes
         if (hglbCopy != NULL) { 
 	        // Lock the handle and copy the text to the buffer.  
-	        LPTSTR lptstrCopy = (LPTSTR) GlobalLock(hglbCopy); 
-			memcpy(lptstrCopy, wincontents, finalLen); // in bytes
-	        lptstrCopy[finalLen - 1] = 0;    // null character 
+	        LPSTR lpstrCopy = (LPSTR) GlobalLock(hglbCopy);
+			memcpy(lpstrCopy, wincontents, finalLen); // in bytes
+	        lpstrCopy[finalLen - 1] = 0;    // null character
 	        GlobalUnlock(hglbCopy);          // Place the handle on the clipboard.  
 			
 			// Convert ANSI to Unicode for m_strLastCutText (now std::wstring)
