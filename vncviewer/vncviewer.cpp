@@ -267,6 +267,11 @@ wchar_t sz_L91[64];
 wchar_t sz_L92[64];
 wchar_t sz_L93[64];
 wchar_t sz_L94[64];
+TCHAR sz_ShowOptions[64];
+TCHAR sz_HideOptions[64];
+TCHAR sz_Computer[64];
+TCHAR sz_ID[64];
+TCHAR sz_Port[64];
 
 // 14 April 2008 jdp
 wchar_t sz_H94[64];
@@ -766,6 +771,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR szCmdLin
 	LoadStringW(m_hInstResDLL, IDS_L92, sz_L92, _countof(sz_L92));
 	LoadStringW(m_hInstResDLL, IDS_L93, sz_L93, _countof(sz_L93));
 	LoadStringW(m_hInstResDLL, IDS_L94, sz_L94, _countof(sz_L94));
+	LoadStringW(m_hInstResDLL, IDS_L95, sz_ShowOptions, sizeof(sz_ShowOptions) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L96, sz_HideOptions, sizeof(sz_HideOptions) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L97, sz_Computer, sizeof(sz_Computer) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L98, sz_ID, sizeof(sz_ID) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L99, sz_Port, sizeof(sz_Port) / sizeof(TCHAR));
 
 	LoadStringW(m_hInstResDLL, IDS_M1, sz_M1, _countof(sz_M1));
 	LoadStringW(m_hInstResDLL, IDS_M2, sz_M2, _countof(sz_M2));
@@ -1249,6 +1259,12 @@ void ReloadLanguage(const wchar_t* langCode)
 	LoadStringW(m_hInstResDLL, IDS_L91, sz_L91, _countof(sz_L91));
 	LoadStringW(m_hInstResDLL, IDS_L92, sz_L92, _countof(sz_L92));
 	LoadStringW(m_hInstResDLL, IDS_L93, sz_L93, _countof(sz_L93));
+	LoadStringW(m_hInstResDLL, IDS_L94, sz_L94, _countof(sz_L93));
+	LoadStringW(m_hInstResDLL, IDS_L95, sz_ShowOptions, sizeof(sz_ShowOptions) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L96, sz_HideOptions, sizeof(sz_HideOptions) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L97, sz_Computer, sizeof(sz_Computer) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L98, sz_ID, sizeof(sz_ID) / sizeof(TCHAR));
+	LoadStringW(m_hInstResDLL, IDS_L99, sz_Port, sizeof(sz_Port) / sizeof(TCHAR));
 	LoadStringW(m_hInstResDLL, IDS_M1, sz_M1, _countof(sz_M1));
 	LoadStringW(m_hInstResDLL, IDS_M2, sz_M2, _countof(sz_M2));
 	LoadStringW(m_hInstResDLL, IDS_M3, sz_M3, _countof(sz_M3));

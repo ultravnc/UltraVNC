@@ -1,4 +1,4 @@
-﻿// Microsoft Visual C++ generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #pragma code_page(65001)
 
@@ -16,9 +16,9 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English resources
+// Russian (Russia) resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,13 +146,13 @@ IDR_TRAYMENU MENU
 BEGIN
     POPUP "t"
     BEGIN
-        MENUITEM "Новое соединение",              ID_NEWCONN
-        MENUITEM "Параметры соединения",          IDC_OPTIONBUTTON
+        MENUITEM "Новое соединение",            ID_NEWCONN
+        MENUITEM "Параметры соединения",        IDC_OPTIONBUTTON
         MENUITEM SEPARATOR
-        MENUITEM "&О UltraVNC Viewer...",   IDD_APP_ABOUT
+        MENUITEM "&О UltraVNC Viewer...",       IDD_APP_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "Режим ожидания (вкл./выкл.)", ID_LISTEN_MODE
-        MENUITEM "Закрыть значок в трее",             ID_CLOSEAPP
+        MENUITEM "Закрыть значок в трее",       ID_CLOSEAPP
     END
 END
 
@@ -160,10 +160,10 @@ IDR_tbMENU MENU
 BEGIN
     POPUP "Меню правой кнопки для полноэкранного заголовка"
     BEGIN
-        MENUITEM "Восстановить",                     IDC_NULL
+        MENUITEM "Восстановить",                IDC_NULL
         MENUITEM "Свернуть",                    IDC_NULL
         MENUITEM SEPARATOR
-        MENUITEM "Закрыть",                       IDC_NULL
+        MENUITEM "Закрыть",                     IDC_NULL
     END
 END
 
@@ -192,48 +192,47 @@ BEGIN
     CONTROL         "u2",IDC_ULTRA2,"Button",BS_AUTORADIOBUTTON,57,94,18,10
     CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,12,105,24,10
     CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,41,105,35,10
-    CONTROL         "Все цвета",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,48,10
-    CONTROL         "256 цветов",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,41,49,10
-    CONTROL         "64 цвета",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,52,45,10
-    CONTROL         "8 цветов",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,63,41,10
-    CONTROL         "8 тёмных",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,74,54,10
+    CONTROL         "Все цвета",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,89,30,58,10
+    CONTROL         "256 цветов",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,41,58,10
+    CONTROL         "64 цвета",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,52,58,10
+    CONTROL         "8 цветов",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,63,58,10
+    CONTROL         "8 тёмных",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,74,58,10
     CONTROL         "4 серых",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,84,58,10
-    CONTROL         "Ч/б",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,95,57,10
-    CONTROL         "Кодирование CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,96,10
-    CONTROL         "Кодирование Cache",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,90,10
-    CONTROL         "Сжатие Zip/Tight",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,87,10
+    CONTROL         "Ч/б",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,89,95,58,10
+    CONTROL         "Кодирование CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,118,136,10
+    CONTROL         "Кодирование Cache",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,98,10
+    CONTROL         "Сжатие Zip/Tight",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,101,10
     EDITTEXT        IDC_COMPRESSLEVEL,113,135,14,12,ES_AUTOHSCROLL
-    CONTROL         "JPEG (Tight) — качество",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,84,10
+    CONTROL         "JPEG (Tight) — качество",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,101,10
     EDITTEXT        IDC_QUALITYLEVEL,113,148,14,12,ES_AUTOHSCROLL
-    CONTROL         "Опереж. обновления",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,81,10
-    CONTROL         "Общий сервер",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,196,71,10
-    CONTROL         "Развернуть при сигнале",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,207,137,8
-    CONTROL         "Откл. буфер обмена",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,216,138,10
-    CONTROL         "Не показывать рекламу спонсора",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,145,10
+    CONTROL         "Опереж. обновления",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,101,10
+    CONTROL         "Общий сервер",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,196,153,10
+    CONTROL         "Развернуть при сигнале",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,207,153,8
+    CONTROL         "Откл. буфер обмена",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,216,153,10
+    CONTROL         "Не показывать рекламу спонсора",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,153,10
     CONTROL         "Эмуляция 3 кнопок (2-кноп. щелчок)",IDC_EMULATECHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,139,10
-    CONTROL         "Поменять кнопки мыши 2 и 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,126,10
-    CONTROL         "Национальная клавиатура",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,78,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,150,10
+    CONTROL         "Поменять кнопки мыши 2 и 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,150,10
+    CONTROL         "Национальная клавиатура",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,150,10
     CONTROL         "Отслеживать удалённый курсор локально",IDC_CSHAPE_ENABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,144,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,151,10
     CONTROL         "Удалённый сервер управляет курсором",IDC_CSHAPE_DISABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,179,63,147,10
+                    "Button",BS_AUTORADIOBUTTON,179,63,151,10
     CONTROL         "Не показывать удалённый курсор",IDC_CSHAPE_IGNORE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,179,74,142,10
+                    "Button",BS_AUTORADIOBUTTON,179,74,151,10
     EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Показывать панель кнопок",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,104,10
-    CONTROL         "Только просмотр (ввод игнор.)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,127,129,10
-    CONTROL         "Полный экран",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,138,114,8
-    CONTROL         "Сохр. позицию",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,147,59,10
-    CONTROL         "Сохр. размер",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,147,47,10
-    LTEXT           "Размер окна:",IDC_STATIC,179,161,39,8
+    CONTROL         "Показывать панель кнопок",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,150,10
+    CONTROL         "Только просмотр (ввод игнор.)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,126,150,10
+    CONTROL         "Полный экран",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,136,150,10
+    CONTROL         "Сохр. позицию",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,146,59,10
+    CONTROL         "Сохр. размер",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,146,47,10
+    LTEXT           "Размер окна:",IDC_STATIC,179,161,38,8
     CONTROL         "Авто",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,160,27,11
     COMBOBOX        IDC_SCALE_CB,282,159,30,12,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Масштаб экрана сервера",IDC_STATIC,180,174,83,8
+    LTEXT           "Масштаб экрана сервера",IDC_STATIC,180,174,80,8
     EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
     CONTROL         "По размеру окна",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
-    LTEXT           "попыток переподключения",IDC_STATIC,195,202,79,8
+    LTEXT           "попыток переподключения",IDC_STATIC,195,202,80,8
     EDITTEXT        IDC_SERVER_RECON_TIME,276,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,251,216,20,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,225,235,50,14
@@ -242,15 +241,15 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,9,22,72,94
     GROUPBOX        "Разное",IDC_STATIC,4,188,160,52
     GROUPBOX        "Мышь и клавиатура",IDC_STATIC,174,2,159,100
-    LTEXT           "Задержка событий мыши (мс)",IDC_STATIC,205,88,116,11
+    LTEXT           "Задержка событий мыши (мс)",IDC_STATIC,205,88,125,11
     GROUPBOX        "Экран",IDC_STATIC,174,104,159,93
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,317,161,8,8
-    LTEXT           "1  /",IDC_STATIC,265,175,15,8
+    LTEXT           "1  /",IDC_STATIC,265,175,12,8
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
-    LTEXT           "тайм-аут",IDC_STATIC,295,202,41,8
-    LTEXT           "Тайм-аут передачи",IDC_STATIC,177,219,72,8
-    CONTROL         "Zstd вместо Zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,90,10
+    LTEXT           "тайм-аут",IDC_STATIC,295,202,25,8
+    LTEXT           "Тайм-аут передачи",IDC_STATIC,177,219,65,8
+    CONTROL         "Zstd вместо Zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,101,10
     CONTROL         "Выровнять",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,160,27,11
 END
 
@@ -262,7 +261,7 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Журнал",IDC_HS_STATIC,4,378,26,8
     COMBOBOX        IDC_HISTORY_CB,45,376,507,71,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Прогресс",IDC_PR_STATIC,4,390,39,8
+    LTEXT           "Прогресс",IDC_PR_STATIC,4,390,32,8
     CONTROL         "Прогресс1",IDC_PROGRESS,"msctls_progress32",WS_BORDER,45,390,307,8
     CONTROL         "",IDC_LOCAL_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,3,359,238,14,WS_EX_STATICEDGE
     CONTROL         "",IDC_REMOTE_STATUS,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,314,359,238,14,WS_EX_STATICEDGE
@@ -298,28 +297,29 @@ END
 
 IDD_SESSION_DLG DIALOGEX 0, 0, 290, 278
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Viewer 1.4.4.0-dev — соединение"
+CAPTION "UltraVNC Viewer - (VERSION)"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    COMBOBOX        IDC_HOSTNAME_EDIT,96,26,185,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    EDITTEXT        IDC_PROXY_EDIT,96,39,185,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Подключить",IDCONNECT,231,54,50,13
-    PUSHBUTTON      "Параметры",IDC_BUTTON_EXPAND,9,54,50,13,BS_ICON
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,7,5,26,23
-    CONTROL         "Прямое",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER | WS_GROUP | WS_TABSTOP,83,14,47,10
-    CONTROL         "Репитер",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,133,14,47,10
-    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,273,172
-    PUSHBUTTON      "Удалить",IDC_HOSTNAME_DEL,148,258,60,13
-    PUSHBUTTON      "Загрузить ",IDC_LOADPROFILE_B,221,258,60,13
-    PUSHBUTTON      "О программе",IDC_ABOUT,75,277,60,13
-    PUSHBUTTON      "Сохр. как",IDC_SAVEAS,148,277,60,13
-    PUSHBUTTON      "По умолч.",IDC_RESET_DEFAULTS,75,258,60,13
-    PUSHBUTTON      "Сохранить",IDC_SAVE,221,277,60,13
-    COMBOBOX        IDC_LANGUAGE_COMBO,9,277,60,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Компьютер",IDC_LINE1,43,28,46,8
-    CTEXT           "UltraVNC Viewer",IDC_LOGO,46,4,156,8,SS_CENTERIMAGE
-    LTEXT           "Компьютер",IDC_LINE2,43,41,47,8
+    COMBOBOX        IDC_HOSTNAME_EDIT,96,25,125,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_PROXY_EDIT,96,39,125,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Подключить",IDCONNECT,230,24,51,13
+    PUSHBUTTON      "",IDC_BUTTON_EXPAND,9,56,9,8,BS_BITMAP
+    LTEXT           "Показать параметры",IDC_SHOWOPTIONS,22,55,74,9,SS_NOTIFY | SS_CENTERIMAGE
+    CONTROL         "Прямое",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER | WS_GROUP | WS_TABSTOP,96,14,47,10
+    CONTROL         "Репитер",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,146,14,47,10
+    CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,273,159
+    PUSHBUTTON      "Удалить",IDC_HOSTNAME_DEL,150,244,60,13
+    PUSHBUTTON      "Загрузить ",IDC_LOADPROFILE_B,221,244,60,13
+    PUSHBUTTON      "О программе",IDC_ABOUT,79,261,60,13
+    PUSHBUTTON      "Сохр. как",IDC_SAVEAS,150,261,60,13
+    PUSHBUTTON      "По умолч.",IDC_RESET_DEFAULTS,79,244,60,13
+    PUSHBUTTON      "Сохранить",IDC_SAVE,221,261,60,13
+    COMBOBOX        IDC_LANGUAGE_COMBO,9,262,60,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Компьютер:",IDC_LINE1,43,26,48,8
+    CTEXT           "UltraVNC Viewer",IDC_LOGO,39,4,212,8,SS_CENTERIMAGE
+    LTEXT           "Репитер:",IDC_LINE2,43,41,48,8
     CONTROL         "",IDC_DEFAULTBOX,"Static",SS_BLACKFRAME | SS_REALSIZEIMAGE,4,0,286,75
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,7,5,32,28
 END
 
 IDD_SERVINFO_DLG DIALOGEX 0, 0, 224, 170
@@ -331,35 +331,35 @@ BEGIN
     EDITTEXT        IDC_SERVINFO_EDIT,7,7,210,134,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY
 END
 
-IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 63
+IDD_AUTH_DIALOG DIALOGEX 101, 66, 214, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — аутентификация"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDD_USER_NAME,104,6,96,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_PASSWD_EDIT,104,22,96,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,90,42,50,15
-    PUSHBUTTON      "Отмена",IDCANCEL,150,42,50,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,10,44,8
-    LTEXT           "Пароль",IDC_STATIC,58,26,37,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,10,44,41
+    EDITTEXT        IDD_USER_NAME,90,7,117,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,90,25,117,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,45,50,14
+    LTEXT           "Имя пользователя",IDC_STATIC,46,10,43,8
+    LTEXT           "Пароль",IDC_STATIC,46,28,43,8
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
 END
 
-IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 113
+IDD_AUTH_DIALOG2 DIALOGEX 101, 66, 214, 127
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — аутентификация — небезопасная передача"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "В текущей версии UltraVNC Viewer указанный пароль передаётся небезопасно, кроме случая использования DSMPlugin для шифрования.\r\nОбновите UltraVNC Server на удалённом компьютере до v1.0.2 или выше для безопасной передачи пароля.",IDC_STATIC,8,6,196,44
-    EDITTEXT        IDD_USER_NAME,114,57,92,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_PASSWD_EDIT,114,73,92,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,95,92,54,15
-    PUSHBUTTON      "Отмена",IDCANCEL,156,92,50,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,60,54,8
-    LTEXT           "Пароль",IDC_STATIC,58,76,42,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,8,60,44,41
+    LTEXT           "В текущей версии UltraVNC Viewer указанный пароль передаётся небезопасно, кроме случая использования DSMPlugin для шифрования.\r\nОбновите UltraVNC Server на удалённом компьютере до v1.0.2 или выше для безопасной передачи пароля.",IDC_STATIC,8,6,196,51
+    EDITTEXT        IDD_USER_NAME,89,64,118,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,89,80,118,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,106,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,106,50,14
+    LTEXT           "Имя пользователя",IDC_STATIC,46,67,43,8
+    LTEXT           "Пароль",IDC_STATIC,46,83,42,8
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,7,64,32,32
 END
 
 IDD_CUSTUM_KEY DIALOGEX 0, 0, 224, 58
@@ -368,7 +368,7 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — отправить клавишу (эксперим.)"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Код клавиши (десят.)",IDC_STATIC,7,9,91,12
+    LTEXT           "Код клавиши (десят.)",IDC_STATIC,7,9,87,12
     EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
     CONTROL         "ALT GR",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
     CONTROL         "CTRL",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
@@ -387,7 +387,7 @@ BEGIN
     GROUPBOX        "Соединение",IDC_STATIC,7,0,199,112
     GROUPBOX        "Трафик",IDC_STATIC,7,112,199,42
     LTEXT           "Порт",IDC_STATIC,12,26,46,9
-    LTEXT           "Отправлено байт",IDC_STATIC,12,125,73,9
+    LTEXT           "Отправлено байт",IDC_STATIC,12,125,63,9
     RTEXT           "Получено байт",IDC_STATIC,117,125,68,9
     RTEXT           "Отправлено",IDC_SEND,11,141,64,9
     RTEXT           "Получено",IDC_RECEIVED,117,141,72,9
@@ -399,27 +399,27 @@ BEGIN
     LTEXT           "Соединение закрыто",IDC_STATUS,101,54,105,9
     RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Отмена",IDQUIT,7,180,50,14
-    LTEXT           "Скорость",IDC_STATIC,12,85,41,8
+    LTEXT           "Скорость",IDC_STATIC,12,85,31,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
     LTEXT           "кбит/с",IDC_STATIC,134,85,50,8
     LTEXT           "",IDC_ENCODER,101,40,101,9
     LTEXT           "Кодер",IDC_STATIC,12,40,46,9
     LTEXT           "FPS",IDC_STATIC,12,99,46,8
     LTEXT           "1",IDC_FPS,101,99,58,8
-    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,12,161,191,11
+    LTEXT           "UltraVNC Viewer - (VERSION)",IDC_UVVERSION,12,161,191,11
 END
 
-IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 234, 58
+IDD_AUTH_DIALOG1 DIALOGEX 101, 66, 214, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — ПРЕДУПРЕЖДЕНИЕ: обновите сервер..."
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_PASSWD_EDIT,108,13,110,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,108,37,54,15
-    PUSHBUTTON      "Отмена",IDCANCEL,168,37,50,15
-    LTEXT           "Пароль",-1,65,16,40,8
-    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE,6,6,50,42
+    EDITTEXT        IDC_PASSWD_EDIT,89,16,118,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,45,50,14
+    LTEXT           "Пароль",-1,46,19,40,8
+    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
 END
 
 IDD_FTPARAM_DLG DIALOGEX 0, 0, 241, 60
@@ -428,9 +428,9 @@ CAPTION "UltraVNC Viewer — параметры передачи файлов"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_FTPARAM_EDIT,10,21,224,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,128,42,50,14
-    PUSHBUTTON      "Отмена",IDCANCEL,184,42,50,14
-    LTEXT           "Комментарий параметров передачи файлов. Введите значение...",IDC_FTPARAMCOMMENT,9,7,239,8
+    DEFPUSHBUTTON   "OK",IDOK,126,39,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,184,39,50,14
+    LTEXT           "Комментарий параметров передачи файлов. Введите значение...",IDC_FTPARAMCOMMENT,9,7,225,8
 END
 
 IDD_TEXTCHAT_DLG DIALOGEX 0, 0, 307, 175
@@ -451,14 +451,14 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | 
 CAPTION "UltraVNC Viewer — о программе"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,198,48,62,14
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,8,1,34,29
-    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION,44,7,199,11
-    LTEXT           "Copyright © 2002-2026 участники команды UltraVNC",IDC_STATIC,44,31,223,13
-    LTEXT           "Сборка",IDC_STATIC,44,18,32,11
-    LTEXT           "Время сборки",IDC_BUILDTIME,78,18,98,11
-    LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,54,81,8
-    LTEXT           "Сайт:",IDC_STATIC,7,54,29,8
+    DEFPUSHBUTTON   "OK",IDOK,207,45,50,14
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
+    LTEXT           "UltraVNC Viewer - (VERSION)",IDC_UVVERSION,46,7,211,8
+    LTEXT           "Copyright © 2002-2026 участники команды UltraVNC",IDC_STATIC,46,31,183,8
+    LTEXT           "Сборка",IDC_STATIC,46,19,20,8
+    LTEXT           "Время сборки",IDC_BUILDTIME,80,19,177,8
+    LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,51,81,8
+    LTEXT           "Сайт:",IDC_STATIC,7,51,29,8
 END
 
 IDD_FTCONFIRM_DLG DIALOGEX 0, 0, 227, 86
@@ -467,11 +467,11 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Текст подтверждения",IDC_FTPCONFIRMCOMMENT,4,8,163,53
-    DEFPUSHBUTTON   "Да",IDC_YES_B,4,65,53,14
-    PUSHBUTTON      "Да для всех",IDC_YESALL_B,58,65,53,14
-    PUSHBUTTON      "Нет",IDC_NO_B,112,65,53,14
-    PUSHBUTTON      "Нет для всех",IDC_NOALL_B,166,65,53,14
+    LTEXT           "Текст подтверждения",IDC_FTPCONFIRMCOMMENT,7,7,213,53
+    DEFPUSHBUTTON   "Да",IDC_YES_B,7,65,53,14
+    PUSHBUTTON      "Да для всех",IDC_YESALL_B,60,65,53,14
+    PUSHBUTTON      "Нет",IDC_NO_B,113,65,53,14
+    PUSHBUTTON      "Нет для всех",IDC_NOALL_B,167,65,53,14
 END
 
 IDD_APP_MESSAGE2 DIALOGEX 0, 0, 273, 109
@@ -479,69 +479,69 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_FIXEDSYS | DS_CENTER | 
 CAPTION "UltraVNC Viewer — информация"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Закрыть",IDOK,213,114,54,15
-    LTEXT           "Информационное сообщение",IDC_Message2,43,35,213,25
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,5,7,34,29
-    LTEXT           "UltraVNC Viewer 1.4.4.0-dev",IDC_UVVERSION2,43,6,199,11
-    LTEXT           "Сборка",IDC_STATIC,43,17,23,10
-    LTEXT           "Время сборки",IDC_BUILDTIME,68,17,98,10
-    LTEXT           "https://forum.uvnc.com/",IDC_FORUMHYPERLINK,56,74,109,8
-    LTEXT           "https://uvnc.com/",IDC_WEBSITE,56,64,94,8
-    LTEXT           "https://github.com/ultravnc/UltraVNC",IDC_GIT,56,84,168,8
-    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,186,8
-    LTEXT           "Сайт:",IDC_STATIC,10,64,38,8
-    LTEXT           "Форум:",IDC_STATIC,10,74,38,8
-    LTEXT           "Git:",IDC_STATIC,10,84,38,8
-    LTEXT           "Скачать:",IDC_STATIC,10,94,38,8
+    DEFPUSHBUTTON   "Закрыть",IDOK,216,88,50,14
+    LTEXT           "Информационное сообщение",IDC_Message2,46,35,220,25
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
+    LTEXT           "UltraVNC Viewer - (VERSION)",IDC_UVVERSION2,46,7,199,8
+    LTEXT           "Сборка",IDC_STATIC,46,19,20,8
+    LTEXT           "Время сборки",IDC_BUILDTIME,80,19,98,8
+    LTEXT           "https://forum.uvnc.com/",IDC_FORUMHYPERLINK,56,74,150,8
+    LTEXT           "https://uvnc.com/",IDC_WEBSITE,56,64,150,8
+    LTEXT           "https://github.com/ultravnc/UltraVNC",IDC_GIT,56,84,150,8
+    LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,150,8
+    LTEXT           "Форум:",IDC_STATIC,7,74,38,8
+    LTEXT           "Git:",IDC_STATIC,7,84,38,8
+    LTEXT           "Скачать:",IDC_STATIC,7,94,38,8
+    LTEXT           "Сайт:",IDC_STATIC,7,64,38,8
 END
 
-IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 234, 58
+IDD_AUTH_DIALOG3 DIALOGEX 101, 66, 214, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — аутентификация"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_PASSWD_EDIT,118,13,100,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,108,37,54,15
-    PUSHBUTTON      "Отмена",IDCANCEL,168,37,50,15
-    LTEXT           "Пароль",-1,65,16,43,8
-    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE,6,6,50,42
+    EDITTEXT        IDC_PASSWD_EDIT,89,16,118,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,45,50,14
+    LTEXT           "Пароль",-1,46,19,43,8
+    CONTROL         IDB_VNC64,-1,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
 END
 
-IDD_AUTH_DIALOG4 DIALOGEX 101, 66, 215, 91
+IDD_AUTH_DIALOG4 DIALOGEX 101, 66, 214, 91
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — аутентификация"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDD_USER_NAME,96,7,110,14,ES_AUTOHSCROLL
-    EDITTEXT        IDC_PASSWD_EDIT,96,25,110,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,91,71,54,15
-    PUSHBUTTON      "Отмена",IDCANCEL,156,71,54,15
-    LTEXT           "Имя пользователя",IDC_STATIC,58,9,36,8
-    LTEXT           "Пароль",IDC_STATIC,58,28,33,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP,8,6,26,23
-    LTEXT           "Контр. фраза",IDC_STATIC,8,47,48,8
-    LTEXT           "Подпись",IDC_STATIC,8,60,35,8
-    LTEXT           "",IDC_CATCHPHRASE,58,47,148,8
-    LTEXT           "",IDC_SIGNATURE,58,60,148,8
+    EDITTEXT        IDD_USER_NAME,89,7,118,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWD_EDIT,89,25,118,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,70,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,70,50,14
+    LTEXT           "Имя пользователя",IDC_STATIC,46,10,37,8
+    LTEXT           "Пароль",IDC_STATIC,46,28,33,8
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
+    LTEXT           "Контр. фраза",IDC_STATIC,7,47,56,8
+    LTEXT           "Подпись",IDC_STATIC,7,60,56,8
+    LTEXT           "",IDC_CATCHPHRASE,63,47,143,8
+    LTEXT           "",IDC_SIGNATURE,63,60,143,8
 END
 
-IDD_AUTH_DIALOG5 DIALOGEX 101, 66, 235, 79
+IDD_AUTH_DIALOG5 DIALOGEX 101, 66, 214, 91
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer — аутентификация"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_PASSWD_EDIT,107,6,117,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Войти",IDOK,114,59,50,15
-    PUSHBUTTON      "Отмена",IDCANCEL,174,59,50,15
-    LTEXT           "Пароль",IDC_STATIC,65,9,33,8
-    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,6,-1,37,30
-    LTEXT           "Контр. фраза",IDC_STATIC,14,32,49,8
-    LTEXT           "Подпись",IDC_STATIC,14,47,35,8
-    LTEXT           "",IDC_CATCHPHRASE,65,32,159,8
-    LTEXT           "",IDC_SIGNATURE,65,47,159,8
+    EDITTEXT        IDC_PASSWD_EDIT,89,16,118,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "Войти",IDOK,89,70,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,70,50,14
+    LTEXT           "Пароль",IDC_STATIC,46,19,33,8
+    CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
+    LTEXT           "Контр. фраза",IDC_STATIC,7,47,42,8
+    LTEXT           "Подпись",IDC_STATIC,7,60,35,8
+    LTEXT           "",IDC_CATCHPHRASE,63,47,144,8
+    LTEXT           "",IDC_SIGNATURE,63,60,144,8
 END
 
 IDD_SESSIONSELECTOR DIALOGEX 0, 0, 316, 183
@@ -560,13 +560,13 @@ EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
 CAPTION "UltraVNC Viewer — скриншот"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_FOLDER,51,7,189,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_FOLDER,51,7,201,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Обзор",IDC_BROWSE,259,7,50,14
     EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,259,38,50,14
     LTEXT           "Папка",IDC_STATIC,13,9,24,9
-    LTEXT           "Префикс",IDC_STATIC,13,28,36,8
+    LTEXT           "Префикс",IDC_STATIC,13,28,22,8
 END
 
 IDD_ENCODERS DIALOGEX 0, 0, 270, 145
@@ -586,33 +586,33 @@ BEGIN
     CONTROL         "ZYWRLE",IDC_ZYWRLERADIO,"Button",BS_AUTORADIOBUTTON,14,97,38,10
     CONTROL         "XZ",IDC_XZRADIO,"Button",BS_AUTORADIOBUTTON,54,97,24,10
     CONTROL         "XZYW",IDC_XZYWRADIO,"Button",BS_AUTORADIOBUTTON,86,97,37,10
-    CONTROL         "Все цвета",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,142,21,48,10
-    CONTROL         "256 цветов",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,31,49,10
-    CONTROL         "64 цвета",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,41,45,10
-    CONTROL         "8 цветов",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,51,41,10
-    CONTROL         "8 тёмных",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,61,54,10
-    CONTROL         "4 серых",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,71,58,10
-    CONTROL         "Ч/б",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,142,81,57,10
-    CONTROL         "Сжатие Zlib",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,68,10
+    CONTROL         "Все цвета",IDC_FULLCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,163,21,103,10
+    CONTROL         "256 цветов",IDC_256COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,31,103,10
+    CONTROL         "64 цвета",IDC_64COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,41,103,10
+    CONTROL         "8 цветов",IDC_8COLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,51,103,10
+    CONTROL         "8 тёмных",IDC_8GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,61,103,10
+    CONTROL         "4 серых",IDC_4GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,71,103,10
+    CONTROL         "Ч/б",IDC_2GREYCOLORS_RADIO,"Button",BS_AUTORADIOBUTTON,163,81,103,10
+    CONTROL         "Сжатие Zlib",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,71,10
     EDITTEXT        IDC_COMPRESSLEVEL,87,113,14,12,ES_AUTOHSCROLL
-    CONTROL         "Качество JPEG",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,54,10
+    CONTROL         "Качество JPEG",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,71,10
     EDITTEXT        IDC_QUALITYLEVEL,87,126,14,12,ES_AUTOHSCROLL
-    CONTROL         "Zstd вместо zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,100,90,10
-    CONTROL         "Кодирование CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,110,94,10
-    CONTROL         "Кодирование кеша",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,120,90,10
-    CONTROL         "Опереж. обновления",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,130,81,10
-    LTEXT           "Больше CPU, меньше трафик ",IDC_STATIC,8,87,123,8
-    LTEXT           "Меньше CPU, больше трафик",IDC_STATIC,8,17,118,8
-    LTEXT           "Больше CPU, средний трафик (без потерь)",IDC_STATIC,8,41,132,8
-    LTEXT           "Средний CPU, малый трафик (с потерями)",IDC_STATIC,8,64,132,8
+    CONTROL         "Zstd вместо zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,100,103,10
+    CONTROL         "Кодирование CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,110,103,10
+    CONTROL         "Кодирование кеша",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,120,103,10
+    CONTROL         "Опереж. обновления",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,130,103,10
+    LTEXT           "Больше CPU, меньше трафик ",IDC_STATIC,8,87,144,8
+    LTEXT           "Меньше CPU, больше трафик",IDC_STATIC,8,17,144,8
+    LTEXT           "Больше CPU, средний трафик (без потерь)",IDC_STATIC,8,41,151,8
+    LTEXT           "Средний CPU, малый трафик (с потерями)",IDC_STATIC,8,64,148,8
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Менять разрешение сервера",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,100,10
-    LTEXT           "Малый",IDC_STATIC,19,12,22,8
+    CONTROL         "Менять разрешение сервера",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,167,10
+    LTEXT           "Малый",IDC_STATIC,12,12,31,8
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CTEXT           "",IDC_RES,181,12,47,8
     CONTROL         "Использовать все мониторы для удалённого сеанса",IDC_ALLMONS,
@@ -626,43 +626,41 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,233,10
     CONTROL         "Разрешить полный экран на несколько мониторов",IDC_ALLOWSPAN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,262,10
-    CONTROL         "Подогнать под экран: без прокрутки",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,103,10
-    CONTROL         "Показать панель",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,60,10
-    CONTROL         "Автомасштаб",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,64,10
+    CONTROL         "Подогнать под экран: без прокрутки",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,141,10
+    CONTROL         "Показать панель",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,141,10
+    CONTROL         "Автомасштаб",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,78,10
     COMBOBOX        IDC_SCALE_CB,73,105,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,106,107,8,8
-    LTEXT           "Масштаб экрана сервера",IDC_STATIC,12,119,90,8
-    LTEXT           "1  /",IDC_STATIC,104,119,14,8
+    CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,122,108,8,8
+    LTEXT           "Масштаб экрана сервера",IDC_STATIC,12,119,88,8
+    LTEXT           "1  /",IDC_STATIC,104,119,12,8
     EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
-    CONTROL         "Сохр. позицию при выходе",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,97,10
-    CONTROL         "Запуск в полном экране",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,87,90,10
-    CONTROL         "Автомасштаб - ровно",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,98,65,10
-    CONTROL         "",IDC_GNOME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,110,12,11
-    CONTROL         "Сохр. размер при выходе",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,129,73,10
-    LTEXT           "GNOME Remote Desktop \nQEMU",IDC_STATIC,163,111,103,18
+    CONTROL         "Сохр. позицию при выходе",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
+    CONTROL         "Запуск в полном экране",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,85,112,10
+    CONTROL         "Автомасштаб - ровно",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,96,112,10
+    CONTROL         "GNOME Remote Desktop \nQEMU",IDC_GNOME,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,154,108,112,16
+    CONTROL         "Сохр. размер при выходе",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,129,112,10
 END
 
 IDD_MISC DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_FOLDER,40,15,137,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Обзор",IDC_BROWSE,186,15,46,14
-    EDITTEXT        IDC_PREFIX,40,34,49,14,ES_AUTOHSCROLL
-    COMBOBOX        IDC_IMAGEFORMAT,138,34,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_FOLDER,30,15,182,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Обзор",IDC_BROWSE,220,15,46,14
+    EDITTEXT        IDC_PREFIX,30,34,86,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_IMAGEFORMAT,137,36,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_SERVER_RECON,100,59,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_SERVER_RECON_TIME,169,59,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,100,79,16,14,ES_AUTOHSCROLL
-    CONTROL         "Не показывать рекламу спонсора",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,164,10
-    CONTROL         "Скрыть окно состояния",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,128,10
+    CONTROL         "Не показывать рекламу спонсора",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,262,10
+    CONTROL         "Скрыть окно состояния",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,262,10
     CONTROL         "Скрыть ошибку End of Stream",IDC_HIDEENDOFSTREAMERROR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,164,10
-    LTEXT           "Папка",IDC_STATIC,4,18,36,9
-    LTEXT           "Префикс",IDC_STATIC,4,36,36,8
-    LTEXT           "Папка и префикс скриншотов",IDC_STATIC,4,4,232,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,262,10
+    LTEXT           "Папка",IDC_STATIC,4,18,25,9
+    LTEXT           "Префикс",IDC_STATIC,4,36,25,8
+    LTEXT           "Папка и префикс скриншотов",IDC_STATIC,4,4,262,8
     LTEXT           "Попыток переподкл.",IDC_STATIC,4,62,89,8
-    LTEXT           "Тайм-аут",IDC_STATIC,130,62,37,8
+    LTEXT           "Тайм-аут",IDC_STATIC,130,62,34,8
     LTEXT           "Тайм-аут передачи",IDC_STATIC,4,82,87,8
 END
 
@@ -673,19 +671,19 @@ BEGIN
     CONTROL         "Использовать шифрование",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,8,66,10
     COMBOBOX        IDC_PLUGINS_COMBO,74,6,138,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "НАСТР. ШИФРОВАНИЯ",IDC_PLUGIN_BUTTON,74,20,138,12
-    CONTROL         "Только зашифрованные серверы.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,112,10
+    CONTROL         "Только зашифрованные серверы.",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,131,10
     CONTROL         "Общий сервер: разрешить другим подключаться.",IDC_SHARED,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,163,10
-    CONTROL         "Откл. буфер обмена",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,171,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,262,10
+    CONTROL         "Откл. буфер обмена",IDC_DISABLECLIPBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,262,10
     CONTROL         "Автоприём входящих (режим ожидания)",IDC_AUTOACCEPT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,178,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,262,10
     CONTROL         "Игнор. отсутствие шифрования (режим ожидания)",IDC_AUTOACCEPTNOWARN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,201,10
-    CONTROL         "Скрыть меню",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,49,10
-    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,232,25,ES_MULTILINE
-    LTEXT           "Уведомление при подключении",IDC_STATIC,4,108,127,8
-    CONTROL         "Только серверы с паролем",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,35,104,10
-    CONTROL         "Использовать IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,44,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,262,10
+    CONTROL         "Скрыть меню",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,262,10
+    EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,262,25,ES_MULTILINE
+    LTEXT           "Уведомление при подключении",IDC_STATIC,4,108,262,8
+    CONTROL         "Только серверы с паролем",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,35,131,10
+    CONTROL         "Использовать IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,262,10
 END
 
 IDD_KEYBOARDMOUSE DIALOGEX 0, 0, 270, 145
@@ -693,35 +691,34 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Отслеживать удалённый курсор локально",IDC_CSHAPE_ENABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,144,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,260,10
     CONTROL         "Курсором управляет удалённый сервер",IDC_CSHAPE_DISABLE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,19,147,10
+                    "Button",BS_AUTORADIOBUTTON,6,19,260,10
     CONTROL         "Не показывать удалённый курсор",IDC_CSHAPE_IGNORE_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,6,30,142,10
-    CONTROL         "Только просмотр, без ввода",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,129,10
-    CONTROL         "Откл. горячие клавиши",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,66,10
+                    "Button",BS_AUTORADIOBUTTON,6,30,260,10
+    CONTROL         "Только просмотр, без ввода",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,260,10
+    CONTROL         "Откл. горячие клавиши",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
     CONTROL         "Эмуляция 3 кнопок (2-кноп. щелчок)",IDC_EMULATECHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,139,10
-    CONTROL         "Поменять кнопки мыши 2 и 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,126,10
-    CONTROL         "Национальная клавиатура",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,78,10
-    LTEXT           "Задержка мыши (мс)",IDC_STATIC,6,106,89,11
-    EDITTEXT        IDC_MOUSE_THROTTLE,106,104,42,12,ES_AUTOHSCROLL | ES_NUMBER
-    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,24,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,260,10
+    CONTROL         "Поменять кнопки мыши 2 и 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,260,10
+    CONTROL         "Национальная клавиатура",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,260,10
+    LTEXT           "Задержка мыши (мс)",IDC_STATIC,6,106,100,11
+    EDITTEXT        IDC_MOUSE_THROTTLE,111,104,42,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,105,10
 END
 
 IDD_QUICKOPTIONS DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "АВТО    (автовыбор настроек)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,177,10
-    CONTROL         "ВИДЕО   (> 2 Мбит/с)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,176,10
-    CONTROL         "LAN     (> 1 Мбит/с) — макс. цветов",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,176,10
+    CONTROL         "АВТО    (автовыбор настроек)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,257,10
+    CONTROL         "ВИДЕО   (> 2 Мбит/с)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,257,10
+    CONTROL         "LAN     (> 1 Мбит/с) — макс. цветов",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,257,10
     CONTROL         "СРЕДНЕ  (128–256 Кбит/с) — 256 цветов",IDC_MEDIUM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,56,153,10
-    CONTROL         "МОДЕМ   (19–128 Кбит/с) — 64 цвета",IDC_MODEM_RB,
-                    "Button",BS_AUTORADIOBUTTON,9,70,148,10
-    CONTROL         "МЕДЛЕННО(< 19 Кбит/с) — 8 цветов",IDC_SLOW_RB,"Button",BS_AUTORADIOBUTTON,9,84,128,10
-    CONTROL         "РУЧНОЙ  (используйте Параметры)",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,123,10
+                    "Button",BS_AUTORADIOBUTTON,9,56,257,10
+    CONTROL         "МОДЕМ   (19–128 Кбит/с) — 64 цвета",IDC_MODEM_RB,"Button",BS_AUTORADIOBUTTON,9,70,257,10
+    CONTROL         "МЕДЛЕННО(< 19 Кбит/с) — 8 цветов",IDC_SLOW_RB,"Button",BS_AUTORADIOBUTTON,9,84,257,10
+    CONTROL         "РУЧНОЙ  (используйте Параметры)",IDC_MANUAL,"Button",BS_AUTORADIOBUTTON,9,98,257,10
 END
 
 IDD_LISTEN DIALOGEX 0, 0, 270, 145
@@ -729,8 +726,8 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     EDITTEXT        IDC_LISTENPORT,23,24,40,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "Начать ожидание",IDC_STARTLISTEN,169,121,73,14
-    LTEXT           "Режим ожидания",IDC_STATIC,4,10,68,8
+    DEFPUSHBUTTON   "Начать ожидание",IDC_STARTLISTEN,76,24,67,14
+    LTEXT           "Режим ожидания",IDC_STATIC,4,10,133,8
     LTEXT           "Порт",IDC_STATIC,4,27,17,8
 END
 
@@ -738,11 +735,11 @@ IDD_CONFIG DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "1",IDC_DEFAULTCONFIG,4,49,232,13
-    CONTROL         "Только options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,82,10
-    LTEXT           "Файл конф. по умолч.",IDC_SLIDERRES,4,35,124,8
-    LTEXT           "Пользовательский файл конф.",IDC_STATIC,4,66,127,8
-    LTEXT           "2",IDC_CUSTOMCONFIG,4,79,232,18
+    CONTROL         "Только options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,129,10
+    EDITTEXT        IDC_DEFAULTCONFIG,11,34,245,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    EDITTEXT        IDC_CUSTOMCONFIG,12,64,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    GROUPBOX        "Файл конф. по умолч.",IDC_STATIC,4,21,262,27
+    GROUPBOX        "Пользовательский файл конф.",IDC_STATIC,4,53,262,27
 END
 
 
@@ -757,6 +754,8 @@ BEGIN
     IDD_OPTIONDIALOG, DIALOG
     BEGIN
         RIGHTMARGIN, 330
+        VERTGUIDE, 112
+        VERTGUIDE, 147
         VERTGUIDE, 164
         BOTTOMMARGIN, 249
         HORZGUIDE, 179
@@ -774,20 +773,21 @@ BEGIN
     BEGIN
         VERTGUIDE, 4
         VERTGUIDE, 9
-        VERTGUIDE, 46
-        VERTGUIDE, 130
-        VERTGUIDE, 184
-        VERTGUIDE, 202
-        VERTGUIDE, 213
-        VERTGUIDE, 247
+        VERTGUIDE, 43
+        VERTGUIDE, 96
+        VERTGUIDE, 221
         VERTGUIDE, 251
         VERTGUIDE, 281
-        BOTTOMMARGIN, 293
-        HORZGUIDE, 70
+        VERTGUIDE, 286
+        BOTTOMMARGIN, 274
+        HORZGUIDE, 30
+        HORZGUIDE, 45
+        HORZGUIDE, 60
+        HORZGUIDE, 67
         HORZGUIDE, 79
         HORZGUIDE, 145
-        HORZGUIDE, 271
-        HORZGUIDE, 290
+        HORZGUIDE, 257
+        HORZGUIDE, 274
     END
 
     IDD_SERVINFO_DLG, DIALOG
@@ -800,27 +800,30 @@ BEGIN
 
     IDD_AUTH_DIALOG, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 209
-        VERTGUIDE, 8
-        VERTGUIDE, 43
-        VERTGUIDE, 56
-        VERTGUIDE, 58
-        VERTGUIDE, 81
-        VERTGUIDE, 115
-        VERTGUIDE, 118
-        VERTGUIDE, 200
-        BOTTOMMARGIN, 58
-        HORZGUIDE, 20
-        HORZGUIDE, 36
-        HORZGUIDE, 52
-        HORZGUIDE, 57
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+        HORZGUIDE, 14
+        HORZGUIDE, 21
+        HORZGUIDE, 32
+        HORZGUIDE, 39
     END
 
     IDD_AUTH_DIALOG2, DIALOG
     BEGIN
-        VERTGUIDE, 206
-        BOTTOMMARGIN, 92
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 120
+        HORZGUIDE, 64
+        HORZGUIDE, 71
+        HORZGUIDE, 80
+        HORZGUIDE, 87
     END
 
     IDD_CUSTUM_KEY, DIALOG
@@ -843,23 +846,13 @@ BEGIN
 
     IDD_AUTH_DIALOG1, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 229
-        VERTGUIDE, 6
-        VERTGUIDE, 43
-        VERTGUIDE, 49
-        VERTGUIDE, 65
-        VERTGUIDE, 81
-        VERTGUIDE, 105
-        VERTGUIDE, 108
-        VERTGUIDE, 118
-        VERTGUIDE, 218
-        BOTTOMMARGIN, 53
-        HORZGUIDE, 25
-        HORZGUIDE, 27
-        HORZGUIDE, 36
-        HORZGUIDE, 52
-        HORZGUIDE, 57
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+        HORZGUIDE, 23
     END
 
     IDD_FTPARAM_DLG, DIALOG
@@ -878,98 +871,78 @@ BEGIN
     IDD_APP_ABOUT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 227
+        RIGHTMARGIN, 257
         VERTGUIDE, 12
-        VERTGUIDE, 94
+        VERTGUIDE, 46
+        VERTGUIDE, 80
         VERTGUIDE, 108
         VERTGUIDE, 120
-        VERTGUIDE, 247
         TOPMARGIN, 7
-        BOTTOMMARGIN, 62
+        BOTTOMMARGIN, 59
+        HORZGUIDE, 39
     END
 
     IDD_FTCONFIRM_DLG, DIALOG
     BEGIN
-        RIGHTMARGIN, 178
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 220
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
     END
 
     IDD_APP_MESSAGE2, DIALOG
     BEGIN
-        LEFTMARGIN, 5
-        RIGHTMARGIN, 267
-        VERTGUIDE, 9
-        VERTGUIDE, 43
-        VERTGUIDE, 86
-        VERTGUIDE, 94
-        VERTGUIDE, 108
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 266
+        VERTGUIDE, 46
+        VERTGUIDE, 80
+        VERTGUIDE, 206
         TOPMARGIN, 7
-        BOTTOMMARGIN, 129
+        BOTTOMMARGIN, 102
         HORZGUIDE, 35
         HORZGUIDE, 60
-        HORZGUIDE, 78
-        HORZGUIDE, 89
     END
 
     IDD_AUTH_DIALOG3, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 229
-        VERTGUIDE, 6
-        VERTGUIDE, 43
-        VERTGUIDE, 49
-        VERTGUIDE, 65
-        VERTGUIDE, 81
-        VERTGUIDE, 108
-        VERTGUIDE, 118
-        VERTGUIDE, 218
-        BOTTOMMARGIN, 53
-        HORZGUIDE, 25
-        HORZGUIDE, 27
-        HORZGUIDE, 36
-        HORZGUIDE, 52
-        HORZGUIDE, 57
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+        HORZGUIDE, 23
     END
 
     IDD_AUTH_DIALOG4, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 210
-        VERTGUIDE, 8
-        VERTGUIDE, 43
-        VERTGUIDE, 56
-        VERTGUIDE, 58
-        VERTGUIDE, 81
-        VERTGUIDE, 84
-        VERTGUIDE, 115
-        VERTGUIDE, 118
-        VERTGUIDE, 190
-        VERTGUIDE, 206
-        BOTTOMMARGIN, 86
-        HORZGUIDE, 20
-        HORZGUIDE, 29
-        HORZGUIDE, 36
-        HORZGUIDE, 52
-        HORZGUIDE, 57
-        HORZGUIDE, 68
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 63
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 84
+        HORZGUIDE, 14
+        HORZGUIDE, 21
+        HORZGUIDE, 32
+        HORZGUIDE, 39
+        HORZGUIDE, 51
+        HORZGUIDE, 64
     END
 
     IDD_AUTH_DIALOG5, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 230
-        VERTGUIDE, 6
-        VERTGUIDE, 14
-        VERTGUIDE, 43
-        VERTGUIDE, 49
-        VERTGUIDE, 65
-        VERTGUIDE, 81
-        VERTGUIDE, 107
-        VERTGUIDE, 224
-        BOTTOMMARGIN, 74
-        HORZGUIDE, 27
-        HORZGUIDE, 29
-        HORZGUIDE, 36
-        HORZGUIDE, 52
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        VERTGUIDE, 46
+        VERTGUIDE, 63
+        VERTGUIDE, 89
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 84
+        HORZGUIDE, 23
+        HORZGUIDE, 51
+        HORZGUIDE, 64
     END
 
     IDD_SESSIONSELECTOR, DIALOG
@@ -991,48 +964,64 @@ BEGIN
 
     IDD_ENCODERS, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
         VERTGUIDE, 8
         VERTGUIDE, 14
+        VERTGUIDE, 85
+        VERTGUIDE, 152
+        VERTGUIDE, 163
         BOTTOMMARGIN, 141
         HORZGUIDE, 4
     END
 
     IDD_DISPLAY, DIALOG
     BEGIN
-        RIGHTMARGIN, 234
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
+        VERTGUIDE, 12
+        VERTGUIDE, 145
+        VERTGUIDE, 154
         BOTTOMMARGIN, 141
+        HORZGUIDE, 90
+        HORZGUIDE, 101
+        HORZGUIDE, 112
+        HORZGUIDE, 134
     END
 
     IDD_MISC, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
-        VERTGUIDE, 40
+        VERTGUIDE, 30
+        VERTGUIDE, 116
+        VERTGUIDE, 185
         BOTTOMMARGIN, 141
         HORZGUIDE, 4
+        HORZGUIDE, 29
+        HORZGUIDE, 48
     END
 
     IDD_SECURITY, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
+        VERTGUIDE, 128
+        VERTGUIDE, 135
         BOTTOMMARGIN, 141
         HORZGUIDE, 5
     END
 
     IDD_KEYBOARDMOUSE, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 6
         BOTTOMMARGIN, 141
     END
 
     IDD_QUICKOPTIONS, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
         BOTTOMMARGIN, 141
         HORZGUIDE, 5
@@ -1040,15 +1029,17 @@ BEGIN
 
     IDD_LISTEN, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
         BOTTOMMARGIN, 141
     END
 
     IDD_CONFIG, DIALOG
     BEGIN
-        RIGHTMARGIN, 236
+        RIGHTMARGIN, 266
         VERTGUIDE, 4
+        VERTGUIDE, 133
+        VERTGUIDE, 256
         BOTTOMMARGIN, 141
     END
 END
@@ -1441,6 +1432,7 @@ BEGIN
     IDS_N12                 "Недостаточно памяти для буфера zlib."
     IDS_N13                 "Недопустимый код обнаружения\n"
     IDS_N14                 "Аутентификация IDEA больше не поддерживается!"
+    IDS_LANGUAGE_NAME       "Pусский"
     IDS_I4                  "Ошибка демона"
 END
 
@@ -1614,10 +1606,14 @@ BEGIN
     IDS_TAB_QUICKENC        "Быстрый кодер"
     IDS_TAB_LISTEN          "Ожидание"
     IDS_TAB_CONF            "Конфигурация"
-    IDS_LANGUAGE_NAME 	    "Pусский"
+    IDS_L95                 "Показать параметры"
+    IDS_L96                 "Скрыть параметры"
+    IDS_L97                 "Компьютер:"
+    IDS_L98                 "ID:"
+    IDS_L99                 "Port:"
 END
 
-#endif    // English resources
+#endif    // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

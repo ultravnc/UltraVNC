@@ -47,37 +47,37 @@ void SessionDialog::InitTab(HWND hwnd)
 	m_hTab = GetDlgItem(hwnd, IDC_TAB);
 	TCITEM item;
 	item.mask = TCIF_TEXT;
-	wchar_t szTabName[64];
+	TCHAR szTabName[64];
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_ENCODERS, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_ENCODERS, szTabName, sizeof(szTabName)/sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 0, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_INPUT, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_INPUT, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 1, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_DISPLAY, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_DISPLAY, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 2, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_MISC, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_MISC, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 3, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_SECURITY, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_SECURITY, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 4, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_QUICKENC, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_QUICKENC, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 5, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_LISTEN, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_LISTEN, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 6, &item);
 
-	LoadStringW(m_hInstResDLL, IDS_TAB_CONF, szTabName, 64);
+	LoadStringW(m_hInstResDLL, IDS_TAB_CONF, szTabName, sizeof(szTabName) / sizeof(TCHAR));
 	item.pszText = szTabName;
 	TabCtrl_InsertItem(m_hTab, 7, &item);
 	// Use m_hInstResDLL for dialog resources (translated dialogs)
