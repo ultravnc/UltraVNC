@@ -225,7 +225,7 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
 
 		_this->ExpandBox(hwnd, !_this->m_bExpanded);
-		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 		//SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
 		return TRUE;
 	}
@@ -431,19 +431,31 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	// if the dialog is already in the requested state, return
 	// immediately.
 	if (fExpand == m_bExpanded) return;
+ 
+	extern TCHAR sz_ShowOptions[160];
+	extern TCHAR sz_HideOptions[160];
 
 	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
 	HWND wndChild = NULL;
 	HWND wndDefaultBox = NULL;
 
 	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
+	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
 	if (pCtrl == NULL) return;
 
 	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
 	if (wndDefaultBox == NULL) return;
-	//if (!fExpand) SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Show Options");
-	//else SetWindowText(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), "Hide Options");
+
+	// Change button image and text label
+	if (!fExpand) {
+		SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
+		SetWindowText(pCtrl, sz_ShowOptions);
+	}
+	else {
+		SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+		SetWindowText(pCtrl, sz_HideOptions);
+	}
+
 	// retrieve coordinates for the default child window
 	GetWindowRect(wndDefaultBox, &rcDefaultBox);
 	//rcDefaultBox.left += 2;
@@ -782,6 +794,10 @@ bool SessionDialog::connect(HWND hwnd)
 
 void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 {
+	extern TCHAR sz_Computer[160];
+	extern TCHAR sz_ID[160];
+	extern TCHAR sz_Port[160];
+
 	SetTimer(hwnd, 100, 1000, NULL);
 	switch (LOWORD(wParam))
 	{
@@ -789,15 +805,15 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), true);
-		SetDlgItemText(hwnd, IDC_LINE1, _T("ID:12345679"));
-		SetDlgItemText(hwnd, IDC_LINE2, _T("repeater:port"));
+		SetDlgItemText(hwnd, IDC_LINE1, sz_ID);
+		SetDlgItemText(hwnd, IDC_LINE2, sz_Port);
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
 		ShowWindow(GetDlgItem(hwnd, IDC_HOSTNAME_EDIT), true);
 		ShowWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
-		SetDlgItemText(hwnd, IDC_LINE1, _T("server[:port]"));
+		SetDlgItemText(hwnd, IDC_LINE1, sz_Computer);
 		SetDlgItemText(hwnd, IDC_LINE2, _T(""));
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), true);
 		break;
@@ -845,11 +861,11 @@ void SessionDialog::InitLanguage(HWND hwnd)
 						
 						// Load DLL temporarily to read language name
 						HMODULE hLangDll = LoadLibraryExW(dllPath, NULL, LOAD_LIBRARY_AS_DATAFILE);
-						wchar_t displayName[64] = {0};
+						TCHAR displayName[64] = {0};
 						
 						if (hLangDll) {
 							// Try to load IDS_LANGUAGE_NAME string resource from DLL
-							if (LoadStringW(hLangDll, IDS_LANGUAGE_NAME, displayName, _countof(displayName)) > 0) {
+							if (LoadStringW(hLangDll, IDS_LANGUAGE_NAME, displayName, sizeof(displayName)/sizeof(TCHAR)) > 0) {
 								// Successfully loaded language name from DLL
 								int idx = SendMessageW(hLanguageCombo, CB_ADDSTRING, 0, (LPARAM)displayName);
 								SendMessage(hLanguageCombo, CB_SETITEMDATA, idx, (LPARAM)_wcsdup(langCode));

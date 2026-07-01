@@ -700,6 +700,11 @@
 #define IDS_TAB_QUICKENC                50405
 #define IDS_TAB_LISTEN                  50406
 #define IDS_TAB_CONF                    50407
+#define IDS_L95                         50408
+#define IDS_L96                         50409
+#define IDS_L97                         50410
+#define IDS_L98                         50411
+#define IDS_L99                         50412
 
 // Next default values for new objects
 // 
