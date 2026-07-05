@@ -515,6 +515,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 	args[i] = cmd;
 	bool inquote = false;
 	for (pos = cmd; *pos != 0; pos++) {
+		// Handle escaped quote: \" -> literal "
+		if (*pos == '\\' && *(pos + 1) == '"') {
+			memmove(pos, pos + 1, _tcslen(pos + 1) + 1);
+			continue;
+		}
 		// Arguments are normally separated by spaces, unless there's quoting
 		if ((*pos == ' ') && !inquote) {
 			*pos = '\0';
