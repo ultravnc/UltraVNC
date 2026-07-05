@@ -168,6 +168,7 @@ vncServer::vncServer()
 	HookWanted = FALSE;
 	DriverWantedSet = FALSE;
 	sethook = false;
+	m_pendingDSMPlugin = FALSE;
 	char* generatedcode = generateCode();
 	strcpy_s(code, generatedcode);
 	free(generatedcode);
@@ -986,6 +987,12 @@ vncServer::RemoveClient(vncClientId clientid)
 		m_desktop = NULL;
 		vnclog.Print(LL_STATE, VNCLOG("desktop deleted\n"));
 	}
+	// If encryption was enabled while clients were connected, apply it now
+	if (m_authClients.empty() && m_pendingDSMPlugin) {
+		vnclog.Print(LL_INTINFO, VNCLOG("Applying pending DSM plugin activation\n"));
+		SetDSMPlugin(false);
+	}
+
 	// Notify anyone interested of the change
 	DoNotify(WM_SRV_CLIENT_DISCONNECT, 0, 0);
 	vnclog.Print(LL_INTINFO, VNCLOG("RemoveClient() done\n"));
@@ -1737,15 +1744,22 @@ vncServer::SetScreenOffset(int x, int y, bool single_display)
 
 //
 // Load if necessary and initialize the current DSMPlugin
-// This can only be done if NO client is connected (for the moment)
+// If clients are connected, the activation is queued and applied when
+// the last client disconnects, so a server restart is not required.
 //
 BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 {
 	//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Entry \n"));
-	if (AuthClientCount() > 0) 
+	if (AuthClientCount() > 0) {
+		// Encryption can only be activated when no clients are connected.
+		// Queue the change so it is applied automatically when they disconnect.
+		m_pendingDSMPlugin = settings->getUseDSMPlugin();
 		return FALSE;
-	if (!settings->getUseDSMPlugin()) 
+	}
+	if (!settings->getUseDSMPlugin()) {
+		m_pendingDSMPlugin = FALSE;
 		return FALSE;
+	}
 	if (m_pDSMPlugin->IsLoaded()) {
 		//vnclog.Print(LL_INTINFO, VNCLOG("$$$$$$$$$$ SetDSMPlugin - Is Loaded \n"));
 
@@ -1789,6 +1803,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		if (m_pDSMPlugin->SetPluginParams(NULL, szParams, settings->getDSMPluginConfig(), NULL)) {
 			m_pDSMPlugin->SetEnabled(true); // The plugin is ready to be used
 			vnclog.Print(LL_INTINFO, VNCLOG("DSMPlugin Params OK\n"));
+			m_pendingDSMPlugin = FALSE;
 			return TRUE;
 		}
 		else {
@@ -1800,6 +1815,7 @@ BOOL vncServer::SetDSMPlugin(BOOL bForceReload)
 		m_pDSMPlugin->SetEnabled(false);
 		vnclog.Print(LL_INTINFO, VNCLOG("Unable to init DSMPlugin\n"));
 	}
+	m_pendingDSMPlugin = FALSE;
 	return TRUE;
 }
 //
