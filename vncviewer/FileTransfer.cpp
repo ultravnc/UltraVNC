@@ -5414,49 +5414,59 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				GetDlgItemTextW(hWnd, IDC_CURR_LOCAL, szCurrLocalW, MAX_PATH);
 				if (!wcslen(szCurrLocalW)) break;
 
-				int nSelected = -1;
-
 				HWND hWndLocalList = GetDlgItem(hWnd, IDC_LOCAL_FILELIST);
 
-				nSelected = ListView_GetSelectedCount(hWndLocalList);
-				if (nSelected == 0 || nSelected > 1)
+				int nSelected = ListView_GetSelectedCount(hWndLocalList);
+				if (nSelected == 0)
 				{
-					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_M1, sz_M2, MB_ICONINFORMATION);
+					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_H46, sz_H47, MB_ICONINFORMATION);
 					break; 
 				}
 
-				nSelected = ListView_GetNextItem(hWndLocalList, -1, LVNI_SELECTED);
-				LVITEMW ItemW;
-				memset(&ItemW, 0, sizeof(ItemW));
-				ItemW.mask = LVIF_PARAM;
-				ItemW.iItem = nSelected;
-				SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
-				std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
-				if (!pNameW) break;
-				const WCHAR* szSelW = pNameW->c_str();
-				bool isDir = (szSelW[0] == L'[' && szSelW[1] != L'.');
-				WCHAR szFullPathW[MAX_PATH * 4];
-				wcscpy_s(szFullPathW, szCurrLocalW);
-				wcscat_s(szFullPathW, szSelW);
-
-				if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
+				int nCount = ListView_GetItemCount(hWndLocalList);
+				_this->m_nConfirmAnswer = CONFIRM_YES;
+				_this->m_nDeleteCount = 0;
+				for (int i = 0; i < nCount; i++)
 				{
-					wchar_t szMes[MAX_PATH + 96];
-					_snwprintf_s(szMes, MAX_PATH+96, _TRUNCATE, L"%s\n\n< %s > ?\n", isDir ? sz_H95 : sz_H48, szSelW);
-					_this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, szMes);
-					if (_this->m_nConfirmAnswer == CONFIRM_NO)
-						break;
-					if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
-						break;
+					if(ListView_GetItemState(hWndLocalList, i, LVIS_SELECTED) & LVIS_SELECTED)
+					{
+						LVITEMW ItemW;
+						memset(&ItemW, 0, sizeof(ItemW));
+						ItemW.mask = LVIF_PARAM;
+						ItemW.iItem = i;
+						SendMessageW(hWndLocalList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
+						std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
+						if (!pNameW) continue;
+						const WCHAR* szSelW = pNameW->c_str();
+						bool isDir = (szSelW[0] == L'[' && szSelW[1] != L'.');
+						
+						if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
+						{
+							wchar_t szMes[MAX_PATH + 96];
+							_snwprintf_s(szMes, MAX_PATH+96, _TRUNCATE, L"%s\n\n< %s > ?\n", isDir ? sz_H95 : sz_H48, szSelW);
+							_this->DoFTConfirmDialog(isDir ? sz_H94 : sz_H47, szMes);
+							if (_this->m_nConfirmAnswer == CONFIRM_NO)
+								continue;
+							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
+								break;
+						}
+						
+						WCHAR szFullPathW[MAX_PATH * 4];
+						wcscpy_s(szFullPathW, MAX_PATH * 4, szCurrLocalW);
+						wcscat_s(szFullPathW, MAX_PATH * 4, szSelW);
+						
+						if (!_this->DeleteFileOrDirectory(szFullPathW))
+						{
+							_snwprintf_s(szMes, MAX_PATH+96, _TRUNCATE, L"%s < %s >", isDir ? sz_H97 : sz_H49, szFullPathW);
+							_this->SetStatus(szMes);
+							continue;
+						}
+						_snwprintf_s(szMes, MAX_PATH * 4 + 96, _TRUNCATE, L"%s < %s > %s", isDir ? sz_H31 : sz_H17, szFullPathW, sz_H50);
+						_this->SetStatus(szMes);
+						_this->m_nDeleteCount++;
+					}
 				}
-				if (!_this->DeleteFileOrDirectory(szFullPathW))
-				{
-					_snwprintf_s(szMes, MAX_PATH+96, _TRUNCATE, L"%s < %s >", isDir ? sz_H97 : sz_H49, szFullPathW);
-					_this->SetStatus(szMes);
-					break;
-				}
-				_snwprintf_s(szMes, MAX_PATH * 4 + 96, _TRUNCATE, L"%s < %s > %s", isDir ? sz_H31 : sz_H17, szFullPathW, sz_H50);
-				_this->SetStatus(szMes);
+				// Refresh the local list view after deleting multiple files
 				FTListViewClear(GetDlgItem(hWnd, IDC_LOCAL_FILELIST));
 				_this->PopulateLocalListBoxW(hWnd, L"");
 			}
@@ -5465,24 +5475,29 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 				if (_this->m_fFileCommandPending) break;
 				HWND hWndRemoteList = GetDlgItem(hWnd, IDC_REMOTE_FILELIST);
 
-				int nSelected = -1;
-
 				WCHAR szCurrRemoteW[MAX_PATH * 4];
 				GetDlgItemTextW(hWnd, IDC_CURR_REMOTE, szCurrRemoteW, MAX_PATH * 4);
 				if (!wcslen(szCurrRemoteW)) break;
+
+				int nSelected = ListView_GetSelectedCount(hWndRemoteList);
+				if (nSelected == 0)
+				{
+					yesUVNCMessageBox(m_hInstResDLL, _this->hWnd, sz_H46, sz_H47, MB_ICONINFORMATION);
+					break; 
+				}
 
 				int nCount = ListView_GetItemCount(hWndRemoteList);
 				_this->m_nConfirmAnswer = CONFIRM_YES;
 				_this->m_nDeleteCount = 0;
 				std::vector<std::string> pathsToDelete; // UTF-8 paths
-				for (nSelected = 0; nSelected < nCount; nSelected++)
+				for (int i = 0; i < nCount; i++)
 				{
-					if(ListView_GetItemState(hWndRemoteList, nSelected, LVIS_SELECTED) & LVIS_SELECTED)
+					if(ListView_GetItemState(hWndRemoteList, i, LVIS_SELECTED) & LVIS_SELECTED)
 					{
 						LVITEMW ItemW;
 						memset(&ItemW, 0, sizeof(ItemW));
 						ItemW.mask = LVIF_PARAM;
-						ItemW.iItem = nSelected;
+						ItemW.iItem = i;
 						SendMessageW(hWndRemoteList, LVM_GETITEMW, 0, (LPARAM)&ItemW);
 						std::wstring* pNameW = reinterpret_cast<std::wstring*>(ItemW.lParam & ~(LPARAM)FT_LPARAM_UNREADABLE);
 						if (!pNameW) continue;
@@ -5498,16 +5513,20 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 							if (_this->m_nConfirmAnswer == CONFIRM_NOALL)
 								break;
 						}
-						_this->m_fFileCommandPending = true;
 						// Build full Unicode path (dir + filename) then convert to UTF-8 for server
 						WCHAR szFullW[MAX_PATH * 4];
-						wcscpy_s(szFullW, szCurrRemoteW);
-						wcscat_s(szFullW, szSelW);
+						wcscpy_s(szFullW, MAX_PATH * 4, szCurrRemoteW);
+						wcscat_s(szFullW, MAX_PATH * 4, szSelW);
 						char szFullPathUTF8[MAX_PATH * 3];
 						WideCharToMultiByte(CP_UTF8, 0, szFullW, -1, szFullPathUTF8, MAX_PATH * 3, NULL, NULL);
 						_this->m_nDeleteCount++;
 						pathsToDelete.push_back(std::string(szFullPathUTF8));
 					}
+				}
+				// Set command pending only once after collecting all paths
+				if (!pathsToDelete.empty())
+				{
+					_this->m_fFileCommandPending = true;
 				}
 				for (auto& path : pathsToDelete)
 				{
