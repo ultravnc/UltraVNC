@@ -1541,8 +1541,13 @@ typedef struct {
 #define rfbButton3Mask 4
 #define rfbButton4Mask 8
 #define rfbButton5Mask 16
+#define rfbButton6Mask 32
+#define rfbButton7Mask 64
+#define rfbButton8Mask 128
 #define rfbWheelUpMask rfbButton4Mask    // RealVNC 335 method
 #define rfbWheelDownMask rfbButton5Mask
+#define rfbWheelLeftMask rfbButton6Mask    // RFB protocol: bit 5 = scroll left
+#define rfbWheelRightMask rfbButton7Mask   // RFB protocol: bit 6 = scroll right
 
 #define sz_rfbPointerEventMsg 6
 

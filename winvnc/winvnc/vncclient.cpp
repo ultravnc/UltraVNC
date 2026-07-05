@@ -30,6 +30,11 @@
 
 // Includes
 #include "stdhdrs.h"
+
+#ifndef MOUSEEVENTF_HWHEEL
+#define MOUSEEVENTF_HWHEEL 0x01000
+#endif
+
 #include <omnithread.h>
 #include <string>
 #include <sstream>
@@ -3599,6 +3604,18 @@ vncClientThread::run(void* arg)
 							flags |= MOUSEEVENTF_WHEEL;
 							wheel_movement = (DWORD)-120;
 						}
+						else if ((msg.pe.buttonMask & rfbButton6Mask) != 0 &&
+							(m_client->m_ptrevent.buttonMask & rfbButton6Mask) == 0)
+						{
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = (DWORD)-120;
+						}
+						else if ((msg.pe.buttonMask & rfbButton7Mask) != 0 &&
+							(m_client->m_ptrevent.buttonMask & rfbButton7Mask) == 0)
+						{
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = (DWORD)+120;
+						}
 					}
 					else
 					{
@@ -3609,6 +3626,15 @@ vncClientThread::run(void* arg)
 						}
 						if (msg.pe.buttonMask & rfbWheelDownMask) {
 							flags |= MOUSEEVENTF_WHEEL;
+							wheel_movement = -WHEEL_DELTA;
+						}
+						// UltraVNC horizontal wheel
+						if (msg.pe.buttonMask & rfbWheelRightMask) {
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = WHEEL_DELTA;
+						}
+						if (msg.pe.buttonMask & rfbWheelLeftMask) {
+							flags |= MOUSEEVENTF_HWHEEL;
 							wheel_movement = -WHEEL_DELTA;
 						}
 					}
