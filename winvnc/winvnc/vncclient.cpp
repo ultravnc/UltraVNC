@@ -6631,7 +6631,8 @@ bool vncClient::SendFileChunk()
 {
 	bool connected = true;
 	static DWORD lastYieldTime = 0;
-	
+	// Legacy viewers (pre FT_PROTO_VERSION_4) only allocate 8192+1024 bytes for their chunk buffer
+	const DWORD chunkSize = m_fClientSupportsUnicode ? sz_rfbBlockSize : 8192;
 	do
 	{
 		connected = true;
@@ -6648,7 +6649,7 @@ bool vncClient::SendFileChunk()
 				return connected;
 			}
 
-			int nRes = ReadFile(m_hSrcFile, m_pBuff, sz_rfbBlockSize, &m_dwNbBytesRead, NULL);
+			int nRes = ReadFile(m_hSrcFile, m_pBuff, chunkSize, &m_dwNbBytesRead, NULL);
 			if (!nRes && m_dwNbBytesRead != 0)
 			{
 				m_fFileUploadError = true;
@@ -6694,7 +6695,7 @@ bool vncClient::SendFileChunk()
 				{
 					// Compress the data
 					// (Compressed data can be longer if it was already compressed)
-					unsigned int nMaxCompSize = sz_rfbBlockSize + 1024; // TODO: Improve this...
+					unsigned int nMaxCompSize = chunkSize + 1024; // TODO: Improve this...
 					bool fCompressed = false;
 					if (m_fCompressionEnabled)
 					{
