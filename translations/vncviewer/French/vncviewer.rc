@@ -1586,17 +1586,17 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_TAB_ENCODERS        "Encoders"
-    IDS_TAB_INPUT           "Input"
-    IDS_TAB_DISPLAY         "Display"
-    IDS_TAB_MISC            "Misc"
-    IDS_TAB_SECURITY        "Security"
-    IDS_TAB_QUICKENC        "Quick encoder"
-    IDS_TAB_LISTEN          "Listen"
+    IDS_TAB_ENCODERS        "Encodeurs"
+    IDS_TAB_INPUT           "Entree"
+    IDS_TAB_DISPLAY         "Affichage"
+    IDS_TAB_MISC            "Divers"
+    IDS_TAB_SECURITY        "Securite"
+    IDS_TAB_QUICKENC        "Encodeur rapide"
+    IDS_TAB_LISTEN          "Ecoute"
     IDS_TAB_CONF            "Config"
-    IDS_L95                 "Show Options"
-    IDS_L96                 "Hide Options"
-    IDS_L97                 "Computer:"
+    IDS_L95                 "Afficher les options"
+    IDS_L96                 "Masquer les options"
+    IDS_L97                 "Ordinateur:"
     IDS_L98                 "ID:"
     IDS_L99                 "Port:"
 END

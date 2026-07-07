@@ -1259,7 +1259,7 @@ void ReloadLanguage(const wchar_t* langCode)
 	LoadStringW(m_hInstResDLL, IDS_L91, sz_L91, _countof(sz_L91));
 	LoadStringW(m_hInstResDLL, IDS_L92, sz_L92, _countof(sz_L92));
 	LoadStringW(m_hInstResDLL, IDS_L93, sz_L93, _countof(sz_L93));
-	LoadStringW(m_hInstResDLL, IDS_L94, sz_L94, _countof(sz_L93));
+	LoadStringW(m_hInstResDLL, IDS_L94, sz_L94, _countof(sz_L94));
 	LoadStringW(m_hInstResDLL, IDS_L95, sz_ShowOptions, sizeof(sz_ShowOptions) / sizeof(TCHAR));
 	LoadStringW(m_hInstResDLL, IDS_L96, sz_HideOptions, sizeof(sz_HideOptions) / sizeof(TCHAR));
 	LoadStringW(m_hInstResDLL, IDS_L97, sz_Computer, sizeof(sz_Computer) / sizeof(TCHAR));

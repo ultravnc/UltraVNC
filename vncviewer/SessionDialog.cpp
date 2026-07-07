@@ -432,8 +432,8 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	// immediately.
 	if (fExpand == m_bExpanded) return;
  
-	extern TCHAR sz_ShowOptions[160];
-	extern TCHAR sz_HideOptions[160];
+	extern TCHAR sz_ShowOptions[64];
+	extern TCHAR sz_HideOptions[64];
 
 	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
 	HWND wndChild = NULL;
@@ -794,9 +794,9 @@ bool SessionDialog::connect(HWND hwnd)
 
 void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 {
-	extern TCHAR sz_Computer[160];
-	extern TCHAR sz_ID[160];
-	extern TCHAR sz_Port[160];
+	extern TCHAR sz_Computer[64];
+	extern TCHAR sz_ID[64];
+	extern TCHAR sz_Port[64];
 
 	SetTimer(hwnd, 100, 1000, NULL);
 	switch (LOWORD(wParam))
