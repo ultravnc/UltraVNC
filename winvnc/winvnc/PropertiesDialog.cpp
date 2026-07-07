@@ -1101,8 +1101,12 @@ void PropertiesDialog::ShowImpersonateDialog()
 int PropertiesDialog::ShowDialog(bool standalone)
 {
 	this->standalone = standalone;
-	return DialogBoxParam(hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_PROPERTIESDIALOG),
+	int result = DialogBoxParam(hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_PROPERTIESDIALOG),
 		NULL, (DLGPROC)PropertiesDlgProc, (LONG_PTR)this);
+	// Apply settings to the running server so DSM plugin changes take effect
+	// immediately without requiring a restart.
+	UpdateServer();
+	return result;
 };
 
 
@@ -1147,6 +1151,8 @@ void PropertiesDialog::UpdateServer()
 	// DSM Plugin prefs
 	if (settings->getUseDSMPlugin())
 		m_server->SetDSMPlugin(false);
+	else
+		m_server->SetDSMPlugin(false); // clears any pending activation
 
 	// adzm - 2010-07 - Disable more effects or font smoothing
 	m_server->EnableHTTPConnect(settings->getHTTPConnect());

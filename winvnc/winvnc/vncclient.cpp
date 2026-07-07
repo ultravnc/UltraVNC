@@ -30,6 +30,11 @@
 
 // Includes
 #include "stdhdrs.h"
+
+#ifndef MOUSEEVENTF_HWHEEL
+#define MOUSEEVENTF_HWHEEL 0x01000
+#endif
+
 #include <omnithread.h>
 #include <string>
 #include <sstream>
@@ -3599,6 +3604,18 @@ vncClientThread::run(void* arg)
 							flags |= MOUSEEVENTF_WHEEL;
 							wheel_movement = (DWORD)-120;
 						}
+						else if ((msg.pe.buttonMask & rfbButton6Mask) != 0 &&
+							(m_client->m_ptrevent.buttonMask & rfbButton6Mask) == 0)
+						{
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = (DWORD)-120;
+						}
+						else if ((msg.pe.buttonMask & rfbButton7Mask) != 0 &&
+							(m_client->m_ptrevent.buttonMask & rfbButton7Mask) == 0)
+						{
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = (DWORD)+120;
+						}
 					}
 					else
 					{
@@ -3609,6 +3626,15 @@ vncClientThread::run(void* arg)
 						}
 						if (msg.pe.buttonMask & rfbWheelDownMask) {
 							flags |= MOUSEEVENTF_WHEEL;
+							wheel_movement = -WHEEL_DELTA;
+						}
+						// UltraVNC horizontal wheel
+						if (msg.pe.buttonMask & rfbWheelRightMask) {
+							flags |= MOUSEEVENTF_HWHEEL;
+							wheel_movement = WHEEL_DELTA;
+						}
+						if (msg.pe.buttonMask & rfbWheelLeftMask) {
+							flags |= MOUSEEVENTF_HWHEEL;
 							wheel_movement = -WHEEL_DELTA;
 						}
 					}
@@ -6605,7 +6631,8 @@ bool vncClient::SendFileChunk()
 {
 	bool connected = true;
 	static DWORD lastYieldTime = 0;
-	
+	// Legacy viewers (pre FT_PROTO_VERSION_4) only allocate 8192+1024 bytes for their chunk buffer
+	const DWORD chunkSize = m_fClientSupportsUnicode ? sz_rfbBlockSize : 8192;
 	do
 	{
 		connected = true;
@@ -6622,7 +6649,7 @@ bool vncClient::SendFileChunk()
 				return connected;
 			}
 
-			int nRes = ReadFile(m_hSrcFile, m_pBuff, sz_rfbBlockSize, &m_dwNbBytesRead, NULL);
+			int nRes = ReadFile(m_hSrcFile, m_pBuff, chunkSize, &m_dwNbBytesRead, NULL);
 			if (!nRes && m_dwNbBytesRead != 0)
 			{
 				m_fFileUploadError = true;
@@ -6668,7 +6695,7 @@ bool vncClient::SendFileChunk()
 				{
 					// Compress the data
 					// (Compressed data can be longer if it was already compressed)
-					unsigned int nMaxCompSize = sz_rfbBlockSize + 1024; // TODO: Improve this...
+					unsigned int nMaxCompSize = chunkSize + 1024; // TODO: Improve this...
 					bool fCompressed = false;
 					if (m_fCompressionEnabled)
 					{

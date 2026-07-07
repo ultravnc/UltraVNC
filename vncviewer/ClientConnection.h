@@ -283,6 +283,7 @@ private:
 	bool ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg);
  	void SubProcessPointerEvent(int x, int y, DWORD keyflags);
 	void ProcessMouseWheel(int delta); // RealVNC 335 method
+	void ProcessMouseWheelHorizontal(int delta); // UltraVNC horizontal wheel
 	void SendPointerEvent(int x, int y, int buttonMask);
     void ProcessKeyEvent(int virtkey, DWORD keyData);
 	//adzm 2010-09 - Ensure the mouse is moved to the last known spot

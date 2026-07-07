@@ -352,6 +352,7 @@ protected:
     BOOL m_fSendExtraMouse;
 	bool KillAuthClientsBuzy;	
 	BOOL sethook;
+	BOOL m_pendingDSMPlugin;
 	CloudThread* cloudThread;
 	
 };

@@ -54,6 +54,10 @@ extern "C" {
 #include "display.h"
 #include "Snapshot.h"
 #include <commctrl.h>
+
+#ifndef WM_MOUSEHWHEEL
+#define WM_MOUSEHWHEEL 0x020E
+#endif
 #include <shellapi.h>
 #include <lmaccess.h>
 #include <lmat.h>
@@ -5097,6 +5101,23 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
 }
 
 //
+// UltraVNC horizontal wheel method
+//
+inline void ClientConnection::ProcessMouseWheelHorizontal(int delta)
+{
+  int wheelMask = rfbWheelRightMask;
+  if (delta < 0) {
+    wheelMask = rfbWheelLeftMask;
+    delta = -delta;
+  }
+  while (delta > 0) {
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | wheelMask);
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~wheelMask);
+    delta -= 120;
+  }
+}
+
+//
 // SendPointerEvent.
 //
 
@@ -9102,6 +9123,15 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->FlushWriteQueue(true, 5);
 					}
 					return 0;
+
+				// UltraVNC horizontal wheel
+			case WM_MOUSEHWHEEL:
+				if (!_this->m_opts->m_ViewOnly) {
+					_this->ProcessMouseWheelHorizontal((SHORT)HIWORD(wParam));
+					//adzm 2010-09
+					_this->FlushWriteQueue(true, 5);
+				}
+				return 0;
 
 				//Added by: Lars Werner (http://lars.werner.no) - These is the custom messages from the TitleBar
 				case tbWM_CLOSE:
