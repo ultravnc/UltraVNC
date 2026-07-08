@@ -155,7 +155,7 @@ END
 
 IDR_tbMENU MENU
 BEGIN
-    POPUP "Menu clic droit plein écran"
+    POPUP "Menu clic droit plein Ã©cran"
     BEGIN
         MENUITEM "Restaurer",                   IDC_NULL
         MENUITEM "Reduire",                     IDC_NULL
@@ -201,36 +201,36 @@ BEGIN
     CONTROL         "Utiliser encodage cache",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,128,98,10
     CONTROL         "Compression Zip/Tight",IDC_ALLOW_COMPRESSLEVEL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,138,101,10
     EDITTEXT        IDC_COMPRESSLEVEL,113,135,14,12,ES_AUTOHSCROLL
-    CONTROL         "JPEG (Tight) - Qualité",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,101,10
+    CONTROL         "JPEG (Tight) - QualitÃ©",IDC_ALLOW_JPEG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,148,101,10
     EDITTEXT        IDC_QUALITYLEVEL,113,148,14,12,ES_AUTOHSCROLL
-    CONTROL         "Mises à jour préventives",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,101,10
+    CONTROL         "Mises Ã  jour prÃ©ventives",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,158,101,10
     CONTROL         "Partager le serveur",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,196,153,10
     CONTROL         "Restaurer sur signal sonore",IDC_BELLDEICONIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,207,153,8
     CONTROL         "Desactiver le presse-papiers",IDC_DISABLECLIPBOARD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,216,153,10
-    CONTROL         "Ne pas afficher la publicité",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,153,10
-    CONTROL         "Émuler 3 boutons (clic 2 boutons)",IDC_EMULATECHECK,
+    CONTROL         "Ne pas afficher la publicitÃ©",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,226,153,10
+    CONTROL         "Ã‰muler 3 boutons (clic 2 boutons)",IDC_EMULATECHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,15,150,10
     CONTROL         "Inverser boutons souris 2 et 3",ID_SESSION_SWAPMOUSE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,27,150,10
     CONTROL         "Clavier japonais",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,39,150,10
     CONTROL         "Suivre curseur distant localement",IDC_CSHAPE_ENABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,52,151,10
-    CONTROL         "Laisser le serveur gérer le curseur",IDC_CSHAPE_DISABLE_RADIO,
+    CONTROL         "Laisser le serveur gÃ©rer le curseur",IDC_CSHAPE_DISABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON,179,63,151,10
     CONTROL         "Ne pas afficher curseur distant",IDC_CSHAPE_IGNORE_RADIO,
                     "Button",BS_AUTORADIOBUTTON,179,74,151,10
     EDITTEXT        IDC_MOUSE_THROTTLE,179,86,22,12,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Afficher barre de boutons (Toolbar)",IDC_SHOWTOOLBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,116,150,10
-    CONTROL         "Affichage seul (entrées ignorées)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,126,150,10
+    CONTROL         "Affichage seul (entrÃ©es ignorÃ©es)",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,126,150,10
     CONTROL         "Mode plein ecran",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,136,150,10
     CONTROL         "Sauvegarder position",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,146,59,10
     CONTROL         "Sauvegarder taille",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,146,47,10
     LTEXT           "Taille viewer:",IDC_STATIC,179,161,38,8
     CONTROL         "Auto",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,160,27,11
     COMBOBOX        IDC_SCALE_CB,282,159,30,12,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Échelle écran serveur",IDC_STATIC,180,174,80,8
+    LTEXT           "Ã‰chelle Ã©cran serveur",IDC_STATIC,180,174,80,8
     EDITTEXT        IDC_SERVER_SCALE,282,173,14,12,ES_AUTOHSCROLL
     CONTROL         "Adapter a la fenetre",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,184,67,10
     LTEXT           "tentatives de reconnexion",IDC_STATIC,195,202,80,8
@@ -242,14 +242,14 @@ BEGIN
     GROUPBOX        "",IDC_STATIC,9,22,72,94
     GROUPBOX        "Divers",IDC_STATIC,4,188,160,52
     GROUPBOX        "Souris et clavier",IDC_STATIC,174,2,159,100
-    LTEXT           "Limitation événements souris (ms)",IDC_STATIC,205,88,125,11
+    LTEXT           "Limitation Ã©vÃ©nements souris (ms)",IDC_STATIC,205,88,125,11
     GROUPBOX        "Affichage",IDC_STATIC,174,104,159,93
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,317,161,8,8
     LTEXT           "1  /",IDC_STATIC,265,175,12,8
     EDITTEXT        IDC_SERVER_RECON,177,199,16,14,ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "",IDC_STATIC,84,22,65,86,WS_GROUP
-    LTEXT           "délai",IDC_STATIC,295,202,25,8
-    LTEXT           "Délai transfert fichier",IDC_STATIC,177,219,65,8
+    LTEXT           "dÃ©lai",IDC_STATIC,295,202,25,8
+    LTEXT           "DÃ©lai transfert fichier",IDC_STATIC,177,219,65,8
     CONTROL         "Utiliser Zstd au lieu de Zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,168,101,10
     CONTROL         "Pair",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,251,160,27,11
 END
@@ -291,8 +291,8 @@ BEGIN
     CONTROL         "List3",IDC_REMOTE_FILELIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | WS_BORDER | WS_TABSTOP,314,31,238,324
     LTEXT           "",IDC_GLOBAL_STATUS,484,391,65,8,SS_SUNKEN
     LTEXT           "",IDC_PERCENT,356,388,120,8
-    PUSHBUTTON      "Arrêt forcé",IDC_ABORT_B2,246,160,66,14,BS_FLAT | NOT WS_VISIBLE
-    PUSHBUTTON      "Fermeture forcée",IDCANCEL2,246,340,66,14
+    PUSHBUTTON      "ArrÃªt forcÃ©",IDC_ABORT_B2,246,160,66,14,BS_FLAT | NOT WS_VISIBLE
+    PUSHBUTTON      "Fermeture forcÃ©e",IDCANCEL2,246,340,66,14
     PUSHBUTTON      "Actualiser",IDC_REFRESH,246,257,66,14,BS_CENTER | BS_FLAT
 END
 
@@ -307,7 +307,7 @@ BEGIN
     PUSHBUTTON      "",IDC_BUTTON_EXPAND,9,56,9,8,BS_BITMAP
     LTEXT           "Show Options",IDC_SHOWOPTIONS,22,55,69,9,SS_NOTIFY | SS_CENTERIMAGE
     CONTROL         "Direct",IDC_RADIODIRECT,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER | WS_GROUP | WS_TABSTOP,96,14,47,10
-    CONTROL         "Répéteur",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,146,14,47,10
+    CONTROL         "RÃ©pÃ©teur",IDC_RADIOREPEATER,"Button",BS_AUTORADIOBUTTON | BS_LEFT | BS_VCENTER,146,14,47,10
     CONTROL         "",IDC_TAB,"SysTabControl32",TCS_RAGGEDRIGHT | WS_TABSTOP,9,80,273,159
     PUSHBUTTON      "Supprimer",IDC_HOSTNAME_DEL,150,244,60,13
     PUSHBUTTON      "Charger",IDC_LOADPROFILE_B,221,244,60,13
@@ -369,7 +369,7 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "UltraVNC Viewer - Send Custom Key (Experimental...)"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Code touche (décimal)",IDC_STATIC,7,9,87,12
+    LTEXT           "Code touche (dÃ©cimal)",IDC_STATIC,7,9,87,12
     EDITTEXT        IDC_CUSTOM_KEY,100,7,51,14,ES_AUTOHSCROLL
     CONTROL         "ALT GR",IDC_ALTGR,"Button",BS_AUTORADIOBUTTON,54,26,38,9
     CONTROL         "CTRL",IDC_STRG,"Button",BS_AUTORADIOBUTTON,100,26,35,9
@@ -390,13 +390,13 @@ BEGIN
     LTEXT           "Port",IDC_STATIC,12,26,46,9
     LTEXT           "Octets envoyes",IDC_STATIC,12,125,63,9
     RTEXT           "Octets recus",IDC_STATIC,117,125,68,9
-    RTEXT           "Envoyés",IDC_SEND,11,141,64,9
-    RTEXT           "Reçus",IDC_RECEIVED,117,141,72,9
-    LTEXT           "Numéro de port",IDC_PORT,101,26,101,9
+    RTEXT           "EnvoyÃ©s",IDC_SEND,11,141,64,9
+    RTEXT           "ReÃ§us",IDC_RECEIVED,117,141,72,9
+    LTEXT           "NumÃ©ro de port",IDC_PORT,101,26,101,9
     ICON            IDI_NET,IDC_STATIC,93,121,20,20
     LTEXT           "Serveur VNC",IDC_STATIC,11,12,46,9
     LTEXT           "Nom du serveur",IDC_VNCSERVER,101,12,101,9
-    LTEXT           "État",IDC_STATIC,12,54,46,9
+    LTEXT           "Ã‰tat",IDC_STATIC,12,54,46,9
     LTEXT           "Connexion fermee",IDC_STATUS,101,54,105,9
     RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
     PUSHBUTTON      "Annuler",IDQUIT,7,180,50,14
@@ -455,8 +455,8 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,207,45,50,14
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
     LTEXT           "UltraVNC Viewer - (VERSION)",IDC_UVVERSION,46,7,211,8
-    LTEXT           "Copyright © 2002-2026 UltraVNC Team Members",IDC_STATIC,46,31,183,8
-    LTEXT           "Compilé",IDC_STATIC,46,19,20,8
+    LTEXT           "Copyright Â© 2002-2026 UltraVNC Team Members",IDC_STATIC,46,31,183,8
+    LTEXT           "CompilÃ©",IDC_STATIC,46,19,20,8
     LTEXT           "BuildTime",IDC_BUILDTIME,80,19,177,8
     LTEXT           "https://uvnc.com/",IDC_UVNCCOM,39,51,81,8
     LTEXT           "Site web:",IDC_STATIC,7,51,29,8
@@ -484,7 +484,7 @@ BEGIN
     LTEXT           "Info Message",IDC_Message2,46,35,220,25
     CONTROL         IDB_VNC64,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,7,32,32
     LTEXT           "UltraVNC Viewer - (VERSION)",IDC_UVVERSION2,46,7,199,8
-    LTEXT           "Compilé",IDC_STATIC,46,19,20,8
+    LTEXT           "CompilÃ©",IDC_STATIC,46,19,20,8
     LTEXT           "BuildTime",IDC_BUILDTIME,80,19,98,8
     LTEXT           "https://forum.uvnc.com/",IDC_FORUMHYPERLINK,56,74,150,8
     LTEXT           "https://uvnc.com/",IDC_WEBSITE,56,64,150,8
@@ -492,7 +492,7 @@ BEGIN
     LTEXT           "https://uvnc.com/downloads/ultravnc.html",IDC_WEBDOWNLOAD,56,94,150,8
     LTEXT           "Forum:",IDC_STATIC,7,74,38,8
     LTEXT           "Git:",IDC_STATIC,7,84,38,8
-    LTEXT           "Téléchargements:",IDC_STATIC,7,94,38,8
+    LTEXT           "TÃ©lÃ©chargements:",IDC_STATIC,7,94,38,8
     LTEXT           "Site web:",IDC_STATIC,7,64,38,8
 END
 
@@ -574,7 +574,7 @@ IDD_ENCODERS DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Auto (réseau stable requis)",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,4,217,10
+    CONTROL         "Auto (rÃ©seau stable requis)",IDC_AUTODETECT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,4,217,10
     CONTROL         "Raw",IDC_RAWRADIO,"Button",BS_AUTORADIOBUTTON,14,28,29,10
     CONTROL         "Ultra",IDC_ULTRA,"Button",BS_AUTORADIOBUTTON,54,28,29,10
     CONTROL         "Hextile",IDC_HEXTILERADIO,"Button",BS_AUTORADIOBUTTON,86,28,37,10
@@ -600,39 +600,39 @@ BEGIN
     CONTROL         "Utiliser Zstd au lieu de Zlib",IDC_ZSTD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,100,103,10
     CONTROL         "Utiliser encodage CopyRect",ID_SESSION_SET_CRECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,110,103,10
     CONTROL         "Utiliser encodage cache",ID_SESSION_SET_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,120,103,10
-    CONTROL         "Mises à jour préventives",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,130,103,10
-    LTEXT           "CPU élevé, débit plus faible ",IDC_STATIC,8,87,144,8
-    LTEXT           "Faible CPU, haut débit",IDC_STATIC,8,17,144,8
-    LTEXT           "CPU élevé, débit moyen (sans perte)",IDC_STATIC,8,41,144,8
-    LTEXT           "CPU moyen, débit faible (avec perte)",IDC_STATIC,8,64,144,8
+    CONTROL         "Mises Ã  jour prÃ©ventives",IDC_PREEMPTIVEUPDATES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,163,130,103,10
+    LTEXT           "CPU Ã©levÃ©, dÃ©bit plus faible ",IDC_STATIC,8,87,144,8
+    LTEXT           "Faible CPU, haut dÃ©bit",IDC_STATIC,8,17,144,8
+    LTEXT           "CPU Ã©levÃ©, dÃ©bit moyen (sans perte)",IDC_STATIC,8,41,144,8
+    LTEXT           "CPU moyen, dÃ©bit faible (avec perte)",IDC_STATIC,8,64,144,8
 END
 
 IDD_DISPLAY DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Résolution serveur",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,167,10
+    CONTROL         "RÃ©solution serveur",IDC_CHANGESERVER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,1,167,10
     LTEXT           "Petit",IDC_STATIC,12,12,31,8
     CONTROL         "",IDC_SLIDERRES,"msctls_trackbar32",TBS_AUTOTICKS | TBS_ENABLESELRANGE | WS_TABSTOP,43,12,133,11
     CTEXT           "",IDC_RES,181,12,47,8
-    CONTROL         "Tous mes écrans",IDC_ALLMONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,244,10
-    CONTROL         "Résolution écran principal",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,244,10
-    CONTROL         "Écrans virtuels (Win10 1903+)",IDC_RADIO_ONLY_VIRTUAL,
+    CONTROL         "Tous mes Ã©crans",IDC_ALLMONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,244,10
+    CONTROL         "RÃ©solution Ã©cran principal",IDC_RADIO_NOVIRT,"Button",BS_AUTORADIOBUTTON,22,35,244,10
+    CONTROL         "Ã‰crans virtuels (Win10 1903+)",IDC_RADIO_ONLY_VIRTUAL,
                     "Button",BS_AUTORADIOBUTTON,22,45,244,10
-    CONTROL         "Étendre écran (Win10 1903+)",IDC_RADIO_EXTEND,"Button",BS_AUTORADIOBUTTON,22,55,244,10
+    CONTROL         "Ã‰tendre Ã©cran (Win10 1903+)",IDC_RADIO_EXTEND,"Button",BS_AUTORADIOBUTTON,22,55,244,10
     CONTROL         "Afficher extension seule",IDC_SHOW_EXTEND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,65,233,10
-    CONTROL         "Plein écran multi-écrans",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,262,10
-    CONTROL         "Ajuster écran (sans barres)",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,141,10
+    CONTROL         "Plein Ã©cran multi-Ã©crans",IDC_ALLOWSPAN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,74,262,10
+    CONTROL         "Ajuster Ã©cran (sans barres)",IDC_DIRECTX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,141,10
     CONTROL         "Barre d'outils",IDC_SHOWTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,96,141,10
-    CONTROL         "Auto-échelle",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,78,10
+    CONTROL         "Auto-Ã©chelle",IDC_SCALING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,107,78,10
     COMBOBOX        IDC_SCALE_CB,86,106,30,117,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     CONTROL         "%",IDC_STATIC,"Static",SS_CENTER | WS_GROUP | 0x20,122,108,8,8
-    LTEXT           "Échelle écran serveur",IDC_STATIC,12,119,88,8
+    LTEXT           "Ã‰chelle Ã©cran serveur",IDC_STATIC,12,119,88,8
     LTEXT           "1  /",IDC_STATIC,104,119,12,8
     EDITTEXT        IDC_SERVER_SCALE,120,117,14,12,ES_AUTOHSCROLL
     CONTROL         "Sauver position",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
-    CONTROL         "Démarrer plein écran",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,85,112,10
-    CONTROL         "Auto-échelle (pair)",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,96,112,10
+    CONTROL         "DÃ©marrer plein Ã©cran",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,85,112,10
+    CONTROL         "Auto-Ã©chelle (pair)",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,96,112,10
     CONTROL         "GNOME distant \nQEMU",IDC_GNOME,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,154,108,112,16
     CONTROL         "Sauver taille",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,129,112,10
 END
@@ -648,16 +648,16 @@ BEGIN
     EDITTEXT        IDC_SERVER_RECON,100,59,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_SERVER_RECON_TIME,169,59,16,14,ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_FTTIMEOUT,100,79,16,14,ES_AUTOHSCROLL
-    CONTROL         "Ne pas afficher la publicité",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,262,10
-    CONTROL         "Masquer fenêtre statut",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,262,10
+    CONTROL         "Ne pas afficher la publicitÃ©",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,100,262,10
+    CONTROL         "Masquer fenÃªtre statut",IDC_HIDESTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,112,262,10
     CONTROL         "Masquer erreur fin de flux",IDC_HIDEENDOFSTREAMERROR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,262,10
     LTEXT           "Dossier",IDC_STATIC,4,18,25,9
     LTEXT           "Prefixe",IDC_STATIC,4,36,25,8
-    LTEXT           "Dossier et préfixe capture",IDC_STATIC,4,4,262,8
+    LTEXT           "Dossier et prÃ©fixe capture",IDC_STATIC,4,4,262,8
     LTEXT           "tentatives de reconnexion",IDC_STATIC,4,62,89,8
-    LTEXT           "délai",IDC_STATIC,130,62,34,8
-    LTEXT           "Délai transfert fichier",IDC_STATIC,4,82,87,8
+    LTEXT           "dÃ©lai",IDC_STATIC,130,62,34,8
+    LTEXT           "DÃ©lai transfert fichier",IDC_STATIC,4,82,87,8
 END
 
 IDD_SECURITY DIALOGEX 0, 0, 270, 145
@@ -667,16 +667,16 @@ BEGIN
     CONTROL         "Utiliser le chiffrement",IDC_PLUGIN_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,8,66,10
     COMBOBOX        IDC_PLUGINS_COMBO,93,6,138,55,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Configurer plugins chiffrement",IDC_PLUGIN_BUTTON,74,20,138,12
-    CONTROL         "Serveurs chiffrés uniquement",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,124,10
+    CONTROL         "Serveurs chiffrÃ©s uniquement",IDC_ONLYENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,35,124,10
     CONTROL         "Partager le serveur",IDC_SHARED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,45,262,10
     CONTROL         "Desactiver le presse-papiers",IDC_DISABLECLIPBOARD,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,262,10
-    CONTROL         "Accepter auto (mode écoute)",IDC_AUTOACCEPT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,262,10
-    CONTROL         "Ignorer avertissement chiffrement (écoute)",IDC_AUTOACCEPTNOWARN,
+    CONTROL         "Accepter auto (mode Ã©coute)",IDC_AUTOACCEPT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,262,10
+    CONTROL         "Ignorer avertissement chiffrement (Ã©coute)",IDC_AUTOACCEPTNOWARN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,262,10
     CONTROL         "Masquer menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,262,10
     EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,262,25,ES_MULTILINE
-    LTEXT           "Notification à la connexion",IDC_STATIC,4,108,262,8
+    LTEXT           "Notification Ã  la connexion",IDC_STATIC,4,108,262,8
     CONTROL         "Serveurs avec mot de passe",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,35,131,10
     CONTROL         "Utiliser IPv6",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,95,262,10
 END
@@ -687,18 +687,18 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CONTROL         "Suivre curseur distant localement",IDC_CSHAPE_ENABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,6,8,260,10
-    CONTROL         "Laisser le serveur gérer le curseur",IDC_CSHAPE_DISABLE_RADIO,
+    CONTROL         "Laisser le serveur gÃ©rer le curseur",IDC_CSHAPE_DISABLE_RADIO,
                     "Button",BS_AUTORADIOBUTTON,6,19,260,10
     CONTROL         "Ne pas afficher curseur distant",IDC_CSHAPE_IGNORE_RADIO,
                     "Button",BS_AUTORADIOBUTTON,6,30,260,10
-    CONTROL         "Affichage seul, sans entrée",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,260,10
-    CONTROL         "Désactiver raccourcis",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
-    CONTROL         "Émuler 3 boutons (clic 2 boutons)",IDC_EMULATECHECK,
+    CONTROL         "Affichage seul, sans entrÃ©e",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,260,10
+    CONTROL         "DÃ©sactiver raccourcis",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
+    CONTROL         "Ã‰muler 3 boutons (clic 2 boutons)",IDC_EMULATECHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,260,10
     CONTROL         "Inverser boutons souris 2 et 3",ID_SESSION_SWAPMOUSE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,260,10
     CONTROL         "Clavier japonais",IDC_JAPKEYBOARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,91,260,10
-    LTEXT           "Limite événements souris (ms)",IDC_STATIC,6,106,100,11
+    LTEXT           "Limite Ã©vÃ©nements souris (ms)",IDC_STATIC,6,106,100,11
     EDITTEXT        IDC_MOUSE_THROTTLE,111,104,42,12,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Gii",IDC_GII,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,117,105,10
 END
@@ -707,7 +707,7 @@ IDD_QUICKOPTIONS DIALOGEX 0, 0, 270, 145
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "AUTO (Sélection auto)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,257,10
+    CONTROL         "AUTO (SÃ©lection auto)",IDC_DYNAMIC,"Button",BS_AUTORADIOBUTTON,9,14,257,10
     CONTROL         "VIDEO (> 2Mbit/s)",IDC_ULTRA_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,28,257,10
     CONTROL         "LAN (> 1Mbit/s) - Max couleurs",IDC_LAN_RB,"Button",BS_AUTORADIOBUTTON,9,42,257,10
     CONTROL         "MEDIUM (128-256Kbit/s) - 256 couleurs",IDC_MEDIUM_RB,
@@ -734,8 +734,8 @@ BEGIN
     CONTROL         "Utiliser uniquement options.vnc",IDC_CHECKCONFIG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,7,129,10
     EDITTEXT        IDC_DEFAULTCONFIG,11,34,245,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
     EDITTEXT        IDC_CUSTOMCONFIG,12,64,244,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    GROUPBOX        "Fichier config par défaut",IDC_STATIC,4,21,262,27
-    GROUPBOX        "Fichier config personnalisé",IDC_STATIC,4,53,262,27
+    GROUPBOX        "Fichier config par dÃ©faut",IDC_STATIC,4,21,262,27
+    GROUPBOX        "Fichier config personnalisÃ©",IDC_STATIC,4,53,262,27
 END
 
 
@@ -1190,25 +1190,25 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_BUTTON_DINPUT        "Désactiver boutons"
-    ID_BUTTON_DBUTTON       "Désactiver souris et clavier serveur"
-    ID_BUTTON_SW            "Sélectionner SW"
-    ID_BUTTON_DESKTOP       "Sélectionner Bureau"
-    IDS_WARNING             "AVERTISSEMENT: Par défaut, cette session n'utilise aucun chiffrement. Ne l'utilisez pas pour envoyer des données sensibles sauf si vous êtes sûr que votre connexion est sécurisée (en utilisant un plugin de chiffrement, par exemple).\n\n"
-    IDS_A1                  "Arrêter le systray du viewer"
+    ID_BUTTON_DINPUT        "DÃ©sactiver boutons"
+    ID_BUTTON_DBUTTON       "DÃ©sactiver souris et clavier serveur"
+    ID_BUTTON_SW            "SÃ©lectionner SW"
+    ID_BUTTON_DESKTOP       "SÃ©lectionner Bureau"
+    IDS_WARNING             "AVERTISSEMENT: Par dÃ©faut, cette session n'utilise aucun chiffrement. Ne l'utilisez pas pour envoyer des donnÃ©es sensibles sauf si vous Ãªtes sÃ»r que votre connexion est sÃ©curisÃ©e (en utilisant un plugin de chiffrement, par exemple).\n\n"
+    IDS_A1                  "ArrÃªter le systray du viewer"
     IDS_A2                  "Info UltraVNC"
-    IDS_A3                  "Erreur lors de la création du démon d'écoute:\n\r"
-    IDS_A4                  "Peut-être qu'un autre UltraVNC Viewer est déjà en cours d'exécution?"
+    IDS_A3                  "Erreur lors de la crÃ©ation du dÃ©mon d'Ã©coute:\n\r"
+    IDS_A4                  "Peut-Ãªtre qu'un autre UltraVNC Viewer est dÃ©jÃ  en cours d'exÃ©cution?"
     IDS_A5                  "Erreur VNC Viewer"
-    IDS_B1                  "Erreur d'initialisation de la bibliothèque sockets"
-    IDS_B2                  "Débordement de la liste des clients!"
+    IDS_B1                  "Erreur d'initialisation de la bibliothÃ¨que sockets"
+    IDS_B2                  "DÃ©bordement de la liste des clients!"
     IDS_B3                  "Erreur VNC"
 END
 
 STRINGTABLE
 BEGIN
-    ID_CLOSEDAEMON          "Arrêter écoute connexions"
-    ID_SHOWWINDOW           "Afficher fenêtre connexion"
+    ID_CLOSEDAEMON          "ArrÃªter Ã©coute connexions"
+    ID_SHOWWINDOW           "Afficher fenÃªtre connexion"
     ID_NEWCONN              "Connexion manuelle"
     ID_BUTTON_CAD           "Envoyer CTRL+ALT+DEL"
     ID_BUTTON_FTRANS        "Transfert fichiers"
@@ -1217,39 +1217,39 @@ END
 STRINGTABLE
 BEGIN
     IDS_H101                "Avertissement transfert de dossier"
-    IDS_H102                "Un fichier ou dossier portant ce nom existe déjà."
-    IDS_L94                 "Le serveur a fermé la connexion"
-    IDS_STRING50275         "Le serveur ne prend pas en charge le chiffrement, malgré la demande du viewer."
+    IDS_H102                "Un fichier ou dossier portant ce nom existe dÃ©jÃ ."
+    IDS_L94                 "Le serveur a fermÃ© la connexion"
+    IDS_STRING50275         "Le serveur ne prend pas en charge le chiffrement, malgrÃ© la demande du viewer."
     IDS_STRING50276         "Voulez-vous continuer?"
-    IDS_STRING50277         "Accepter connexion non sécurisée"
-    IDS_STRING50278         "Refuser connexion non sécurisée"
-    IDS_STRING50279         "Ne plus demander, toujours autoriser connexion non sécurisée."
+    IDS_STRING50277         "Accepter connexion non sÃ©curisÃ©e"
+    IDS_STRING50278         "Refuser connexion non sÃ©curisÃ©e"
+    IDS_STRING50279         "Ne plus demander, toujours autoriser connexion non sÃ©curisÃ©e."
     IDS_STRING50280         "Accepter connexion entrante"
     IDS_STRING50281         "Refuser connexion entrante"
     IDS_STRING50282         "Connexion entrante"
-    IDS_STRING50283         "Le serveur est configuré sans authentification. Faire confiance?"
+    IDS_STRING50283         "Le serveur est configurÃ© sans authentification. Faire confiance?"
     IDS_STRING50284         "Faire confiance et se connecter sans authentification"
     IDS_STRING50285         "Ne pas se connecter"
-    IDS_STRING50286         "Sécurité"
+    IDS_STRING50286         "SÃ©curitÃ©"
     IDS_STRING50287         "Oui, je veux sauvegarder le mot de passe"
 END
 
 STRINGTABLE
 BEGIN
     IDS_STRING50288         "Non, sauvegarder sans mot de passe"
-    IDS_STRING50289         "Le serveur tente de surcharger un tampon mémoire, possible exploit."
+    IDS_STRING50289         "Le serveur tente de surcharger un tampon mÃ©moire, possible exploit."
     IDS_STRING50290         "Error"
     IDS_STRING50293         "Essayer de continuer"
     IDS_STRING50294         "Quitter"
     IDS_STRING50295         "Transfert interrompu: Connexion serveur perdue"
     IDS_STRING50296         "Warning"
-    IDS_STRING50297         "Le serveur envoie une taille d'écran excessive"
-    IDS_TLS1                "Connexion fermée"
-    IDS_TLS2                "AcquireCredentialsHandle échoué"
-    IDS_TLS3                "QueryContextAttributes échoué"
+    IDS_STRING50297         "Le serveur envoie une taille d'Ã©cran excessive"
+    IDS_TLS1                "Connexion fermÃ©e"
+    IDS_TLS2                "AcquireCredentialsHandle Ã©chouÃ©"
+    IDS_TLS3                "QueryContextAttributes Ã©chouÃ©"
     IDS_TLS4                "Tampons E/S insuffisants"
-    IDS_TLS5                "Négociation interrompue"
-    IDS_TLS6                "Négociation impossible"
+    IDS_TLS5                "NÃ©gociation interrompue"
+    IDS_TLS6                "NÃ©gociation impossible"
 END
 
 STRINGTABLE
@@ -1259,40 +1259,40 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_C1                  "Échec ouverture presse-papiers\n"
-    IDS_C2                  "Échec vidage presse-papiers\n"
-    IDS_C3                  "Échec fermeture presse-papiers\n"
+    IDS_C1                  "Ã‰chec ouverture presse-papiers\n"
+    IDS_C2                  "Ã‰chec vidage presse-papiers\n"
+    IDS_C3                  "Ã‰chec fermeture presse-papiers\n"
     IDS_D1                  "Erreur d'argument"
-    IDS_D2                  "Facteur d'échelle invalide - réinitialisation"
-    IDS_D3                  "Port d'écoute invalide"
-    IDS_D4                  "Aucun facteur d'échelle spécifié"
-    IDS_D5                  "Échelle invalide spécifiée"
-    IDS_D6                  "Aucun délai spécifié"
-    IDS_D7                  "Délai invalide spécifié"
-    IDS_D8                  "Aucun fuzz spécifié"
-    IDS_D9                  "Fuzz invalide spécifié"
-    IDS_D10                 "Aucun délai spécifié"
-    IDS_D11                 "Délai invalide spécifié"
-    IDS_D12                 "Aucun niveau log spécifié"
+    IDS_D2                  "Facteur d'Ã©chelle invalide - rÃ©initialisation"
+    IDS_D3                  "Port d'Ã©coute invalide"
+    IDS_D4                  "Aucun facteur d'Ã©chelle spÃ©cifiÃ©"
+    IDS_D5                  "Ã‰chelle invalide spÃ©cifiÃ©e"
+    IDS_D6                  "Aucun dÃ©lai spÃ©cifiÃ©"
+    IDS_D7                  "DÃ©lai invalide spÃ©cifiÃ©"
+    IDS_D8                  "Aucun fuzz spÃ©cifiÃ©"
+    IDS_D9                  "Fuzz invalide spÃ©cifiÃ©"
+    IDS_D10                 "Aucun dÃ©lai spÃ©cifiÃ©"
+    IDS_D11                 "DÃ©lai invalide spÃ©cifiÃ©"
+    IDS_D12                 "Aucun niveau log spÃ©cifiÃ©"
     IDS_D13                 "Niveau log invalide"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_D14                 "Aucun fichier log spécifié"
+    IDS_D14                 "Aucun fichier log spÃ©cifiÃ©"
     IDS_D15                 "Fichier log invalide"
-    IDS_D16                 "Aucun fichier config spécifié"
+    IDS_D16                 "Aucun fichier config spÃ©cifiÃ©"
     IDS_D17                 "Impossible d'ouvrir le fichier config"
-    IDS_D18                 "Aucun encodage spécifié"
-    IDS_D19                 "Encodage invalide spécifié"
-    IDS_D20                 "Aucun niveau compression spécifié"
+    IDS_D18                 "Aucun encodage spÃ©cifiÃ©"
+    IDS_D19                 "Encodage invalide spÃ©cifiÃ©"
+    IDS_D20                 "Aucun niveau compression spÃ©cifiÃ©"
     IDS_D21                 "Niveau compression invalide"
-    IDS_D22                 "Aucun niveau qualité image spécifié"
-    IDS_D23                 "Niveau qualité image invalide"
-    IDS_D24                 "Aucun mot de passe spécifié"
-    IDS_D25                 "Aucun dénominateur échelle serveur"
-    IDS_D26                 "Aucun numéro option rapide"
-    IDS_D27                 "Aucun plugin DSM spécifié"
+    IDS_D22                 "Aucun niveau qualitÃ© image spÃ©cifiÃ©"
+    IDS_D23                 "Niveau qualitÃ© image invalide"
+    IDS_D24                 "Aucun mot de passe spÃ©cifiÃ©"
+    IDS_D25                 "Aucun dÃ©nominateur Ã©chelle serveur"
+    IDS_D26                 "Aucun numÃ©ro option rapide"
+    IDS_D27                 "Aucun plugin DSM spÃ©cifiÃ©"
     IDS_D28                 "Serveur VNC invalide."
     IDS_E1                  "Impossible de charger Rich Edit (RICHED32.DLL)!"
 END
@@ -1300,33 +1300,33 @@ END
 STRINGTABLE
 BEGIN
     IDS_E2                  "Chargement Rich Edit Dll"
-    IDS_F1                  "Le plugin ne peut pas être chargé.\n\rVérifiez son intégrité."
+    IDS_F1                  "Le plugin ne peut pas Ãªtre chargÃ©.\n\rVÃ©rifiez son intÃ©gritÃ©."
     IDS_F3                  "Activation du plugin"
     IDS_F4                  "SansMdp,viewer"
-    IDS_F5                  "Le plugin ne peut pas être chargé.\n\rVérifiez le nom."
+    IDS_F5                  "Le plugin ne peut pas Ãªtre chargÃ©.\n\rVÃ©rifiez le nom."
     IDS_F6                  "Chargement du plugin"
-    IDS_F7                  "Le plugin ne peut pas être initialisé.\n\rVérifiez le nom."
-    IDS_F8                  "Serveur VNC invalide.\n\rFormat: hôte:affichage."
+    IDS_F7                  "Le plugin ne peut pas Ãªtre initialisÃ©.\n\rVÃ©rifiez le nom."
+    IDS_F8                  "Serveur VNC invalide.\n\rFormat: hÃ´te:affichage."
     IDS_F10                 "Configuration connexion"
-    IDS_F11                 "Aucun plugin détecté..."
-    IDS_G1                  "Erreur création socket Flasher"
+    IDS_F11                 "Aucun plugin dÃ©tectÃ©..."
+    IDS_G1                  "Erreur crÃ©ation socket Flasher"
     IDS_G2                  "Erreur liaison socket Flasher"
-    IDS_G3                  "Erreur écoute Flasher"
-    IDS_H1                  "> ATTENTION: Transfert fichiers désactivé sur la machine distante"
+    IDS_G3                  "Erreur Ã©coute Flasher"
+    IDS_H1                  "> ATTENTION: Transfert fichiers dÃ©sactivÃ© sur la machine distante"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H2                  "> ATTENTION: Transfert fichiers désactivé sur la machine distante"
-    IDS_H3                  "Transfert refusé: désactivé ou utilisateur inconnu ou version incompatible"
+    IDS_H2                  "> ATTENTION: Transfert fichiers dÃ©sactivÃ© sur la machine distante"
+    IDS_H3                  "Transfert refusÃ©: dÃ©sactivÃ© ou utilisateur inconnu ou version incompatible"
     IDS_H4                  "Connected..."
     IDS_H5                  "Transfert interrompu par l'utilisateur"
-    IDS_H6                  "Transfert terminé"
+    IDS_H6                  "Transfert terminÃ©"
     IDS_H7                  "Transfert interrompu par l'utilisateur"
-    IDS_H8                  "> Parcours répertoire local. Patientez..."
-    IDS_H9                  "> ERREUR: Aucun média dans le lecteur local."
-    IDS_H10                 "> ERREUR: Aucun média dans le lecteur distant."
-    IDS_H11                 "> Parcours répertoire distant. Patientez..."
+    IDS_H8                  "> Parcours rÃ©pertoire local. Patientez..."
+    IDS_H9                  "> ERREUR: Aucun mÃ©dia dans le lecteur local."
+    IDS_H10                 "> ERREUR: Aucun mÃ©dia dans le lecteur distant."
+    IDS_H11                 "> Parcours rÃ©pertoire distant. Patientez..."
     IDS_H12                 "ERROR: File"
     IDS_H13                 "is not accessible on Remote Machine"
     IDS_H14                 "ERROR: Insufficient free space on Local Drive for"
@@ -1337,59 +1337,59 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_M1                  "Un seul fichier ou dossier peut être renommé à la fois"
+    IDS_M1                  "Un seul fichier ou dossier peut Ãªtre renommÃ© Ã  la fois"
     IDS_M2                  "Avertissement renommage fichier/dossier"
     IDS_M3                  "Renommer fichier/dossier"
     IDS_M4                  "Entrez le nouveau nom:"
-    IDS_M5                  "ERREUR: Échec renommage "
-    IDS_M6                  "Renommé LOCAL"
+    IDS_M5                  "ERREUR: Ã‰chec renommage "
+    IDS_M6                  "RenommÃ© LOCAL"
     IDS_M7                  "en"
-    IDS_M8                  "Renommé DISTANT"
+    IDS_M8                  "RenommÃ© DISTANT"
     IDS_H94                 "Avertissement suppression dossier"
     IDS_H95                 "Voulez-vous supprimer le dossier LOCAL"
     IDS_H96                 "Voulez-vous supprimer le dossier DISTANT"
     IDS_H97                 "Impossible de supprimer le dossier local"
     IDS_H98                 "Impossible de supprimer le dossier distant"
     IDS_H99                 "Impossible de supprimer le dossier"
-    IDS_H100                "Créer nouveau dossier"
+    IDS_H100                "CrÃ©er nouveau dossier"
     IDS_L93                 "Affichage seul... \tCtrl+Alt+F3"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H18                 "reçu avec succès..."
+    IDS_H18                 "reÃ§u avec succÃ¨s..."
     IDS_H19                 "ERREUR: Transfert du fichier"
-    IDS_H20                 "échoué sur machine distante. Annulé."
-    IDS_H21                 "ERREUR: Problème d'accès au fichier"
+    IDS_H20                 "Ã©chouÃ© sur machine distante. AnnulÃ©."
+    IDS_H21                 "ERREUR: ProblÃ¨me d'accÃ¨s au fichier"
     IDS_H22                 "Envoi du fichier"
-    IDS_H23                 "ERREUR: Problème d'accès au fichier"
-    IDS_H24                 "ne peut être créé sur machine distante"
+    IDS_H23                 "ERREUR: ProblÃ¨me d'accÃ¨s au fichier"
+    IDS_H24                 "ne peut Ãªtre crÃ©Ã© sur machine distante"
     IDS_H25                 "ERREUR: -> Ce fichier"
-    IDS_H26                 "peut être verrouillé ou espace disque distant insuffisant"
-    IDS_H27                 "envoyé avec succès..."
-    IDS_H28                 "échoué sur machine locale. Annulé"
-    IDS_H29                 "Impossible de créer le dossier"
+    IDS_H26                 "peut Ãªtre verrouillÃ© ou espace disque distant insuffisant"
+    IDS_H27                 "envoyÃ© avec succÃ¨s..."
+    IDS_H28                 "Ã©chouÃ© sur machine locale. AnnulÃ©"
+    IDS_H29                 "Impossible de crÃ©er le dossier"
     IDS_H30                 "sur la machine distante"
     IDS_H31                 "Dossier"
-    IDS_H32                 "a été créé sur la machine distante"
+    IDS_H32                 "a Ã©tÃ© crÃ©Ã© sur la machine distante"
     IDS_H33                 "Impossible de supprimer le fichier"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_H34                 "a été supprimé sur la machine distante"
+    IDS_H34                 "a Ã©tÃ© supprimÃ© sur la machine distante"
     IDS_H35                 "Transfert fichiers avec"
-    IDS_H36                 "Connecté"
+    IDS_H36                 "ConnectÃ©"
     IDS_H37                 "Connexion. Patientez..."
-    IDS_H38                 "existe déjà sur machine distante.\n\n Voulez-vous écraser ou reprendre?\n"
+    IDS_H38                 "existe dÃ©jÃ  sur machine distante.\n\n Voulez-vous Ã©craser ou reprendre?\n"
     IDS_H39                 "Avertissement transfert fichiers"
-    IDS_H40                 "Fichiers/dossiers sélectionnés pour transfert"
-    IDS_H41                 "Démarrage transfert. Envoi"
+    IDS_H40                 "Fichiers/dossiers sÃ©lectionnÃ©s pour transfert"
+    IDS_H41                 "DÃ©marrage transfert. Envoi"
     IDS_H42                 "Fichiers/dossiers vers machine distante"
-    IDS_H43                 "existe déjà sur machine locale.\n\n Voulez-vous écraser ou reprendre?\n"
-    IDS_H44                 "Démarrage transfert. Réception"
+    IDS_H43                 "existe dÃ©jÃ  sur machine locale.\n\n Voulez-vous Ã©craser ou reprendre?\n"
+    IDS_H44                 "DÃ©marrage transfert. RÃ©ception"
     IDS_H45                 "Fichiers/dossiers depuis machine distante "
-    IDS_H46                 "Sélectionnez un fichier à supprimer.\nUn seul fichier peut être supprimé à la fois."
+    IDS_H46                 "SÃ©lectionnez un fichier Ã  supprimer.\nUn seul fichier peut Ãªtre supprimÃ© Ã  la fois."
     IDS_H47                 "Avertissement suppression fichier"
     IDS_H48                 "Voulez-vous supprimer le fichier LOCAL"
     IDS_H49                 "Impossible de supprimer le fichier local"
@@ -1397,146 +1397,146 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_H50                 "a été supprimé"
+    IDS_H50                 "a Ã©tÃ© supprimÃ©"
     IDS_H51                 "Voulez-vous supprimer le fichier DISTANT"
     IDS_H52                 "Entrez le nom du nouveau dossier local:"
-    IDS_H53                 "Impossible de créer le dossier local"
+    IDS_H53                 "Impossible de crÃ©er le dossier local"
     IDS_H54                 "Dossier local"
-    IDS_H55                 "a été créé"
+    IDS_H55                 "a Ã©tÃ© crÃ©Ã©"
     IDS_H56                 "Entrez le nom du nouveau dossier distant:"
     IDS_H57                 "Transfert fichiers"
-    IDS_I1                  "Erreur création socket Daemon"
+    IDS_I1                  "Erreur crÃ©ation socket Daemon"
     IDS_I2                  "Erreur liaison socket Daemon"
-    IDS_I3                  "Erreur écoute Daemon"
-    IDS_J1                  "Pour quitter le plein écran, utilisez Ctrl-Esc Esc puis\r\nclic droit sur l'icône UltraVNC Viewer."
-    IDS_J2                  "UltraVNC Viewer mode plein écran"
+    IDS_I3                  "Erreur Ã©coute Daemon"
+    IDS_J1                  "Pour quitter le plein Ã©cran, utilisez Ctrl-Esc Esc puis\r\nclic droit sur l'icÃ´ne UltraVNC Viewer."
+    IDS_J2                  "UltraVNC Viewer mode plein Ã©cran"
     IDS_K2                  "Erreur sauvegarde fichier"
     IDS_K1                  "Nom de fichier invalide"
-    IDS_K3                  "Voulez-vous sauvegarder le mot de passe?\n\r La sauvegarde du mot de passe n'est pas sécurisée."
+    IDS_K3                  "Voulez-vous sauvegarder le mot de passe?\n\r La sauvegarde du mot de passe n'est pas sÃ©curisÃ©e."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_N12                 "Mémoire insuffisante pour tampon zlib."
-    IDS_N13                 "Code de découverte invalide\n"
+    IDS_N12                 "MÃ©moire insuffisante pour tampon zlib."
+    IDS_N13                 "Code de dÃ©couverte invalide\n"
     IDS_N14                 "Impossible d'utiliser l'authentification IDEA!"
-    IDS_LANGUAGE_NAME       "Français"
+    IDS_LANGUAGE_NAME       "FranÃ§ais"
     IDS_I4                  "Erreur Daemon"
 END
 
 STRINGTABLE
 BEGIN
     IDS_H58                 "Fichiers/dossiers"
-    IDS_H59                 "Décompression dossier"
-    IDS_H60                 "après réception. Patientez..."
+    IDS_H59                 "DÃ©compression dossier"
+    IDS_H60                 "aprÃ¨s rÃ©ception. Patientez..."
     IDS_H61                 "Dossier distant"
-    IDS_H62                 "ERREUR décompression dossier distant"
-    IDS_H63                 "Annulé."
+    IDS_H62                 "ERREUR dÃ©compression dossier distant"
+    IDS_H63                 "AnnulÃ©."
     IDS_H64                 "Compression dossier local"
     IDS_H65                 "pour transfert. Patientez..."
     IDS_H66                 "Dossier local"
-    IDS_H67                 "compressé avec succès."
-    IDS_H68                 "ERREUR compression dossier local (fichiers protégés)"
-    IDS_H69                 "Transfert annulé."
-    IDS_H70                 "envoyé avec succès."
+    IDS_H67                 "compressÃ© avec succÃ¨s."
+    IDS_H68                 "ERREUR compression dossier local (fichiers protÃ©gÃ©s)"
+    IDS_H69                 "Transfert annulÃ©."
+    IDS_H70                 "envoyÃ© avec succÃ¨s."
     IDS_H71                 "Le dossier DISTANT"
-    IDS_H72                 "existe déjà.\n\n Écraser avec tous ses fichiers et sous-dossiers?"
+    IDS_H72                 "existe dÃ©jÃ .\n\n Ã‰craser avec tous ses fichiers et sous-dossiers?"
     IDS_H73                 "Le dossier LOCAL"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_K4                  "Avertissement de sécurité"
-    IDS_K5                  "Erreur lecture nom d'hôte"
+    IDS_K4                  "Avertissement de sÃ©curitÃ©"
+    IDS_K5                  "Erreur lecture nom d'hÃ´te"
     IDS_K6                  "Erreur fichier config"
-    IDS_K7                  "Erreur lecture numéro de port"
+    IDS_K7                  "Erreur lecture numÃ©ro de port"
     IDS_L1                  "inconnu"
     IDS_L2                  "Envoyer CTRL+ALT+DEL"
-    IDS_L3                  "Basculer mode plein écran"
+    IDS_L3                  "Basculer mode plein Ã©cran"
     IDS_L4                  "Afficher options connexion..."
     IDS_L5                  "Refresh Screen"
-    IDS_L6                  "Envoyer Démarrer (Ctrl+Esc)"
-    IDS_L7                  "Envoyer touche personnalisée"
-    IDS_L8                  "Afficher fenêtre statut"
+    IDS_L6                  "Envoyer DÃ©marrer (Ctrl+Esc)"
+    IDS_L7                  "Envoyer touche personnalisÃ©e"
+    IDS_L8                  "Afficher fenÃªtre statut"
     IDS_L9                  "Fermer connexion"
     IDS_L10                 "Masquer boutons barre d'outils"
-    IDS_L11                 "Basculer entrée distante/écran noir"
+    IDS_L11                 "Basculer entrÃ©e distante/Ã©cran noir"
     IDS_L12                 "Ouvrir transfert fichiers..."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L13                 "Capture écran"
-    IDS_L14                 "Sélectionner bureau / Changer moniteur"
+    IDS_L13                 "Capture Ã©cran"
+    IDS_L14                 "SÃ©lectionner bureau / Changer moniteur"
     IDS_L15                 "Ouvrir chat..."
     IDS_L16                 "Transfert fichiers... \tCtrl+Alt+F7"
     IDS_L17                 "Chat... \tCtrl+Alt+F8"
     IDS_L18                 "Afficher barre d'outils \tCtrl+Alt+F9"
-    IDS_L19                 "Désactiver entrée/moniteur distant"
-    IDS_L20                 "Activer entrée/moniteur distant "
+    IDS_L19                 "DÃ©sactiver entrÃ©e/moniteur distant"
+    IDS_L20                 "Activer entrÃ©e/moniteur distant "
     IDS_L21                 "&Options connexion... \tCtrl+Alt+F6"
     IDS_L22                 "&Info connexion..\tCtrl+Alt+Shift+I"
-    IDS_L23                 "&Rafraîchir écran..\tCtrl+Alt+Shift+R"
-    IDS_L24                 "&Plein écran \tCtrl+Alt+F12"
-    IDS_L25                 "&Auto-échelle \tCtrl+Alt+F10"
+    IDS_L23                 "&RafraÃ®chir Ã©cran..\tCtrl+Alt+Shift+R"
+    IDS_L24                 "&Plein Ã©cran \tCtrl+Alt+F12"
+    IDS_L25                 "&Auto-Ã©chelle \tCtrl+Alt+F10"
     IDS_L26                 "&Demi-taille \tCtrl+Alt+F11"
-    IDS_L27                 "Écran &flou"
-    IDS_L28                 "Écran &normal \tCtrl+F11"
+    IDS_L27                 "Ã‰cran &flou"
+    IDS_L28                 "Ã‰cran &normal \tCtrl+F11"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L29                 "&Couleurs complètes"
+    IDS_L29                 "&Couleurs complÃ¨tes"
     IDS_L30                 "&256 couleurs"
     IDS_L31                 "Envoyer Ctrl+Alt+Del \tCtrl+Alt+F4"
-    IDS_L32                 "Envoyer Ctrl+Esc (menu Démarrer)"
-    IDS_L33                 "Touche Ctrl enfoncée"
-    IDS_L34                 "Touche Ctrl relâchée"
-    IDS_L35                 "Touche Alt enfoncée"
-    IDS_L36                 "Touche Alt relâchée"
+    IDS_L32                 "Envoyer Ctrl+Esc (menu DÃ©marrer)"
+    IDS_L33                 "Touche Ctrl enfoncÃ©e"
+    IDS_L34                 "Touche Ctrl relÃ¢chÃ©e"
+    IDS_L35                 "Touche Alt enfoncÃ©e"
+    IDS_L36                 "Touche Alt relÃ¢chÃ©e"
     IDS_L37                 "&Nouvelle connexion...\tCtrl+Alt+Shift+N"
     IDS_L38                 "Enregistrer connexion &sous... \tCtrl+Alt+F5"
     IDS_L39                 "&About UltraVNC Viewer..."
-    IDS_L40                 "Fermer &daemon d'écoute"
+    IDS_L40                 "Fermer &daemon d'Ã©coute"
     IDS_L41                 "DSMPlugin non configurable"
-    IDS_L42                 "Annulé par l'utilisateur"
+    IDS_L42                 "AnnulÃ© par l'utilisateur"
     IDS_L43                 "Connexion..."
-    IDS_L44                 "Erreur création socket !"
+    IDS_L44                 "Erreur crÃ©ation socket !"
 END
 
 STRINGTABLE
 BEGIN
     IDS_L45                 "Recherche adresse serveur..."
-    IDS_L46                 "Échec obtention adresse serveur !"
+    IDS_L46                 "Ã‰chec obtention adresse serveur !"
     IDS_L47                 "Connexion au serveur..."
-    IDS_L48                 "Échec connexion au serveur !"
-    IDS_L49                 "Connecté"
-    IDS_L50                 "Erreur désactivation algorithme Nagle"
-    IDS_L51                 "Désolé - ce serveur utilise une ancienne authentification non supportée."
+    IDS_L48                 "Ã‰chec connexion au serveur !"
+    IDS_L49                 "ConnectÃ©"
+    IDS_L50                 "Erreur dÃ©sactivation algorithme Nagle"
+    IDS_L51                 "DÃ©solÃ© - ce serveur utilise une ancienne authentification non supportÃ©e."
     IDS_L52                 "Erreur version protocole"
     IDS_L53                 "Mot de passe vide"
-    IDS_L54                 "Authentification annulée"
-    IDS_L55                 "Mot de passe accepté"
+    IDS_L54                 "Authentification annulÃ©e"
+    IDS_L55                 "Mot de passe acceptÃ©"
     IDS_L56                 "Mot de passe incorrect"
-    IDS_L57                 "Authentification VNC échouée!"
-    IDS_L58                 "Authentification VNC échouée - trop d'essais!"
-    IDS_L59                 "Résultat authentification VNC inconnu!"
-    IDS_L60                 "Schéma authentification inconnu!"
+    IDS_L57                 "Authentification VNC Ã©chouÃ©e!"
+    IDS_L58                 "Authentification VNC Ã©chouÃ©e - trop d'essais!"
+    IDS_L59                 "RÃ©sultat authentification VNC inconnu!"
+    IDS_L60                 "SchÃ©ma authentification inconnu!"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_L61                 "Erreur création image locale écran."
-    IDS_L62                 "Patientez - Chargement écran initial..."
-    IDS_L63                 "Message SetColormap non géré reçu!\n"
-    IDS_L64                 "Type de message non géré reçu!\n"
+    IDS_L61                 "Erreur crÃ©ation image locale Ã©cran."
+    IDS_L62                 "Patientez - Chargement Ã©cran initial..."
+    IDS_L63                 "Message SetColormap non gÃ©rÃ© reÃ§u!\n"
+    IDS_L64                 "Type de message non gÃ©rÃ© reÃ§u!\n"
     IDS_L65                 "WriteExact: Erreur allocation DSMPlugin-RestoreBuffer."
     IDS_L66                 "WriteExact: Erreur DSMPlugin-RestoreBuffer."
-    IDS_L67                 "Connexion fermée (1)"
+    IDS_L67                 "Connexion fermÃ©e (1)"
     IDS_L68                 "WriteExact: Erreur DSMPlugin-TransformBuffer."
-    IDS_L69                 "Serveur a fermé la connexion\n\r -Connexion rejetée\n\r -Déconnexion réseau\n\r -Pare-feu"
-    IDS_L70                 "Mémoire insuffisante pour tampon réseau."
-    IDS_L71                 "Mémoire insuffisante pour tampon zlib."
+    IDS_L69                 "Serveur a fermÃ© la connexion\n\r -Connexion rejetÃ©e\n\r -DÃ©connexion rÃ©seau\n\r -Pare-feu"
+    IDS_L70                 "MÃ©moire insuffisante pour tampon rÃ©seau."
+    IDS_L71                 "MÃ©moire insuffisante pour tampon zlib."
     IDS_L72                 "Statut UltraVNC Viewer pour"
     IDS_L73                 "Statut UltraVNC Viewer"
     IDS_L74                 "Pas de connexion"
@@ -1547,56 +1547,56 @@ END
 STRINGTABLE
 BEGIN
     IDS_L77                 "Le serveur VNC ne supporte pas le transfert fichiers!"
-    IDS_L78                 "UltraVNC Viewer - Fonctionnalité indisponible"
-    IDS_L79                 "La fenêtre transfert fichiers est déjà ouverte!"
+    IDS_L78                 "UltraVNC Viewer - FonctionnalitÃ© indisponible"
+    IDS_L79                 "La fenÃªtre transfert fichiers est dÃ©jÃ  ouverte!"
     IDS_L80                 "Avertissement transfert fichiers"
     IDS_L81                 "Le serveur VNC ne supporte pas le chat texte!"
-    IDS_L82                 "UltraVNC Viewer - Fonctionnalité indisponible"
-    IDS_L83                 "La fenêtre chat est déjà ouverte!"
+    IDS_L82                 "UltraVNC Viewer - FonctionnalitÃ© indisponible"
+    IDS_L83                 "La fenÃªtre chat est dÃ©jÃ  ouverte!"
     IDS_L84                 "Avertissement chat texte"
-    IDS_L85                 "Fermez d'abord la fenêtre transfert fichiers"
-    IDS_L86                 "Fermez d'abord la fenêtre chat"
-    IDS_L87                 "Fermez d'abord la fenêtre options connexion"
+    IDS_L85                 "Fermez d'abord la fenÃªtre transfert fichiers"
+    IDS_L86                 "Fermez d'abord la fenÃªtre chat"
+    IDS_L87                 "Fermez d'abord la fenÃªtre options connexion"
     IDS_L88                 "UltraVNC Viewer - Avertissement"
-    IDS_L89                 "Négociation version protocole..."
-    IDS_L90                 "Mot de passe demandé"
-    IDS_L91                 "Connexion échouée"
+    IDS_L89                 "NÃ©gociation version protocole..."
+    IDS_L90                 "Mot de passe demandÃ©"
+    IDS_L91                 "Connexion Ã©chouÃ©e"
     IDS_L92                 "Aucune authentification requise"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_TLS7                "EncryptMessage échoué"
-    IDS_TLS8                "DecryptMessage échoué"
-    IDS_TLS9                "Résultat DecryptMessage inattendu"
-    IDS_TLS10               "ApplyControlToken échoué"
-    IDS_TLS11               "CertGetCertificateChain échoué"
-    IDS_N1                  "Aucun élément dans la liste"
-    IDS_N2                  "Aucun serveur VNC sélectionné"
-    IDS_N3                  "Périphérique multitouch TCVNC"
-    IDS_N4                  "Fonction supportée uniquement en mode 1:1"
+    IDS_TLS7                "EncryptMessage Ã©chouÃ©"
+    IDS_TLS8                "DecryptMessage Ã©chouÃ©"
+    IDS_TLS9                "RÃ©sultat DecryptMessage inattendu"
+    IDS_TLS10               "ApplyControlToken Ã©chouÃ©"
+    IDS_TLS11               "CertGetCertificateChain Ã©chouÃ©"
+    IDS_N1                  "Aucun Ã©lÃ©ment dans la liste"
+    IDS_N2                  "Aucun serveur VNC sÃ©lectionnÃ©"
+    IDS_N3                  "PÃ©riphÃ©rique multitouch TCVNC"
+    IDS_N4                  "Fonction supportÃ©e uniquement en mode 1:1"
     IDS_N5                  "UltraVNC Viewer - Capture"
     IDS_N6                  "UltraVNC Viewer - Informations connexion"
     IDS_N7                  "UltraVNC Viewer - Connexion perdue, reconnexion ("
     IDS_N8                  "UltraVNC Viewer - Chat avec <%s>"
     IDS_N9                  "UltraVNC Viewer -"
-    IDS_N10                 "Tous les écrans"
-    IDS_N11                 "Moniteur par défaut"
+    IDS_N10                 "Tous les Ã©crans"
+    IDS_N11                 "Moniteur par dÃ©faut"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_TAB_ENCODERS        "Encoders"
-    IDS_TAB_INPUT           "Input"
-    IDS_TAB_DISPLAY         "Display"
-    IDS_TAB_MISC            "Misc"
-    IDS_TAB_SECURITY        "Security"
-    IDS_TAB_QUICKENC        "Quick encoder"
-    IDS_TAB_LISTEN          "Listen"
+    IDS_TAB_ENCODERS        "Encodeurs"
+    IDS_TAB_INPUT           "Entree"
+    IDS_TAB_DISPLAY         "Affichage"
+    IDS_TAB_MISC            "Divers"
+    IDS_TAB_SECURITY        "Securite"
+    IDS_TAB_QUICKENC        "Encodeur rapide"
+    IDS_TAB_LISTEN          "Ecoute"
     IDS_TAB_CONF            "Config"
-    IDS_L95                 "Show Options"
-    IDS_L96                 "Hide Options"
-    IDS_L97                 "Computer:"
+    IDS_L95                 "Afficher les options"
+    IDS_L96                 "Masquer les options"
+    IDS_L97                 "Ordinateur:"
     IDS_L98                 "ID:"
     IDS_L99                 "Port:"
 END

@@ -912,9 +912,9 @@ void SessionDialog::setDisplays()
 			resolutionMap.insert(make_pair(make_pair(dm.dmPelsWidth, dm.dmPelsHeight), dm.dmBitsPerPel));
 	}
 	HWND slider = GetDlgItem(DisplayHwnd, IDC_SLIDERRES);
-	SendMessage(slider, TBM_SETRANGE, (WPARAM)1, (LPARAM)MAKELONG(0, resolutionMap.size() - 1));
+	int mapSize = (int)resolutionMap.size();
+	SendMessage(slider, TBM_SETRANGE, (WPARAM)1, (LPARAM)MAKELONG(0, mapSize > 0 ? mapSize - 1 : 0));
 	SendMessage(slider, TBM_SETTICFREQ, 1, 10);
-	//int mapSize = resolutionMap.size() -1;
 	map<pair<int, int>, int>::iterator itr;
 	int it = 0;
 	int pos = 0;
@@ -932,8 +932,17 @@ void SessionDialog::setDisplays()
 	}
 	SendMessage(slider, TBM_SETPOS, true, pos);
 	TCHAR temp[250];
-	_stprintf_s(temp, _T("%d x %d"), (itr->first).first, (itr->first).second);
-	SetDlgItemText(DisplayHwnd, IDC_RES, temp);
+	if (itr != resolutionMap.end())
+	{
+		_stprintf_s(temp, _T("%d x %d"), (itr->first).first, (itr->first).second);
+		SetDlgItemText(DisplayHwnd, IDC_RES, temp);
+	}
+	else if (!resolutionMap.empty())
+	{
+		itr = resolutionMap.begin();
+		_stprintf_s(temp, _T("%d x %d"), (itr->first).first, (itr->first).second);
+		SetDlgItemText(DisplayHwnd, IDC_RES, temp);
+	}
 }
 
 void SessionDialog::InitDlgProcDisplay()

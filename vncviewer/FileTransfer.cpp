@@ -5452,8 +5452,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						}
 						
 						WCHAR szFullPathW[MAX_PATH * 4];
-						wcscpy_s(szFullPathW, szCurrLocalW);
-						wcscat_s(szFullPathW, szSelW, MAX_PATH * 4);
+						wcscpy_s(szFullPathW, MAX_PATH * 4, szCurrLocalW);
+						wcscat_s(szFullPathW, MAX_PATH * 4, szSelW);
 						
 						if (!_this->DeleteFileOrDirectory(szFullPathW))
 						{
@@ -5515,8 +5515,8 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 						}
 						// Build full Unicode path (dir + filename) then convert to UTF-8 for server
 						WCHAR szFullW[MAX_PATH * 4];
-						wcscpy_s(szFullW, szCurrRemoteW);
-						wcscat_s(szFullW, szSelW, MAX_PATH * 4);
+						wcscpy_s(szFullW, MAX_PATH * 4, szCurrRemoteW);
+						wcscat_s(szFullW, MAX_PATH * 4, szSelW);
 						char szFullPathUTF8[MAX_PATH * 3];
 						WideCharToMultiByte(CP_UTF8, 0, szFullW, -1, szFullPathUTF8, MAX_PATH * 3, NULL, NULL);
 						_this->m_nDeleteCount++;

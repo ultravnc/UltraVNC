@@ -41,6 +41,8 @@ public:
 
 	void ExpandBox(HWND hDlg, BOOL fExpand);
 	BOOL m_bExpanded;
+	int m_nExpandedWidth;
+	int m_nExpandedHeight;
 	HBITMAP hBmpExpand;
 	HBITMAP hBmpCollaps;
 	void InitPlugin(HWND hwnd);

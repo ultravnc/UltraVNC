@@ -43,6 +43,8 @@ extern wchar_t sz_F11[64];
 SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin* pDSMPlugin)
 {
 	m_bExpanded = true;
+	m_nExpandedWidth = 0;
+	m_nExpandedHeight = 0;
 	m_Dpi = pCC->m_Dpi;
 	m_pCC = pCC;
 	m_pOpt = pOpt;
@@ -430,8 +432,8 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	// immediately.
 	if (fExpand == m_bExpanded) return;
  
-	extern TCHAR sz_ShowOptions[160];
-	extern TCHAR sz_HideOptions[160];
+	extern TCHAR sz_ShowOptions[64];
+	extern TCHAR sz_HideOptions[64];
 
 	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
 	HWND wndChild = NULL;
@@ -477,17 +479,18 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		_ASSERT(m_bExpanded);
 		GetWindowRect(hDlg, &rcWnd);
 
+		// Save the full expanded window dimensions for exact restoration
+		m_nExpandedWidth  = rcWnd.right  - rcWnd.left;
+		m_nExpandedHeight = rcWnd.bottom - rcWnd.top;
+
 		// we also hide the default box here so that it is not visible
 		ShowWindow(wndDefaultBox, SW_HIDE);
 
-		// shrink the dialog box so that it encompasses everything from the top,
-		// left up to and including the default box.
+		// shrink only the height; width stays unchanged
 		SetWindowPos(hDlg, NULL, 0, 0,
-			rcDefaultBox.right - rcWnd.left,
+			rcWnd.right - rcWnd.left,
 			rcDefaultBox.bottom - rcWnd.top,
 			SWP_NOZORDER | SWP_NOMOVE);
-
-		//SetWindowText(pCtrl, "Show Options");
 
 		// record that the dialog is contracted.
 		m_bExpanded = FALSE;
@@ -496,37 +499,15 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	{
 		_ASSERT(!m_bExpanded);
 
-		// Position bottom left button 
-		HWND hBottomLeftButton = GetDlgItem(hDlg, IDC_SAVE);
-		RECT rcDelete;
-		GetWindowRect(hBottomLeftButton, &rcDelete);
-		POINT ptBottomRight = { rcDelete.right, rcDelete.bottom };
-		ScreenToClient(hDlg, &ptBottomRight);
-		int paddingX = MulDiv(16, m_Dpi, 96);
-		int paddingY = MulDiv(16, m_Dpi, 96);
-		int desiredWidth = ptBottomRight.x + paddingX;
-		int desiredHeight = ptBottomRight.y + paddingY;
-		DWORD dwStyle = GetWindowLong(hDlg, GWL_STYLE);
-		DWORD dwExStyle = GetWindowLong(hDlg, GWL_EXSTYLE);
-		RECT rcClient = { 0, 0, desiredWidth, desiredHeight };	
-		if (m_pCC->adjustWindowRectExForDpi)
-		{
-			m_pCC->adjustWindowRectExForDpi(&rcClient, dwStyle, FALSE, dwExStyle,m_Dpi);
-		}
-		else
-		{
-			AdjustWindowRectEx(&rcClient, dwStyle, FALSE, dwExStyle);
-		}
-
+		// Restore only the height; keep current width unchanged
+		GetWindowRect(hDlg, &rcWnd);
 		SetWindowPos(hDlg, NULL, 0, 0,
-			rcClient.right - rcClient.left,
-			rcClient.bottom - rcClient.top,
+			rcWnd.right - rcWnd.left,
+			m_nExpandedHeight,
 			SWP_NOMOVE | SWP_NOZORDER);
 
-		// make sure that the entire dialog box is visible on the user's
-		// screen.
+		// make sure that the entire dialog box is visible on the user's screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
-		//SetWindowText(pCtrl, "Hide Options");
 		m_bExpanded = TRUE;
 	}
 }
@@ -813,9 +794,9 @@ bool SessionDialog::connect(HWND hwnd)
 
 void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 {
-	extern TCHAR sz_Computer[160];
-	extern TCHAR sz_ID[160];
-	extern TCHAR sz_Port[160];
+	extern TCHAR sz_Computer[64];
+	extern TCHAR sz_ID[64];
+	extern TCHAR sz_Port[64];
 
 	SetTimer(hwnd, 100, 1000, NULL);
 	switch (LOWORD(wParam))
