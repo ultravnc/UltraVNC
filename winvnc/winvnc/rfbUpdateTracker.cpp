@@ -17,9 +17,33 @@
 
 #include "stdhdrs.h"
 #include <assert.h>
+#include <algorithm>
 #include "rfbUpdateTracker.h"
 
 using namespace rfb;
+
+static void mergeChangedRects(std::vector<rfb::Rect>& rects, int gapThreshold = 16)
+{
+    if (rects.size() <= 1) return;
+    std::sort(rects.begin(), rects.end(), [](const rfb::Rect& a, const rfb::Rect& b) {
+        return a.tl.y != b.tl.y ? a.tl.y < b.tl.y : a.tl.x < b.tl.x;
+    });
+    std::vector<rfb::Rect> out;
+    out.reserve(rects.size());
+    for (auto& r : rects) {
+        bool merged = false;
+        for (auto& o : out) {
+            if (o.tl.y == r.tl.y && o.br.y == r.br.y &&
+                r.tl.x <= o.br.x + gapThreshold) {
+                o.br.x = std::max(o.br.x, r.br.x);
+                merged = true;
+                break;
+            }
+        }
+        if (!merged) out.push_back(r);
+    }
+    rects = std::move(out);
+}
 
 // ClippedUpdateTracker
 
@@ -170,6 +194,7 @@ void SimpleUpdateTracker::flush_update(UpdateInfo &info, const Region2D &cliprgn
 
 	// Save the update and copyrect rectangles info the UpdateInfo
 	updatergn.get_rects(info.changed, 1, 1);
+	mergeChangedRects(info.changed);
 	cachedrgn.get_rects(info.cached, 1, 1);
 	copyrgn.get_rects(info.copied, copy_delta.x <= 0, copy_delta.y <= 0);
 	info.copy_delta = copy_delta;

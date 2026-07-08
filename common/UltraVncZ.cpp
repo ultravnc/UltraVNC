@@ -39,13 +39,13 @@ UltraVncZ::~UltraVncZ()
 		inflateEnd(&decompStream);
 	if (compStreamInitedZstd) {
 		ZSTD_freeCStream(cstream);
-		free(outBufferC);
-		free(inBufferC);
+		delete outBufferC;
+		delete inBufferC;
 	}
 	if (decompStreamInitedZstd) {
 		ZSTD_freeDStream(dstream);
-		free(outBufferD);
-		free(inBufferD);
+		delete outBufferD;
+		delete inBufferD;
 	}
 }
 
@@ -53,8 +53,8 @@ void UltraVncZ::endInflateStream(bool zstd)
 {
 	if (zstd && compStreamInitedZstd) {
 		ZSTD_freeCStream(cstream);
-		free(outBufferC);
-		free(inBufferC);
+		delete outBufferC;
+		delete inBufferC;
 		compStreamInitedZstd = false;
 	}
 
@@ -116,8 +116,11 @@ UINT UltraVncZ::compressZstd(int compresslevel, UINT avail_in, UINT avail_out, B
 			return 0;
 		if (ZSTD_isError(ZSTD_initCStream(cstream, compresslevel)))
 			return 0;
-		if (ZSTD_isError(ZSTD_CCtx_setParameter(cstream, ZSTD_c_strategy, ZSTD_fast)))
-			return 0;
+		{
+			ZSTD_strategy initStrategy = (compresslevel <= 1) ? ZSTD_fast : ZSTD_dfast;
+			if (ZSTD_isError(ZSTD_CCtx_setParameter(cstream, ZSTD_c_strategy, initStrategy)))
+				return 0;
+		}
 		outBufferC = new ZSTD_outBuffer;
 		inBufferC = new ZSTD_inBuffer;
 		compStreamInitedZstd = true;
@@ -132,6 +135,8 @@ UINT UltraVncZ::compressZstd(int compresslevel, UINT avail_in, UINT avail_out, B
 	outBufferC->pos = 0;
 	if (this->compresslevel != compresslevel) {
 		ZSTD_CCtx_setParameter(cstream, ZSTD_c_compressionLevel, compresslevel);
+		ZSTD_strategy strategy = (compresslevel <= 1) ? ZSTD_fast : ZSTD_dfast;
+		ZSTD_CCtx_setParameter(cstream, ZSTD_c_strategy, strategy);
 		this->compresslevel = compresslevel;
 	}
 	rc = ZSTD_compressStream2(cstream, outBufferC, inBufferC, ZSTD_e_flush);
