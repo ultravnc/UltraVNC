@@ -22,6 +22,7 @@
 #include "ClientConnection.h"
 #include "SessionDialog.h"
 #include "AuthDialog.h"
+#include "CredentialManager.h"
 #include "AboutBox.h"
 #include "LowLevelHook.h"
 
@@ -402,6 +403,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_ms_user[0] = '\0';    // act: add msuser storage
 	m_cmdlnUser[0] = '\0'; // act: add user option on command line
 	m_clearPasswd[0] = '\0'; // Modif sf@2002
+	m_usedSavedVncPassword = false;
 	// static window
 	m_BytesSend=0;
 	m_BytesRead=0;
@@ -1583,6 +1585,7 @@ void ClientConnection::CreateDisplay()
 		AppendMenu(hsysmenu, MF_STRING, ID_NEWCONN,			_T("New Connection"));
 		AppendMenu(hsysmenu, MF_STRING | (m_serverInitiated ? MF_GRAYED : 0),
 			ID_CONN_SAVE_AS,	_T("Save As"));
+		AppendMenu(hsysmenu, MF_STRING, ID_CLEAR_SAVED_PASSWORD, _T("Clear Saved Password"));
 	}
     AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
 	AppendMenu(hsysmenu, MF_STRING, IDD_APP_ABOUT,		_T("About"));
@@ -3157,6 +3160,21 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 	case rfbVncAuthFailedEx:
 		vnclog.Print(0, _T("VNC authentication failed!"));
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L56);
+
+		if (m_usedSavedVncPassword)
+		{
+			wchar_t msg[512];
+			_snwprintf_s(msg, _countof(msg), _TRUNCATE,
+				L"Authentication failed for %s:%d.\n\nDo you want to remove the saved credentials from Credential Manager?",
+				m_host, m_port);
+			if (MessageBoxW(m_hwndMain, msg, L"UltraVNC Viewer - Authentication", MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES)
+			{
+				CredentialManager::DeleteVncPassword(m_host, m_port);
+				CredentialManager::DeleteMsLogonPassword(m_host, m_port);
+				vnclog.Print(0, _T("Removed saved credentials from Credential Manager for %s:%d\n"), m_host, m_port);
+			}
+		}
+
 		if (m_minorVersion >= 7 || authResult == rfbVncAuthFailedEx) {
 			vnclog.Print(0, _T("VNC authentication failed! Extended information available."));
 			//adzm 2010-05-11 - Send an explanatory message for the failure (if any)
@@ -3513,17 +3531,36 @@ void ClientConnection::AuthMsLogonII()
 	}
 	else
 	{
-	AuthDialog ad;
-	ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
-	// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
-	if (ad.DoDialog(dtUserPass, m_host, m_port)) {
-		strncpy_s(passwd, 256, ad.m_passwd, 63); passwd[63]='\0';
-		strncpy_s(user, 256, ad.m_user, 254);
-		vncEncryptPasswdMs(m_encPasswdMs, passwd);
-		strcpy_s(m_ms_user, user);
-	} else {
-		QuietException_helper(sz_L54);
-	}
+		// Try Windows Credential Manager first
+		char savedDomain[256] = {0};
+		m_usedSavedVncPassword = CredentialManager::ReadMsLogonPassword(m_host, m_port, savedDomain, 256,
+			user, sizeof(user), passwd, sizeof(passwd));
+		if (m_usedSavedVncPassword)
+		{
+			vnclog.Print(0, _T("Using saved MS-Logon credentials from Credential Manager for %s:%d\n"), m_host, m_port);
+			vncEncryptPasswdMs(m_encPasswdMs, passwd);
+			strcpy_s(m_ms_user, user);
+		}
+		else
+		{
+			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+			// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
+			if (ad.DoDialog(dtUserPass, m_host, m_port)) {
+				strncpy_s(passwd, 256, ad.m_passwd, 63); passwd[63]='\0';
+				strncpy_s(user, 256, ad.m_user, 254);
+				vncEncryptPasswdMs(m_encPasswdMs, passwd);
+				strcpy_s(m_ms_user, user);
+
+				if (ad.m_savePassword)
+				{
+					CredentialManager::WriteMsLogonPassword(m_host, m_port, "", user, passwd);
+					vnclog.Print(0, _T("MS-Logon credentials saved to Credential Manager for %s:%d\n"), m_host, m_port);
+				}
+			} else {
+				QuietException_helper(sz_L54);
+			}
+		}
 	//user = domain + "\\" + user;
 	}
 	vncEncryptBytes2((unsigned char*) user, sizeof(user), key);
@@ -3591,10 +3628,24 @@ void ClientConnection::AuthMsLogonI()
 	}
 	else
 	{
-		AuthDialog ad;
-		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
-		///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
-		if (ad.DoDialog(dtUserPassNotEncryption, m_host, m_port))
+		// Try Windows Credential Manager first
+		m_usedSavedVncPassword = CredentialManager::ReadMsLogonPassword(m_host, m_port, domain, sizeof(domain),
+			user, sizeof(user), passwd, sizeof(passwd));
+		if (m_usedSavedVncPassword)
+		{
+			vnclog.Print(0, _T("Using saved MS-Logon I credentials from Credential Manager for %s:%d\n"), m_host, m_port);
+			if (m_ms_logon_I_legacy)
+			{
+				vncEncryptPasswdMs(m_encPasswdMs, passwd);
+				strcpy_s(m_ms_user, user);
+			}
+		}
+		else
+		{
+			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+			///////////////ppppppppppppppppppppppppppppppppppppppppp // adzm 2010-10 - what?
+			if (ad.DoDialog(dtUserPassNotEncryption, m_host, m_port))
 		{
 //					flash = new BmpFlasher;
 			strncpy_s(passwd, 256, ad.m_passwd, 254);
@@ -3616,12 +3667,19 @@ void ClientConnection::AuthMsLogonI()
 				vncEncryptPasswdMs(m_encPasswdMs, passwd);
 				strcpy_s(m_ms_user, user);
 			}
+
+			if (ad.m_savePassword)
+			{
+				CredentialManager::WriteMsLogonPassword(m_host, m_port, domain, user, passwd);
+				vnclog.Print(0, _T("MS-Logon I credentials saved to Credential Manager for %s:%d\n"), m_host, m_port);
+			}
 		}
 		else
 		{
 //					if (flash) {flash->Killflash();}
 			QuietException_helper(sz_L54);
 		}
+	}
 	}
 
 	// sf@2002
@@ -3708,16 +3766,35 @@ void ClientConnection::AuthMsLogonIII()
 	}
 	else
 	{
-		AuthDialog ad;
-		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
-		if (ad.DoDialog(dtUserPass, m_host, m_port)) {
-			strncpy_s(passwd, _countof(passwd), ad.m_passwd, 63); passwd[63] = '\0';
-			strncpy_s(user, _countof(user), ad.m_user, 254);
+		// Try Windows Credential Manager first
+		char savedDomain[256] = {0};
+		m_usedSavedVncPassword = CredentialManager::ReadMsLogonPassword(m_host, m_port, savedDomain, 256,
+			user, sizeof(user), passwd, sizeof(passwd));
+		if (m_usedSavedVncPassword)
+		{
+			vnclog.Print(0, _T("Using saved MS-Logon III credentials from Credential Manager for %s:%d\n"), m_host, m_port);
 			vncEncryptPasswdMs(m_encPasswdMs, passwd);
 			strcpy_s(m_ms_user, user);
 		}
-		else {
-			QuietException_helper(sz_L54);
+		else
+		{
+			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+			if (ad.DoDialog(dtUserPass, m_host, m_port)) {
+				strncpy_s(passwd, _countof(passwd), ad.m_passwd, 63); passwd[63] = '\0';
+				strncpy_s(user, _countof(user), ad.m_user, 254);
+				vncEncryptPasswdMs(m_encPasswdMs, passwd);
+				strcpy_s(m_ms_user, user);
+
+				if (ad.m_savePassword)
+				{
+					CredentialManager::WriteMsLogonPassword(m_host, m_port, "", user, passwd);
+					vnclog.Print(0, _T("MS-Logon III credentials saved to Credential Manager for %s:%d\n"), m_host, m_port);
+				}
+			}
+			else {
+				QuietException_helper(sz_L54);
+			}
 		}
 	}
 	
@@ -3764,25 +3841,43 @@ void ClientConnection::AuthVnc()
 	}
 	else
 	{
-		AuthDialog ad;
-		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
-		if (ad.DoDialog(dtPass, m_host, m_port))
+		// Try Windows Credential Manager first
+		m_usedSavedVncPassword = CredentialManager::ReadVncPassword(m_host, m_port, passwd, 256);
+		if (m_usedSavedVncPassword)
 		{
-			strcpy_s(passwd, 256, ad.m_passwd);
-			if (strlen(passwd) == 0)
-			{
-				vnclog.Print(0, _T("Password had zero length\n"));
-				throw WarningException(sz_L53);
-			}
+			vnclog.Print(0, _T("Using saved password from Credential Manager for %s:%d\n"), m_host, m_port);
 			if (strlen(passwd) > 8)
-			{
 				passwd[8] = '\0';
-			}
 			vncEncryptPasswd(m_encPasswd, passwd);
 		}
 		else
 		{
-			QuietException_helper(sz_L54);
+			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+			if (ad.DoDialog(dtPass, m_host, m_port))
+			{
+				strcpy_s(passwd, 256, ad.m_passwd);
+				if (strlen(passwd) == 0)
+				{
+					vnclog.Print(0, _T("Password had zero length\n"));
+					throw WarningException(sz_L53);
+				}
+				if (strlen(passwd) > 8)
+				{
+					passwd[8] = '\0';
+				}
+				vncEncryptPasswd(m_encPasswd, passwd);
+
+				if (ad.m_savePassword)
+				{
+					CredentialManager::WriteVncPassword(m_host, m_port, passwd);
+					vnclog.Print(0, _T("Password saved to Credential Manager for %s:%d\n"), m_host, m_port);
+				}
+			}
+			else
+			{
+				QuietException_helper(sz_L54);
+			}
 		}
 	}
 	ReadExact((char *)challenge, CHALLENGESIZE);
@@ -8292,6 +8387,22 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_CONN_SAVE_AS:
 						_this->SaveConnection();
 						return 0;
+
+					case ID_CLEAR_SAVED_PASSWORD:
+					{
+						bool removedVnc = CredentialManager::DeleteVncPassword(_this->m_host, _this->m_port);
+						bool removedMs = CredentialManager::DeleteMsLogonPassword(_this->m_host, _this->m_port);
+						if (removedVnc || removedMs)
+						{
+							vnclog.Print(0, _T("Cleared saved password(s) from Credential Manager for %s:%d\n"), _this->m_host, _this->m_port);
+							MessageBoxW(hwnd, L"Saved password(s) removed from Credential Manager.", L"UltraVNC Viewer", MB_OK | MB_ICONINFORMATION);
+						}
+						else
+						{
+							MessageBoxW(hwnd, L"No saved password was found for this connection.", L"UltraVNC Viewer", MB_OK | MB_ICONINFORMATION);
+						}
+						return 0;
+					}
 
 					case IDC_OPTIONBUTTON:
 						{

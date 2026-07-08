@@ -27,6 +27,7 @@ AuthDialog::AuthDialog()
 	m_passwd[0]=__T('\0');
 	//adzm 2010-05-12 - passphrase
 	m_bPassphraseMode = false;
+	m_savePassword = false;
 	m_hwndStatus = NULL;
 	m_className[0] = L'\0';
 	m_statusWasVisible = false;
@@ -142,6 +143,7 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 					_this->m_domain, 256);
 				res= GetDlgItemTextA( hwnd,  IDD_USER_NAME,
 					_this->m_user, 256);
+				_this->m_savePassword = (IsDlgButtonChecked(hwnd, IDC_SAVE_PASSWORD) == BST_CHECKED);
 				
 				EndDialog(hwnd, TRUE);
 
@@ -194,6 +196,7 @@ BOOL CALLBACK AuthDialog::DlgProc1(  HWND hwnd,  UINT uMsg,
 			{
 				UINT res= GetDlgItemTextA( hwnd,  IDC_PASSWD_EDIT,
 					_this->m_passwd, 256);
+				_this->m_savePassword = (IsDlgButtonChecked(hwnd, IDC_SAVE_PASSWORD) == BST_CHECKED);
 				EndDialog(hwnd, TRUE);
 
 				return TRUE;

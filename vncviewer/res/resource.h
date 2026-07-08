@@ -350,6 +350,7 @@
 #define IDC_DEFAULTCONFIG               2080
 #define IDC_CUSTOMCONFIG                2081
 #define IDC_CHECKCONFIG                 2082
+#define IDC_SAVE_PASSWORD               2083
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
@@ -374,6 +375,7 @@
 #define ID_BUTTON_DESKTOP               50021
 #define ID_BUTTON_TEXTCHAT              50022
 #define IDS_WARNING                     50022
+#define ID_CLEAR_SAVED_PASSWORD         50025
 #define IDS_A1                          50023
 #define IDC_NULL                        50023
 #define ID_CLOSEAPP                     50023
@@ -712,8 +714,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        242
-#define _APS_NEXT_COMMAND_VALUE         50025
-#define _APS_NEXT_CONTROL_VALUE         2083
+#define _APS_NEXT_COMMAND_VALUE         50026
+#define _APS_NEXT_CONTROL_VALUE         2084
 #define _APS_NEXT_SYMED_VALUE           154
 #endif
 #endif

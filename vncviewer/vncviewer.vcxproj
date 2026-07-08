@@ -1845,6 +1845,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='OldCPU|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="CredentialManager.cpp" />
     <ClCompile Include="directx\directxviewer.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="Exception.cpp">
@@ -2382,6 +2383,7 @@
     <ClInclude Include="AccelKeys.h" />
     <ClInclude Include="AuthDialog.h" />
     <ClInclude Include="ClientConnection.h" />
+    <ClInclude Include="CredentialManager.h" />
     <ClInclude Include="..\common\Clipboard.h" />
     <ClInclude Include="Daemon.h" />
     <ClInclude Include="..\rfb\dh.h" />
