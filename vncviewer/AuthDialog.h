@@ -31,6 +31,7 @@ public:
 	
 	//adzm 2010-05-12 - passphrase
 	bool m_bPassphraseMode;
+	bool m_savePassword;
 	wchar_t _host[MAX_HOST_NAME_LEN];
 	int _port;
 	DialogType dialogType;

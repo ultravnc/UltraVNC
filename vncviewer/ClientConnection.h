@@ -650,6 +650,7 @@ private:
 	char m_ms_user[256];  // act: add user storage for MS-Logon autoreconnect
 	char m_cmdlnUser[256]; // act: add user option on command line
 	char m_clearPasswd[256]; // Modif sf@2002
+	bool m_usedSavedVncPassword;
 
 	rfbPixelFormat m_myFormat, m_pendingFormat;
 	// protocol version in use.
