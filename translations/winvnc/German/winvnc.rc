@@ -73,7 +73,7 @@ END
 
 IDD_ABOUT DIALOGEX 0, 0, 274, 76
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - About"
+CAPTION "UltraVNC Server - Über"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
@@ -89,7 +89,7 @@ END
 
 IDD_OUTGOING_CONN DIALOGEX 0, 0, 223, 88
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
-CAPTION "UltraVNC Server - Initiate Connection"
+CAPTION "UltraVNC Server - Verbindung aufbauen"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     CTEXT           "",IDC_CAPTION_STATIC,7,6,209,15,NOT WS_VISIBLE
@@ -104,15 +104,15 @@ END
 IDD_ACCEPT_CONN DIALOGEX 0, 0, 186, 95
 STYLE DS_SYSMODAL | DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
 EXSTYLE WS_EX_TOPMOST
-CAPTION "UltraVNC Server - Accept connection"
+CAPTION "UltraVNC Server - Verbindung akzeptieren"
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    PUSHBUTTON      "&ACCEPT",IDACCEPT,7,74,53,14
-    DEFPUSHBUTTON   "&REJECT",IDREJECT,130,74,49,14
-    LTEXT           "UltraVNC Server has received an incoming connection from",IDC_STATIC_TEXT1,7,7,107,36
-    CTEXT           "<unknown host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
-    CTEXT           "Do you wish to Accept or Reject the connection?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
-    CTEXT           "AutoReject:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
+    PUSHBUTTON      "&Akzeptieren",IDACCEPT,7,74,53,14
+    DEFPUSHBUTTON   "A&blehnen",IDREJECT,130,74,49,14
+    LTEXT           "UltraVNC Server hat eine Verbindung erhalten von",IDC_STATIC_TEXT1,7,7,107,36
+    CTEXT           "<unbekannter Host>",IDC_ACCEPT_IP,5,47,172,9,SS_CENTERIMAGE
+    CTEXT           "Wollen Sie die Verbindung zulassen?",IDC_STATIC_TEXT,7,58,172,15,SS_CENTERIMAGE
+    CTEXT           "Automatische Ablehnung:",IDC_ACCEPT_TIMEOUT,60,74,70,14,SS_CENTERIMAGE
     CONTROL         IDB_LOGO64,IDC_ACCEPTLOGO,"Static",SS_BITMAP,130,7,43,39
 END
 
@@ -174,8 +174,8 @@ BEGIN
     CONTROL         "",IDC_CHECKG3L,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,56,16,8
     CONTROL         "",IDC_CHECKG3D,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,153,56,16,8
     GROUPBOX        "Regeln",IDC_STATIC,5,77,178,68
-    LTEXT           "Group 1, 2 = Full Access       Group 3 = Read Only",IDC_STATIC,16,88,184,8
-    LTEXT           "Local administrators have always access.",IDC_STATIC,8,100,174,41
+    LTEXT           "Gruppe 1, 2 = Vollständiger  Zugriff       Gruppe 3 = Nur lesend",IDC_STATIC,16,88,184,8
+    LTEXT           "Lokale Administratoren haben immer Zugriff.",IDC_STATIC,8,100,174,41
     DEFPUSHBUTTON   "OK",IDOK,77,148,50,14
     PUSHBUTTON      "Abbrechen",IDCANCEL,132,148,50,14
     LTEXT           "1",IDC_STATIC,11,22,8,8
