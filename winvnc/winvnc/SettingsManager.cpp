@@ -190,6 +190,7 @@ void SettingsManager::setDefaults()
 	m_pref_UseDSMPlugin = FALSE;
 	m_pref_EnableFileTransfer = TRUE;
 	m_pref_FTUserImpersonation = TRUE;
+	memset(reinterpret_cast<void*>(m_pref_FileTransferRoot), 0, sizeof(m_pref_FileTransferRoot));
 	m_pref_EnableBlankMonitor = TRUE;
 	m_pref_BlankInputsOnly = FALSE;
 	m_pref_QueryIfNoLogon = 1;
@@ -320,6 +321,7 @@ void SettingsManager::load()
 	m_pref_UseIpv6 = iniFile.ReadInt("admin", "UseIpv6", m_pref_UseIpv6);
 	m_pref_EnableFileTransfer = iniFile.ReadInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
 	m_pref_FTUserImpersonation = iniFile.ReadInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
+	iniFile.ReadString("admin", "FileTransferRoot", m_pref_FileTransferRoot, sizeof(m_pref_FileTransferRoot));
 	m_pref_EnableBlankMonitor = iniFile.ReadInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
 	m_pref_BlankInputsOnly = iniFile.ReadInt("admin", "BlankInputsOnly", m_pref_BlankInputsOnly); //PGM
 	m_pref_DefaultScale = iniFile.ReadInt("admin", "DefaultScale", m_pref_DefaultScale);
@@ -428,6 +430,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "AllowUserSettingsWithPassword", m_pref_AllowUserSettingsWithPassword);
 	iniFile.WriteInt("admin", "FileTransferEnabled", m_pref_EnableFileTransfer);
 	iniFile.WriteInt("admin", "FTUserImpersonation", m_pref_FTUserImpersonation); // sf@2005
+	iniFile.WriteString("admin", "FileTransferRoot", m_pref_FileTransferRoot);
 	iniFile.WriteInt("admin", "BlankMonitorEnabled", m_pref_EnableBlankMonitor);
 	iniFile.WriteInt("admin", "BlankInputsOnly", m_pref_BlankInputsOnly); //PGM
 	iniFile.WriteInt("admin", "DefaultScale", m_pref_DefaultScale);

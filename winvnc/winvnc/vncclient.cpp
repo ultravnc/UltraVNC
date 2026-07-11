@@ -121,6 +121,81 @@ std::string get_real_filename(std::string name)
 	return name;
 }
 
+// Canonicalize a file-transfer destination path and pin it to the configured root.
+// Returns true if the path is acceptable; on success outCanonical holds the canonical UTF-8 path.
+static bool ValidateFileTransferPath(const char* szUtf8Path, const char* szUtf8Root, std::string& outCanonical)
+{
+	outCanonical.clear();
+
+	WCHAR szPathW[MAX_PATH * 4];
+	int nPath = MultiByteToWideChar(CP_UTF8, 0, szUtf8Path, -1, szPathW, _countof(szPathW));
+	if (nPath <= 0)
+		return false;
+
+	WCHAR szCanonW[MAX_PATH * 4];
+	DWORD dwLen = GetFullPathNameW(szPathW, _countof(szCanonW), szCanonW, NULL);
+	if (dwLen == 0 || dwLen >= _countof(szCanonW))
+		return false;
+
+	// Only accept absolute paths: X:\... or \\server\share
+	bool fAbsolute = (szCanonW[0] != L'\0' && szCanonW[1] == L':' && szCanonW[2] == L'\\') ||
+					 (szCanonW[0] == L'\\' && szCanonW[1] == L'\\');
+	if (!fAbsolute)
+		return false;
+
+	// Reject any .. component remaining after canonicalization
+	const WCHAR* p = szCanonW;
+	while (*p)
+	{
+		while (*p == L'\\')
+			++p;
+		const WCHAR* seg = p;
+		while (*p && *p != L'\\')
+			++p;
+		size_t segLen = p - seg;
+		if (segLen == 2 && seg[0] == L'.' && seg[1] == L'.')
+			return false;
+		if (*p)
+			++p;
+	}
+
+	// If a root is configured, the path must be inside it
+	if (szUtf8Root && szUtf8Root[0] != '\0')
+	{
+		WCHAR szRootW[MAX_PATH * 4];
+		int nRoot = MultiByteToWideChar(CP_ACP, 0, szUtf8Root, -1, szRootW, _countof(szRootW));
+		if (nRoot <= 0)
+			return false;
+
+		WCHAR szRootCanonW[MAX_PATH * 4];
+		DWORD dwRootLen = GetFullPathNameW(szRootW, _countof(szRootCanonW), szRootCanonW, NULL);
+		if (dwRootLen == 0 || dwRootLen >= _countof(szRootCanonW))
+			return false;
+
+		size_t rootLen = wcslen(szRootCanonW);
+		if (rootLen == 0)
+			return false;
+		if (szRootCanonW[rootLen - 1] != L'\\')
+		{
+			if (rootLen + 1 >= _countof(szRootCanonW))
+				return false;
+			wcscat_s(szRootCanonW, L"\\");
+		}
+
+		size_t rootPrefix = wcslen(szRootCanonW);
+		if (wcslen(szCanonW) < rootPrefix || _wcsnicmp(szCanonW, szRootCanonW, rootPrefix) != 0)
+			return false;
+	}
+
+	char szCanonA[MAX_PATH * 4];
+	int nBytes = WideCharToMultiByte(CP_UTF8, 0, szCanonW, -1, szCanonA, sizeof(szCanonA), NULL, NULL);
+	if (nBytes <= 0)
+		return false;
+
+	outCanonical = szCanonA;
+	return true;
+}
+
 // #include "rfb.h"
 bool DeleteFileOrDirectory(WCHAR* srcpath)
 {
@@ -2369,7 +2444,7 @@ vncClientThread::run(void* arg)
 #endif
 	InjectTouchInputUVNC = NULL;
 	InitializeTouchInjectionUVNC = NULL;
-	HINSTANCE user32 = LoadLibraryA("user32.dll");
+	HINSTANCE user32 = LoadLibraryExA("user32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (user32) {
 		InjectTouchInputUVNC = (PtrInjectTouchInput)(GetProcAddress(user32, "InjectTouchInput"));
 		InitializeTouchInjectionUVNC = (PtrInitializeTouchInjection)(GetProcAddress(user32, "InitializeTouchInjection"));
@@ -4047,10 +4122,21 @@ vncClientThread::run(void* arg)
 						*p = '\0';
 					}
 
-					// make a temp file name
-					strcpy_s(m_client->m_szFullDestName, make_temp_filename(m_client->m_szFullDestName).c_str());
+					// Validate, canonicalize, and make a temp file name
+					bool fPathOk = false;
+					std::string canonicalPath;
+					if (ValidateFileTransferPath(m_client->m_szFullDestName, settings->getFileTransferRoot(), canonicalPath))
+					{
+						fPathOk = true;
+						strcpy_s(m_client->m_szFullDestName, canonicalPath.c_str());
+						strcpy_s(m_client->m_szFullDestName, make_temp_filename(m_client->m_szFullDestName).c_str());
+					}
+					else
+					{
+						m_client->m_szFullDestName[0] = '\0';
+					}
 
-					DWORD dwDstSize = (DWORD)0; // Dummy size, actually a return value
+					DWORD dwDstSize = fPathOk ? (DWORD)0 : 0xFFFFFFFF; // Dummy size, actually a return value
 
 #if DEBUG_FT
 					{WCHAR _dbg[MAX_PATH*4]; MultiByteToWideChar(CP_UTF8,0,m_client->m_szFullDestName,-1,_dbg,MAX_PATH*4);

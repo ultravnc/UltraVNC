@@ -1325,18 +1325,14 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 
 	case IDC_START_SERVICE:
 	{
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-		WinExec(command, SW_HIDE);
+		serviceHelpers::Real_start_service();
 		Sleep(3000);
 		setServiceStatusText(hwnd);
 	}
 		break;
 	case IDC_STOP_SERVICE:
 	{
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
-		WinExec(command, SW_HIDE);
+		serviceHelpers::Real_stop_service();
 		Sleep(3000);
 		setServiceStatusText(hwnd);
 	}

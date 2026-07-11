@@ -147,7 +147,7 @@ bool
 VNC_OSVersion::LoadDM(VOID) 
  { 
          if (DMdll) return TRUE;   
-         DMdll = LoadLibraryA("dwmapi.dll"); 
+         DMdll = LoadLibraryExA("dwmapi.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32); 
          if (!DMdll) return FALSE;   
          pfnDwmIsCompositionEnabled = (P_DwmIsCompositionEnabled)GetProcAddress(DMdll, "DwmIsCompositionEnabled");  
 		 pfnDwmEnableComposition = (P_DwmEnableComposition)GetProcAddress(DMdll, "DwmEnableComposition");

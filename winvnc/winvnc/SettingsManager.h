@@ -39,6 +39,7 @@ public:
 	char* getAccept_reject_mesg() { return m_pref_accept_reject_mesg; };
 	BOOL getEnableFileTransfer() { return m_pref_EnableFileTransfer; };
 	BOOL getFTUserImpersonation() { return m_pref_FTUserImpersonation; };
+	char* getFileTransferRoot() { return m_pref_FileTransferRoot; };
 	BOOL getPrimary() { return m_pref_Primary; };
 	BOOL getSecondary() { return m_pref_Secondary; };
 	void setPrimary(BOOL value) { m_pref_Primary = value;};
@@ -121,6 +122,7 @@ public:
 	void setNoScreensaver(BOOL value) { m_pref_Noscreensaver = value; };
 	void setEnableFileTransfer(BOOL value) { m_pref_EnableFileTransfer = value; };
 	void setFTUserImpersonation(BOOL value) { m_pref_FTUserImpersonation = value; };
+	void setFileTransferRoot(char* value) { strcpy_s(m_pref_FileTransferRoot, value); };
 	void setAutoPortSelect(BOOL value) { m_pref_AutoPortSelect = value; };
 	void setPortNumber(LONG port) { m_pref_PortNumber = port; };
 	void setHttpPortNumber(LONG port) { m_pref_HttpPortNumber = port; };
@@ -322,6 +324,7 @@ private:
 	BOOL m_pref_clearconsole;
 	BOOL m_pref_EnableFileTransfer;
 	BOOL m_pref_FTUserImpersonation;
+	char m_pref_FileTransferRoot[MAX_PATH * 4];
 	BOOL m_pref_EnableBlankMonitor;
 	BOOL m_pref_BlankInputsOnly;
 	int  m_pref_DefaultScale;
