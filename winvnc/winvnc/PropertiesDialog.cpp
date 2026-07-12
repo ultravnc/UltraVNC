@@ -481,6 +481,18 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_CONNECT_HTTP))
 		SendMessage(GetDlgItem(hwnd, IDC_CONNECT_HTTP), BM_SETCHECK, settings->getHTTPConnect(), 0);
 
+	if (GetDlgItem(hwnd, IDC_TLS)) {
+		BOOL bTLS = settings->getEnableTLS();
+		SendMessage(GetDlgItem(hwnd, IDC_TLS), BM_SETCHECK, bTLS, 0);
+		if (GetDlgItem(hwnd, IDC_PORTHTTP))
+			ShowWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bTLS ? SW_HIDE : SW_SHOW);
+		if (GetDlgItem(hwnd, IDC_PORTHTTPS)) {
+			ShowWindow(GetDlgItem(hwnd, IDC_PORTHTTPS), bTLS ? SW_SHOW : SW_HIDE);
+			if (bTLS)
+				SetDlgItemInt(hwnd, IDC_PORTHTTPS, settings->getTLSPort(), FALSE);
+		}
+	}
+
 	if (GetDlgItem(hwnd, IDC_FILETRANSFER))
 		SendMessage(GetDlgItem(hwnd, IDC_FILETRANSFER), BM_SETCHECK, settings->getEnableFileTransfer(), 0);
 
@@ -1375,6 +1387,19 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 				BM_GETCHECK, 0, 0) == BST_CHECKED));
 		break;
 
+	case IDC_TLS:
+	{
+		BOOL bTLS = (SendDlgItemMessage(hwnd, IDC_TLS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		if (GetDlgItem(hwnd, IDC_PORTHTTP))
+			ShowWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bTLS ? SW_HIDE : SW_SHOW);
+		if (GetDlgItem(hwnd, IDC_PORTHTTPS)) {
+			ShowWindow(GetDlgItem(hwnd, IDC_PORTHTTPS), bTLS ? SW_SHOW : SW_HIDE);
+			if (bTLS)
+				SetDlgItemInt(hwnd, IDC_PORTHTTPS, settings->getTLSPort(), FALSE);
+		}
+	}
+	break;
+
 	case IDC_CONNECT_SOCK:
 		// TightVNC 1.2.7 method
 		// The user has clicked on the socket connect tickbox
@@ -1946,6 +1971,17 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		if (m_server)
 			m_server->EnableHTTPConnect(SendMessage(hConnectHTTP, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		settings->setHTTPConnect(SendMessage(hConnectHTTP, BM_GETCHECK, 0, 0) == BST_CHECKED);
+	}
+
+	if (GetDlgItem(hwnd, IDC_TLS)) {
+		BOOL bTLS = (SendDlgItemMessage(hwnd, IDC_TLS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setEnableTLS(bTLS);
+		if (bTLS && GetDlgItem(hwnd, IDC_PORTHTTPS)) {
+			BOOL ok{};
+			UINT tlsPort = GetDlgItemInt(hwnd, IDC_PORTHTTPS, &ok, FALSE);
+			if (ok)
+				settings->setTLSPort(tlsPort);
+		}
 	}
 
 	if (GetDlgItem(hwnd, IDC_DISABLE_INPUTS)) {

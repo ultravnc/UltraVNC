@@ -265,18 +265,18 @@ IDD_FORM_Incoming DIALOGEX 0, 0, 361, 209
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,43,132,10
+    CONTROL         "Allow Loopback Connections",IDC_ALLOWLOOPBACK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,43,132,10
     CONTROL         "LoopbackOnly",IDC_LOOPBACKONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,160,43,58,10
     CONTROL         "Allow IPv6 mode (restart required)",IDC_IPV6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,56,130,10
     GROUPBOX        "Incoming connection",IDC_STATIC,7,7,344,195
-    CONTROL         "Enable incoming port",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,16,132,11
-    CONTROL         "Manual",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,271,30,37,10
-    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,271,19,34,9
-    LTEXT           "RFB port",IDC_STATIC,160,17,36,8
-    EDITTEXT        IDC_PORTRFB,219,16,29,12,ES_AUTOHSCROLL
-    LTEXT           "HTTP port",IDC_STATIC,160,31,38,8
-    EDITTEXT        IDC_PORTHTTP,219,30,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable UltraVNC JavaViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,30,122,10
+    CONTROL         "Enable incoming port",IDC_CONNECT_SOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,16,132,11
+    CONTROL         "Manual",IDC_SPECPORT,"Button",BS_AUTORADIOBUTTON,304,30,37,10
+    CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,304,19,34,9
+    LTEXT           "RFB port",IDC_STATIC,193,17,36,8
+    EDITTEXT        IDC_PORTRFB,252,16,29,12,ES_AUTOHSCROLL
+    LTEXT           "HTTP port",IDC_STATIC_HTTPPORT,193,30,38,10
+    EDITTEXT        IDC_PORTHTTP,252,30,29,12,ES_AUTOHSCROLL
+    CONTROL         "Enable UltraVNC WebViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,28,122,10
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
     CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
@@ -295,9 +295,11 @@ BEGIN
     LTEXT           "Max Viewers",IDC_STATIC,15,188,46,8
     CONTROL         "Refuse",IDC_MAXREFUSE,"Button",BS_AUTORADIOBUTTON,155,188,46,10
     CONTROL         "Disconnect oldest",IDC_MAXDISCONNECT,"Button",BS_AUTORADIOBUTTON,204,188,101,10
-    LTEXT           "Action",IDC_STATIC,98,188,49,10
-    LTEXT           "On last viewer disconnect",IDC_STATIC,15,71,132,8
+    LTEXT           "Action",IDC_STATIC,91,188,49,10
+    LTEXT           "On last viewer disconnect",IDC_STATIC,8,71,132,8
     LTEXT           "On multi viewer connection",IDC_STATIC,15,100,87,8
+    CONTROL         "TLS",IDC_TLS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,141,28,42,10
+    EDITTEXT        IDC_PORTHTTPS,252,30,29,12,ES_AUTOHSCROLL
 END
 
 IDD_EDIT_IP_ACESS_CONTROL DIALOGEX 0, 0, 227, 147
@@ -730,29 +732,143 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// JAVAARCHIVE
+// JS
 //
 
-IDR_VNCVIEWER_JAR       JAVAARCHIVE             "res/vncviewer.jar"
+IDR_WEBVIEWER_CORE_BASE64_JS JS                      "../../webviewer/core/base64.js"
 
-IDR_JAVAARCHIVE1        JAVAARCHIVE             "res/mslogon/VncViewer.jar"
+IDR_WEBVIEWER_CORE_CRYPTO_AES_JS JS                      "../../webviewer/core/crypto/aes.js"
 
-#if defined(SC_20)
+IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS JS                      "../../webviewer/core/crypto/bigint.js"
+
+IDR_WEBVIEWER_CORE_CRYPTO_CRYPTO_JS JS                      "../../webviewer/core/crypto/crypto.js"
+
+IDR_WEBVIEWER_CORE_CRYPTO_DES_JS JS                      "../../webviewer/core/crypto/des.js"
+
+IDR_WEBVIEWER_CORE_CRYPTO_DH_JS JS                      "../../webviewer/core/crypto/dh.js"
+
+IDR_WEBVIEWER_CORE_CRYPTO_MD5_JS JS                      "../../webviewer/core/crypto/md5.js"
+
+IDR_WEBVIEWER_CORE_CRYPTO_RSA_JS JS                      "../../webviewer/core/crypto/rsa.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_COPYRECT_JS JS                      "../../webviewer/core/decoders/copyrect.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_H264_JS JS                      "../../webviewer/core/decoders/h264.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_HEXTILE_JS JS                      "../../webviewer/core/decoders/hextile.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_JPEG_JS JS                      "../../webviewer/core/decoders/jpeg.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_RAW_JS JS                      "../../webviewer/core/decoders/raw.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_RRE_JS JS                      "../../webviewer/core/decoders/rre.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_TIGHT_JS JS                      "../../webviewer/core/decoders/tight.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_TIGHTPNG_JS JS                      "../../webviewer/core/decoders/tightpng.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_ZLIB_JS JS                      "../../webviewer/core/decoders/zlib.js"
+
+IDR_WEBVIEWER_CORE_DECODERS_ZRLE_JS JS                      "../../webviewer/core/decoders/zrle.js"
+
+IDR_WEBVIEWER_CORE_DEFLATOR_JS JS                      "../../webviewer/core/deflator.js"
+
+IDR_WEBVIEWER_CORE_DISPLAY_JS JS                      "../../webviewer/core/display.js"
+
+IDR_WEBVIEWER_CORE_ENCODINGS_JS JS                      "../../webviewer/core/encodings.js"
+
+IDR_WEBVIEWER_CORE_INFLATOR_JS JS                      "../../webviewer/core/inflator.js"
+
+IDR_WEBVIEWER_CORE_INPUT_DOMKEYTABLE_JS JS                      "../../webviewer/core/input/domkeytable.js"
+
+IDR_WEBVIEWER_CORE_INPUT_FIXEDKEYS_JS JS                      "../../webviewer/core/input/fixedkeys.js"
+
+IDR_WEBVIEWER_CORE_INPUT_GESTUREHANDLER_JS JS                      "../../webviewer/core/input/gesturehandler.js"
+
+IDR_WEBVIEWER_CORE_INPUT_KEYBOARD_JS JS                      "../../webviewer/core/input/keyboard.js"
+
+IDR_WEBVIEWER_CORE_INPUT_KEYSYM_JS JS                      "../../webviewer/core/input/keysym.js"
+
+IDR_WEBVIEWER_CORE_INPUT_KEYSYMDEF_JS JS                      "../../webviewer/core/input/keysymdef.js"
+
+IDR_WEBVIEWER_CORE_INPUT_UTIL_JS JS                      "../../webviewer/core/input/util.js"
+
+IDR_WEBVIEWER_CORE_INPUT_VKEYS_JS JS                      "../../webviewer/core/input/vkeys.js"
+
+IDR_WEBVIEWER_CORE_INPUT_XTSCANCODES_JS JS                      "../../webviewer/core/input/xtscancodes.js"
+
+IDR_WEBVIEWER_CORE_RA2_JS JS                      "../../webviewer/core/ra2.js"
+
+IDR_WEBVIEWER_CORE_RFB_JS JS                      "../../webviewer/core/rfb.js"
+
+IDR_WEBVIEWER_CORE_UTIL_BROWSER_JS JS                      "../../webviewer/core/util/browser.js"
+
+IDR_WEBVIEWER_CORE_UTIL_CURSOR_JS JS                      "../../webviewer/core/util/cursor.js"
+
+IDR_WEBVIEWER_CORE_UTIL_ELEMENT_JS JS                      "../../webviewer/core/util/element.js"
+
+IDR_WEBVIEWER_CORE_UTIL_EVENTS_JS JS                      "../../webviewer/core/util/events.js"
+
+IDR_WEBVIEWER_CORE_UTIL_EVENTTARGET_JS JS                      "../../webviewer/core/util/eventtarget.js"
+
+IDR_WEBVIEWER_CORE_UTIL_INT_JS JS                      "../../webviewer/core/util/int.js"
+
+IDR_WEBVIEWER_CORE_UTIL_LOGGING_JS JS                      "../../webviewer/core/util/logging.js"
+
+IDR_WEBVIEWER_CORE_UTIL_STRINGS_JS JS                      "../../webviewer/core/util/strings.js"
+
+IDR_WEBVIEWER_CORE_WEBSOCK_JS JS                      "../../webviewer/core/websock.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_UTILS_COMMON_JS JS                      "../../webviewer/vendor/pako/lib/utils/common.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ADLER32_JS JS                      "../../webviewer/vendor/pako/lib/zlib/adler32.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CONSTANTS_JS JS                      "../../webviewer/vendor/pako/lib/zlib/constants.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CRC32_JS JS                      "../../webviewer/vendor/pako/lib/zlib/crc32.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_DEFLATE_JS JS                      "../../webviewer/vendor/pako/lib/zlib/deflate.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_GZHEADER_JS JS                      "../../webviewer/vendor/pako/lib/zlib/gzheader.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFFAST_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inffast.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFLATE_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inflate.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFTREES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inftrees.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_MESSAGES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/messages.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_TREES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/trees.js"
+
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS JS                      "../../webviewer/vendor/pako/lib/zlib/zstream.js"
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// DLL
+// HTML
 //
 
-IDR_DLL1                DLL                     "res/ddengine.dll"
+IDR_WEBVIEWER_INDEX_HTML HTML                    "res/webviewer_index.html"
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// ENCRYPTIONDLL
-//
-IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+#ifndef APSTUDIO_INVOKED
+	#if defined(SC_20)
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// DLL
+	//
+
+	IDR_DLL1                DLL                     "res/ddengine.dll"
+
+
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// ENCRYPTIONDLL
+	//
+	IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
+	#endif
 #endif
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // AFX_DIALOG_LAYOUT

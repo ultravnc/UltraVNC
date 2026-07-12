@@ -66,6 +66,13 @@ public:
 	BOOL getHTTPConnect() { return m_pref_EnableHTTPConnect; };
 	void setEnableConnections(bool value) { m_pref_EnableConnection = value; };
 	void setHTTPConnect(bool value) { m_pref_EnableHTTPConnect = value; };
+
+	BOOL getEnableTLS()                { return m_pref_EnableTLS; };
+	void setEnableTLS(BOOL v)          { m_pref_EnableTLS = v; };
+	LONG getTLSPort()                  { return m_pref_TLSPort; };
+	void setTLSPort(LONG v)            { m_pref_TLSPort = v; };
+	const char* getTLSCertThumbprint() { return m_pref_TLSCertThumbprint; };
+	void setTLSCertThumbprint(const char* v) { strncpy_s(m_pref_TLSCertThumbprint, v, 40); m_pref_TLSCertThumbprint[40] = 0; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -296,6 +303,10 @@ private:
 	char m_pref_accept_reject_mesg[512];
 	BOOL m_pref_EnableConnection;
 	BOOL m_pref_EnableHTTPConnect;
+
+	BOOL m_pref_EnableTLS;
+	LONG m_pref_TLSPort;
+	char m_pref_TLSCertThumbprint[41];
 
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;

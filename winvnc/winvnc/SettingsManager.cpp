@@ -146,6 +146,9 @@ void SettingsManager::setDefaults()
 	m_pref_PortNumber = RFB_PORT_OFFSET;
 	m_pref_EnableConnection = TRUE;
 	m_pref_HttpPortNumber = DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber));
+	m_pref_EnableTLS = FALSE;
+	m_pref_TLSPort = 6080;
+	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
@@ -332,6 +335,9 @@ void SettingsManager::load()
 	m_pref_Secondary = iniFile.ReadInt("admin", "secondary", m_pref_Secondary);
 	m_pref_EnableConnection = iniFile.ReadInt("admin", "SocketConnect", m_pref_EnableConnection);
 	m_pref_EnableHTTPConnect = iniFile.ReadInt("admin", "HTTPConnect", m_pref_EnableHTTPConnect);
+	m_pref_EnableTLS = iniFile.ReadInt("admin", "EnableTLS", m_pref_EnableTLS);
+	m_pref_TLSPort   = iniFile.ReadInt("admin", "TLSPort",   m_pref_TLSPort);
+	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber = iniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = iniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
@@ -442,6 +448,9 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "secondary", m_pref_Secondary);
 	iniFile.WriteInt("admin", "SocketConnect", m_pref_EnableConnection);
 	iniFile.WriteInt("admin", "HTTPConnect", m_pref_EnableHTTPConnect);
+	iniFile.WriteInt("admin", "EnableTLS", m_pref_EnableTLS);
+	iniFile.WriteInt("admin", "TLSPort",   (int)m_pref_TLSPort);
+	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
 	iniFile.WriteInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	if (!m_pref_AutoPortSelect) {
 		iniFile.WriteInt("admin", "PortNumber", m_pref_PortNumber);

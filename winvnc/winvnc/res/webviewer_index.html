@@ -1,0 +1,452 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>UltraVNC WebViewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { height: 100%; background: #1a1a2e; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; }
+
+        #toolbar {
+            display: flex; align-items: center; gap: 4px;
+            background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+            color: #e0e0e0; padding: 4px 8px;
+            border-bottom: 1px solid #e94560;
+            height: 36px;
+        }
+
+        #status {
+            flex: 1; text-align: center; font-size: 12px; font-weight: 500;
+            color: #a0c4ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .tb-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            color: #e0e0e0; padding: 3px 10px; border-radius: 4px;
+            cursor: pointer; font-size: 11px; font-weight: 600; white-space: nowrap;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .tb-btn:hover { background: rgba(233,69,96,0.3); border-color: #e94560; }
+        .tb-btn:active { background: rgba(233,69,96,0.5); }
+        .tb-btn.active { background: rgba(233,69,96,0.25); border-color: #e94560; color: #ff8fa3; }
+
+        .tb-sep { width: 1px; background: rgba(255,255,255,0.15); height: 20px; margin: 0 2px; flex-shrink: 0; }
+
+        body { margin: 0; overflow: hidden; }
+
+        #toolbar { position: fixed; top: 0; left: 0; right: 0; height: 36px; z-index: 100; }
+
+        #screen-wrapper {
+            position: fixed; top: 36px; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a2e;
+        }
+        #screen {
+            display: contents;
+        }
+        #screen canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Clipboard panel */
+        #clipboard-panel {
+            display: none; position: fixed; top: 40px; right: 8px;
+            background: #16213e; border: 1px solid #e94560; border-radius: 6px;
+            padding: 8px; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            width: 300px;
+        }
+        #clipboard-panel.open { display: block; }
+        #clipboard-panel label { color: #a0c4ff; font-size: 11px; display: block; margin-bottom: 4px; }
+        #clipboard-text {
+            width: 100%; height: 80px; background: #0f3460; color: #e0e0e0;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+            padding: 4px; font-size: 12px; resize: vertical;
+        }
+        #clipboard-send {
+            margin-top: 6px; width: 100%; padding: 4px;
+            background: #e94560; color: white; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 12px; font-weight: 600;
+        }
+        #clipboard-send:hover { background: #c73652; }
+
+        /* Keys panel */
+        #keys-panel {
+            display: none; position: fixed; top: 40px; left: 50%; transform: translateX(-50%);
+            background: #16213e; border: 1px solid #e94560; border-radius: 6px;
+            padding: 8px 12px; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        }
+        #keys-panel.open { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .key-btn {
+            background: #0f3460; border: 1px solid rgba(255,255,255,0.2);
+            color: #e0e0e0; padding: 4px 10px; border-radius: 4px;
+            cursor: pointer; font-size: 11px; font-weight: 600;
+        }
+        .key-btn:hover { background: #e94560; border-color: #e94560; }
+
+        /* Password dialog */
+        #password-dialog {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 300; align-items: center; justify-content: center;
+        }
+        #password-dialog.open { display: flex; }
+        #password-box {
+            background: #16213e; border: 1px solid #e94560; border-radius: 8px;
+            padding: 20px; width: 280px; text-align: center;
+        }
+        #password-box h3 { color: #a0c4ff; margin-bottom: 12px; font-size: 14px; }
+        #password-input {
+            width: 100%; padding: 6px; background: #0f3460; color: #e0e0e0;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+            font-size: 13px; margin-bottom: 10px;
+        }
+        #password-ok {
+            width: 100%; padding: 6px; background: #e94560; color: white;
+            border: none; border-radius: 4px; cursor: pointer; font-weight: 600;
+        }
+        #password-ok:hover { background: #c73652; }
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <button class="tb-btn" id="btn-cad" title="Send Ctrl+Alt+Del">Ctrl+Alt+Del</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" id="btn-keys" title="Extra keys panel">Keys</button>
+        <button class="tb-btn" id="btn-clipboard" title="Clipboard">Clipboard</button>
+        <div class="tb-sep"></div>
+        <div id="monitor-sep" class="tb-sep" style="display:none;"></div>
+        <div id="monitor-btns" style="display:none; gap:2px; align-items:center;"></div>
+        <div id="monitor-sep2" class="tb-sep" style="display:none;"></div>
+        <button class="tb-btn active" id="btn-scale" title="Fit remote desktop to window">Fit Screen</button>
+        <button class="tb-btn" id="btn-viewonly" title="Toggle view-only mode">View Only</button>
+        <button class="tb-btn" id="btn-fullscreen" title="Toggle fullscreen">Fullscreen</button>
+        <div class="tb-sep"></div>
+        <div id="status">Connecting...</div>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" id="btn-disconnect" title="Disconnect">Disconnect</button>
+    </div>
+
+    <div id="screen-wrapper"><div id="screen"></div></div>
+
+    <!-- Clipboard panel -->
+    <div id="clipboard-panel">
+        <label>Clipboard (send to remote):</label>
+        <textarea id="clipboard-text" placeholder="Type or paste text here..."></textarea>
+        <button id="clipboard-send">Send to Remote</button>
+    </div>
+
+    <!-- Extra keys panel -->
+    <div id="keys-panel">
+        <button class="key-btn" data-key="Escape" data-keysym="0xFF1B">Esc</button>
+        <button class="key-btn" data-key="Tab" data-keysym="0xFF09">Tab</button>
+        <button class="key-btn" data-key="ctrl">Ctrl</button>
+        <button class="key-btn" data-key="alt">Alt</button>
+        <button class="key-btn" data-key="super">Win</button>
+        <button class="key-btn" data-cad="1">Ctrl+Alt+Del</button>
+        <button class="key-btn" data-key="F1" data-keysym="0xFFBE">F1</button>
+        <button class="key-btn" data-key="F2" data-keysym="0xFFBF">F2</button>
+        <button class="key-btn" data-key="F3" data-keysym="0xFFC0">F3</button>
+        <button class="key-btn" data-key="F4" data-keysym="0xFFC1">F4</button>
+        <button class="key-btn" data-key="F5" data-keysym="0xFFC2">F5</button>
+        <button class="key-btn" data-key="F11" data-keysym="0xFFC8">F11</button>
+        <button class="key-btn" data-key="F12" data-keysym="0xFFC9">F12</button>
+    </div>
+
+    <!-- Password dialog -->
+    <div id="password-dialog">
+        <div id="password-box">
+            <h3>Password Required</h3>
+            <input id="password-input" type="password" placeholder="Enter VNC password" autofocus>
+            <button id="password-ok">Connect</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import RFB from './core/rfb.js';
+
+        function readParam(name, def) {
+            const re = new RegExp('[?&]' + name + '=([^&#]*)');
+            const m = location.href.match(re);
+            return m ? decodeURIComponent(m[1]) : def;
+        }
+
+        const host     = readParam('host', location.hostname);
+        const port     = readParam('port', location.port);
+        const path     = readParam('path', 'ws');
+        const password = readParam('password', '');
+
+        const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+        const url   = proto + '://' + host + (port ? ':' + port : '') + '/' + path;
+
+        let rfb = null;
+        let desktopName = '';
+        let scaleActive = true;
+        let cssScaleActive = true;
+        let viewOnlyActive = false;
+        let monitorCount = 0;
+        let currentMonitor = -1; // -1 = not yet selected
+        let keepAliveInterval = null;
+
+
+        function setStatus(text, color) {
+            const el = document.getElementById('status');
+            el.textContent = text;
+            el.style.color = color || '#a0c4ff';
+        }
+
+        function connect() {
+            setStatus('Connecting...');
+            const screen = document.getElementById('screen');
+            rfb = new RFB(screen, url,
+                password ? { credentials: { password } } : {});
+            rfb.viewOnly = viewOnlyActive;
+            rfb.addEventListener('connect',              onConnect);
+            rfb.addEventListener('disconnect',           onDisconnect);
+            rfb.addEventListener('credentialsrequired',  onCredentials);
+            rfb.addEventListener('desktopname',          e => { desktopName = e.detail.name; setStatus('Connected: ' + desktopName, '#69ff6e'); });
+            rfb.addEventListener('clipboard',            onClipboard);
+            rfb.addEventListener('ultraVncMonitorInfo', onMonitorInfo);
+            rfb.addEventListener('ultraVncDesktopResized', onDesktopSize);
+            window._rfb = rfb;
+        }
+
+        function sendFullUpdateRequest() {
+            if (!rfb || !rfb._sock) return;
+            rfb._sock.sQpush8(3);   // FramebufferUpdateRequest
+            rfb._sock.sQpush8(0);   // non-incremental
+            rfb._sock.sQpush16(0);
+            rfb._sock.sQpush16(0);
+            rfb._sock.sQpush16(rfb._fbWidth  || 1920);
+            rfb._sock.sQpush16(rfb._fbHeight || 1080);
+            rfb._sock.flush();
+        }
+
+        function onDesktopSize() {
+            // After server resizes framebuffer, request a full non-incremental refresh
+            setTimeout(sendFullUpdateRequest, 100);
+            setTimeout(applyScale, 150);
+        }
+
+        function sendSetMonitor(nbr) {
+            if (!rfb || !rfb._sock) return;
+            // rfbSetMonitor: type(1)=254, nbr(1), pad(1), pad(1)
+            rfb._sock.sQpush8(254);
+            rfb._sock.sQpush8(nbr);
+            rfb._sock.sQpush8(0);
+            rfb._sock.sQpush8(0);
+            // Full FramebufferUpdateRequest (non-incremental): type=3, incr=0, x=0, y=0, w, h
+            rfb._sock.sQpush8(3);
+            rfb._sock.sQpush8(0);   // non-incremental
+            rfb._sock.sQpush16(0);  // x
+            rfb._sock.sQpush16(0);  // y
+            rfb._sock.sQpush16(rfb._fbWidth  || 1920);
+            rfb._sock.sQpush16(rfb._fbHeight || 1080);
+            rfb._sock.flush();
+            currentMonitor = nbr;
+            updateMonitorButtons();
+            setTimeout(applyScale, 600);
+        }
+
+        function buildMonitorButtons() {
+            const container = document.getElementById('monitor-btns');
+            container.innerHTML = '';
+            const show = monitorCount >= 2;
+            container.style.display = show ? 'flex' : 'none';
+            document.getElementById('monitor-sep').style.display = show ? 'block' : 'none';
+            document.getElementById('monitor-sep2').style.display = show ? 'block' : 'none';
+            if (!show) return;
+            // server: nbr=0 is primary (Mon 1), nbr=1 is second (Mon 2), etc.
+            for (let i = 0; i < monitorCount; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'tb-btn' + (currentMonitor === i ? ' active' : '');
+                btn.textContent = 'Mon ' + (i + 1);
+                btn.title = 'Show monitor ' + (i + 1);
+                btn.dataset.mon = String(i);
+                btn.onclick = () => sendSetMonitor(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function updateMonitorButtons() {
+            document.querySelectorAll('#monitor-btns .tb-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.mon) === currentMonitor);
+            });
+        }
+
+        function onMonitorInfo(e) {
+            monitorCount = e.detail.count;
+            buildMonitorButtons();
+        }
+
+        function applyScale() {
+            if (!rfb) return;
+            const canvas = document.querySelector('#screen canvas');
+            if (!canvas) return;
+            if (!cssScaleActive) {
+                canvas.style.width = '';
+                canvas.style.height = '';
+                canvas.style.marginLeft = '';
+                canvas.style.marginTop = '';
+                canvas.style.transform = '';
+                return;
+            }
+            const wrapper = document.getElementById('screen-wrapper');
+            const cw = wrapper.clientWidth;
+            const ch = wrapper.clientHeight;
+            const fw = canvas.width;
+            const fh = canvas.height;
+            if (!fw || !fh) return;
+            const scale = Math.min(cw / fw, ch / fh);
+            const scaledW = Math.floor(fw * scale);
+            const scaledH = Math.floor(fh * scale);
+            // Use CSS width/height so the canvas occupies correct layout space (no scrollbars)
+            canvas.style.width  = scaledW + 'px';
+            canvas.style.height = scaledH + 'px';
+            canvas.style.transform = '';
+            canvas.style.marginLeft = Math.floor((cw - scaledW) / 2) + 'px';
+            canvas.style.marginTop  = Math.floor((ch - scaledH) / 2) + 'px';
+        }
+
+        function sendKeepAlive() {
+            if (!rfb || !rfb._sock) return;
+            // Incremental FBU request — keeps connection alive with minimal traffic
+            rfb._sock.sQpush8(3);
+            rfb._sock.sQpush8(1);   // incremental
+            rfb._sock.sQpush16(0);
+            rfb._sock.sQpush16(0);
+            rfb._sock.sQpush16(rfb._fbWidth  || 1920);
+            rfb._sock.sQpush16(rfb._fbHeight || 1080);
+            rfb._sock.flush();
+        }
+
+        function onConnect() {
+            setStatus('Connected: ' + (desktopName || host), '#69ff6e');
+            setTimeout(() => { sendSetMonitor(0); }, 400);
+            setTimeout(applyScale, 1000);
+            keepAliveInterval = setInterval(sendKeepAlive, 5000);
+        }
+
+        function onDisconnect(e) {
+            if (keepAliveInterval) { clearInterval(keepAliveInterval); keepAliveInterval = null; }
+            if (e.detail.clean) {
+                setStatus('Disconnected', '#a0c4ff');
+            } else {
+                setStatus('Connection lost — reload to reconnect', '#ff6b6b');
+            }
+            rfb = null;
+        }
+
+        function onCredentials() {
+            document.getElementById('password-dialog').classList.add('open');
+            document.getElementById('password-input').focus();
+        }
+
+        function onClipboard(e) {
+            document.getElementById('clipboard-text').value = e.detail.text;
+        }
+
+        // Password dialog
+        function submitPassword() {
+            const pw = document.getElementById('password-input').value;
+            document.getElementById('password-dialog').classList.remove('open');
+            document.getElementById('password-input').value = '';
+            if (rfb) rfb.sendCredentials({ password: pw });
+        }
+        document.getElementById('password-ok').onclick = submitPassword;
+        document.getElementById('password-input').onkeydown = e => { if (e.key === 'Enter') submitPassword(); };
+
+        // Ctrl+Alt+Del
+        document.getElementById('btn-cad').onclick = () => { if (rfb) rfb.sendCtrlAltDel(); };
+
+        // Disconnect
+        document.getElementById('btn-disconnect').onclick = () => { if (rfb) rfb.disconnect(); };
+
+        // Fit Screen toggle
+        document.getElementById('btn-scale').onclick = function() {
+            cssScaleActive = !cssScaleActive;
+            this.classList.toggle('active', cssScaleActive);
+            applyScale();
+        };
+
+        // View-only toggle
+        document.getElementById('btn-viewonly').onclick = function() {
+            viewOnlyActive = !viewOnlyActive;
+            this.classList.toggle('active', viewOnlyActive);
+            if (rfb) rfb.viewOnly = viewOnlyActive;
+        };
+
+        // Fullscreen
+        document.getElementById('btn-fullscreen').onclick = function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                this.classList.add('active');
+            } else {
+                document.exitFullscreen();
+                this.classList.remove('active');
+            }
+        };
+        document.addEventListener('fullscreenchange', () => {
+            document.getElementById('btn-fullscreen').classList.toggle('active', !!document.fullscreenElement);
+        });
+
+        // Clipboard panel
+        document.getElementById('btn-clipboard').onclick = function() {
+            document.getElementById('clipboard-panel').classList.toggle('open');
+            document.getElementById('keys-panel').classList.remove('open');
+            this.classList.toggle('active');
+        };
+        document.getElementById('clipboard-send').onclick = () => {
+            if (rfb) rfb.clipboardPasteFrom(document.getElementById('clipboard-text').value);
+        };
+
+        // Keys panel
+        document.getElementById('btn-keys').onclick = function() {
+            document.getElementById('keys-panel').classList.toggle('open');
+            document.getElementById('clipboard-panel').classList.remove('open');
+            this.classList.toggle('active');
+            document.getElementById('btn-clipboard').classList.remove('active');
+        };
+
+        document.querySelectorAll('.key-btn').forEach(btn => {
+            btn.onclick = () => {
+                if (!rfb) return;
+                if (btn.dataset.cad) { rfb.sendCtrlAltDel(); return; }
+                if (btn.dataset.key === 'ctrl')  { rfb.sendKey(0xFFE3, 'ControlLeft', true);  rfb.sendKey(0xFFE3, 'ControlLeft', false);  return; }
+                if (btn.dataset.key === 'alt')   { rfb.sendKey(0xFFE9, 'AltLeft', true);      rfb.sendKey(0xFFE9, 'AltLeft', false);      return; }
+                if (btn.dataset.key === 'super') { rfb.sendKey(0xFFEB, 'MetaLeft', true);     rfb.sendKey(0xFFEB, 'MetaLeft', false);     return; }
+                const keysym = parseInt(btn.dataset.keysym);
+                const code   = btn.dataset.key;
+                rfb.sendKey(keysym, code, true);
+                rfb.sendKey(keysym, code, false);
+            };
+        });
+
+        // Close panels when clicking outside
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#clipboard-panel') && !e.target.closest('#btn-clipboard')) {
+                document.getElementById('clipboard-panel').classList.remove('open');
+                document.getElementById('btn-clipboard').classList.remove('active');
+            }
+            if (!e.target.closest('#keys-panel') && !e.target.closest('#btn-keys')) {
+                document.getElementById('keys-panel').classList.remove('open');
+                document.getElementById('btn-keys').classList.remove('active');
+            }
+        });
+
+        window.addEventListener('resize', () => { setTimeout(applyScale, 50); });
+        new ResizeObserver(() => { setTimeout(applyScale, 50); }).observe(document.getElementById('screen-wrapper'));
+
+        // Re-apply scale whenever noVNC updates the canvas size
+        new MutationObserver(applyScale).observe(document.getElementById('screen'), { childList: true, subtree: true, attributes: true, attributeFilter: ['width', 'height'] });
+
+        connect();
+    </script>
+</body>
+</html>

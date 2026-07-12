@@ -1,32 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
-// This file is part of UltraVNC
-// https://github.com/ultravnc/UltraVNC
-// https://uvnc.com/
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-//
-// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
-// SPDX-FileCopyrightText: Copyright (C) 1999-2002 Vdacc-VNC & eSVNC Projects. All Rights Reserved.
-//
--->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Manifest Include="winvnc.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\..\common\Clipboard.cpp" />
+    <ClCompile Include="..\..\common\d3des.c" />
+    <ClCompile Include="..\..\common\Hyperlinks.cpp" />
+    <ClCompile Include="..\..\common\inifile.cpp" />
+    <ClCompile Include="..\..\common\UltraVncZ.cpp" />
+    <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
+    <ClCompile Include="..\loadmemory\MemoryModule.c" />
     <ClCompile Include="benchmark.cpp" />
     <ClCompile Include="buildtime.cpp" />
+    <ClCompile Include="cadthread.cpp" />
+    <ClCompile Include="DlgChangePassword.cpp" />
     <ClCompile Include="CpuUsage.cpp" />
     <ClCompile Include="..\..\rfb\dh.cpp" />
     <ClCompile Include="..\..\DSMPlugin\DSMPlugin.cpp" />
+    <ClCompile Include="DeskdupEngine.cpp" />
     <ClCompile Include="Dtwinver.cpp" />
     <ClCompile Include="getinfo.cpp" />
     <ClCompile Include="HelperFunctions.cpp" />
     <ClCompile Include="HideDesktop.cpp" />
     <ClCompile Include="IPC.cpp" />
     <ClCompile Include="..\..\lzo\minilzo.c" />
+    <ClCompile Include="LayeredWindows.cpp" />
+    <ClCompile Include="MouseSimulator.cpp" />
+    <ClCompile Include="PropertiesDialog.cpp" />
     <ClCompile Include="rfbRegion_win32.cpp" />
     <ClCompile Include="rfbRegion_X11.cxx" />
     <ClCompile Include="rfbUpdateTracker.cpp" />
+    <ClCompile Include="RulesListView.cpp" />
+    <ClCompile Include="ScreenCapture.cpp" />
+    <ClCompile Include="ScSelect.cpp" />
+    <ClCompile Include="credentials.cpp" />
+    <ClCompile Include="SettingsManager.cpp" />
+    <ClCompile Include="UdpEchoServer.cpp" />
     <ClCompile Include="UltraVNCService.cpp" />
     <ClCompile Include="stdhdrs.cpp" />
     <ClCompile Include="tableinitcmtemplate.cpp" />
@@ -37,6 +47,7 @@
     <ClCompile Include="uvncUiAccess.cpp" />
     <ClCompile Include="videodriver.cpp" />
     <ClCompile Include="videodrivercheck.cpp" />
+    <ClCompile Include="VirtualDisplay.cpp" />
     <ClCompile Include="vistahook.cpp" />
     <ClCompile Include="vncabout.cpp" />
     <ClCompile Include="vncacceptdialog.cpp" />
@@ -69,6 +80,7 @@
     <ClCompile Include="vncMultiMonitor.cpp" />
     <ClCompile Include="vncntlm.cpp" />
     <ClCompile Include="vncOSVersion.cpp" />
+    <ClCompile Include="SchannelTLS.cpp" />
     <ClCompile Include="vncserver.cpp" />
     <ClCompile Include="vncsetauth.cpp" />
     <ClCompile Include="vncsockconnect.cpp" />
@@ -76,496 +88,198 @@
     <ClCompile Include="vsocket.cpp" />
     <ClCompile Include="..\..\common\win32_helpers.cpp" />
     <ClCompile Include="winvnc.cpp" />
-    <ClCompile Include="credentials.cpp" />
-    <ClCompile Include="DeskdupEngine.cpp" />
-    <ClCompile Include="ScreenCapture.cpp" />
-    <ClCompile Include="cadthread.cpp" />
-    <ClCompile Include="..\..\common\UltraVncZ.cpp" />
-    <ClCompile Include="VirtualDisplay.cpp" />
-    <ClCompile Include="MouseSimulator.cpp" />
-    <ClCompile Include="LayeredWindows.cpp" />
-    <ClCompile Include="..\loadmemory\MemoryModule.c" />
-    <ClCompile Include="..\loadmemory\loadDllFromMemory.cpp" />
-    <ClCompile Include="ScSelect.cpp" />
-    <ClCompile Include="SettingsManager.cpp" />
-    <ClCompile Include="..\..\common\d3des.c" />
-    <ClCompile Include="UdpEchoServer.cpp" />
-    <ClCompile Include="..\..\common\Hyperlinks.cpp" />
-    <ClCompile Include="PropertiesDialog.cpp" />
-    <ClCompile Include="RulesListView.cpp" />
-    <ClCompile Include="DlgChangePassword.cpp" />
-    <ClCompile Include="..\..\common\inifile.cpp" />
     <ClCompile Include="..\..\common\ZipUnzip\MiniZipNG.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="winvnc.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\common\win32_helpers.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vtypes.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vsocket.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vnctimedmsgbox.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncsockconnect.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncsetauth.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncserver.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncpasswd.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncmenu.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vnclog.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncListDlg.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vnckeymap.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncinsthandler.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vnchttpconnect.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencodezrle.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeZlibHex.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeZlib.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeXZ.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeUltra2.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeUltra.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncEncodeTight.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencoderre.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencoder.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencodemgr.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencodehext.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncencodecorre.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncdesktopthread.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncdesktop.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncconndialog.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncclient.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncbuffer.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncauth.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncacceptdialog.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="vncabout.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="videodriver.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="uvncUiAccess.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="translate.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="TextChat.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="stdhdrs.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbUpdateTracker.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbRegion_X11.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbRegion_win32.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbRegion.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbRect.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\rfb\rfbproto.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfbMisc.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="rfb.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="keysymdef.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="IPC.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="HideDesktop.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Dtwinver.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\rfb\dh.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="CpuUsage.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="DeskdupEngine.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ScreenCapture.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="HelperFunctions.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ScSelect.h" />
-    <ClInclude Include="cadthread.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="credentials.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="LayeredWindows.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\loadmemory\loadDllFromMemory.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\loadmemory\MemoryModule.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="MouseSimulator.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="SettingsManager.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="UltraVNCService.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\common\UltraVncZ.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="VirtualDisplay.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\common\d3des.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="UdpEchoServer.h" />
+    <ClInclude Include="..\..\common\d3des.h" />
     <ClInclude Include="..\..\common\Hyperlinks.h" />
-    <ClInclude Include="PropertiesDialog.h" />
-    <ClInclude Include="RulesListView.h" />
+    <ClInclude Include="..\..\common\inifile.h" />
+    <ClInclude Include="..\..\common\UltraVncZ.h" />
+    <ClInclude Include="..\loadmemory\loadDllFromMemory.h" />
+    <ClInclude Include="..\loadmemory\MemoryModule.h" />
+    <ClInclude Include="cadthread.h" />
     <ClInclude Include="DlgChangePassword.h" />
-    <ClInclude Include="..\..\common\inifile.h">
-      <Filter>headers</Filter>
-    </ClInclude>
+    <ClInclude Include="CpuUsage.h" />
+    <ClInclude Include="DeskdupEngine.h" />
+    <ClInclude Include="Dtwinver.h" />
+    <ClInclude Include="..\..\common\win32_helpers.h" />
     <ClInclude Include="..\..\common\ZipUnzip\MiniZipNG.h" />
+    <ClInclude Include="..\..\rfb\dh.h" />
+    <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
+    <ClInclude Include="HelperFunctions.h" />
+    <ClInclude Include="HideDesktop.h" />
+    <ClInclude Include="IPC.h" />
+    <ClInclude Include="keysymdef.h" />
+    <ClInclude Include="LayeredWindows.h" />
+    <ClInclude Include="MouseSimulator.h" />
+    <ClInclude Include="PropertiesDialog.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="rfb.h" />
+    <ClInclude Include="rfbMisc.h" />
+    <ClInclude Include="..\..\rfb\rfbproto.h" />
+    <ClInclude Include="rfbRect.h" />
+    <ClInclude Include="rfbRegion.h" />
+    <ClInclude Include="rfbRegion_win32.h" />
+    <ClInclude Include="rfbRegion_X11.h" />
+    <ClInclude Include="rfbUpdateTracker.h" />
+    <ClInclude Include="RulesListView.h" />
+    <ClInclude Include="ScreenCapture.h" />
+    <ClInclude Include="ScSelect.h" />
+    <ClInclude Include="credentials.h" />
+    <ClInclude Include="SettingsManager.h" />
+    <ClInclude Include="stdhdrs.h" />
+    <ClInclude Include="TextChat.h" />
+    <ClInclude Include="translate.h" />
+    <ClInclude Include="UdpEchoServer.h" />
+    <ClInclude Include="UltraVNCService.h" />
+    <ClInclude Include="uvncUiAccess.h" />
+    <ClInclude Include="videodriver.h" />
+    <ClInclude Include="VirtualDisplay.h" />
+    <ClInclude Include="vncabout.h" />
+    <ClInclude Include="vncacceptdialog.h" />
+    <ClInclude Include="vncauth.h" />
+    <ClInclude Include="vncbuffer.h" />
+    <ClInclude Include="vncclient.h" />
+    <ClInclude Include="vncconndialog.h" />
+    <ClInclude Include="vncdesktop.h" />
+    <ClInclude Include="vncdesktopthread.h" />
+    <ClInclude Include="vncencodecorre.h" />
+    <ClInclude Include="vncencodehext.h" />
+    <ClInclude Include="vncencodemgr.h" />
+    <ClInclude Include="vncencoder.h" />
+    <ClInclude Include="vncencoderre.h" />
+    <ClInclude Include="vncEncodeTight.h" />
+    <ClInclude Include="vncEncodeUltra.h" />
+    <ClInclude Include="vncEncodeUltra2.h" />
+    <ClInclude Include="vncEncodeXZ.h" />
+    <ClInclude Include="vncEncodeZlib.h" />
+    <ClInclude Include="vncEncodeZlibHex.h" />
+    <ClInclude Include="vncencodezrle.h" />
+    <ClInclude Include="vnchttpconnect.h" />
+    <ClInclude Include="SchannelTLS.h" />
+    <ClInclude Include="vncinsthandler.h" />
+    <ClInclude Include="vnckeymap.h" />
+    <ClInclude Include="vncListDlg.h" />
+    <ClInclude Include="vnclog.h" />
+    <ClInclude Include="vncmenu.h" />
+    <ClInclude Include="vncpasswd.h" />
+    <ClInclude Include="vncserver.h" />
+    <ClInclude Include="vncsetauth.h" />
+    <ClInclude Include="vncsockconnect.h" />
+    <ClInclude Include="vnctimedmsgbox.h" />
+    <ClInclude Include="vsocket.h" />
+    <ClInclude Include="vtypes.h" />
+    <ClInclude Include="winvnc.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\AuthPanel.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\background.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\AuthPanel.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\background2.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\ButtonPanel.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\ButtonPanel.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\ClipboardFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\clipboardframe.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\DesCipher.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\descipher.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\ding_dong.wav">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\icon2.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\icon1.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\ico00001.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\FTPFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\FTPFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\FTPFrame$StrComp.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\ftpframe$strcomp.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\Finger.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\DH.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\DH.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\RecordingFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\RecordingFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\OptionsFrame.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\optionsframe.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\ww-grn-sq2.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\VncViewer.jar">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vncviewer.jar">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\VncViewer.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vncviewer.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\VncCanvas.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vnccanvas.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vnc64.BMP">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vnc-1.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vnc-1.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="vnc.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vnc.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\vdacc.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\SessionRecorder.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\SessionRecorder.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\runas.bmp">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\mslogon\RfbProto.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\rfbproto.class">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="vnc.hh">
-      <Filter>headers</Filter>
-    </None>
-    <None Include="res\winvnc.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\world3a.ico">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor1.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor1.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor2.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor2.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor3.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor3.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor4.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor4.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor5.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor5.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor6.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor6.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor7.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor7.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor8.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor8.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="cursor9.cur">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="res\cursor9.cur">
-      <Filter>resources</Filter>
-    </None>
+    <ResourceCompile Include="winvnc.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="down.bmp" />
+    <Image Include="res\down.bmp" />
+    <Image Include="res\LedGreen.bmp" />
+    <Image Include="res\LedRed.bmp" />
+    <Image Include="res\LedYellow.bmp" />
+    <Image Include="res\up.bmp" />
+    <Image Include="res\world3a.bmp" />
+    <Image Include="up.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\common\versionServerViewer.inc" />
+    <None Include="..\SC_20\ddengine.dll" />
+    <None Include="..\SC_20\SecureVNCPlugin.dsm" />
     <None Include="cpp.hint" />
-    <None Include="..\SC_20\ddengine.dll">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="..\SC_20\SecureVNCPlugin.dsm">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="version.rc2">
-      <Filter>resources</Filter>
-    </None>
-    <None Include="..\..\common\versionServerViewer.inc">
-      <Filter>resources</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="resources">
-      <UniqueIdentifier>{e5c38b6a-18d7-4469-b92a-3f4f472cfd35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="headers">
-      <UniqueIdentifier>{9539db56-2e5e-4122-8bf0-7323b90ec8a6}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="winvnc.rc">
-      <Filter>resources</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\down.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="down.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="res\LedGreen.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="res\LedRed.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="res\LedYellow.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="res\up.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="up.bmp">
-      <Filter>resources</Filter>
-    </Image>
-    <Image Include="res\world3a.bmp">
-      <Filter>resources</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="winvnc.exe.manifest" />
+    <None Include="cursor1.cur" />
+    <None Include="cursor2.cur" />
+    <None Include="cursor3.cur" />
+    <None Include="cursor4.cur" />
+    <None Include="cursor5.cur" />
+    <None Include="cursor6.cur" />
+    <None Include="cursor7.cur" />
+    <None Include="cursor8.cur" />
+    <None Include="cursor9.cur" />
+    <None Include="res\cursor1.cur" />
+    <None Include="res\cursor2.cur" />
+    <None Include="res\cursor3.cur" />
+    <None Include="res\cursor4.cur" />
+    <None Include="res\cursor5.cur" />
+    <None Include="res\cursor6.cur" />
+    <None Include="res\cursor7.cur" />
+    <None Include="res\cursor8.cur" />
+    <None Include="res\cursor9.cur" />
+    <None Include="version.rc2" />
+    <None Include="vnc.hh" />
+    <None Include="res\background.bmp" />
+    <None Include="res\background2.bmp" />
+    <None Include="res\Finger.cur" />
+    <None Include="res\ico00001.ico" />
+    <None Include="res\icon1.ico" />
+    <None Include="res\icon2.ico" />
+    <None Include="res\runas.bmp" />
+    <None Include="res\vdacc.bmp" />
+    <None Include="res\vnc-1.bmp" />
+    <None Include="res\vnc-1.ico" />
+    <None Include="vnc.bmp" />
+    <None Include="res\vnc.bmp" />
+    <None Include="res\vnc64.BMP" />
+    <None Include="res\world3a.ico" />
+    <None Include="res\winvnc.ico" />
+    <None Include="res\ww-grn-sq2.ico" />
+    <None Include="res\ding_dong.wav" />
+    <None Include="..\..\webviewer\core\base64.js" />
+    <None Include="..\..\webviewer\core\crypto\aes.js" />
+    <None Include="..\..\webviewer\core\crypto\bigint.js" />
+    <None Include="..\..\webviewer\core\crypto\crypto.js" />
+    <None Include="..\..\webviewer\core\crypto\des.js" />
+    <None Include="..\..\webviewer\core\crypto\dh.js" />
+    <None Include="..\..\webviewer\core\crypto\md5.js" />
+    <None Include="..\..\webviewer\core\crypto\rsa.js" />
+    <None Include="..\..\webviewer\core\decoders\copyrect.js" />
+    <None Include="..\..\webviewer\core\decoders\h264.js" />
+    <None Include="..\..\webviewer\core\decoders\hextile.js" />
+    <None Include="..\..\webviewer\core\decoders\jpeg.js" />
+    <None Include="..\..\webviewer\core\decoders\raw.js" />
+    <None Include="..\..\webviewer\core\decoders\rre.js" />
+    <None Include="..\..\webviewer\core\decoders\tight.js" />
+    <None Include="..\..\webviewer\core\decoders\tightpng.js" />
+    <None Include="..\..\webviewer\core\decoders\zlib.js" />
+    <None Include="..\..\webviewer\core\decoders\zrle.js" />
+    <None Include="..\..\webviewer\core\deflator.js" />
+    <None Include="..\..\webviewer\core\display.js" />
+    <None Include="..\..\webviewer\core\encodings.js" />
+    <None Include="..\..\webviewer\core\inflator.js" />
+    <None Include="..\..\webviewer\core\input\domkeytable.js" />
+    <None Include="..\..\webviewer\core\input\fixedkeys.js" />
+    <None Include="..\..\webviewer\core\input\gesturehandler.js" />
+    <None Include="..\..\webviewer\core\input\keyboard.js" />
+    <None Include="..\..\webviewer\core\input\keysym.js" />
+    <None Include="..\..\webviewer\core\input\keysymdef.js" />
+    <None Include="..\..\webviewer\core\input\util.js" />
+    <None Include="..\..\webviewer\core\input\vkeys.js" />
+    <None Include="..\..\webviewer\core\input\xtscancodes.js" />
+    <None Include="..\..\webviewer\core\ra2.js" />
+    <None Include="..\..\webviewer\core\rfb.js" />
+    <None Include="..\..\webviewer\core\util\browser.js" />
+    <None Include="..\..\webviewer\core\util\cursor.js" />
+    <None Include="..\..\webviewer\core\util\element.js" />
+    <None Include="..\..\webviewer\core\util\events.js" />
+    <None Include="..\..\webviewer\core\util\eventtarget.js" />
+    <None Include="..\..\webviewer\core\util\int.js" />
+    <None Include="..\..\webviewer\core\util\logging.js" />
+    <None Include="..\..\webviewer\core\util\strings.js" />
+    <None Include="..\..\webviewer\core\websock.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\utils\common.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\adler32.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\constants.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\crc32.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\deflate.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\gzheader.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inffast.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inflate.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inftrees.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\messages.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\trees.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\zstream.js" />
+    <None Include="res\webviewer_index.html" />
   </ItemGroup>
 </Project>
