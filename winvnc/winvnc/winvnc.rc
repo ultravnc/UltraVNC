@@ -735,113 +735,113 @@ END
 // JS
 //
 
-IDR_WEBVIEWER_CORE_BASE64_JS JS                      "../../webviewer/core/base64.js"
+IDR_WEBVIEWER_CORE_BASE64_JS JS                      "../../3rdparty/noVNC/core/base64.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_AES_JS JS                      "../../webviewer/core/crypto/aes.js"
+IDR_WEBVIEWER_CORE_CRYPTO_AES_JS JS                      "../../3rdparty/noVNC/core/crypto/aes.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS JS                      "../../webviewer/core/crypto/bigint.js"
+IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS JS                      "../../3rdparty/noVNC/core/crypto/bigint.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_CRYPTO_JS JS                      "../../webviewer/core/crypto/crypto.js"
+IDR_WEBVIEWER_CORE_CRYPTO_CRYPTO_JS JS                      "../../3rdparty/noVNC/core/crypto/crypto.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_DES_JS JS                      "../../webviewer/core/crypto/des.js"
+IDR_WEBVIEWER_CORE_CRYPTO_DES_JS JS                      "../../3rdparty/noVNC/core/crypto/des.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_DH_JS JS                      "../../webviewer/core/crypto/dh.js"
+IDR_WEBVIEWER_CORE_CRYPTO_DH_JS JS                      "../../3rdparty/noVNC/core/crypto/dh.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_MD5_JS JS                      "../../webviewer/core/crypto/md5.js"
+IDR_WEBVIEWER_CORE_CRYPTO_MD5_JS JS                      "../../3rdparty/noVNC/core/crypto/md5.js"
 
-IDR_WEBVIEWER_CORE_CRYPTO_RSA_JS JS                      "../../webviewer/core/crypto/rsa.js"
+IDR_WEBVIEWER_CORE_CRYPTO_RSA_JS JS                      "../../3rdparty/noVNC/core/crypto/rsa.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_COPYRECT_JS JS                      "../../webviewer/core/decoders/copyrect.js"
+IDR_WEBVIEWER_CORE_DECODERS_COPYRECT_JS JS                      "../../3rdparty/noVNC/core/decoders/copyrect.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_H264_JS JS                      "../../webviewer/core/decoders/h264.js"
+IDR_WEBVIEWER_CORE_DECODERS_H264_JS JS                      "../../3rdparty/noVNC/core/decoders/h264.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_HEXTILE_JS JS                      "../../webviewer/core/decoders/hextile.js"
+IDR_WEBVIEWER_CORE_DECODERS_HEXTILE_JS JS                      "../../3rdparty/noVNC/core/decoders/hextile.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_JPEG_JS JS                      "../../webviewer/core/decoders/jpeg.js"
+IDR_WEBVIEWER_CORE_DECODERS_JPEG_JS JS                      "../../3rdparty/noVNC/core/decoders/jpeg.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_RAW_JS JS                      "../../webviewer/core/decoders/raw.js"
+IDR_WEBVIEWER_CORE_DECODERS_RAW_JS JS                      "../../3rdparty/noVNC/core/decoders/raw.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_RRE_JS JS                      "../../webviewer/core/decoders/rre.js"
+IDR_WEBVIEWER_CORE_DECODERS_RRE_JS JS                      "../../3rdparty/noVNC/core/decoders/rre.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_TIGHT_JS JS                      "../../webviewer/core/decoders/tight.js"
+IDR_WEBVIEWER_CORE_DECODERS_TIGHT_JS JS                      "../../3rdparty/noVNC/core/decoders/tight.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_TIGHTPNG_JS JS                      "../../webviewer/core/decoders/tightpng.js"
+IDR_WEBVIEWER_CORE_DECODERS_TIGHTPNG_JS JS                      "../../3rdparty/noVNC/core/decoders/tightpng.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_ZLIB_JS JS                      "../../webviewer/core/decoders/zlib.js"
+IDR_WEBVIEWER_CORE_DECODERS_ZLIB_JS JS                      "../../3rdparty/noVNC/core/decoders/zlib.js"
 
-IDR_WEBVIEWER_CORE_DECODERS_ZRLE_JS JS                      "../../webviewer/core/decoders/zrle.js"
+IDR_WEBVIEWER_CORE_DECODERS_ZRLE_JS JS                      "../../3rdparty/noVNC/core/decoders/zrle.js"
 
-IDR_WEBVIEWER_CORE_DEFLATOR_JS JS                      "../../webviewer/core/deflator.js"
+IDR_WEBVIEWER_CORE_DEFLATOR_JS JS                      "../../3rdparty/noVNC/core/deflator.js"
 
-IDR_WEBVIEWER_CORE_DISPLAY_JS JS                      "../../webviewer/core/display.js"
+IDR_WEBVIEWER_CORE_DISPLAY_JS JS                      "../../3rdparty/noVNC/core/display.js"
 
-IDR_WEBVIEWER_CORE_ENCODINGS_JS JS                      "../../webviewer/core/encodings.js"
+IDR_WEBVIEWER_CORE_ENCODINGS_JS JS                      "../../3rdparty/noVNC/core/encodings.js"
 
-IDR_WEBVIEWER_CORE_INFLATOR_JS JS                      "../../webviewer/core/inflator.js"
+IDR_WEBVIEWER_CORE_INFLATOR_JS JS                      "../../3rdparty/noVNC/core/inflator.js"
 
-IDR_WEBVIEWER_CORE_INPUT_DOMKEYTABLE_JS JS                      "../../webviewer/core/input/domkeytable.js"
+IDR_WEBVIEWER_CORE_INPUT_DOMKEYTABLE_JS JS                      "../../3rdparty/noVNC/core/input/domkeytable.js"
 
-IDR_WEBVIEWER_CORE_INPUT_FIXEDKEYS_JS JS                      "../../webviewer/core/input/fixedkeys.js"
+IDR_WEBVIEWER_CORE_INPUT_FIXEDKEYS_JS JS                      "../../3rdparty/noVNC/core/input/fixedkeys.js"
 
-IDR_WEBVIEWER_CORE_INPUT_GESTUREHANDLER_JS JS                      "../../webviewer/core/input/gesturehandler.js"
+IDR_WEBVIEWER_CORE_INPUT_GESTUREHANDLER_JS JS                      "../../3rdparty/noVNC/core/input/gesturehandler.js"
 
-IDR_WEBVIEWER_CORE_INPUT_KEYBOARD_JS JS                      "../../webviewer/core/input/keyboard.js"
+IDR_WEBVIEWER_CORE_INPUT_KEYBOARD_JS JS                      "../../3rdparty/noVNC/core/input/keyboard.js"
 
-IDR_WEBVIEWER_CORE_INPUT_KEYSYM_JS JS                      "../../webviewer/core/input/keysym.js"
+IDR_WEBVIEWER_CORE_INPUT_KEYSYM_JS JS                      "../../3rdparty/noVNC/core/input/keysym.js"
 
-IDR_WEBVIEWER_CORE_INPUT_KEYSYMDEF_JS JS                      "../../webviewer/core/input/keysymdef.js"
+IDR_WEBVIEWER_CORE_INPUT_KEYSYMDEF_JS JS                      "../../3rdparty/noVNC/core/input/keysymdef.js"
 
-IDR_WEBVIEWER_CORE_INPUT_UTIL_JS JS                      "../../webviewer/core/input/util.js"
+IDR_WEBVIEWER_CORE_INPUT_UTIL_JS JS                      "../../3rdparty/noVNC/core/input/util.js"
 
-IDR_WEBVIEWER_CORE_INPUT_VKEYS_JS JS                      "../../webviewer/core/input/vkeys.js"
+IDR_WEBVIEWER_CORE_INPUT_VKEYS_JS JS                      "../../3rdparty/noVNC/core/input/vkeys.js"
 
-IDR_WEBVIEWER_CORE_INPUT_XTSCANCODES_JS JS                      "../../webviewer/core/input/xtscancodes.js"
+IDR_WEBVIEWER_CORE_INPUT_XTSCANCODES_JS JS                      "../../3rdparty/noVNC/core/input/xtscancodes.js"
 
-IDR_WEBVIEWER_CORE_RA2_JS JS                      "../../webviewer/core/ra2.js"
+IDR_WEBVIEWER_CORE_RA2_JS JS                      "../../3rdparty/noVNC/core/ra2.js"
 
-IDR_WEBVIEWER_CORE_RFB_JS JS                      "../../webviewer/core/rfb.js"
+IDR_WEBVIEWER_CORE_RFB_JS JS                      "../../3rdparty/noVNC/core/rfb.js"
 
-IDR_WEBVIEWER_CORE_UTIL_BROWSER_JS JS                      "../../webviewer/core/util/browser.js"
+IDR_WEBVIEWER_CORE_UTIL_BROWSER_JS JS                      "../../3rdparty/noVNC/core/util/browser.js"
 
-IDR_WEBVIEWER_CORE_UTIL_CURSOR_JS JS                      "../../webviewer/core/util/cursor.js"
+IDR_WEBVIEWER_CORE_UTIL_CURSOR_JS JS                      "../../3rdparty/noVNC/core/util/cursor.js"
 
-IDR_WEBVIEWER_CORE_UTIL_ELEMENT_JS JS                      "../../webviewer/core/util/element.js"
+IDR_WEBVIEWER_CORE_UTIL_ELEMENT_JS JS                      "../../3rdparty/noVNC/core/util/element.js"
 
-IDR_WEBVIEWER_CORE_UTIL_EVENTS_JS JS                      "../../webviewer/core/util/events.js"
+IDR_WEBVIEWER_CORE_UTIL_EVENTS_JS JS                      "../../3rdparty/noVNC/core/util/events.js"
 
-IDR_WEBVIEWER_CORE_UTIL_EVENTTARGET_JS JS                      "../../webviewer/core/util/eventtarget.js"
+IDR_WEBVIEWER_CORE_UTIL_EVENTTARGET_JS JS                      "../../3rdparty/noVNC/core/util/eventtarget.js"
 
-IDR_WEBVIEWER_CORE_UTIL_INT_JS JS                      "../../webviewer/core/util/int.js"
+IDR_WEBVIEWER_CORE_UTIL_INT_JS JS                      "../../3rdparty/noVNC/core/util/int.js"
 
-IDR_WEBVIEWER_CORE_UTIL_LOGGING_JS JS                      "../../webviewer/core/util/logging.js"
+IDR_WEBVIEWER_CORE_UTIL_LOGGING_JS JS                      "../../3rdparty/noVNC/core/util/logging.js"
 
-IDR_WEBVIEWER_CORE_UTIL_STRINGS_JS JS                      "../../webviewer/core/util/strings.js"
+IDR_WEBVIEWER_CORE_UTIL_STRINGS_JS JS                      "../../3rdparty/noVNC/core/util/strings.js"
 
-IDR_WEBVIEWER_CORE_WEBSOCK_JS JS                      "../../webviewer/core/websock.js"
+IDR_WEBVIEWER_CORE_WEBSOCK_JS JS                      "../../3rdparty/noVNC/core/websock.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_UTILS_COMMON_JS JS                      "../../webviewer/vendor/pako/lib/utils/common.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_UTILS_COMMON_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/utils/common.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ADLER32_JS JS                      "../../webviewer/vendor/pako/lib/zlib/adler32.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ADLER32_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/adler32.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CONSTANTS_JS JS                      "../../webviewer/vendor/pako/lib/zlib/constants.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CONSTANTS_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/constants.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CRC32_JS JS                      "../../webviewer/vendor/pako/lib/zlib/crc32.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CRC32_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/crc32.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_DEFLATE_JS JS                      "../../webviewer/vendor/pako/lib/zlib/deflate.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_DEFLATE_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/deflate.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_GZHEADER_JS JS                      "../../webviewer/vendor/pako/lib/zlib/gzheader.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_GZHEADER_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/gzheader.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFFAST_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inffast.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFFAST_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/inffast.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFLATE_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inflate.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFLATE_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/inflate.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFTREES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/inftrees.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFTREES_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/inftrees.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_MESSAGES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/messages.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_MESSAGES_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/messages.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_TREES_JS JS                      "../../webviewer/vendor/pako/lib/zlib/trees.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_TREES_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/trees.js"
 
-IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS JS                      "../../webviewer/vendor/pako/lib/zlib/zstream.js"
+IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS JS                      "../../3rdparty/noVNC/vendor/pako/lib/zlib/zstream.js"
 
 
 /////////////////////////////////////////////////////////////////////////////
