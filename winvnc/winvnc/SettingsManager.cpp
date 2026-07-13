@@ -199,6 +199,7 @@ void SettingsManager::setDefaults()
 	m_pref_QueryIfNoLogon = 1;
 	m_pref_DefaultScale = 1;
 	m_pref_RequireMSLogon = false;
+	m_pref_RequireMSLogonIII = false;
 	m_pref_Secure = false;
 	m_pref_NewMSLogon = false;
 #ifdef SC_20
@@ -290,6 +291,7 @@ void SettingsManager::load()
 	m_pref_LoopbackOnly = iniFile.ReadInt("admin", "LoopbackOnly", m_pref_LoopbackOnly);
 	m_pref_Secure = iniFile.ReadInt("admin", "Secure", m_pref_Secure);
 	m_pref_RequireMSLogon = iniFile.ReadInt("admin", "MSLogonRequired", m_pref_RequireMSLogon);
+	m_pref_RequireMSLogonIII = iniFile.ReadInt("admin", "RequireMSLogonIII", m_pref_RequireMSLogonIII);
 	m_pref_NewMSLogon = iniFile.ReadInt("admin", "NewMSLogon", m_pref_NewMSLogon);
 	m_pref_UseDSMPlugin = iniFile.ReadInt("admin", "UseDSMPlugin", m_pref_UseDSMPlugin);
 	iniFile.ReadString("admin", "DSMPlugin", m_pref_szDSMPlugin, 128);
@@ -499,6 +501,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "noscreensaver", m_pref_Noscreensaver);
 	iniFile.WriteInt("admin", "Secure", m_pref_Secure);
 	iniFile.WriteInt("admin", "MSLogonRequired", m_pref_RequireMSLogon);
+	iniFile.WriteInt("admin", "RequireMSLogonIII", m_pref_RequireMSLogonIII);
 	iniFile.WriteInt("admin", "NewMSLogon", m_pref_NewMSLogon);
 	iniFile.WriteInt("admin", "ReverseAuthRequired", m_pref_ReverseAuthRequired);
 	iniFile.WriteInt("admin", "ConnectPriority", m_pref_ConnectPriority);
