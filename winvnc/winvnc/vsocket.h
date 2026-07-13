@@ -25,6 +25,7 @@ extern BOOL G_ipv6_allowed;
 #if (!defined(_ATT_VSOCKET_DEFINED))
 #define _ATT_VSOCKET_DEFINED
 
+#include <functional>
 #include "vtypes.h"
 #include <DSMPlugin/DSMPlugin.h>
 ////////////////////////////
@@ -257,6 +258,14 @@ public:
   VBool SendExactHTTP(const char *buff, const VCard bufflen);
   VBool ReadExactHTTP(char *buff, const VCard bufflen);
 
+  // TLS callback hooks — set by SchannelTLS layer, nullptr = plain TCP
+  struct TLSCallbacks {
+    std::function<bool(const char*, int)>        send; // encrypted send
+    std::function<bool(char*, int, int*)>        recv; // decrypted recv
+  };
+  void SetTLSCallbacks(TLSCallbacks* cb) { m_tlsCallbacks = cb; }
+  TLSCallbacks* GetTLSCallbacks() const  { return m_tlsCallbacks; }
+
   //adzm 2010-05-10
   IIntegratedPlugin* GetIntegratedPlugin() { return m_pIntegratedPluginInterface; };
 
@@ -305,6 +314,8 @@ protected:
 
   bool							GetOptimalSndBuf();
   unsigned int							G_SENDBUFFER;
+
+  TLSCallbacks* m_tlsCallbacks = nullptr;
 };
 
 #endif // _ATT_VSOCKET_DEFINED

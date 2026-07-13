@@ -298,6 +298,7 @@ protected:
 	// Connection servers
 	vncSockConnect		*m_socketConn;
 	vncHTTPConnect		*m_httpConn;
+	vncHTTPConnect		*m_httpsConn;
 	BOOL				m_enableHttpConn;
 
 

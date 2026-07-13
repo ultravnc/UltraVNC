@@ -39,6 +39,7 @@ public:
 	char* getAccept_reject_mesg() { return m_pref_accept_reject_mesg; };
 	BOOL getEnableFileTransfer() { return m_pref_EnableFileTransfer; };
 	BOOL getFTUserImpersonation() { return m_pref_FTUserImpersonation; };
+	char* getFileTransferRoot() { return m_pref_FileTransferRoot; };
 	BOOL getPrimary() { return m_pref_Primary; };
 	BOOL getSecondary() { return m_pref_Secondary; };
 	void setPrimary(BOOL value) { m_pref_Primary = value;};
@@ -65,6 +66,13 @@ public:
 	BOOL getHTTPConnect() { return m_pref_EnableHTTPConnect; };
 	void setEnableConnections(bool value) { m_pref_EnableConnection = value; };
 	void setHTTPConnect(bool value) { m_pref_EnableHTTPConnect = value; };
+
+	BOOL getEnableTLS()                { return m_pref_EnableTLS; };
+	void setEnableTLS(BOOL v)          { m_pref_EnableTLS = v; };
+	LONG getTLSPort()                  { return m_pref_TLSPort; };
+	void setTLSPort(LONG v)            { m_pref_TLSPort = v; };
+	const char* getTLSCertThumbprint() { return m_pref_TLSCertThumbprint; };
+	void setTLSCertThumbprint(const char* v) { strncpy_s(m_pref_TLSCertThumbprint, v, 40); m_pref_TLSCertThumbprint[40] = 0; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -121,6 +129,7 @@ public:
 	void setNoScreensaver(BOOL value) { m_pref_Noscreensaver = value; };
 	void setEnableFileTransfer(BOOL value) { m_pref_EnableFileTransfer = value; };
 	void setFTUserImpersonation(BOOL value) { m_pref_FTUserImpersonation = value; };
+	void setFileTransferRoot(char* value) { strcpy_s(m_pref_FileTransferRoot, value); };
 	void setAutoPortSelect(BOOL value) { m_pref_AutoPortSelect = value; };
 	void setPortNumber(LONG port) { m_pref_PortNumber = port; };
 	void setHttpPortNumber(LONG port) { m_pref_HttpPortNumber = port; };
@@ -295,6 +304,10 @@ private:
 	BOOL m_pref_EnableConnection;
 	BOOL m_pref_EnableHTTPConnect;
 
+	BOOL m_pref_EnableTLS;
+	LONG m_pref_TLSPort;
+	char m_pref_TLSCertThumbprint[41];
+
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;
 	LONG m_pref_HttpPortNumber;
@@ -322,6 +335,7 @@ private:
 	BOOL m_pref_clearconsole;
 	BOOL m_pref_EnableFileTransfer;
 	BOOL m_pref_FTUserImpersonation;
+	char m_pref_FileTransferRoot[MAX_PATH * 4];
 	BOOL m_pref_EnableBlankMonitor;
 	BOOL m_pref_BlankInputsOnly;
 	int  m_pref_DefaultScale;

@@ -127,6 +127,7 @@ vncServer::vncServer()
 	// Initialise some important stuffs...
 	m_socketConn = NULL;
 	m_httpConn = NULL;
+	m_httpsConn = NULL;
 	m_enableHttpConn = false;
 	m_desktop = NULL;
 	m_name = NULL;
@@ -196,6 +197,11 @@ vncServer::ShutdownServer()
 	if (m_httpConn != NULL) {
 		delete m_httpConn;
 		m_httpConn = NULL;
+	}
+
+	if (m_httpsConn != NULL) {
+		delete m_httpsConn;
+		m_httpsConn = NULL;
 	}
 
 	if (retrysock != NULL)
@@ -1318,12 +1324,33 @@ vncServer::EnableHTTPConnect(BOOL enable)
 				}
 			}
 		}
+		// Start TLS HTTPS listener if enabled
+		if (settings->getEnableTLS() && m_httpsConn == NULL)
+		{
+			m_httpsConn = new vncHTTPConnect;
+			if (m_httpsConn != NULL) {
+				if (!m_httpsConn->InitTLS(this, (UINT)settings->getTLSPort(),
+										  settings->getTLSCertThumbprint())) {
+					delete m_httpsConn;
+					m_httpsConn = NULL;
+					vnclog.Print(LL_CONNERR, VNCLOG("Failed to start HTTPS listener on port %d\n"),
+								(int)settings->getTLSPort());
+				} else {
+					vnclog.Print(LL_CLIENTS, VNCLOG("HTTPS listener started on port %d\n"),
+								(int)settings->getTLSPort());
+				}
+			}
+		}
 	}
 	else {
 		if (m_httpConn != NULL) {
 			// Close the socket
 			delete m_httpConn;
 			m_httpConn = NULL;
+		}
+		if (m_httpsConn != NULL) {
+			delete m_httpsConn;
+			m_httpsConn = NULL;
 		}
 	}
 

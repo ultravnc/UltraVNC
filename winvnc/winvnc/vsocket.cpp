@@ -214,6 +214,8 @@ VSocket::CreateConnect(const VString address, const VCard port)
 	}
 	freeaddrinfo(AddrInfo);
 	if (AI == NULL) return false;
+	if (sock4 != INVALID_SOCKET) sock = sock4;
+	else if (sock6 != INVALID_SOCKET) sock = sock6;
 	return VTrue;
 }
 VBool
@@ -271,6 +273,8 @@ VSocket::CreateBindConnect(const VString address, const VCard port)
 	}
 	freeaddrinfo(AddrInfo);
 	if (AI == NULL) return VFalse;
+	if (sock4 != INVALID_SOCKET) sock = sock4;
+	else if (sock6 != INVALID_SOCKET) sock = sock6;
 	return VTrue;
 }
 
@@ -2327,6 +2331,8 @@ void VSocket::CheckNetRectBufferSize(int nBufSize)
 VBool
 VSocket::SendExactHTTP(const char *buff, const VCard bufflen)
 {
+  if (m_tlsCallbacks && m_tlsCallbacks->send)
+    return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
   return Send(buff, bufflen) == (VInt)bufflen;
 }
 
@@ -2336,6 +2342,20 @@ VSocket::SendExactHTTP(const char *buff, const VCard bufflen)
 VBool
 VSocket::ReadExactHTTP(char *buff, const VCard bufflen)
 {
+	if (m_tlsCallbacks && m_tlsCallbacks->recv)
+	{
+		VCard remaining = bufflen;
+		while (remaining > 0)
+		{
+			int got = 0;
+			if (!m_tlsCallbacks->recv(buff, (int)remaining, &got) || got == 0)
+				return VFalse;
+			buff      += got;
+			remaining -= got;
+		}
+		return VTrue;
+	}
+
 	int n;
 	VCard currlen = bufflen;
     

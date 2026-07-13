@@ -95,10 +95,31 @@ namespace serviceHelpers {
 		ShellExecuteEx(&shExecInfo);
 	}
 
-	void Real_stop_service() {
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
+	static bool IsValidServiceName(const char* name) {
+		for (const char* p = name; *p; ++p) {
+			unsigned char c = static_cast<unsigned char>(*p);
+			if (!(isalnum(c) || c == ' ' || c == '_' || c == '-' || c == '.'))
+				return false;
+		}
+		return *name != '\0';
+	}
+
+	static void RunNetServiceCommand(const char* verb) {
+		if (!IsValidServiceName(UltraVNCService::service_name))
+			return;
+
+		char szSystemDir[MAX_PATH];
+		if (GetSystemDirectoryA(szSystemDir, MAX_PATH) == 0)
+			return;
+
+		char command[MAX_PATH + 64];
+		_snprintf_s(command, sizeof command, _TRUNCATE, "\"%s\\net.exe\" %s \"%s\"",
+			 szSystemDir, verb, UltraVNCService::service_name);
 		WinExec(command, SW_HIDE);
+	}
+
+	void Real_stop_service() {
+		RunNetServiceCommand("stop");
 	}
 
 	void Set_start_service_as_admin() {
@@ -120,9 +141,7 @@ namespace serviceHelpers {
 	}
 
 	void Real_start_service() {
-		char command[MAX_PATH + 32]; // 29 January 2008 jdp
-		_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-		WinExec(command, SW_HIDE);
+		RunNetServiceCommand("start");
 	}
 
 	void Set_install_service_as_admin() {

@@ -42,6 +42,7 @@ public:
 
 	// Init
 	virtual VBool Init(vncServer *server, UINT port);
+	virtual VBool InitTLS(vncServer *server, UINT port, const char* certThumbprint);
 
 	// Implementation
 protected:

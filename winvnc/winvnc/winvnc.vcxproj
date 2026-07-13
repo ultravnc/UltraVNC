@@ -503,7 +503,7 @@
     <Link>
       <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/winvnc.pdb</ProgramDatabaseFile>
@@ -554,7 +554,7 @@
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\Debug/winvnc.pdb</ProgramDatabaseFile>
@@ -606,7 +606,7 @@
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -656,7 +656,7 @@
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -711,7 +711,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -777,7 +777,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -840,7 +840,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -901,7 +901,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -961,7 +961,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -1024,7 +1024,7 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateManifest>true</GenerateManifest>
       <SubSystem>Windows</SubSystem>
@@ -1089,7 +1089,7 @@
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1154,7 +1154,7 @@
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1214,7 +1214,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1274,7 +1274,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1334,7 +1334,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -1396,7 +1396,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <Link>
       <DependentLoadFlags>0x800</DependentLoadFlags>
       <DelayLoadDLLs>bcrypt.dll</DelayLoadDLLs>
-      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;version.lib;wtsapi32.lib;userenv.lib;d3d11.lib;dxgi.lib;bcrypt.lib;ncrypt.lib;crypt32.lib;secur32.lib;delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
@@ -2990,6 +2990,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='IPV6|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Vista|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SchannelTLS.cpp" />
     <ClCompile Include="vncserver.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='SC_20_DEBUG|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3263,6 +3264,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="vncEncodeZlibHex.h" />
     <ClInclude Include="vncencodezrle.h" />
     <ClInclude Include="vnchttpconnect.h" />
+    <ClInclude Include="SchannelTLS.h" />
     <ClInclude Include="vncinsthandler.h" />
     <ClInclude Include="vnckeymap.h" />
     <ClInclude Include="vncListDlg.h" />
@@ -3299,6 +3301,60 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\common\versionServerViewer.inc" />
+    <None Include="..\..\webviewer\core\base64.js" />
+    <None Include="..\..\webviewer\core\crypto\aes.js" />
+    <None Include="..\..\webviewer\core\crypto\bigint.js" />
+    <None Include="..\..\webviewer\core\crypto\crypto.js" />
+    <None Include="..\..\webviewer\core\crypto\des.js" />
+    <None Include="..\..\webviewer\core\crypto\dh.js" />
+    <None Include="..\..\webviewer\core\crypto\md5.js" />
+    <None Include="..\..\webviewer\core\crypto\rsa.js" />
+    <None Include="..\..\webviewer\core\decoders\copyrect.js" />
+    <None Include="..\..\webviewer\core\decoders\h264.js" />
+    <None Include="..\..\webviewer\core\decoders\hextile.js" />
+    <None Include="..\..\webviewer\core\decoders\jpeg.js" />
+    <None Include="..\..\webviewer\core\decoders\raw.js" />
+    <None Include="..\..\webviewer\core\decoders\rre.js" />
+    <None Include="..\..\webviewer\core\decoders\tight.js" />
+    <None Include="..\..\webviewer\core\decoders\tightpng.js" />
+    <None Include="..\..\webviewer\core\decoders\zlib.js" />
+    <None Include="..\..\webviewer\core\decoders\zrle.js" />
+    <None Include="..\..\webviewer\core\deflator.js" />
+    <None Include="..\..\webviewer\core\display.js" />
+    <None Include="..\..\webviewer\core\encodings.js" />
+    <None Include="..\..\webviewer\core\inflator.js" />
+    <None Include="..\..\webviewer\core\input\domkeytable.js" />
+    <None Include="..\..\webviewer\core\input\fixedkeys.js" />
+    <None Include="..\..\webviewer\core\input\gesturehandler.js" />
+    <None Include="..\..\webviewer\core\input\keyboard.js" />
+    <None Include="..\..\webviewer\core\input\keysym.js" />
+    <None Include="..\..\webviewer\core\input\keysymdef.js" />
+    <None Include="..\..\webviewer\core\input\util.js" />
+    <None Include="..\..\webviewer\core\input\vkeys.js" />
+    <None Include="..\..\webviewer\core\input\xtscancodes.js" />
+    <None Include="..\..\webviewer\core\ra2.js" />
+    <None Include="..\..\webviewer\core\rfb.js" />
+    <None Include="..\..\webviewer\core\util\browser.js" />
+    <None Include="..\..\webviewer\core\util\cursor.js" />
+    <None Include="..\..\webviewer\core\util\element.js" />
+    <None Include="..\..\webviewer\core\util\events.js" />
+    <None Include="..\..\webviewer\core\util\eventtarget.js" />
+    <None Include="..\..\webviewer\core\util\int.js" />
+    <None Include="..\..\webviewer\core\util\logging.js" />
+    <None Include="..\..\webviewer\core\util\strings.js" />
+    <None Include="..\..\webviewer\core\websock.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\utils\common.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\adler32.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\constants.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\crc32.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\deflate.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\gzheader.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inffast.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inflate.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\inftrees.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\messages.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\trees.js" />
+    <None Include="..\..\webviewer\vendor\pako\lib\zlib\zstream.js" />
     <None Include="..\SC_20\ddengine.dll" />
     <None Include="..\SC_20\SecureVNCPlugin.dsm" />
     <None Include="cpp.hint" />
@@ -3320,32 +3376,15 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="res\cursor7.cur" />
     <None Include="res\cursor8.cur" />
     <None Include="res\cursor9.cur" />
-    <None Include="res\mslogon\AuthPanel.class" />
-    <None Include="res\mslogon\ButtonPanel.class" />
-    <None Include="res\mslogon\ClipboardFrame.class" />
-    <None Include="res\mslogon\DesCipher.class" />
-    <None Include="res\mslogon\DH.class" />
-    <None Include="res\mslogon\FTPFrame$StrComp.class" />
-    <None Include="res\mslogon\FTPFrame.class" />
-    <None Include="res\mslogon\OptionsFrame.class" />
-    <None Include="res\mslogon\RecordingFrame.class" />
-    <None Include="res\mslogon\RfbProto.class" />
-    <None Include="res\mslogon\SessionRecorder.class" />
-    <None Include="res\mslogon\VncCanvas.class" />
-    <None Include="res\mslogon\VncViewer.class" />
-    <None Include="res\mslogon\VncViewer.jar" />
+    <None Include="res\webviewer_index.html" />
     <None Include="version.rc2" />
     <None Include="vnc.hh" />
     <None Include="res\background.bmp" />
     <None Include="res\background2.bmp" />
-    <None Include="res\clipboardframe.class" />
-    <None Include="res\descipher.class" />
     <None Include="res\Finger.cur" />
     <None Include="res\ico00001.ico" />
     <None Include="res\icon1.ico" />
     <None Include="res\icon2.ico" />
-    <None Include="res\optionsframe.class" />
-    <None Include="res\rfbproto.class" />
     <None Include="res\runas.bmp" />
     <None Include="res\vdacc.bmp" />
     <None Include="res\vnc-1.bmp" />
@@ -3353,20 +3392,10 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <None Include="vnc.bmp" />
     <None Include="res\vnc.bmp" />
     <None Include="res\vnc64.BMP" />
-    <None Include="res\vnccanvas.class" />
-    <None Include="res\vncviewer.class" />
-    <None Include="res\vncviewer.jar" />
     <None Include="res\world3a.ico" />
     <None Include="res\winvnc.ico" />
     <None Include="res\ww-grn-sq2.ico" />
-    <None Include="res\AuthPanel.class" />
-    <None Include="res\ButtonPanel.class" />
-    <None Include="res\DH.class" />
     <None Include="res\ding_dong.wav" />
-    <None Include="res\ftpframe$strcomp.class" />
-    <None Include="res\FTPFrame.class" />
-    <None Include="res\RecordingFrame.class" />
-    <None Include="res\SessionRecorder.class" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\rdr\rdr.vcxproj">

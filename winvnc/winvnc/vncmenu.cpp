@@ -378,8 +378,16 @@ vncMenu::AddTrayIcon()
 		// as the main program window
 		// sf@2007 - Do not display Properties pages when running in Application0 mode
 		if (!settings->RunningFromExternalService()) {
-			m_properties.ShowDialog();
-			PostQuitMessage(0);
+			if (processHelper::GetExplorerLogonPid() == 0) {
+				// No explorer shell available (for example WinPE). Keep server running headless.
+				vnclog.Print(LL_INTINFO, VNCLOG("Tray icon unavailable and no shell detected; running headless\n"));
+			}
+			else {
+				m_properties.ShowDialog();
+				// On normal desktop sessions, keep existing behavior: close when dialog closes.
+				fShutdownOrdered = TRUE;
+				PostQuitMessage(0);
+			}
 		}
 	}
 	else {

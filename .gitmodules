@@ -1,0 +1,3 @@
+[submodule "webviewer"]
+	path = webviewer
+	url = https://github.com/novnc/noVNC.git

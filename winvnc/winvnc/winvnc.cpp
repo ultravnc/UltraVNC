@@ -523,8 +523,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 		// make vnc last service to stop
 		SetProcessShutdownParameters(0x100, false);
 		// handle dpi on aero
-		HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-		HMODULE hSHCore = LoadLibrary(_T("SHCore.dll"));
+		HMODULE hUser32 = LoadLibraryEx(_T("user32.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+		HMODULE hSHCore = LoadLibraryEx(_T("SHCore.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 
 		HRESULT(WINAPI * _SetProcessDpiAwareness)(DWORD value);
 		_SetProcessDpiAwareness =
@@ -849,9 +849,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 				}
 				UltraVNCService::install_service();
 				Sleep(2000);
-				char command[MAX_PATH + 32]; // 29 January 2008 jdp
-				_snprintf_s(command, sizeof command, "net start \"%s\"", UltraVNCService::service_name);
-				WinExec(command, SW_HIDE);
+				serviceHelpers::Real_start_service();
 				return return2(0);
 			}
 			if (strncmp(&szCmdLine[i], winvncUnInstallService, strlen(winvncUnInstallService)) == 0)
@@ -885,8 +883,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine2
 					strncpy_s(UltraVNCService::service_name, 256, pServiceName, 256);
 					UltraVNCService::service_name[255] = 0;
 				}
-				_snprintf_s(command, sizeof command, "net stop \"%s\"", UltraVNCService::service_name);
-				WinExec(command, SW_HIDE);
+				serviceHelpers::Real_stop_service();
 				UltraVNCService::uninstall_service();
 				return return2(0);
 			}

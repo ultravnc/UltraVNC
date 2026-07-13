@@ -87,7 +87,7 @@ BOOL SHDesktopHTML()
 	HINSTANCE	hinstDll;
     BOOL		enabled = FALSE;
 
-    hinstDll = LoadLibrary("shell32.dll");
+    hinstDll = LoadLibraryEx(_T("shell32.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	
     if (hinstDll)
     {
