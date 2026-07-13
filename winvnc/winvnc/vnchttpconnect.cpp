@@ -774,6 +774,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			if (PerformWebSocketHandshake(socket, headers))
 			{
 				vnclog.Print(LL_CLIENTS, VNCLOG("WebSocket tunnel established\n"));
+				socket->SetTimeout(0); // No timeout during RFB session (auth needs user input)
 				BridgeWebSocketToRFB(socket, m_server);
 			}
 			else
