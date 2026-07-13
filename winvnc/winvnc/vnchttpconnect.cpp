@@ -64,6 +64,7 @@ typedef struct _FileToResourceMap {
 	int resourceID;
 } FileMap;
 
+
 const FileMap filemapping [] = {
 	{"/core/base64.js",	"JS",	IDR_WEBVIEWER_CORE_BASE64_JS},
 	{"/core/crypto/aes.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_AES_JS},
@@ -109,8 +110,6 @@ const FileMap filemapping [] = {
 	{"/core/websock.js",	"JS",	IDR_WEBVIEWER_CORE_WEBSOCK_JS},
 	{"/index.html",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
 	{"/",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/webviewer/",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/webviewer/index.html",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
 	{"/vendor/pako/lib/utils/common.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_UTILS_COMMON_JS},
 	{"/vendor/pako/lib/zlib/adler32.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ADLER32_JS},
 	{"/vendor/pako/lib/zlib/constants.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CONSTANTS_JS},
@@ -129,73 +128,7 @@ const FileMap filemapping [] = {
 
 
 
-
-const FileMap filemapping2 [] = {
-	{"/core/base64.js",	"JS",	IDR_WEBVIEWER_CORE_BASE64_JS},
-	{"/core/crypto/aes.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_AES_JS},
-	{"/core/crypto/bigint.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS},
-	{"/core/crypto/crypto.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_CRYPTO_JS},
-	{"/core/crypto/des.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_DES_JS},
-	{"/core/crypto/dh.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_DH_JS},
-	{"/core/crypto/md5.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_MD5_JS},
-	{"/core/crypto/rsa.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_RSA_JS},
-	{"/core/decoders/copyrect.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_COPYRECT_JS},
-	{"/core/decoders/h264.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_H264_JS},
-	{"/core/decoders/hextile.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_HEXTILE_JS},
-	{"/core/decoders/jpeg.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_JPEG_JS},
-	{"/core/decoders/raw.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_RAW_JS},
-	{"/core/decoders/rre.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_RRE_JS},
-	{"/core/decoders/tight.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_TIGHT_JS},
-	{"/core/decoders/tightpng.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_TIGHTPNG_JS},
-	{"/core/decoders/zlib.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_ZLIB_JS},
-	{"/core/decoders/zrle.js",	"JS",	IDR_WEBVIEWER_CORE_DECODERS_ZRLE_JS},
-	{"/core/deflator.js",	"JS",	IDR_WEBVIEWER_CORE_DEFLATOR_JS},
-	{"/core/display.js",	"JS",	IDR_WEBVIEWER_CORE_DISPLAY_JS},
-	{"/core/encodings.js",	"JS",	IDR_WEBVIEWER_CORE_ENCODINGS_JS},
-	{"/core/inflator.js",	"JS",	IDR_WEBVIEWER_CORE_INFLATOR_JS},
-	{"/core/input/domkeytable.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_DOMKEYTABLE_JS},
-	{"/core/input/fixedkeys.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_FIXEDKEYS_JS},
-	{"/core/input/gesturehandler.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_GESTUREHANDLER_JS},
-	{"/core/input/keyboard.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_KEYBOARD_JS},
-	{"/core/input/keysym.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_KEYSYM_JS},
-	{"/core/input/keysymdef.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_KEYSYMDEF_JS},
-	{"/core/input/util.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_UTIL_JS},
-	{"/core/input/vkeys.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_VKEYS_JS},
-	{"/core/input/xtscancodes.js",	"JS",	IDR_WEBVIEWER_CORE_INPUT_XTSCANCODES_JS},
-	{"/core/ra2.js",	"JS",	IDR_WEBVIEWER_CORE_RA2_JS},
-	{"/core/rfb.js",	"JS",	IDR_WEBVIEWER_CORE_RFB_JS},
-	{"/core/util/browser.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_BROWSER_JS},
-	{"/core/util/cursor.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_CURSOR_JS},
-	{"/core/util/element.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_ELEMENT_JS},
-	{"/core/util/events.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_EVENTS_JS},
-	{"/core/util/eventtarget.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_EVENTTARGET_JS},
-	{"/core/util/int.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_INT_JS},
-	{"/core/util/logging.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_LOGGING_JS},
-	{"/core/util/strings.js",	"JS",	IDR_WEBVIEWER_CORE_UTIL_STRINGS_JS},
-	{"/core/websock.js",	"JS",	IDR_WEBVIEWER_CORE_WEBSOCK_JS},
-	{"/index.html",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/webviewer/",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/webviewer/index.html",	"HTML",	IDR_WEBVIEWER_INDEX_HTML},
-	{"/vendor/pako/lib/utils/common.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_UTILS_COMMON_JS},
-	{"/vendor/pako/lib/zlib/adler32.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ADLER32_JS},
-	{"/vendor/pako/lib/zlib/constants.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CONSTANTS_JS},
-	{"/vendor/pako/lib/zlib/crc32.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_CRC32_JS},
-	{"/vendor/pako/lib/zlib/deflate.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_DEFLATE_JS},
-	{"/vendor/pako/lib/zlib/gzheader.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_GZHEADER_JS},
-	{"/vendor/pako/lib/zlib/inffast.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFFAST_JS},
-	{"/vendor/pako/lib/zlib/inflate.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFLATE_JS},
-	{"/vendor/pako/lib/zlib/inftrees.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_INFTREES_JS},
-	{"/vendor/pako/lib/zlib/messages.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_MESSAGES_JS},
-	{"/vendor/pako/lib/zlib/trees.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_TREES_JS},
-	{"/vendor/pako/lib/zlib/zstream.js",	"JS",	IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS},
-};
-
-
-
-
-
-const int filemappingsize = 58;
+const int filemappingsize = sizeof(filemapping) / sizeof(filemapping[0]);
 
 // -------------------------------------------------------------------------
 // WebSocket helpers: handshake (SHA-1 + Base64) and framing.
@@ -810,7 +743,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 
 		for (int x=0; x < filemappingsize; x++)
 	{
-		if (strcmp(filename, filemapping2[x].filename) == 0)
+		if (strcmp(filename, filemapping[x].filename) == 0)
 		{
 			HRSRC resource;
 			HGLOBAL resourcehan;
@@ -818,13 +751,13 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			int resourcesize;
 
 			resource = FindResource(hInstResDLL,
-					MAKEINTRESOURCE(filemapping2[x].resourceID),
-					GetResourceType(filemapping2[x].type)
+					MAKEINTRESOURCE(filemapping[x].resourceID),
+					GetResourceType(filemapping[x].type)
 					);
 			if (resource == NULL)
 			{
 				vnclog.Print(LL_CONNERR, VNCLOG("DoHTTP: resource not found for %s (id=%d type=%s)\n"),
-					filemapping2[x].filename, filemapping2[x].resourceID, filemapping2[x].type);
+					filemapping[x].filename, filemapping[x].resourceID, filemapping[x].type);
 				return;
 			}
 
@@ -844,7 +777,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 				"Cache-Control: no-cache, no-store, must-revalidate\r\n"
 				"Pragma: no-cache\r\n"
 				"Expires: 0\r\n\r\n",
-				GetResourceMimeType(filemapping2[x].type), resourcesize);
+				GetResourceMimeType(filemapping[x].type), resourcesize);
 			if (!socket->SendExactHTTP(responseHdr, (const VCard)strlen(responseHdr)))
 				return;
 
