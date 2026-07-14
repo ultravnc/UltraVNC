@@ -43,8 +43,8 @@
             position: fixed; top: 36px; left: 0; right: 0; bottom: 0;
             overflow: hidden;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-start;
+            justify-content: flex-start;
             background: #1a1a2e;
         }
         #screen {
@@ -159,11 +159,12 @@
         <button class="key-btn" data-key="F12" data-keysym="0xFFC9">F12</button>
     </div>
 
-    <!-- Password dialog -->
+    <!-- Credentials dialog -->
     <div id="password-dialog">
         <div id="password-box">
-            <h3>Password Required</h3>
-            <input id="password-input" type="password" placeholder="Enter VNC password" autofocus>
+            <h3 id="cred-title">Password Required</h3>
+            <input id="username-input" type="text" placeholder="Username" style="display:none;width:100%;padding:6px;background:#0f3460;color:#e0e0e0;border:1px solid rgba(255,255,255,0.2);border-radius:4px;font-size:13px;margin-bottom:6px;box-sizing:border-box;">
+            <input id="password-input" type="password" placeholder="Password">
             <button id="password-ok">Connect</button>
         </div>
     </div>
@@ -311,7 +312,7 @@
             canvas.style.height = scaledH + 'px';
             canvas.style.transform = '';
             canvas.style.marginLeft = Math.floor((cw - scaledW) / 2) + 'px';
-            canvas.style.marginTop  = Math.floor((ch - scaledH) / 2) + 'px';
+            canvas.style.marginTop  = '0px';
         }
 
         function sendKeepAlive() {
@@ -343,21 +344,33 @@
             rfb = null;
         }
 
-        function onCredentials() {
+        let credTypes = ['password'];
+        function onCredentials(e) {
+            credTypes = e.detail.types || ['password'];
+            const needUser = credTypes.includes('username');
+            document.getElementById('cred-title').textContent = needUser ? 'Login Required' : 'Password Required';
+            const userInput = document.getElementById('username-input');
+            userInput.style.display = needUser ? 'block' : 'none';
             document.getElementById('password-dialog').classList.add('open');
-            document.getElementById('password-input').focus();
+            if (needUser) userInput.focus();
+            else document.getElementById('password-input').focus();
         }
 
         function onClipboard(e) {
             document.getElementById('clipboard-text').value = e.detail.text;
         }
 
-        // Password dialog
+        // Credentials dialog
         function submitPassword() {
             const pw = document.getElementById('password-input').value;
+            const un = document.getElementById('username-input').value;
             document.getElementById('password-dialog').classList.remove('open');
             document.getElementById('password-input').value = '';
-            if (rfb) rfb.sendCredentials({ password: pw });
+            document.getElementById('username-input').value = '';
+            if (!rfb) return;
+            const creds = { password: pw };
+            if (credTypes.includes('username')) creds.username = un;
+            rfb.sendCredentials(creds);
         }
         document.getElementById('password-ok').onclick = submitPassword;
         document.getElementById('password-input').onkeydown = e => { if (e.key === 'Enter') submitPassword(); };
