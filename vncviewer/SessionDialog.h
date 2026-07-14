@@ -41,7 +41,7 @@ public:
 
 	void ExpandBox(HWND hDlg, BOOL fExpand);
 	BOOL m_bExpanded;
-	BOOL m_bInitShrink;
+	BOOL m_bInitShrink; // Skip animation on initial start
 	int m_nExpandedWidth;
 	int m_nExpandedHeight;
 	HBITMAP hBmpExpand;

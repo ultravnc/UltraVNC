@@ -494,9 +494,9 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 				SWP_NOZORDER | SWP_NOMOVE);
 			m_bInitShrink = false;
 		}
-		else // Animate shrinking.
+		else // Animate shrinking. Height - 1 to compensate rounding error
 		{		
-			for (float i = m_nExpandedHeight; i >= rcDefaultBox.bottom - rcWnd.top;
+			for (float i = m_nExpandedHeight; i >= rcDefaultBox.bottom - rcWnd.top - 1;
 				i -= static_cast<float>(m_nExpandedHeight - (rcDefaultBox.bottom - rcWnd.top)) / 15)
 			{
 				SetWindowPos(hDlg, NULL, 0, 0,
@@ -516,7 +516,7 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 
 		// Restore only the height; keep current width unchanged
 		GetWindowRect(hDlg, &rcWnd);
-		// Animate expanding.
+		// Animate expanding. Height + 1 to compensate rounding error
 		for (float i = rcDefaultBox.bottom - rcWnd.top; i <= m_nExpandedHeight + 1; 
 			i += static_cast<float>(m_nExpandedHeight - (rcDefaultBox.bottom - rcWnd.top)) / 15)
 		{

@@ -192,6 +192,9 @@
     <ClCompile Include="..\common\ZipUnzip\MiniZipNG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CredentialManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutBox.h">
@@ -324,6 +327,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="..\common\ZipUnzip\MiniZipNG.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="CredentialManager.h">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
