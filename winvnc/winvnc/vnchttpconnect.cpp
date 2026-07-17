@@ -67,6 +67,7 @@ typedef struct _FileToResourceMap {
 
 const FileMap filemapping [] = {
 	{"/core/base64.js",	"JS",	IDR_WEBVIEWER_CORE_BASE64_JS},
+	{"/core/clipboard.js",	"JS",	IDR_WEBVIEWER_CORE_CLIPBOARD_JS},
 	{"/core/crypto/aes.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_AES_JS},
 	{"/core/crypto/bigint.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS},
 	{"/core/crypto/crypto.js",	"JS",	IDR_WEBVIEWER_CORE_CRYPTO_CRYPTO_JS},
@@ -584,7 +585,7 @@ static unsigned __stdcall WSRFBToClient(void* arg)
 	while (ctx->running) {
 		VInt r = ctx->rfb->Read(buf.data(), RFB_BUF);
 		if (r <= 0) {
-				ctx->running = FALSE;
+			ctx->running = FALSE;
 			break;
 		}
 		EnterCriticalSection(&ctx->sendLock);

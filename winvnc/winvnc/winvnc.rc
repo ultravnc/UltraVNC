@@ -736,6 +736,7 @@ END
 //
 
 IDR_WEBVIEWER_CORE_BASE64_JS JS                      "../../3rdparty/noVNC/core/base64.js"
+IDR_WEBVIEWER_CORE_CLIPBOARD_JS JS                   "../../3rdparty/noVNC/core/clipboard.js"
 
 IDR_WEBVIEWER_CORE_CRYPTO_AES_JS JS                      "../../3rdparty/noVNC/core/crypto/aes.js"
 
