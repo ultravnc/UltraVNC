@@ -431,10 +431,10 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	vnclog.SetMode(settings->getDebugMode());
 	vnclog.SetFile();
 	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORD)) {
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (!settings->isPasswdSet()) ? "SET" : "CHANGE");
 	}
 	if (GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO)) {
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (!settings->isPasswdViewOnlySet()) ? "SET" : "CHANGE");
 	}
 
 	else
@@ -1556,7 +1556,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			return true;
 		isRunningPw = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
-		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
+		if (dlgChangePassword->ShowDlg(NULL, (!settings->isPasswdSet()) 
 			? "UltraVNC Server - Set Password"
 			: "UltraVNC Server - Change Password", 8)) {
 			char password[1024];
@@ -1573,7 +1573,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		}
 		delete dlgChangePassword;
 		isRunningPw = false;
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (!settings->isPasswdSet()) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CHANGEPASSWORDVO:
@@ -1583,7 +1583,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			return true;
 		isRunningPwVo = true;
 		DlgChangePassword* dlgChangePassword = new DlgChangePassword();
-		if (dlgChangePassword->ShowDlg(NULL, (strlen(settings->getPasswd()) == 0) 
+		if (dlgChangePassword->ShowDlg(NULL, (!settings->isPasswdSet()) 
 					? "UltraVNC Server - Set View-only Password"
 					: "UltraVNC Server - Change View-only Password", 8)) {
 			char password[1024];
@@ -1599,7 +1599,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			}
 		}
 		delete dlgChangePassword;
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (!settings->isPasswdViewOnlySet()) ? "SET" : "CHANGE");
 		isRunningPwVo = false;
 		return true;
 	}
@@ -1632,14 +1632,14 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	{
 		settings->setPasswd("");
 		settings->savePassword();
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (strlen(settings->getPasswd()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORD), (!settings->isPasswdSet()) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_CLEARPASSWORDVO:
 	{
 		settings->setPasswdViewOnly("");
 		settings->saveViewOnlyPassword();
-		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (strlen(settings->getPasswdViewOnly()) == 0) ? "SET" : "CHANGE");
+		SetWindowText(GetDlgItem(hwnd, IDC_CHANGEPASSWORDVO), (!settings->isPasswdViewOnlySet()) ? "SET" : "CHANGE");
 		return true;
 	}
 	case IDC_PLUGIN_BUTTON:

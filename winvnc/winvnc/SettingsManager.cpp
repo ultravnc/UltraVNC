@@ -29,6 +29,16 @@
 SettingsManager* SettingsManager::s_instance = NULL;
 SettingsManager* settings = nullptr;
 
+bool SettingsManager::isPasswdSet() const
+{
+    return !vncPasswdIsEmpty(m_pref_passwd);
+}
+
+bool SettingsManager::isPasswdViewOnlySet() const
+{
+    return !vncPasswdIsEmpty(m_pref_passwdViewOnly);
+}
+
 SettingsManager* SettingsManager::getInstance()
 {
 	if (!s_instance) {
@@ -413,7 +423,7 @@ void SettingsManager::load()
 }
 
 void SettingsManager::savePassword() {
-	if (strlen(m_pref_passwd) == 0) {
+	if (vncPasswdIsEmpty(m_pref_passwd)) {
 		iniFile.WriteString("UltraVNC", "passwd", m_pref_passwd);
 		return;
 	}
@@ -421,10 +431,10 @@ void SettingsManager::savePassword() {
 }
 
 void SettingsManager::saveViewOnlyPassword() {
-	if (strlen(m_pref_passwdViewOnly) == 0) {
+	if (vncPasswdIsEmpty(m_pref_passwdViewOnly)) {
 		iniFile.WriteString("UltraVNC", "passwd2", m_pref_passwdViewOnly);
 		return;
-	}	
+	}
 	iniFile.WritePasswordViewOnly(m_pref_passwdViewOnly);
 }
 

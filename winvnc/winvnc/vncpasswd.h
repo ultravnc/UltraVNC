@@ -30,6 +30,19 @@ extern "C" {
 #include "vncauth.h"
 #endif
 
+// Helper to test whether an encrypted password buffer is empty/unset.
+// Do not use strlen() on the 8-byte encrypted value: DES can produce a NUL
+// byte as the first ciphertext byte, which would be mistaken for an empty
+// C string.
+inline bool vncPasswdIsEmpty(const char encrypted[MAXPWLEN])
+{
+    for (int i = 0; i < MAXPWLEN; ++i) {
+        if (encrypted[i] != 0)
+            return false;
+    }
+    return true;
+}
+
 // Password handling helper class
 class vncPasswd
 {
@@ -44,10 +57,10 @@ public:
 	    //vnclog.Print(LL_INTINFO, VNCLOG("PASSWD : ToText called\n"));
 		char* emptyPasswd = (char*)malloc(1);
 		emptyPasswd[0] = 0;
-	    plaintext = (strlen(encrypted) == 0) 
-				? emptyPasswd 
+	    plaintext = vncPasswdIsEmpty(encrypted)
+				? emptyPasswd
 				: vncDecryptPasswd((char*)encrypted, secure);
-		
+
 	}
 	inline ~ToText()
 	{

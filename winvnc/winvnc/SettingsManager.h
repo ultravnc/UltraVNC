@@ -82,6 +82,8 @@ public:
 	BOOL getClearconsole() { return m_pref_clearconsole; };
 	char* getPasswd() { return m_pref_passwd; };
 	char* getPasswdViewOnly() { return m_pref_passwdViewOnly; };
+	bool isPasswdSet() const;
+	bool isPasswdViewOnlySet() const;
 	BOOL getAutoPortSelect() { return m_pref_AutoPortSelect; };
 	LONG getPortNumber() { return m_pref_PortNumber; };
 	LONG getHttpPortNumber() { return m_pref_HttpPortNumber; };
@@ -173,11 +175,15 @@ public:
 
 	void setPasswd(const char* passwd)
 	{
-		memcpy(m_pref_passwd, passwd, MAXPWLEN);
+		memset(m_pref_passwd, 0, sizeof(m_pref_passwd));
+		if (passwd && passwd[0] != '\0')
+			memcpy(m_pref_passwd, passwd, MAXPWLEN);
 	}
 	void setPasswdViewOnly(const char* passwd)
 	{
-		memcpy(m_pref_passwdViewOnly, passwd, MAXPWLEN);
+		memset(m_pref_passwdViewOnly, 0, sizeof(m_pref_passwdViewOnly));
+		if (passwd && passwd[0] != '\0')
+			memcpy(m_pref_passwdViewOnly, passwd, MAXPWLEN);
 	}
 
 	void setDSMPluginConfig(char* value) { strncpy_s(m_pref_DSMPluginConfig, sizeof(m_pref_DSMPluginConfig) - 1, value, _TRUNCATE); };
