@@ -6687,10 +6687,17 @@ inline void ClientConnection::ReadScreenUpdate()
 void ClientConnection::SetDormant(int newstate)
 {
 	vnclog.Print(5, _T("%s dormant mode\n"), newstate ? _T("Entering") : _T("Leaving"));
+	bool leavingDormant = (newstate == 0 && IsDormant());
 	m_dormant = newstate;
 	if (m_dormant!=1 && m_running) {
 		//adzm 2010-09
-		SendIncrementalFramebufferUpdateRequest(false);
+		// After leaving dormant (minimize/idle), request a full refresh so
+		// the screen recovers from any stale state instead of relying on a
+		// possibly stale incremental update.
+		if (leavingDormant)
+			SendFullFramebufferUpdateRequest(false);
+		else
+			SendIncrementalFramebufferUpdateRequest(false);
 	}
 }
 
