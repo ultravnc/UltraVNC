@@ -624,6 +624,7 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		}
 		else if (SwitchMatch(args[j], _T("fullscreen"))) {
 			m_FullScreen = true;
+			m_ShowToolbar = false;
 		}
 		else if (SwitchMatch(args[j], _T("savepos"))) {
 			m_SavePos = true;
@@ -764,13 +765,12 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				ArgError(sz_D14);
 				continue;
 			}
-			if (_stscanf(args[j], _T("%s"), m_logFilename) != 1) {
+			if (args[j][0] == '\0') {
 				ArgError(sz_D15);
 				continue;
 			}
-			else {
-				m_logToFile = true;
-			}
+			_tcscpy_s(m_logFilename, _countof(m_logFilename), args[j]);
+			m_logToFile = true;
 		}
 		else if (SwitchMatch(args[j], _T("config"))) {
 			if (++j == i) {
