@@ -246,6 +246,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_ABOUT:
 			ShowAboutBox();
 			break;
+		case IDC_GETVIEWERTOKEN:
+			ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/viewer.php"), NULL, NULL, SW_SHOWNORMAL);
+			break;
 		case IDC_RADIOBRIDGE:
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
@@ -928,6 +931,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_HIDE);
 		}
 		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
+		if (GetDlgItem(hwnd, IDC_GETVIEWERTOKEN)) { ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_HIDE); }
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -944,6 +948,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_HIDE);
 		}
 		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
+		if (GetDlgItem(hwnd, IDC_GETVIEWERTOKEN)) { ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_HIDE); }
 		break;
 	case IDC_RADIOBRIDGE:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -956,6 +961,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		EnableWindow(GetDlgItem(hwnd, IDCONNECT), FALSE);
 		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_SHOW);
 		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_SHOW);
+		ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_SHOW);
 		SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, m_cloudToken);
 		// Trigger probe if there's a valid code
 		PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE), 
