@@ -396,7 +396,9 @@ void SettingsManager::load()
 	if (m_pref_cloudServer[0] == _T('\0'))
 		_tcscpy_s(m_pref_cloudServer, _T("support1.uvnc.com"));
 	m_pref_cloudEnabled = iniFile.ReadInt("admin", "cloudEnabled", m_pref_cloudEnabled);
-	iniFile.ReadString("cloud", "token", m_pref_cloudToken, sizeof(m_pref_cloudToken));
+	iniFile.ReadString("cloud", "server_token", m_pref_cloudToken, sizeof(m_pref_cloudToken));
+	if (m_pref_cloudToken[0] == _T('\0'))
+		iniFile.ReadString("cloud", "token", m_pref_cloudToken, sizeof(m_pref_cloudToken));
 
 	iniFile.ReadString("admin", "alternate_shell", m_pref_alternateShell, 1024);
 
@@ -537,7 +539,7 @@ void SettingsManager::save()
 
 	iniFile.WriteString("admin", "cloudServer", m_pref_cloudServer);
 	iniFile.WriteInt("admin", "cloudEnabled", m_pref_cloudEnabled);
-	iniFile.WriteString("cloud", "token", m_pref_cloudToken);
+	iniFile.WriteString("cloud", "server_token", m_pref_cloudToken);
 
 	iniFile.WriteString("admin_auth", "group1", m_pref_group1);
 	iniFile.WriteString("admin_auth", "group2", m_pref_group2);
