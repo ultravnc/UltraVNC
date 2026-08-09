@@ -254,6 +254,9 @@ CloudDialog::DialogProc(HWND hwnd,
 			return TRUE;
 		}
 
+		case IDC_GETSERVERTOKEN:
+			ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/server.php"), NULL, NULL, SW_SHOWNORMAL);
+			return TRUE;
 		case IDC_STARTCLOUD:
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer(), MAX_HOST_NAME_LEN);
