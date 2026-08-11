@@ -27,6 +27,16 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, boo
     return;
   }
 
+  // Hardening: reject malformed rectangles before the gradient/palette
+  // filters can overflow their fixed-size buffers.
+  if ((int)pfburh->r.x + (int)pfburh->r.w > (int)m_si.framebufferWidth ||
+      (int)pfburh->r.y + (int)pfburh->r.h > (int)m_si.framebufferHeight) {
+      vnclog.Print(0, _T("Tight encoding: invalid rectangle %dx%d at (%d,%d), framebuffer %dx%d\n"),
+                   pfburh->r.w, pfburh->r.h, pfburh->r.x, pfburh->r.y,
+                   m_si.framebufferWidth, m_si.framebufferHeight);
+      throw WarningException(L"Invalid Tight rectangle received from server.");
+  }
+
   CARD8 comp_ctl;
   ReadExact((char *)&comp_ctl, 1);
 

@@ -6201,6 +6201,20 @@ inline void ClientConnection::ReadScreenUpdate()
 			continue;
 		}
 
+		// Hardening: reject malformed real update rectangles before any
+		// encoding-specific code uses them.  Pseudo-encodings (negative
+		// or > LASTENCODING) use the rectangle header for metadata and
+		// are handled separately above.
+		if (surh.encoding >= rfbEncodingRaw && surh.encoding <= LASTENCODING) {
+			if ((int)surh.r.x + (int)surh.r.w > (int)m_si.framebufferWidth ||
+				(int)surh.r.y + (int)surh.r.h > (int)m_si.framebufferHeight) {
+				vnclog.Print(0, _T("Invalid update rectangle %dx%d at (%d,%d), encoding %d, framebuffer %dx%d\n"),
+					surh.r.w, surh.r.h, surh.r.x, surh.r.y, surh.encoding,
+					m_si.framebufferWidth, m_si.framebufferHeight);
+				throw WarningException(L"Invalid framebuffer update rectangle received from server.");
+			}
+		}
+
 		// Tight cursor handling
 		if ( surh.encoding == rfbEncodingXCursor ||
 			surh.encoding == rfbEncodingRichCursor )
