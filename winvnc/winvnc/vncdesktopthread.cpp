@@ -1208,6 +1208,14 @@ vncDesktopThread::run_undetached(void *arg)
 												}
 											}
 
+											// Force a full initial update so the viewer receives the entire
+											// current frame, avoiding the multi-monitor "initial black screen"
+											// where the first incremental update is empty.
+											if (!initialupdate) {
+												checkrgn.assign_union(m_desktop->m_Cliprect);
+												fullframe = true;
+											}
+
 											m_desktop->m_buffer.CheckRegion(changedrgn,cachedrgn, checkrgn, fullframe);
 
 											if(m_desktop->m_screenCapture)
