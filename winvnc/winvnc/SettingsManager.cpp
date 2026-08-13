@@ -366,8 +366,8 @@ void SettingsManager::load()
 	m_pref_OSD = iniFile.ReadInt("admin", "OSD", m_pref_OSD);
 	m_pref_NotificationSelection = iniFile.ReadInt("admin", "NotificationSelection", m_pref_NotificationSelection);
 	m_pref_QueryIfNoLogon = iniFile.ReadInt("admin", "QueryIfNoLogon", m_pref_QueryIfNoLogon);
-	strcpy_s(m_pref_passwd, "");
-	strcpy_s(m_pref_passwdViewOnly, "");
+	memset(m_pref_passwd, 0, sizeof(m_pref_passwd));
+	memset(m_pref_passwdViewOnly, 0, sizeof(m_pref_passwdViewOnly));
 	iniFile.ReadPassword(m_pref_passwd, MAXPWLEN);
 	iniFile.ReadPasswordViewOnly(m_pref_passwdViewOnly, MAXPWLEN); //PGM
 	m_pref_EnableRemoteInputs = iniFile.ReadInt("admin", "InputsEnabled", m_pref_EnableRemoteInputs);
