@@ -601,12 +601,17 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
     return;
   }
 
+  if (w < 1 || h < 1 || w > 65535) {
+    vnclog.Print(0, _T("Tight JPEG: invalid rectangle dimensions %dx%d\n"), w, h);
+    jpeg_destroy_decompress(&cinfo);
+    return;
+  }
+
   omni_mutex_lock l(m_bitmapdcMutex);
 
   // Two scanlines: for 24bit and COLORREF samples
   // adzm 2010-08 - Increase zlib buffer size (from TightVNC)
-  const int maxRowWidth = 8192;
-  CheckZlibBufferSize(2*maxRowWidth*4);
+  CheckZlibBufferSize(2 * w * 4);
 
   JSAMPROW rowPointer[1];
   rowPointer[0] = (JSAMPROW)m_zlibbuf;
@@ -617,11 +622,11 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
     if (jpegError) {
       break;
     }
-    pixelPtr = (COLORREF *)&m_zlibbuf[maxRowWidth*4];
+    pixelPtr = (COLORREF *)&m_zlibbuf[w * 4];
     for (int dx = 0; dx < w; dx++) {
       *pixelPtr++ = COLOR_FROM_PIXEL24_ADDRESS(&m_zlibbuf[dx*3]);
     }
-    SETPIXELS_NOCONV(&m_zlibbuf[maxRowWidth*4], x, y + dy, w, 1);
+    SETPIXELS_NOCONV(&m_zlibbuf[w * 4], x, y + dy, w, 1);
   }
 
   if (!jpegError)
