@@ -68,6 +68,9 @@ void VNCviewerApp32::NewConnection(bool Is_Listening) {
 	ClientConnection *pcc = new ClientConnection(this);
 	try {
 		pcc->m_optsCopy = m_options;
+		// Re-apply the original command line so per-connection options keep
+		// command-line priority over the INI values loaded by the constructor.
+		pcc->m_optsCopy.SetFromCommandLine(m_options.szCmdLine);
 		pcc->m_opts = &pcc->m_optsCopy;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
@@ -82,6 +85,9 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,TCHAR *host, int port) {
 	ClientConnection *pcc = new ClientConnection(this, host,port);
 	try {
 		pcc->m_optsCopy = m_options;
+		// Re-apply the original command line so per-connection options keep
+		// command-line priority over the INI values loaded by the constructor.
+		pcc->m_optsCopy.SetFromCommandLine(m_options.szCmdLine);
 		pcc->m_opts = &pcc->m_optsCopy;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
@@ -96,6 +102,9 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,SOCKET sock) {
 	ClientConnection *pcc = new ClientConnection(this, sock);
 	try {
 		pcc->m_optsCopy = m_options;
+		// Re-apply the original command line so per-connection options keep
+		// command-line priority over the INI values loaded by the constructor.
+		pcc->m_optsCopy.SetFromCommandLine(m_options.szCmdLine);
 		pcc->m_opts = &pcc->m_optsCopy;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
