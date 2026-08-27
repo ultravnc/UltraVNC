@@ -27,7 +27,7 @@ extern HINSTANCE	hInstResDLL;
 
 // Constructor
 
-vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char *infoMsg, bool notification)
+vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char *infoMsg, bool notification, bool infoMsgIsUtf8)
 {
 	m_timeoutSecs = timeoutSecs;
 	m_ipAddress = _strdup(ipAddress);
@@ -36,6 +36,7 @@ vncAcceptDialog::vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const ch
 	ThreadHandle = NULL;
 	this->infoMsg = infoMsg;
 	this->notification = notification;
+	m_infoMsgIsUtf8 = infoMsgIsUtf8;
 }
 
 // Destructor
@@ -114,18 +115,29 @@ BOOL CALLBACK vncAcceptDialog::vncAcceptDlgProc(HWND hwnd,
             vncAcceptDialog *_this = (vncAcceptDialog *) lParam;
 
 			// Set the IP-address string
-			char accept_reject_mesg[512];
-			strcpy_s(accept_reject_mesg, settings->getAccept_reject_mesg());
+			char baseMsg[512];
+			strcpy_s(baseMsg, settings->getAccept_reject_mesg());
 
-			if (strlen(accept_reject_mesg) == 0) 
-				strcpy_s(accept_reject_mesg,"UltraVNC Server has received an incoming connection from");
+			if (strlen(baseMsg) == 0) 
+				strcpy_s(baseMsg,"UltraVNC Server has received an incoming connection from");
+
+			// Base accept/reject message is in the system/INI code page (CP_ACP).
+			// The infoMsg is either UTF-8 (new Unicode path) or CP_ACP (legacy viewer).
+			wchar_t wAcceptReject[512] = { 0 };
+			MultiByteToWideChar(CP_ACP, 0, baseMsg, -1, wAcceptReject, _countof(wAcceptReject));
 
 			if (strlen(_this->infoMsg) > 0) {
-				strcat_s(accept_reject_mesg, "\r\n");
-				strcat_s(accept_reject_mesg, _this->infoMsg);
+				wcscat_s(wAcceptReject, _countof(wAcceptReject), L"\r\n");
+				wchar_t wInfo[256] = { 0 };
+				UINT cp = _this->m_infoMsgIsUtf8 ? CP_UTF8 : CP_ACP;
+				MultiByteToWideChar(cp, 0, _this->infoMsg, -1, wInfo, _countof(wInfo));
+				wcscat_s(wAcceptReject, _countof(wAcceptReject), wInfo);
 			}
-			SetDlgItemText(hwnd, IDC_STATIC_TEXT1, accept_reject_mesg);
-			SetDlgItemText(hwnd, IDC_ACCEPT_IP, _this->m_ipAddress);
+			SetDlgItemTextW(hwnd, IDC_STATIC_TEXT1, wAcceptReject);
+			
+			wchar_t wIpAddress[256] = { 0 };
+			MultiByteToWideChar(CP_ACP, 0, _this->m_ipAddress, -1, wIpAddress, _countof(wIpAddress));
+			SetDlgItemTextW(hwnd, IDC_ACCEPT_IP, wIpAddress);
 
 			{
 			char mycommand[MAX_PATH];	

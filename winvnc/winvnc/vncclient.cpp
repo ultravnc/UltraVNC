@@ -991,7 +991,7 @@ vncClientThread::FilterClients_Ask_Permission()
 					verified = vncServer::aqrAccept;
 			}
 			else {
-				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept() == 1, m_socket->GetPeerName(true), m_client->infoMsg, settings->getNotification());
+				vncAcceptDialog* acceptDlg = new vncAcceptDialog(settings->getQueryTimeout(), m_server->QueryAccept() == 1, m_socket->GetPeerName(true), m_client->infoMsg, settings->getNotification(), m_client->infoMsgIsUtf8);
 				if (acceptDlg == NULL) {
 					if (m_server->QueryAccept() == 1)
 						verified = vncServer::aqrAccept;
@@ -1238,11 +1238,17 @@ vncClientThread::InitAuthenticate()
 			infoMsgW[msg.textLength / sizeof(wchar_t)] = L'\0';
 			// Convert to UTF-8 for storage in m_client->infoMsg
 			WideCharToMultiByte(CP_UTF8, 0, infoMsgW, -1, m_client->infoMsg, 255, NULL, NULL);
+			m_client->infoMsgIsUtf8 = true;
 		} else {
 			// Legacy: client sends UTF-8 (or CP_ACP for very old clients)
 			if (!m_socket->ReadExact(m_client->infoMsg, msg.textLength))
 				return FALSE;
 			m_client->infoMsg[msg.textLength] = '\0';
+			// Auto-detect UTF-8 vs. CP_ACP so the new server displays both correctly.
+			if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, m_client->infoMsg, -1, NULL, 0) > 0)
+				m_client->infoMsgIsUtf8 = true;
+			else
+				m_client->infoMsgIsUtf8 = false;
 		}
 	}
 

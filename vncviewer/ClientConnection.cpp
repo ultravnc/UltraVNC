@@ -2984,14 +2984,11 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			WriteExact((char *)&authSchemeMsg, sizeof(authSchemeMsg));
 			if (authScheme == rfbClientInitExtraMsgSupport) {
 				rfbClientInitExtraMsg msg;
-				// Encode as UTF-8 for wire compatibility with all server versions
-				char utf8Msg[255] = { 0 };
-				int utf8Len = WideCharToMultiByte(CP_UTF8, 0, m_opts->m_InfoMsg, -1, utf8Msg, sizeof(utf8Msg) - 1, NULL, NULL);
-				size_t textLen = (utf8Len > 0) ? (size_t)(utf8Len - 1) : 0;  // exclude null terminator
-				if (textLen > 0 && textLen <= 254) {
-					msg.textLength = (CARD8)textLen;
+				size_t wlen = wcslen(m_opts->m_InfoMsg);
+				if (wlen > 0 && wlen <= 127) {  // Max 127 wchars = 254 bytes (textLength is CARD8)
+					msg.textLength = (CARD8)(wlen * sizeof(wchar_t));
 					WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-					WriteExact(utf8Msg, msg.textLength);
+					WriteExact((char*)m_opts->m_InfoMsg, msg.textLength);
 				} else {
 					msg.textLength = 0;
 					WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
@@ -3957,26 +3954,19 @@ void ClientConnection::SendClientInit()
 	}
 	if (brfbClientInitExtraMsgSupportNew) {
 		ci.flags |= clientInitExtraMsgSupport;
-		// NOTE: Do NOT set clientInitExtraMsgUnicode here. The
-		// rfbClientInitExtraMsgSupportNew capability marker predates the
-		// Unicode wire format, so older UltraVNC servers may advertise it
-		// without understanding the Unicode flag/encoding. Sending UTF-8
-		// (ASCII-compatible, superset of plain text) keeps this message
-		// readable on both old and new servers.
+		ci.flags |= clientInitExtraMsgUnicode;  // Signal Unicode support
 	}
 
     WriteExact((char *)&ci, sz_rfbClientInitMsg); // sf@2002 - RSM Plugin
 	if (brfbClientInitExtraMsgSupportNew) {
 		brfbClientInitExtraMsgSupportNew = false;
 		rfbClientInitExtraMsg msg;
-		// Encode as UTF-8 for wire compatibility with all server versions
-		char utf8Msg[255] = { 0 };
-		int utf8Len = WideCharToMultiByte(CP_UTF8, 0, m_opts->m_InfoMsg, -1, utf8Msg, sizeof(utf8Msg) - 1, NULL, NULL);
-		size_t textLen = (utf8Len > 0) ? (size_t)(utf8Len - 1) : 0;  // exclude null terminator
-		if (textLen > 0 && textLen <= 254) {
-			msg.textLength = (CARD8)textLen;
+		// Send Unicode (UTF-16LE) directly - no lossy CP_UTF8 conversion
+		size_t wlen = wcslen(m_opts->m_InfoMsg);
+		if (wlen > 0 && wlen <= 127) {  // Max 127 wchars = 254 bytes
+			msg.textLength = (CARD8)(wlen * sizeof(wchar_t));
 			WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);
-			WriteExact(utf8Msg, msg.textLength);
+			WriteExact((char*)m_opts->m_InfoMsg, msg.textLength);
 		} else {
 			msg.textLength = 0;
 			WriteExact((char*)&msg, sz_rfbClientInitExtraMsg);

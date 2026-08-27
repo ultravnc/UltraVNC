@@ -353,6 +353,7 @@ public:
 	// sf@2002 
 	// Update routines
 	char infoMsg[255] = { 0 };
+	bool infoMsgIsUtf8 = false;
 protected:
 	DesktopUsersToken* desktopUsersToken;
 	BOOL SendUpdate(rfb::SimpleUpdateTracker &update);

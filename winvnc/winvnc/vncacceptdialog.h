@@ -24,7 +24,7 @@ class vncAcceptDialog
 {
 public:
 
-	vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char* infoMsg, bool notification);
+	vncAcceptDialog(UINT timeoutSecs,BOOL acceptOnTimeout, const char *ipAddress, char* infoMsg, bool notification, bool infoMsgIsUtf8 = false);
 	virtual ~vncAcceptDialog();
 	BOOL DoDialog();
 	BOOL m_acceptOnTimeout;
@@ -43,6 +43,7 @@ private:
 	HANDLE ThreadHandle;
 	char *infoMsg;
 	bool notification;
+	bool m_infoMsgIsUtf8;
 };
 
 #endif

@@ -500,8 +500,13 @@ vncServer::Authenticated(vncClientId clientid)
 		wchar_t szInfo[256] = { 0 };
 
 		_snwprintf_s(szInfo, 255, L"%s %s %s", ScSelect::Balloon2A, ScSelect::Balloon2B, ScSelect::Balloon2C);
-		if (settings->getNotification() && strlen(client->infoMsg) > 0)
-			_snwprintf_s(szInfo, 255, L"%s", client->infoMsg);
+		if (settings->getNotification() && strlen(client->infoMsg) > 0) {
+			// client->infoMsg may be UTF-8 (new Unicode path) or CP_ACP (legacy viewer)
+			wchar_t infoMsgW[256] = { 0 };
+			UINT cp = client->infoMsgIsUtf8 ? CP_UTF8 : CP_ACP;
+			MultiByteToWideChar(cp, 0, client->infoMsg, -1, infoMsgW, _countof(infoMsgW));
+			_snwprintf_s(szInfo, 255, L"%s", infoMsgW);
+		}
 		_snwprintf_s(szTitle, 255, L"%s", ScSelect::Balloon2Title);
 		vncMenu::NotifyBalloon(szInfo, szTitle);
 #else
@@ -528,7 +533,9 @@ vncServer::Authenticated(vncClientId clientid)
 					_snwprintf_s(szTitle, 63, L"Connection from: %hs", client->GetClientNameName());
 					szTitle[62] = '\0';
 				}
-				_snwprintf_s(szInfo, 255, L"%hs", client->infoMsg);
+				// client->infoMsg may be UTF-8 (new Unicode path) or CP_ACP (legacy viewer)
+				UINT cp = client->infoMsgIsUtf8 ? CP_UTF8 : CP_ACP;
+				MultiByteToWideChar(cp, 0, client->infoMsg, -1, szInfo, _countof(szInfo));
 				vncMenu::NotifyBalloon(szInfo, szTitle);
 			}
 			else if (settings->getNotificationSelection() == 0) {
