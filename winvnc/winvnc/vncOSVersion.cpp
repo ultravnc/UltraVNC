@@ -101,6 +101,7 @@ VNC_OSVersion::~VNC_OSVersion()
 {
 	ResetAero();
 	UnloadDM();
+	vnc_OSVersion = nullptr;
 }
 
 void
@@ -177,6 +178,8 @@ VNC_OSVersion::DisableAero(VOID)
 void
 VNC_OSVersion::ResetAero(VOID) 
  { 
+		 // Do not call through a stale pointer (e.g. after UnloadDM or use-after-free)
+		 if (!DMdll || !pfnDwmEnableComposition) return;
          if (pfnDwmEnableComposition && AeroWasEnabled) pfnDwmEnableComposition(AeroWasEnabled);
 		 BOOL pfnDwmEnableCompositiond = FALSE;
 	     if (pfnDwmIsCompositionEnabled==NULL) OS_AERO_ON=false;

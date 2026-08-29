@@ -1506,7 +1506,6 @@ int WinVNCAppMain()
 		g_szRepeaterHost = NULL;
 	}
 
-	if (VNC_OSVersion::getInstance())
-		delete VNC_OSVersion::getInstance();
+	VNC_OSVersion::releaseInstance();
 	return 1;
 };

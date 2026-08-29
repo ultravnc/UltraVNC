@@ -24,8 +24,10 @@ public:
 			vnc_OSVersion;
 	}
 	static void releaseInstance() {
-		if (vnc_OSVersion)
+		if (vnc_OSVersion) {
 			delete vnc_OSVersion;
+			vnc_OSVersion = NULL;
+		}
 	}
 
 	VNC_OSVersion();
