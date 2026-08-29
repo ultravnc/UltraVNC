@@ -83,6 +83,22 @@ vncEncoder::SendEmptyCursorShape(VSocket *outConn)
 	return outConn->SendExactQueue((char *)&hdr, sizeof(hdr));
 }
 
+static BOOL
+IsMagentaLikePixel(BYTE *pixel, int bytes_pixel)
+{
+	if (bytes_pixel >= 3) {
+		int c0 = pixel[0];
+		int c1 = pixel[1];
+		int c2 = pixel[2];
+		return (c1 < 64) && (c0 > 64) && (c2 > 64) && (abs(c0 - c2) < 64);
+	}
+	if (bytes_pixel == 2) {
+		WORD pixel16 = *(WORD*)pixel;
+		return (pixel16 == 0xF81F || pixel16 == 0x7C1F);
+	}
+	return FALSE;
+}
+
 BOOL
 vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 {
@@ -368,7 +384,10 @@ vncEncoder::FixCursorMask(BYTE *mbits, BYTE *cbits,
             }
         }
     } else if (isColorCursor) {
-        // For color cursors: Magenta (RGB 255,0,255) is used as transparency key
+        // Generate the mask from the color buffer. Pixels close to the magenta
+        // background (including its anti-aliased one-pixel shadow ring) are
+        // treated as transparent; this removes the purple halo on cursors such
+        // as the hand, Busy and Working in Background pointers.
         int bytes_pixel = m_localformat.bitsPerPixel / 8;
         int bytes_row = width * bytes_pixel;
         while (bytes_row % sizeof(DWORD))
@@ -379,26 +398,9 @@ vncEncoder::FixCursorMask(BYTE *mbits, BYTE *cbits,
             bitmask = 0x80;
             for (x = 0; x < width; x++) {
                 BYTE *pixel = &cbits[y * bytes_row + x * bytes_pixel];
-                BOOL isMagenta = FALSE;
 
-                // Check if pixel is magenta (transparency key)
-                if (bytes_pixel == 4) {
-                    // 32-bit BGRA: B=255, G=0, R=255 (or RGBA: R=255, G=0, B=255)
-                    isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255) ||
-                                (pixel[2] == 255 && pixel[1] == 0 && pixel[0] == 255);
-                } else if (bytes_pixel == 3) {
-                    // 24-bit BGR or RGB
-                    isMagenta = (pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 255);
-                } else if (bytes_pixel == 2) {
-                    // 16-bit: magenta would be specific bit pattern
-                    WORD pixel16 = *(WORD*)pixel;
-                    // For RGB565: R=31, G=0, B=31 -> 0xF81F
-                    // For RGB555: R=31, G=0, B=31 -> 0x7C1F
-                    isMagenta = (pixel16 == 0xF81F || pixel16 == 0x7C1F);
-                }
-
-                if (isMagenta) {
-                    // Transparent pixel - clear mask bit and set color to black
+                if (IsMagentaLikePixel(pixel, bytes_pixel)) {
+                    // Transparent - clear mask bit and set color to black
                     mbits[y * packed_width_bytes + x / 8] &= ~bitmask;
                     memset(pixel, 0, bytes_pixel);
                 } else {
