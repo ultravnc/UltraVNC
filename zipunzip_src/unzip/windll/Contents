@@ -1,0 +1,65 @@
+Contents of the "windll" subdirectory for UnZip 5.52 and later:
+
+  Contents       this file
+  decs.h         Exported function declarations.
+  structs.h      header file, used by both the DLL and by calling applications,
+                 defines the structures used in the DLL interface
+  unziplib.def   definition file for 32-bit UnZip library
+  windll16.def   definition file for 16-bit UnZip DLL
+  windll32.def   definition file for 32-bit UnZip DLL
+  windllgcc.def  definition file for 32-bit UnZip DLL, variant for GCC tools
+  windll_lc.def  definition file for 32-bit UnZip DLL, variant for LCC tools
+  windll.c       contains the entry point for the DLL, "fake" printing,
+                 sound, rename, replace and password functions
+  windll.h       header file for both 16- and 32-bit DLLs
+  windll.rc      resource file for both 16- and 32-bit DLLs
+  windll.txt     simplistic explanation of how to use DLL
+  uzexampl.c     a very simplistic example of how to load the DLL and make
+                 a call into it
+  uzexampl.h     header file for uzexampl.c
+
+  guisfx\        directory with GUI frontend for SFX stub
+    dialog.h       interface declarations to dialog definition
+    sfxw.ico       icon graphic (binary file!)
+    sfxwiz.c       main source module for SFX stub
+    sfxwiz.dlg     dialog window definitions
+    sfxwiz.rc      resourses for GUISFX stub
+    sfxwiz16.mak   makefile for 16-bit GUISFX stub (Borland C++ 4.52)
+    unzsfx16.def   linker definition file for 16-bit unzipsfx static library
+
+  vb\            example files for using the Visual C++ DLL with Visual Basic
+
+  vc5\dll\       directory with DLL project for Visual C++ 5.0
+  vc5\lib\       directory with LIB project for Visual C++ 5.0
+  vc5\sfx\       directory with SFX project files for Visual C++ 5.0
+    SFXWiz32.dsp   MS Visual C++ 5.0 project file for 32-bit GUISFX stub
+    SFXWiz32.dsw   MS Visual C++ 5.0 workspace file for 32-bit GUISFX stub
+    unzsfx32.dsp   MS Visual C++ 5.0 project for 32-bit sfxunzip static lib
+  vc5\
+    unzip32.dsw    MS Visual C++ 5.0 workspace file for all windll projects
+
+  vc6\dll\       directory with DLL project for Visual C++ 6.0
+  vc6\lib\       directory with LIB project for Visual C++ 6.0
+  vc6\sfx\       directory with SFX project files for Visual C++ 6.0
+    SFXWiz32.dsp   MS Visual C++ 6.0 project file for 32-bit GUISFX stub
+    SFXWiz32.dsw   MS Visual C++ 6.0 workspace file for 32-bit GUISFX stub
+    unzsfx32.dsp   MS Visual C++ 6.0 project for 32-bit sfxunzip static lib
+  vc6\
+    unzip32.dsw    MS Visual C++ 6.0 workspace file for all windll projects
+
+
+If you want to build the UnZip DLL or the WinGUI SFX stub from the command
+line, you may use the MSC Makefile supplied in the subdirectory of the
+Win32 command line port.
+
+Note that Borland C++ 5.0 is full of bugs; version 4.5 or 5.01 is recommended
+instead.  If you must use Borland C++ 5.0, using the Intel optimizing compiler
+is required to avoid crashes (possibly due to a bug in the stat() function in
+the normal Borland compiler).  This does have the advantage of giving you a
+smaller code size than the 4.52 compiler.  Borland C++ 5.01 has resolved many
+of the problems seen with 5.0 and can be used reliably.
+The UnZip DLL and SFXWiz have been successfully built with Borland C++ 5.5.1
+from the command line. However, we do not currently have the resources to
+supply project files for the Borland IDE environment (C Builder 5.x - 6.x).
+For compilation with Borland C++, please use the appropiate targets supplied
+with the Borland Makefile in the Win32 subdirectory.

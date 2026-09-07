@@ -16,6 +16,8 @@ find_package(libjpeg-turbo CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
 find_package(LibLZMA REQUIRED)
+find_package(minizip-ng CONFIG REQUIRED)
+find_package(unofficial-sodium CONFIG REQUIRED)
 
 set(${PROJECT_NAME}_SOURCES
     ../DSMPlugin/DSMPlugin.cpp
@@ -50,6 +52,7 @@ set(${PROJECT_NAME}_SOURCES
     ClientConnectionUltra2.cpp
     ClientConnectionZlib.cpp
     ClientConnectionZlibHex.cpp
+    CredentialManager.cpp
     Daemon.cpp
     Exception.cpp
     FileTransfer.cpp
@@ -87,13 +90,15 @@ foreach(file ${${PROJECT_NAME}_SOURCES})
 endforeach(file)
 target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/../vncviewer/res/vncviewer.rc LANGUAGE RC)
-target_compile_definitions(${PROJECT_NAME} PRIVATE NDEBUG WIN32 _WINDOWS __NT__ _WINSTATIC __WIN32__ _VIEWER _XZ _VCPKG NOMINMAX)
+target_compile_definitions(${PROJECT_NAME} PRIVATE NDEBUG WIN32 _WINDOWS __NT__ _WINSTATIC __WIN32__ _VIEWER _XZ _VCPKG NOMINMAX _UNICODE UNICODE)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE JPEG::JPEG
     PRIVATE $<IF:$<TARGET_EXISTS:libjpeg-turbo::turbojpeg>,libjpeg-turbo::turbojpeg,libjpeg-turbo::turbojpeg-static>
     PRIVATE ZLIB::ZLIB
     PRIVATE zstd::libzstd
     PRIVATE LibLZMA::LibLZMA
+    PRIVATE MINIZIP::minizip-ng
+    PRIVATE unofficial-sodium::sodium
     libomnithread
     librdr
     #libudtcloud
