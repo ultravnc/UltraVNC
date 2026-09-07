@@ -223,3 +223,7 @@ ultravnc_service/src/.opencppcov/
 vncviewer/vcpkg_installed/
 winvnc/winvnc/vcpkg_installed/
 rdr/vcpkg_installed/
+
+# Our CMake build output
+obj-ninja/
+vcpkg_installed/
