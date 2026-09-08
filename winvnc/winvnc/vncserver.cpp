@@ -1729,10 +1729,14 @@ vncServer::SetNewSWSize(long w, long h, BOOL desktop)
 {
 	vncClientList::iterator i;
 	omni_mutex_lock l(m_clientsLock, 62);
-	// Post this screen size update to all the connected clients
+	// Post this screen size update to the connected clients that support it
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
-		// Post the update
-		if (!GetClient(*i)->SetNewSWSize(w, h, desktop)) {
+		vncClient* client = GetClient(*i);
+		if (!client->SupportsNewFBSize()) {
+			vnclog.Print(LL_INTINFO, VNCLOG("Client does not support desktop resize, skipping\n"));
+			continue;
+		}
+		if (!client->SetNewSWSize(w, h, desktop)) {
 			vnclog.Print(LL_INTINFO, VNCLOG("Unable to set new desktop size\n"));
 			KillClient(*i);
 		}
@@ -1916,6 +1920,17 @@ vncServer::All_clients_initialalized() {
 			return false;
 	}
 	return true;
+}
+
+BOOL
+vncServer::AnyClientSupportsResize() {
+	vncClientList::iterator i;
+	omni_mutex_lock l(m_clientsLock, 69);
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
+		if (GetClient(*i)->SupportsNewFBSize())
+			return TRUE;
+	}
+	return FALSE;
 }
 
 void

@@ -130,6 +130,7 @@ public:
 	UINT getNumberViewers();
 
 	virtual BOOL All_clients_initialalized();
+	virtual BOOL AnyClientSupportsResize();
 	void initialCapture_done();
 
 	// Lock to protect the client list from concurrency - lock when reading/updating client list

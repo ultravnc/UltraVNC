@@ -241,6 +241,7 @@ public:
 	virtual void EnableProtocol_no_mutex();
 	// resize desktop
 	virtual BOOL SetNewSWSize(long w,long h,BOOL desktop);
+	virtual BOOL SupportsNewFBSize() { return m_use_NewSWSize; }
 	virtual void SetBufferOffset(int x,int y);
 	virtual void SetScreenOffset(int x,int y, bool single_display);
 	virtual void InitialUpdate(bool value);
