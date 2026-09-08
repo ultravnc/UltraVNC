@@ -381,12 +381,16 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				}
 			}
 
+				BOOL clients_support_resize = m_server->AnyClientSupportsResize();
+
 				//*******************************************************
 				// Reinitialize buffers,color, etc
 				// monitor change, for non driver, use another buffer
 				//*******************************************************
 				if (!m_server->IsThereFileTransBusy())
-					if (m_desktop->m_displaychanged || desktopSelector::InputDesktopSelected()==0 || m_desktop->m_hookswitch || (monitor_changed && !m_desktop->m_screenCapture)) {
+					if (desktopSelector::InputDesktopSelected()==0 || m_desktop->m_hookswitch ||
+						m_desktop->m_displaychanged ||
+						(monitor_changed && !m_desktop->m_screenCapture && clients_support_resize)) {
 						// Attempt to close the old hooks
 						// shutdown(true) driver is reinstalled without shutdown,(shutdown need a 640x480x8 switch)
 						vnclog.Print(LL_INTERR, VNCLOG("m_desktop->Shutdown"));
@@ -580,14 +584,16 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 									m_desktop->m_ScreenOffsety = m_desktop->mymonitor[m_desktop->m_current_monitor].offsety;
 								}
 							}
-							m_server->SetNewSWSize(rc.right, rc.bottom, monitor_changed);//changed no lock ok
+							if (clients_support_resize)
+								m_server->SetNewSWSize(rc.right, rc.bottom, monitor_changed);//changed no lock ok
 							m_server->SetScreenOffset(m_desktop->m_ScreenOffsetx, m_desktop->m_ScreenOffsety, m_desktop->nr_monitors == 1);// no lock ok							
 						}
 					
 					if (monitor_changed && m_desktop->m_screenCapture)
 						{
 							monitor_changed=false;
-							m_server->SetNewSWSize(rc.right,rc.bottom,TRUE);
+							if (clients_support_resize)
+								m_server->SetNewSWSize(rc.right,rc.bottom,TRUE);
 						}
 			}// end lock
 	}
