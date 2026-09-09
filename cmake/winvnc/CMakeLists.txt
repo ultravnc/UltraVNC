@@ -28,6 +28,7 @@ set(${PROJECT_NAME}_SOURCES
     ../../common/win32_helpers.cpp
     ../../lzo/minilzo.c
     ../../rfb/dh.cpp
+    ../../rfb/arddh.cpp
     CloudDialog.cpp
     CpuUsage.cpp
     DeskdupEngine.cpp
@@ -123,6 +124,7 @@ target_link_libraries(${PROJECT_NAME}
     libzipunzip
     comctl32
     comdlg32
+    bcrypt
     dwmapi
     imm32
     iphlpapi

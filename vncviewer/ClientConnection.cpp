@@ -2946,6 +2946,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbRSAAESne:
 				case rfbVncAuth:
 				case rfbNoAuth:
+				case rfbAppleARD:
 					auth_supported.push_back(authAllowed[i]);
 					break;
 				}
@@ -2967,6 +2968,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbRSAAESne_256);
 				auth_priority.push_back(rfbRSAAESne);
 				auth_priority.push_back(rfbVncAuth);
+				auth_priority.push_back(rfbAppleARD); // low priority while the ARD path is stubbed
 				auth_priority.push_back(rfbNoAuth);
 
 				for (std::vector<CARD8>::iterator best_auth_it = auth_priority.begin(); best_auth_it != auth_priority.end(); best_auth_it++) {
@@ -3129,6 +3131,9 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		break;
 	case rfbRSAAESne_256:
 		AuthRSAAES(256, false);
+		break;
+	case rfbAppleARD:
+		AuthAppleARD();
 		break;
 	case rfbVeNCypt:
 		AuthVeNCrypt();
@@ -3712,6 +3717,16 @@ void ClientConnection::AuthMsLogonI()
 
 // MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
 // This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+void ClientConnection::AuthAppleARD()
+{
+	// Apple ARD (RFB security type 30). Server sends (big-endian):
+	//   U16 generator, U16 keyLength, prime[ keyLength ], peerPub[ keyLength ]
+	// Implementation pending (ard_dh_compute in rfb/arddh.cpp + AES-128). Until
+	// then, fail cleanly instead of dry-lapping the handshake.
+	vnclog.Print(0, _T("Apple ARD authentication (type 30) is not yet implemented\n"));
+	throw WarningException(L"Apple ARD authentication (type 30) is not yet implemented");
+}
+
 void ClientConnection::AuthMsLogonIII()
 {
 	// X25519 key exchange

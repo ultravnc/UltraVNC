@@ -277,6 +277,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbInvalidAuth 0
 #define rfbNoAuth 1
 #define rfbVncAuth 2
+#define rfbAppleARD 30 // Apple Remote Desktop / macOS Screen Sharing account auth (DH + AES-128)
 #define rfbRSAAES 5
 #define rfbRSAAESne 6
 #define rfbRSAAES_256 129

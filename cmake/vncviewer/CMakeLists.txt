@@ -31,6 +31,7 @@ set(${PROJECT_NAME}_SOURCES
     ../common/win32_helpers.cpp
     ../lzo/minilzo.c
     ../rfb/dh.cpp
+    ../rfb/arddh.cpp
     AboutBox.cpp
     AccelKeys.cpp
     AuthDialog.cpp
@@ -108,6 +109,7 @@ target_link_libraries(${PROJECT_NAME}
     comdlg32
     crypt32
     cryptui
+    bcrypt
     gdi32
     gdiplus
     imm32

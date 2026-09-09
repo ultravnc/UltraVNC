@@ -254,6 +254,7 @@ private:
 	void AuthMsLogonI();
 	void AuthMsLogonII();
 	void AuthMsLogonIII();  // X25519 + AES-256-GCM (secure replacement for MS-Logon II)
+	void AuthAppleARD();    // Apple Remote Desktop / macOS Screen Sharing (type 30, DH + AES-128)
 	void AuthSecureVNCPlugin();
 	void AuthSecureVNCPlugin_old();
 	////////////////////////////////////////////////
