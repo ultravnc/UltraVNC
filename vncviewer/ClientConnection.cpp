@@ -6210,7 +6210,13 @@ inline void ClientConnection::ReadScreenUpdate()
 		// encoding-specific code uses them.  Pseudo-encodings (negative
 		// or > LASTENCODING) use the rectangle header for metadata and
 		// are handled separately above.
-		if (surh.encoding >= rfbEncodingRaw && surh.encoding <= LASTENCODING) {
+		// XZ and XZYW also use the rectangle header for metadata (compressed size
+		// and rectangle count), not coordinates, so exclude them from validation.
+		if (surh.encoding >= rfbEncodingRaw && surh.encoding <= LASTENCODING
+#ifdef _XZ
+			&& surh.encoding != rfbEncodingXZ && surh.encoding != rfbEncodingXZYW
+#endif
+			) {
 			if ((int)surh.r.x + (int)surh.r.w > (int)m_si.framebufferWidth ||
 				(int)surh.r.y + (int)surh.r.h > (int)m_si.framebufferHeight) {
 				vnclog.Print(0, _T("Invalid update rectangle %dx%d at (%d,%d), encoding %d, framebuffer %dx%d\n"),
