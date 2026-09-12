@@ -570,7 +570,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 
 				GlobalUnlock(hData);
 
-				if (!::SetClipboardData(ClipboardSettings::formatHTML, hData)) {
+				if (::SetClipboardData(ClipboardSettings::formatHTML, hData)) {
 					hData = NULL;
 					m_lengthHTML = length;
 				} else {
@@ -599,7 +599,7 @@ bool ClipboardData::Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extend
 
 				GlobalUnlock(hData);
 
-				if (!::SetClipboardData(ClipboardSettings::formatDIB, hData)) {
+				if (::SetClipboardData(ClipboardSettings::formatDIB, hData)) {
 					hData = NULL;
 					m_lengthDIB = length;
 				} else {
