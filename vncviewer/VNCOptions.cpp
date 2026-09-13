@@ -139,7 +139,7 @@ VNCOptions::VNCOptions()
 	m_GNOME = false;
 	m_Directx = false;
 	m_cmdDirectx = false;
-	m_fKeepAspect = false;
+	m_fKeepAspect = true;
 	autoDetect = false;
 	m_Use8Bit = rfbPFFullColors; //false;
 	m_ShowToolbar = true;
