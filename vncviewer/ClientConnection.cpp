@@ -381,6 +381,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_hwndcn = 0;
 	m_desktopName = NULL;
 	m_desktopName_viewonly = NULL;
+	m_serverName[0] = '\0';
 	m_port = -1;
 	m_proxyport = -1;
 	m_host[0] = '\0';
@@ -4007,6 +4008,7 @@ void ClientConnection::ReadServerInit(bool reconnect)
 	}
     { char _dn[2025]={0}; ReadString(_dn, m_si.nameLength); _dn[m_si.nameLength<2024?m_si.nameLength:2024]=0; MultiByteToWideChar(CP_UTF8,0,_dn,-1,m_desktopName,2024); }
 	m_desktopName[256] = '\0';
+	_tcscpy_s(m_serverName, m_desktopName);
 	_tcscat_s(m_desktopName, 2024, _T(" "));
 
 	_tcscpy_s(m_desktopName_viewonly, 2024, m_desktopName);
@@ -8329,7 +8331,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_SW:
 						{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat);
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat,
+							_this->m_serverName[0] ? _this->m_serverName : _this->m_host);
 						_tcscpy_s(_this->m_opts->m_document_folder,snapshot.getFolder());
 						_tcscpy_s(_this->m_opts->m_prefix, snapshot.getPrefix());
 						}
@@ -9332,7 +9335,8 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				case tbWM_PHOTO:
 					{
 						Snapshot snapshot;
-						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat);
+						snapshot.SaveJpeg(_this->m_membitmap,_this->m_opts->m_document_folder, _this->m_opts->m_prefix,  _this->m_opts->m_imageFormat,
+							_this->m_serverName[0] ? _this->m_serverName : _this->m_host);
 						_tcscpy_s(_this->m_opts->m_document_folder,snapshot.getFolder());
 						_tcscpy_s(_this->m_opts->m_prefix, snapshot.getPrefix());
 					}

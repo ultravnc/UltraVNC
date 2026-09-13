@@ -646,6 +646,7 @@ private:
 	
 	TCHAR *m_desktopName;
 	TCHAR *m_desktopName_viewonly;
+	TCHAR m_serverName[260];
 	unsigned char m_encPasswd[8];
 	unsigned char m_encPasswdMs[32];
 	char m_ms_user[256];  // act: add user storage for MS-Logon autoreconnect
