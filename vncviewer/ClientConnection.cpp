@@ -581,6 +581,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_statusThread=NULL;
 	m_SavedAreaBIB=NULL;
     m_bClosedByUser = false;
+	m_bReachedAuth = false;
     m_server_wants_keepalives = false;
 	hbmToolbig = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarbig.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
 	hbmToolsmall = (HBITMAP)LoadImage(m_hInstResDLL, _T("tlbarsmall.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
@@ -738,7 +739,45 @@ void ClientConnection::Run()
 		Save_Latest_Connection();
 	}
 
-	DoConnection(); // sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+	// sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
+	// Apply the auto-reconnect behaviour to the initial connection as well:
+	// keep retrying while the reconnect counter allows and the user has not
+	// cancelled in the status window.  Only pre-authentication failures are
+	// retried so a failed login can't hammer the server into blacklisting us.
+	reconnectcounter = m_reconnectcounter;
+	m_bReachedAuth = false;
+	while (true)
+	{
+		try {
+			DoConnection();
+			break;
+		}
+		catch (Exception &) {
+			if (m_Is_Listening || Pressed_Cancel || m_bReachedAuth ||
+				m_autoReconnect == 0 || reconnectcounter <= 0)
+				throw;
+			reconnectcounter--;
+			vnclog.Print(0, _T("Initial connection failed, retrying in %ds (%d attempt(s) left)\n"),
+				m_autoReconnect, reconnectcounter);
+			if (m_hwndStatus) {
+				wchar_t szText[256];
+				_snwprintf_s(szText, 256, _TRUNCATE,
+					L"Connection failed, retrying in %ds (%d attempt(s) left)",
+					m_autoReconnect, reconnectcounter);
+				SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
+				UpdateWindow(m_hwndStatus);
+			}
+			Sleep(m_autoReconnect * 1000);
+			if (Pressed_Cancel || forcedexit)
+				throw;
+			// The failed attempt may leave an unconnected socket behind
+			if (m_sock != INVALID_SOCKET) {
+				closesocket(m_sock);
+				m_sock = INVALID_SOCKET;
+			}
+			ResetEvent(KillEvent);
+		}
+	}
 
 	GTGBS_CreateDisplay();
 	GTGBS_CreateToolbar();
@@ -2889,6 +2928,9 @@ void ClientConnection::NegotiateProxy()
 
 void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 {
+	// The TCP connect and protocol negotiation succeeded; initial-connect
+	// retries stop here so a failed login can't hammer the server.
+	m_bReachedAuth = true;
 	if (current_auth.size() > 5) {
 		vnclog.Print(0, _T("Cannot layer more than two authentication schemes\n"));
 		throw ErrorException(L"Cannot layer more than two authentication schemes\n");

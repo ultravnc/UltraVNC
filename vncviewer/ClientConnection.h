@@ -601,6 +601,7 @@ private:
 	int m_reconnectcounter;
 
     bool m_bClosedByUser;
+	bool m_bReachedAuth;
 	// Modif sf@2002 - Data Stream Modification Plugin handling
 	int m_nTO;
 	CDSMPlugin *m_pDSMPlugin;
