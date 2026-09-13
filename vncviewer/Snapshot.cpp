@@ -79,7 +79,34 @@ std::string datetime()
     return std::string(s);
 }
 
-void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56], TCHAR imageFormat[56])
+static std::basic_string<TCHAR> ReplaceToken(const TCHAR *src, const TCHAR *token, const std::basic_string<TCHAR>& value)
+{
+	std::basic_string<TCHAR> out;
+	const size_t tokenLen = _tcslen(token);
+	for (const TCHAR *p = src; *p;) {
+		if (_tcsnicmp(p, token, tokenLen) == 0) {
+			out += value;
+			p += tokenLen;
+		}
+		else {
+			out += *p++;
+		}
+	}
+	return out;
+}
+
+static std::basic_string<TCHAR> SanitizeFileName(std::basic_string<TCHAR> name)
+{
+	for (auto& c : name) {
+		if (c < 32 || _tcschr(_T("\\/:*?\"<>|"), c) != NULL)
+			c = _T('_');
+	}
+	size_t start = name.find_first_not_of(_T(" "));
+	size_t end = name.find_last_not_of(_T(" ."));
+	return (start == std::basic_string<TCHAR>::npos) ? _T("") : name.substr(start, end - start + 1);
+}
+
+void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56], TCHAR imageFormat[56], const TCHAR *hostname)
 {
 	_tcscpy_s(m_folder,  folder);
 	_tcscpy_s(m_prefix,  prefix);
@@ -104,7 +131,10 @@ void Snapshot::SaveJpeg(HBITMAP membit,TCHAR folder[MAX_PATH], TCHAR prefix[56],
 	_tcscat_s(filename, _T("_"));
 	_tcscat_s(filename, buffer);
 	_tcscat_s(filename, imageFormat);
-	ExpandEnvironmentStrings(filename, expanded_filename, MAX_PATH);
+	// Replace %hostname% token with the connected server's name
+	std::basic_string<TCHAR> filenameExpanded =
+		ReplaceToken(filename, _T("%hostname%"), SanitizeFileName(hostname ? hostname : _T("")));
+	ExpandEnvironmentStrings(filenameExpanded.c_str(), expanded_filename, MAX_PATH);
 	using namespace Gdiplus;
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
