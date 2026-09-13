@@ -30,6 +30,115 @@ extern wchar_t sz_I1[64];
 extern wchar_t sz_I2[64];
 extern wchar_t sz_I3[64];
 
+// Match an address string against an AuthHosts-style pattern.  The pattern
+// is a prefix that must end on an octet boundary (same semantics as
+// winvnc's MatchStringToTemplate); an empty pattern matches everything.
+static BOOL MatchListenPattern(const char* addr, UINT addrlen,
+	const char* filtstr, UINT filtlen) {
+	if (filtlen == 0)
+		return 1;
+	if (addrlen < filtlen)
+		return 0;
+	for (UINT x = 0; x < filtlen; x++) {
+		if (addr[x] != filtstr[x])
+			return 0;
+	}
+	if ((addrlen > filtlen) && (addr[filtlen] != '.'))
+		return 0;
+	return 1;
+}
+
+// Check an incoming listen-mode peer against the AuthHosts filter string.
+// Format: [+-?]pattern[:[+-?]pattern...] — '+' accepts, '-' rejects, '?'
+// accepts (the normal incoming-connection prompt still applies during the
+// handshake).  Last matching pattern wins; an empty filter accepts all.
+static bool ListenHostAllowed(const TCHAR* filter, const char* hostname) {
+	if (filter == NULL || filter[0] == '\0' || hostname == NULL)
+		return true;
+
+	// The filter only uses ASCII; copy it narrow.
+	char filt[1280];
+	UINT i = 0;
+	for (; i < sizeof(filt) - 1 && filter[i] != '\0'; i++)
+		filt[i] = (char)(filter[i] & 0xFF);
+	filt[i] = '\0';
+	if (filt[0] == '\0')
+		return true;
+
+	enum vh_Mode { vh_ExpectIncludeExclude, vh_ExpectPattern, vh_ExpectDelimiter };
+	vh_Mode machineMode = vh_ExpectIncludeExclude;
+	bool accepted = true;
+	bool patternAccept = false;
+	UINT filtPos = 0;
+	UINT patternStart = 0;
+	UINT hostNameLen = (UINT)strlen(hostname);
+
+	while (1) {
+		switch (machineMode) {
+		case vh_ExpectIncludeExclude:
+			if (filt[filtPos] == '+') {
+				patternAccept = true;
+				patternStart = filtPos + 1;
+				machineMode = vh_ExpectPattern;
+			}
+			else if (filt[filtPos] == '-') {
+				patternAccept = false;
+				patternStart = filtPos + 1;
+				machineMode = vh_ExpectPattern;
+			}
+			else if (filt[filtPos] == '?') {
+				patternAccept = true;
+				patternStart = filtPos + 1;
+				machineMode = vh_ExpectPattern;
+			}
+			else if (filt[filtPos] != '\0') {
+				vnclog.Print(0, _T("Listen AuthHosts - malformed filter string\n"));
+				machineMode = vh_ExpectDelimiter;
+			}
+			break;
+
+		case vh_ExpectPattern:
+		case vh_ExpectDelimiter:
+			if ((filt[filtPos] == ':') || (filt[filtPos] == '\0')) {
+				if (machineMode == vh_ExpectPattern && patternStart != 0) {
+					if (MatchListenPattern(hostname, hostNameLen,
+						&filt[patternStart], filtPos - patternStart))
+						accepted = patternAccept;
+				}
+				machineMode = vh_ExpectIncludeExclude;
+			}
+			break;
+		}
+
+		if (filt[filtPos] == '\0')
+			break;
+		filtPos++;
+	}
+	return accepted;
+}
+
+// Format the peer address of an accepted listen socket and apply the
+// AuthHosts filter.  Returns true if the connection may proceed.
+static bool DaemonAcceptPeer(const struct sockaddr* addr) {
+	if (pApp->m_options.m_listenAuthHosts[0] == '\0')
+		return true;
+	char host[INET6_ADDRSTRLEN] = { 0 };
+	if (addr->sa_family == AF_INET) {
+		const struct sockaddr_in* a4 = (const struct sockaddr_in*)addr;
+		inet_ntop(AF_INET, &a4->sin_addr, host, sizeof(host));
+	}
+	else if (addr->sa_family == AF_INET6) {
+		const struct sockaddr_in6* a6 = (const struct sockaddr_in6*)addr;
+		inet_ntop(AF_INET6, &a6->sin6_addr, host, sizeof(host));
+	}
+	if (host[0] == '\0')
+		return true;
+	if (ListenHostAllowed(pApp->m_options.m_listenAuthHosts, host))
+		return true;
+	vnclog.Print(0, _T("Listen-mode connection from %S rejected by AuthHosts\n"), host);
+	return false;
+}
+
 Daemon::Daemon(int port, bool ipv6)
 {
 	this->ipv6 = ipv6;
@@ -252,7 +361,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 		switch(lParam) {
 		case FD_ACCEPT:
 		{
-			struct sockaddr_in incoming;
+			struct sockaddr_storage incoming;
 			int size_incoming = sizeof(incoming);
 			memset(&incoming, 0, sizeof(incoming));
 
@@ -262,7 +371,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			unsigned long nbarg = 0;
 			ioctlsocket(hNewSock, FIONBIO, &nbarg);
 			// Phil Money @ Advantig, LLC 7-9-2005
-			if (ListenMode){ 
+			if (ListenMode && DaemonAcceptPeer((struct sockaddr *)&incoming)){ 
 
 				pApp->NewConnection(true,hNewSock);
 
@@ -301,7 +410,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 		switch (lParam) {
 		case FD_ACCEPT:
 		{
-			struct sockaddr_in6 incoming;
+			struct sockaddr_storage incoming;
 			int size_incoming = sizeof(incoming);
 			memset(&incoming, 0, sizeof(incoming));
 
@@ -312,7 +421,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			unsigned long nbarg = 0;
 			ioctlsocket(hNewSock, FIONBIO, &nbarg);
 			// Phil Money @ Advantig, LLC 7-9-2005
-			if (ListenMode){
+			if (ListenMode && DaemonAcceptPeer((struct sockaddr *)&incoming)){
 
 				pApp->NewConnection(true, hNewSock);
 
@@ -352,7 +461,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 			switch(lParam) {
 			case FD_ACCEPT:
 				{
-					struct sockaddr_in incoming;
+					struct sockaddr_storage incoming;
 					int size_incoming = sizeof(incoming);
 					memset(&incoming, 0, sizeof(incoming));
 
@@ -363,7 +472,7 @@ LRESULT CALLBACK Daemon::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lPa
 					unsigned long nbarg = 0;
 					ioctlsocket(hNewSock, FIONBIO, &nbarg);
 					// Phil Money @ Advantig, LLC 7-9-2005
-					if (ListenMode){ 
+					if (ListenMode && DaemonAcceptPeer((struct sockaddr *)&incoming)){ 
 
 						pApp->NewConnection(true,hNewSock);
 

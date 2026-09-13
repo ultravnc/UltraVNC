@@ -51,6 +51,7 @@ public:
 	// process options
 	bool	m_listening;
 	int     m_listenPort;
+	TCHAR   m_listenAuthHosts[1280];
 	bool	m_connectionSpecified;
 	bool	m_configSpecified;
 	char   m_cmdlnUser[256]; // act: add user option on command line
