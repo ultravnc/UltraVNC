@@ -195,6 +195,7 @@ VNCOptions::VNCOptions()
 	m_configFilename[0] = '\0';
 	m_listening = false;
 	m_listenPort = INCOMING_PORT_OFFSET;
+	m_listenAuthHosts[0] = '\0';
 	m_restricted = false;
 	m_ipv6 = false;
 	m_AllowUntrustedServers = false;
@@ -407,6 +408,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	m_listening = s.m_listening;
 	m_listenPort = s.m_listenPort;
+	_tcscpy_s(m_listenAuthHosts, s.m_listenAuthHosts);
 	m_restricted = s.m_restricted;
 	m_ipv6 = s.m_ipv6;
 	m_AllowUntrustedServers = s.m_AllowUntrustedServers;
@@ -559,6 +561,15 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 				}
 				j++;
 			}
+		}
+		else if (SwitchMatch(args[j], _T("authhosts")))
+		{
+			if (++j == i)
+			{
+				ArgError(sz_D27);
+				continue;
+			}
+			_tcscpy_s(m_listenAuthHosts, _countof(m_listenAuthHosts), args[j]);
 		}
 		else if (SwitchMatch(args[j], _T("fttimeout"))) { //PGM @ Advantig
 			if (j + 1 < i && args[j + 1][0] >= '0' && args[j + 1][0] <= '9') {
@@ -1243,6 +1254,7 @@ void VNCOptions::SaveOptions(const wchar_t* fname)
 	saveInt(L"ExitCheck", m_fExitCheck, fname);
 	saveInt(L"FileTransferTimeout", m_FTTimeout, fname);
 	saveInt(L"ListenPort", m_listenPort, fname);
+	WritePrivateProfileStringW(L"options", L"AuthHosts", m_listenAuthHosts, fname);
 	saveInt(L"KeepAliveInterval", m_keepAliveInterval, fname);
 	saveInt(L"ThrottleMouse", m_throttleMouse, fname);
 #ifdef _Gii
@@ -1345,6 +1357,7 @@ void VNCOptions::LoadOptions(const wchar_t* fname)
 	m_fExitCheck = readInt(L"ExitCheck", m_fExitCheck, fname) != 0; //PGM @ Advantig
 	m_FTTimeout = readInt(L"FileTransferTimeout", m_FTTimeout, fname);
 	m_listenPort = readInt(L"ListenPort", m_listenPort, fname);
+	GetPrivateProfileStringW(L"options", L"AuthHosts", L"", m_listenAuthHosts, _countof(m_listenAuthHosts), fname);
 	if (m_FTTimeout > 600)
 		m_FTTimeout = 600; // cap at 1 minute
 
@@ -1396,6 +1409,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/requireencryption] [/enablecache] [/throttlemouse n] [/socketkeepalivetimeout n]\r\n" //adzm 2010-05-12
 			"      [/gnome] [/hideendofstreamerror]\r\n"
 			"      [/uploadlocal fullfilename /uploadremote path]\r\n"
+			"      [/authhosts \"+pattern:-pattern:?pattern\"]  (listen-mode IP filter)\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_A2, MB_ICONINFORMATION);
