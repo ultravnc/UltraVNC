@@ -23,8 +23,14 @@ DWORD LowLevelHook::g_VncProcessID=0;
 HHOOK LowLevelHook::g_HookID=0;
 BOOL  LowLevelHook::g_fCheckScrollLock=TRUE;
 BOOL  LowLevelHook::g_fScrollLock=FALSE;
+BOOL  LowLevelHook::g_fViewerFullScreen=FALSE;
 HANDLE LowLevelHook::g_hThread=NULL;
 DWORD LowLevelHook::g_nThreadID=0;
+
+void LowLevelHook::SetViewerFullScreen(BOOL fFullScreen)
+{
+	g_fViewerFullScreen = fFullScreen;
+}
 
 BOOL LowLevelHook::Initialize(HWND hwndMain)
 {
@@ -243,7 +249,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
                         case VK_LWIN:
-                                if (CheckScrollLock()) {
+                                if (CheckScrollLock() || g_fViewerFullScreen) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_LWINDOWN,0);
                                         else
@@ -252,7 +258,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
 						case VK_RWIN:
-                                if (CheckScrollLock()) {
+                                if (CheckScrollLock() || g_fViewerFullScreen) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_RWINDOWN,0);
                                         else
@@ -261,7 +267,7 @@ LRESULT CALLBACK LowLevelHook::VncLowLevelKbHookProc(INT nCode, WPARAM wParam, L
                                 }
                                 break;
 						case VK_APPS:
-                                if (CheckScrollLock()) {
+                                if (CheckScrollLock() || g_fViewerFullScreen) {
                                         if(fKeyDown)
                                                 PostMessage(g_hwndVNCViewer,WM_SYSCOMMAND,ID_VK_APPSDOWN,0);
                                         else
