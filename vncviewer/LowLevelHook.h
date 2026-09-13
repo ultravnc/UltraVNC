@@ -26,12 +26,17 @@ public:
 
 		static DWORD WINAPI HookThreadProc(LPVOID lpParam);
 
+		// When the viewer runs fullscreen, system keys such as the Win key
+		// are always sent to the remote side, regardless of Scroll Lock.
+		static void SetViewerFullScreen(BOOL fFullScreen);
+
 private:
 		// adzm 2009-09-25 - Different way to check the scroll lock state. Only query if we know it has changed.
         static BOOL GetCurrentScrollLockState();
 		static BOOL CheckScrollLock();
         static BOOL  g_fScrollLock;
         static BOOL  g_fCheckScrollLock;
+		static BOOL  g_fViewerFullScreen;
 
         static LRESULT CALLBACK VncLowLevelKbHookProc(INT nCode, WPARAM wParam, LPARAM lParam);
 
