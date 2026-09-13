@@ -2564,7 +2564,7 @@ void ClientConnection::NegotiateProtocolVersion()
 									L"- Another viewer using a DSMPlugin is already connected to the Server (more than one is forbidden)\r\n"
 									,1003
 									);
-		else if (!m_opts->m_fAutoAcceptNoDSM)
+		else if (!m_opts->m_fAutoAcceptNoDSM && !m_opts->m_HideEndOfStreamError)
 			throw WarningException(L"Connection failed - End of Stream\r\n\r\n"
 									L"Possible causes:\r\r"
 									L"- Another user is already listening on this ID\r\n"
