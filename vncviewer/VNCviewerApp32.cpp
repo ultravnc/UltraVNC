@@ -108,7 +108,16 @@ void VNCviewerApp32::NewConnection(bool Is_Listening,SOCKET sock) {
 		pcc->m_opts = &pcc->m_optsCopy;
 		pcc->m_Is_Listening=Is_Listening;
 		pcc->Run();
-	} catch (Exception &e) { 
+	} catch (WarningException &e) {
+		pcc->CloseWindows();
+		// A failed incoming listen-mode connection is usually a port scanner;
+		// log it instead of showing a popup for every attempt.
+		if (Is_Listening)
+			vnclog.Print(0, _T("Listen-mode connection failed: %s\n"), e.GetInfo());
+		else
+			e.Report();
+		delete pcc;
+	} catch (Exception &e) {
 		pcc->CloseWindows();
 		e.Report();	
 		delete pcc;
