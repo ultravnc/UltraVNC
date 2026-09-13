@@ -13,6 +13,18 @@
 #include "inifile.h"
 #pragma warning( disable : 4100 )
 
+// UltraVNC stores the VNC password as an 8-byte DES-encrypted blob.
+// The encrypted value may contain NUL bytes, so it must not be checked
+// with strlen() -- some valid passwords would be mistaken for empty.
+static bool IsEncryptedPasswordEmpty(const char encrypted[8])
+{
+    for (int i = 0; i < 8; ++i) {
+        if (encrypted[i] != 0)
+            return false;
+    }
+    return true;
+}
+
 IniFile::IniFile()
 {
 }
@@ -73,7 +85,7 @@ IniFile::ReadPasswordViewOnly(char *value,int valuesize) //PGM
 bool
 IniFile::WritePassword(char *value)
 {
-	if (strlen(value) == 0)
+	if (IsEncryptedPasswordEmpty(value))
 		return (FALSE != WritePrivateProfileStruct("UltraVNC", "passwd", NULL, 8, strIniFile));
 	return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd", value,8,strIniFile));
 }
@@ -81,7 +93,7 @@ IniFile::WritePassword(char *value)
 bool 
 IniFile::WritePasswordViewOnly(char*value)
 { 
-	if (strlen(value) == 0)
+	if (IsEncryptedPasswordEmpty(value))
 		return (FALSE != WritePrivateProfileStruct("UltraVNC", "passwd2", NULL, 8, strIniFile));
 	return (FALSE != WritePrivateProfileStruct("UltraVNC","passwd2", value,8,strIniFile));
 } 
