@@ -567,6 +567,7 @@ BEGIN
     EDITTEXT        IDC_FOLDER,51,7,201,14,ES_AUTOHSCROLL
     PUSHBUTTON      "Browse",IDC_BROWSE,259,7,50,14
     EDITTEXT        IDC_PREFIX,51,26,40,14,ES_AUTOHSCROLL
+    LTEXT           "%hostname% = server name",IDC_STATIC,95,29,105,8
     DEFPUSHBUTTON   "OK",IDOK,205,38,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,259,38,50,14
     LTEXT           "Folder",IDC_STATIC,13,9,24,9
@@ -663,7 +664,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,124,262,10
     LTEXT           "Folder:",IDC_STATIC,4,18,25,9
     LTEXT           "Prefix:",IDC_STATIC,4,36,25,8
-    LTEXT           "Snapshot folder and prefix",IDC_STATIC,4,4,262,8
+    LTEXT           "Snapshot folder and prefix (%hostname% = server name)",IDC_STATIC,4,4,262,8
     LTEXT           "Reconnection attempts",IDC_STATIC,4,62,89,8
     LTEXT           "Timeout",IDC_STATIC,130,62,34,8
     LTEXT           "File Transfer timeout",IDC_STATIC,4,82,87,8
