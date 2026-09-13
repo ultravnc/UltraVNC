@@ -4723,7 +4723,7 @@ void ClientConnection::Createdib()
 			vnclog.Print(0, _T("Cache: Cache buffer bitmap creation\n"));
 		}
 	}
-	if (m_opts->m_Directx && !m_opts->m_showExtend && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
+	if (m_opts->m_Directx && !m_opts->m_showExtend && !m_opts->m_fKeepAspect && (m_myFormat.bitsPerPixel==32 || m_myFormat.bitsPerPixel==16))
 	if (!FAILED(directx_output->InitD3D(m_hwndcn,m_hwndMain, m_si.framebufferWidth, m_si.framebufferHeight, false,m_myFormat.bitsPerPixel,m_myFormat.redShift)))
 			{
 				if (directx_output->m_directxformat.bitsPerPixel ==m_myFormat.bitsPerPixel)
@@ -5203,9 +5203,43 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 
 		if (m_opts->m_Directx)
 		{
-			x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
-			if(m_opts->m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
-			else y_scaled =(y) * m_si.framebufferHeight / m_cliheight ;
+			int areaW = m_cliwidth;
+			int areaH = m_opts->m_ShowToolbar ? m_cliheight - m_TBr.bottom : m_cliheight;
+			if (m_opts->m_fKeepAspect)
+			{
+				RECT cnrect;
+				GetClientRect(m_hwndcn, &cnrect);
+				areaW = cnrect.right - cnrect.left;
+				areaH = cnrect.bottom - cnrect.top;
+			}
+			if (m_opts->m_fKeepAspect && areaW > 0 && areaH > 0)
+			{
+				// Image is centred and letterboxed - undo offset and scale
+				float ratio = min((float)areaW / (float)m_si.framebufferWidth,
+					(float)areaH / (float)m_si.framebufferHeight);
+				int imgW = (int)(m_si.framebufferWidth * ratio);
+				int imgH = (int)(m_si.framebufferHeight * ratio);
+				if (imgW > 0 && imgH > 0)
+				{
+					x_scaled = (x - (areaW - imgW) / 2) * m_si.framebufferWidth / imgW;
+					y_scaled = (y - (areaH - imgH) / 2) * m_si.framebufferHeight / imgH;
+					if (x_scaled < 0) x_scaled = 0;
+					if (y_scaled < 0) y_scaled = 0;
+					if (x_scaled > (int)m_si.framebufferWidth - 1) x_scaled = m_si.framebufferWidth - 1;
+					if (y_scaled > (int)m_si.framebufferHeight - 1) y_scaled = m_si.framebufferHeight - 1;
+				}
+				else
+				{
+					x_scaled = 0;
+					y_scaled = 0;
+				}
+			}
+			else
+			{
+				x_scaled = (x ) *  m_si.framebufferWidth /m_cliwidth ;
+				if(m_opts->m_ShowToolbar) y_scaled =(y) * m_si.framebufferHeight / (m_cliheight-m_TBr.bottom) ;
+				else y_scaled =(y) * m_si.framebufferHeight / m_cliheight ;
+			}
 		}
 
 		SendPointerEvent(x_scaled, y_scaled, mask);
@@ -5508,15 +5542,17 @@ inline void ClientConnection::DoBlit()
 			{
 
 				RECT myclrect;
-				GetClientRect(m_hwndMain, &myclrect);
+				GetClientRect(m_opts->m_fKeepAspect ? m_hwndcn : m_hwndMain, &myclrect);
 				int w = myclrect.right - myclrect.left;
 				int h = myclrect.bottom - myclrect.top;
 
-				if (m_opts->m_ShowToolbar) h = h - m_TBr.bottom;
+				if (m_opts->m_ShowToolbar && !m_opts->m_fKeepAspect) h = h - m_TBr.bottom;
 
 				float horizontalRatio = (float)w / (float)m_si.framebufferWidth;
 				float verticalRatio = (float)h / (float)m_si.framebufferHeight;
 
+				if (m_opts->m_fKeepAspect)
+					horizontalRatio = verticalRatio = min(horizontalRatio, verticalRatio);
 
 				SetStretchBltMode(hdc, HALFTONE);
 				SetBrushOrgEx(hdc, 0, 0, NULL);
@@ -5524,18 +5560,62 @@ inline void ClientConnection::DoBlit()
 					if (m_hmemdc)
 					{
 						ObjectSelector bb(m_hmemdc, m_membitmap);
-						StretchBlt(
-							hdc,
-							ps.rcPaint.left,
-							ps.rcPaint.top,
-							ps.rcPaint.right - ps.rcPaint.left,
-							ps.rcPaint.bottom - ps.rcPaint.top,
-							m_hmemdc,
-							(int)((ps.rcPaint.left + m_hScrollPos)     / horizontalRatio),
-							(int)((ps.rcPaint.top + m_vScrollPos)      / verticalRatio),
-							(int)((ps.rcPaint.right - ps.rcPaint.left) / horizontalRatio),
-							(int)((ps.rcPaint.bottom - ps.rcPaint.top) / verticalRatio),
-							SRCCOPY);
+						if (m_opts->m_fKeepAspect)
+						{
+							// Letterbox: centre the image keeping its aspect
+							// ratio and fill the remaining area black.
+							int imgW = (int)(m_si.framebufferWidth * horizontalRatio);
+							int imgH = (int)(m_si.framebufferHeight * verticalRatio);
+							int offX = (w - imgW) / 2;
+							int offY = (h - imgH) / 2;
+							RECT img = { offX, offY, offX + imgW, offY + imgH };
+							RECT draw;
+							if (offX > 0 || offY > 0)
+							{
+								// Fill only the letterbox margins; the update
+								// region clips this to what actually needs it.
+								HBRUSH br = CreateSolidBrush(RGB(0, 0, 0));
+								RECT r = { 0, 0, w, offY };
+								FillRect(hdc, &r, br);
+								SetRect(&r, 0, offY + imgH, w, h);
+								FillRect(hdc, &r, br);
+								SetRect(&r, 0, offY, offX, offY + imgH);
+								FillRect(hdc, &r, br);
+								SetRect(&r, offX + imgW, offY, w, offY + imgH);
+								FillRect(hdc, &r, br);
+								DeleteObject(br);
+							}
+							if (imgW > 0 && imgH > 0 && IntersectRect(&draw, &ps.rcPaint, &img))
+							{
+								StretchBlt(
+									hdc,
+									draw.left,
+									draw.top,
+									draw.right - draw.left,
+									draw.bottom - draw.top,
+									m_hmemdc,
+									(int)((draw.left - offX) / horizontalRatio),
+									(int)((draw.top - offY) / verticalRatio),
+									(int)((draw.right - draw.left) / horizontalRatio),
+									(int)((draw.bottom - draw.top) / verticalRatio),
+									SRCCOPY);
+							}
+						}
+						else
+						{
+							StretchBlt(
+								hdc,
+								ps.rcPaint.left,
+								ps.rcPaint.top,
+								ps.rcPaint.right - ps.rcPaint.left,
+								ps.rcPaint.bottom - ps.rcPaint.top,
+								m_hmemdc,
+								(int)((ps.rcPaint.left + m_hScrollPos)     / horizontalRatio),
+								(int)((ps.rcPaint.top + m_vScrollPos)      / verticalRatio),
+								(int)((ps.rcPaint.right - ps.rcPaint.left) / horizontalRatio),
+								(int)((ps.rcPaint.bottom - ps.rcPaint.top) / verticalRatio),
+								SRCCOPY);
+						}
 					}
 				}
 			}

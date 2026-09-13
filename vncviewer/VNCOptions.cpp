@@ -139,6 +139,7 @@ VNCOptions::VNCOptions()
 	m_GNOME = false;
 	m_Directx = false;
 	m_cmdDirectx = false;
+	m_fKeepAspect = false;
 	autoDetect = false;
 	m_Use8Bit = rfbPFFullColors; //false;
 	m_ShowToolbar = true;
@@ -335,6 +336,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 	m_GNOME = s.m_GNOME;
 	m_Directx = s.m_Directx;
 	m_cmdDirectx = s.m_cmdDirectx;
+	m_fKeepAspect = s.m_fKeepAspect;
 	autoDetect = s.autoDetect;
 	m_Use8Bit = s.m_Use8Bit;
 	m_PreferredEncodings = s.m_PreferredEncodings;
@@ -649,6 +651,9 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		else if (SwitchMatch(args[j], _T("directx"))) {
 			m_Directx = true;
 			m_cmdDirectx = true;
+		}
+		else if (SwitchMatch(args[j], _T("keepaspect"))) {
+			m_fKeepAspect = true;
 		}
 		else if (SwitchMatch(args[j], _T("noauto"))) {
 			autoDetect = false;
@@ -1197,6 +1202,7 @@ void VNCOptions::SaveOptions(const wchar_t* fname)
 	saveInt(L"SaveSize", m_SaveSize, fname);
 	saveInt(L"GNOME", m_GNOME, fname);
 	saveInt(L"directx", m_Directx, fname);
+	saveInt(L"KeepAspect", m_fKeepAspect, fname);
 	saveInt(L"autoDetect", autoDetect, fname);
 	saveInt(L"8bit", m_Use8Bit, fname);
 	saveInt(L"shared", m_Shared, fname);
@@ -1292,6 +1298,7 @@ void VNCOptions::LoadOptions(const wchar_t* fname)
 	m_SaveSize = readInt(L"SaveSize", m_SaveSize, fname) != 0;
 	m_GNOME = readInt(L"GNOME", m_GNOME, fname) != 0;
 	m_Directx = readInt(L"directx", m_Directx, fname) != 0;
+	m_fKeepAspect = readInt(L"KeepAspect", m_fKeepAspect, fname) != 0;
 	autoDetect = readInt(L"autoDetect", autoDetect, fname) != 0;
 	m_Use8Bit = readInt(L"8bit", m_Use8Bit, fname);
 	m_Shared = readInt(L"shared", m_Shared, fname) != 0;
@@ -1410,6 +1417,7 @@ void VNCOptions::ShowUsage(LPTSTR info) {
 			"      [/gnome] [/hideendofstreamerror]\r\n"
 			"      [/uploadlocal fullfilename /uploadremote path]\r\n"
 			"      [/authhosts \"+pattern:-pattern:?pattern\"]  (listen-mode IP filter)\r\n"
+			"      [/keepaspect]  (preserve aspect ratio in scale-to-window mode)\r\n"
 			"For full details see documentation."),
 		tmpinf);
 	yesUVNCMessageBox(m_hInstResDLL, NULL, msg, sz_A2, MB_ICONINFORMATION);
