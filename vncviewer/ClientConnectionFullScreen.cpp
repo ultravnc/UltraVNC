@@ -18,6 +18,7 @@
 #include "ClientConnection.h"
 #include "FullScreenTitleBar.h" //Added by: Lars Werner (http://lars.werner.no)
 #include "display.h"
+#include "LowLevelHook.h"
 
 // Parameters for scrolling in full screen mode
 #define BUMPSCROLLBORDER 8
@@ -96,6 +97,7 @@ void ClientConnection::SetFullScreenMode(bool enable)
 void ClientConnection::RealiseFullScreenMode()
 {
 	if (m_opts->m_NoBorder) {
+		LowLevelHook::SetViewerFullScreen(FALSE);
 		BorderlessMode();
 		return;
 	}
@@ -103,6 +105,9 @@ void ClientConnection::RealiseFullScreenMode()
 		m_FullScreen = m_opts->m_FullScreen;
 		m_fScalingDone = false;
 	}
+	// In fullscreen the Win/menu keys are sent to the remote side even
+	// without Scroll Lock enabled.
+	LowLevelHook::SetViewerFullScreen(m_opts->m_FullScreen);
 	HMONITOR hMonitor = ::MonitorFromWindow(m_hwndMain, MONITOR_DEFAULTTONEAREST);
 
 	LONG style = GetWindowLong(m_hwndMain, GWL_STYLE);
