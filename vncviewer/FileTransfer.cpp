@@ -3433,7 +3433,7 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 		}
 		else
 		{
-			OutputDebugStringW(L"  Rename SUCCESS\n");
+			OutputDebugStringW(L"  Rename/Merge SUCCESS\n");
 		}
 #endif
 		}
@@ -5189,10 +5189,15 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					const WCHAR* szSelW = pNameW->c_str();
 					{WCHAR dbg[256]; _snwprintf_s(dbg,256,_TRUNCATE,L"IDC_UPLOAD_B: selected item %d=[%s]\n",nSelected,szSelW); OutputDebugStringW(dbg);}
 
-					if (_wcsicmp(szSelW, szUpDirMaskW) != 0)
+					// Display text is "[ name ]" for folders (lParam holds the raw name)
+					WCHAR szDispW[MAX_PATH + 8] = { 0 };
+					{ LVITEMW _di; memset(&_di,0,sizeof(_di)); _di.mask=LVIF_TEXT; _di.iItem=nSelected;
+					  _di.pszText=szDispW; _di.cchTextMax=MAX_PATH+8;
+					  SendMessageW(hWndLocalList, LVM_GETITEMTEXTW, nSelected, (LPARAM)&_di); }
+					if (_wcsicmp(szDispW, szUpDirMaskW) != 0)
 					{
-						bool fDirectory = (szSelW[0] == szPrefixW[0] && szSelW[1] == szPrefixW[1]);
-						if (_this->FileOrFolderExists(hWndRemoteList, std::wstring(szSelW)))
+						bool fDirectory = (szDispW[0] == szPrefixW[0] && szDispW[1] == szPrefixW[1]);
+						if (_this->FileOrFolderExists(hWndRemoteList, std::wstring(szDispW)))
 						{
 							if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 							{
@@ -5309,10 +5314,15 @@ BOOL CALLBACK FileTransfer::FileTransferDlgProc(  HWND hWnd,  UINT uMsg,  WPARAM
 					if (!pNameW) continue;
 					const WCHAR* szSelW = pNameW->c_str();
 
-					if (_wcsicmp(szSelW, szUpDirMaskW) != 0)
+					// Display text is "[ name ]" for folders (lParam holds the raw name)
+					WCHAR szDispW[MAX_PATH + 8] = { 0 };
+					{ LVITEMW _di; memset(&_di,0,sizeof(_di)); _di.mask=LVIF_TEXT; _di.iItem=nSelected;
+					  _di.pszText=szDispW; _di.cchTextMax=MAX_PATH+8;
+					  SendMessageW(hWndRemoteList, LVM_GETITEMTEXTW, nSelected, (LPARAM)&_di); }
+					if (_wcsicmp(szDispW, szUpDirMaskW) != 0)
 					{
-						bool fDirectory = (szSelW[0] == szPrefixW[0] && szSelW[1] == szPrefixW[1]);
-						if (_this->FileOrFolderExists(hWndLocalList, std::wstring(szSelW)))
+						bool fDirectory = (szDispW[0] == szPrefixW[0] && szDispW[1] == szPrefixW[1]);
+						if (_this->FileOrFolderExists(hWndLocalList, std::wstring(szDispW)))
 						{
 							if (_this->m_nConfirmAnswer == CONFIRM_YES || _this->m_nConfirmAnswer == CONFIRM_NO)
 							{
