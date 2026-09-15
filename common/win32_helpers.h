@@ -46,6 +46,12 @@ bool yesUVNCMessageBox(HINSTANCE hInst, HWND m_hWnd, wchar_t* body, wchar_t* szH
 
 void close_handle(HANDLE& h);
 
+// Moves all contents of srcDir into dstDir, overwriting same-named files
+// and merging subdirectories recursively. dstDir is created if needed.
+// On full success srcDir is removed. Returns false if anything failed
+// (unmoved items remain in srcDir).
+bool MoveDirContentsInto(LPCWSTR srcDir, LPCWSTR dstDir);
+
     class DynamicFnBase {
     public:
       DynamicFnBase(const TCHAR* dllName, const char* fnName);
