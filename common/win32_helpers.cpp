@@ -77,6 +77,95 @@ void close_handle(HANDLE& h)
     }
 }
 
+// Add the \\?\ (or \\?\UNC\) prefix so paths longer than MAX_PATH work.
+static void PrefixLongPathW(LPCWSTR in, WCHAR* out, int outLen)
+{
+    if (in[0] == L'\\' && in[1] == L'\\' && in[2] == L'?' && in[3] == L'\\')
+        wcscpy_s(out, outLen, in); // already prefixed
+    else if (in[0] == L'\\' && in[1] == L'\\')
+        _snwprintf_s(out, outLen, _TRUNCATE, L"\\\\?\\UNC\\%s", in + 2);
+    else if (in[0] && in[1] == L':')
+        _snwprintf_s(out, outLen, _TRUNCATE, L"\\\\?\\%s", in);
+    else
+        wcscpy_s(out, outLen, in);
+}
+
+// Recursive worker on already-prefixed paths.
+static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
+{
+    DWORD dstAttr = GetFileAttributesW(dstDirL);
+    if (dstAttr == INVALID_FILE_ATTRIBUTES)
+    {
+        if (!CreateDirectoryW(dstDirL, NULL))
+            return false;
+    }
+    else if (!(dstAttr & FILE_ATTRIBUTE_DIRECTORY))
+        return false; // can't merge a directory into a file
+
+    WCHAR pattern[MAX_PATH * 4];
+    _snwprintf_s(pattern, _countof(pattern), _TRUNCATE, L"%s\\*", srcDirL);
+    WIN32_FIND_DATAW fd;
+    HANDLE hFind = FindFirstFileW(pattern, &fd);
+    if (hFind == INVALID_HANDLE_VALUE)
+        return false;
+
+    bool ok = true;
+    do {
+        if (!wcscmp(fd.cFileName, L".") || !wcscmp(fd.cFileName, L".."))
+            continue;
+
+        WCHAR srcChild[MAX_PATH * 4], dstChild[MAX_PATH * 4];
+        _snwprintf_s(srcChild, _countof(srcChild), _TRUNCATE, L"%s\\%s", srcDirL, fd.cFileName);
+        _snwprintf_s(dstChild, _countof(dstChild), _TRUNCATE, L"%s\\%s", dstDirL, fd.cFileName);
+
+        DWORD a = GetFileAttributesW(dstChild);
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+            if (a == INVALID_FILE_ATTRIBUTES)
+            {
+                // No conflict: move the whole subtree in one shot
+                if (!MoveFileExW(srcChild, dstChild, MOVEFILE_COPY_ALLOWED))
+                    ok = false;
+            }
+            else if (a & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                if (!MoveDirContentsIntoImpl(srcChild, dstChild))
+                    ok = false;
+            }
+            else
+                ok = false; // file/dir name conflict
+        }
+        else
+        {
+            if (a != INVALID_FILE_ATTRIBUTES)
+            {
+                if (a & FILE_ATTRIBUTE_DIRECTORY)
+                {
+                    ok = false; // dir/file name conflict
+                    continue;
+                }
+                if (a & FILE_ATTRIBUTE_READONLY)
+                    SetFileAttributesW(dstChild, a & ~FILE_ATTRIBUTE_READONLY);
+            }
+            if (!MoveFileExW(srcChild, dstChild, MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED))
+                ok = false;
+        }
+    } while (FindNextFileW(hFind, &fd));
+    FindClose(hFind);
+
+    if (ok)
+        RemoveDirectoryW(srcDirL);
+    return ok;
+}
+
+bool MoveDirContentsInto(LPCWSTR srcDir, LPCWSTR dstDir)
+{
+    WCHAR srcL[MAX_PATH * 4], dstL[MAX_PATH * 4];
+    PrefixLongPathW(srcDir, srcL, _countof(srcL));
+    PrefixLongPathW(dstDir, dstL, _countof(dstL));
+    return MoveDirContentsIntoImpl(srcL, dstL);
+}
+
 DynamicFnBase::DynamicFnBase(const TCHAR* dllName, const char* fnName) : fnPtr(0), dllHandle(0) {
   dllHandle = LoadLibrary(dllName);
   if (!dllHandle) {
