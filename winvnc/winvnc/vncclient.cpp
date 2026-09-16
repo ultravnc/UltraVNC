@@ -1697,6 +1697,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 	}
 
 	BOOL auth_ok = FALSE;
+	BOOL plugin_auth_ok = FALSE;
 
 	const char* plainPassword = plain;
 	const char* plainPasswordViewOnly = plainViewOnly;
@@ -1751,10 +1752,12 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 		if (!m_socket->GetIntegratedPlugin()->HandleResponse(pResponseData, (int)wResponseLength, nSequenceNumber, bSendChallenge)) {
 			auth_message = m_socket->GetIntegratedPlugin()->GetLastErrorString();
 			auth_ok = FALSE;
+			plugin_auth_ok = FALSE;
 			bSendChallenge = false;
 		}
 		else if (!bSendChallenge) {
 			auth_ok = TRUE;
+			plugin_auth_ok = TRUE;
 		}
 
 		delete[] pResponseData;
@@ -1779,7 +1782,7 @@ BOOL vncClientThread::AuthSecureVNCPlugin(std::string& auth_message)
 				if (plainLen == 0 || wResponseLength < plainLen || sodium_memcmp(plain, pResponseData, plainLen) != 0) 
 						auth_ok = false;
 				size_t voLen = strlen(plainViewOnly);
-				if (auth_ok == false && voLen > 0 && wResponseLength >= voLen && sodium_memcmp(plainViewOnly, pResponseData, voLen) == 0) {
+				if (plugin_auth_ok && auth_ok == false && voLen > 0 && wResponseLength >= voLen && sodium_memcmp(plainViewOnly, pResponseData, voLen) == 0) {
 					m_client->EnableKeyboard(false); //PGM
 					m_client->EnablePointer(false); //PGM
 					m_client->EnableGii(false);
