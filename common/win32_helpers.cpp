@@ -11,6 +11,7 @@
 
 #include <winsock2.h>
 #include <windows.h>
+#include <stdio.h>
 #include "win32_helpers.h"
 #ifdef _VIEWER
 #include "../vncviewer/res/resource.h"
@@ -90,6 +91,15 @@ static void PrefixLongPathW(LPCWSTR in, WCHAR* out, int outLen)
         wcscpy_s(out, outLen, in);
 }
 
+// Helper to log a merge failure with the failing path and error.
+static void MoveDirLog(LPCWSTR msg, LPCWSTR path)
+{
+    DWORD dwErr = GetLastError();
+    WCHAR buf[MAX_PATH * 4 + 128];
+    _snwprintf_s(buf, _countof(buf), _TRUNCATE, L"[MoveDirContentsInto] %s: %s (err=%lu)\n", msg, path, dwErr);
+    OutputDebugStringW(buf);
+}
+
 // Recursive worker on already-prefixed paths.
 static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
 {
@@ -97,17 +107,26 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
     if (dstAttr == INVALID_FILE_ATTRIBUTES)
     {
         if (!CreateDirectoryW(dstDirL, NULL))
+        {
+            MoveDirLog(L"CreateDirectoryW failed", dstDirL);
             return false;
+        }
     }
     else if (!(dstAttr & FILE_ATTRIBUTE_DIRECTORY))
+    {
+        MoveDirLog(L"destination is not a directory", dstDirL);
         return false; // can't merge a directory into a file
+    }
 
     WCHAR pattern[MAX_PATH * 4];
     _snwprintf_s(pattern, _countof(pattern), _TRUNCATE, L"%s\\*", srcDirL);
     WIN32_FIND_DATAW fd;
     HANDLE hFind = FindFirstFileW(pattern, &fd);
     if (hFind == INVALID_HANDLE_VALUE)
+    {
+        MoveDirLog(L"FindFirstFileW failed", srcDirL);
         return false;
+    }
 
     bool ok = true;
     do {
@@ -121,19 +140,24 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
         DWORD a = GetFileAttributesW(dstChild);
         if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
-            if (a == INVALID_FILE_ATTRIBUTES)
+            if (a != INVALID_FILE_ATTRIBUTES && !(a & FILE_ATTRIBUTE_DIRECTORY))
             {
-                // No conflict: move the whole subtree in one shot
-                if (!MoveFileExW(srcChild, dstChild, MOVEFILE_COPY_ALLOWED))
-                    ok = false;
-            }
-            else if (a & FILE_ATTRIBUTE_DIRECTORY)
-            {
-                if (!MoveDirContentsIntoImpl(srcChild, dstChild))
-                    ok = false;
-            }
-            else
+                MoveDirLog(L"source dir conflicts with destination file", dstChild);
                 ok = false; // file/dir name conflict
+                continue;
+            }
+            // Always create/ensure the target dir then merge recursively.
+            // This is slower than a whole-subtree rename, but it works across
+            // volumes and with long paths, and the source subdir is removed
+            // by the recursive call once it is empty.
+            if (a == INVALID_FILE_ATTRIBUTES && !CreateDirectoryW(dstChild, NULL))
+            {
+                MoveDirLog(L"CreateDirectoryW failed for subdir", dstChild);
+                ok = false;
+                continue;
+            }
+            if (!MoveDirContentsIntoImpl(srcChild, dstChild))
+                ok = false;
         }
         else
         {
@@ -141,6 +165,7 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
             {
                 if (a & FILE_ATTRIBUTE_DIRECTORY)
                 {
+                    MoveDirLog(L"source file conflicts with destination dir", dstChild);
                     ok = false; // dir/file name conflict
                     continue;
                 }
@@ -148,13 +173,22 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
                     SetFileAttributesW(dstChild, a & ~FILE_ATTRIBUTE_READONLY);
             }
             if (!MoveFileExW(srcChild, dstChild, MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED))
+            {
+                MoveDirLog(L"MoveFileExW failed", srcChild);
                 ok = false;
+            }
         }
     } while (FindNextFileW(hFind, &fd));
     FindClose(hFind);
 
     if (ok)
-        RemoveDirectoryW(srcDirL);
+    {
+        if (!RemoveDirectoryW(srcDirL))
+        {
+            MoveDirLog(L"RemoveDirectoryW failed on source", srcDirL);
+            ok = false;
+        }
+    }
     return ok;
 }
 
@@ -163,6 +197,11 @@ bool MoveDirContentsInto(LPCWSTR srcDir, LPCWSTR dstDir)
     WCHAR srcL[MAX_PATH * 4], dstL[MAX_PATH * 4];
     PrefixLongPathW(srcDir, srcL, _countof(srcL));
     PrefixLongPathW(dstDir, dstL, _countof(dstL));
+
+    WCHAR info[MAX_PATH * 4 + 64];
+    _snwprintf_s(info, _countof(info), _TRUNCATE, L"[MoveDirContentsInto] %s -> %s\n", srcL, dstL);
+    OutputDebugStringW(info);
+
     return MoveDirContentsIntoImpl(srcL, dstL);
 }
 

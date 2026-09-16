@@ -7175,6 +7175,15 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 				}
 				
 				BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+				if (!bMoved)
+				{
+					// Destination folder already exists: merge extracted content into it
+					DWORD dwDstAttr = GetFileAttributesW(szFinalPathW);
+					if (dwDstAttr != INVALID_FILE_ATTRIBUTES && (dwDstAttr & FILE_ATTRIBUTE_DIRECTORY))
+						bMoved = helper::MoveDirContentsInto(szExtractPathW, szFinalPathW) ? TRUE : FALSE;
+					if (!bMoved)
+						m_fFileDownloadError = true;
+				}
 			}
 		}
 		else
