@@ -7,9 +7,11 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <string>
+#include <vector>
 #include <thread>
 #include <atomic>
 #include <functional>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 
@@ -23,22 +25,40 @@ constexpr uint16_t CLOUD_MATCHMAKER_PORT = 5352;
 constexpr const char* CLOUD_MATCHMAKER_HOST = "support1.uvnc.com";
 constexpr uint16_t CLOUD_LOCAL_TCP_PORT = 5901;  // VNC viewer connects here
 
+// Connection / announcement types used in CloudPacket::contype.
+// Values 0-5 are the original protocol. Public-code fast-connect variants
+// were added so the matchmaker can distinguish tokenless sessions.
+enum CloudConnType {
+    CloudConn_Announce         = 0, // token-protected server/viewer announcement (ack uses same value)
+    CloudConn_Match_WAN        = 1,
+    CloudConn_Match_LAN        = 2,
+    CloudConn_Probe            = 3,
+    CloudConn_Probe_Online     = 4,
+    CloudConn_Probe_Offline    = 5,
+    CloudConn_AnnouncePublic   = 6, // code-only (tokenless) server/viewer announcement
+    CloudConn_ProbePublic      = 7, // code-only probe request
+    CloudConn_ListServersReq   = 8, // request list of online servers in the same group
+    CloudConn_ListServersEntry = 9, // one server from the list
+    CloudConn_ListServersEnd   = 11 // end of list marker
+};
+
 #pragma pack(push, 1)
 struct CloudPacket {
     char name[32];
-    char group[32];       // token (from portal) used as HMAC key derivation input
+    char group[32];       // token (from portal) used as HMAC key derivation input; "uvnc" when empty
     char ident[8];
     char localip[32];
     char externip[32];
     int32_t localport;
     int32_t externport;
-    int32_t contype;
+    int32_t contype;      // CloudConnType
     bool serverviewer;
     uint8_t _pad0;
     uint8_t _pad1;
     uint8_t _pad2;
     uint32_t timestamp;   // unix time (UTC) when packet was created
     uint8_t hmac[32];     // HMAC-SHA256 over packet body (hmac field zeroed)
+    char alias[32];       // human-readable server name/alias (display only)
 
     CloudPacket() { memset(this, 0, sizeof(*this)); }
 
@@ -47,6 +67,13 @@ struct CloudPacket {
     }
 };
 #pragma pack(pop)
+
+struct CloudServerEntry {
+    std::string code;
+    std::string alias;
+};
+
+using CloudServerList = std::vector<CloudServerEntry>;
 
 // Sign a CloudPacket using HMAC-SHA256 (token as group key derivation input).
 // Token goes into group[]; timestamp is set to now; hmac computed over full packet.
@@ -92,18 +119,22 @@ inline bool SignCloudPacket(CloudPacket& pkt, const std::string& token) {
     memset(tmp->hmac, 0, sizeof(tmp->hmac));
 
     // HMAC-SHA256(groupKey, buf) -> pkt.hmac
+    // Hash only the fields before the hmac (and before any trailing display-only
+    // fields such as alias), so adding new trailing fields does not break HMAC
+    // compatibility with older clients.
     {
         BCRYPT_ALG_HANDLE hAlg = nullptr;
         BCRYPT_HASH_HANDLE hHash = nullptr;
         DWORD hashObjSize = 0, cbData = 0;
         uint8_t* hashObj = nullptr;
         bool ok = false;
+        size_t signLen = offsetof(CloudPacket, hmac);
         if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, nullptr, BCRYPT_ALG_HANDLE_HMAC_FLAG) == 0 &&
             BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH, (PBYTE)&hashObjSize, sizeof(DWORD), &cbData, 0) == 0) {
             hashObj = new uint8_t[hashObjSize];
             if (BCryptCreateHash(hAlg, &hHash, hashObj, hashObjSize,
                                  groupKey, 32, 0) == 0 &&
-                BCryptHashData(hHash, buf, sizeof(CloudPacket), 0) == 0 &&
+                BCryptHashData(hHash, buf, (ULONG)signLen, 0) == 0 &&
                 BCryptFinishHash(hHash, pkt.hmac, 32, 0) == 0) ok = true;
         }
         if (hHash) BCryptDestroyHash(hHash);
@@ -144,6 +175,13 @@ public:
                       const std::string& matchmakerHost = CLOUD_MATCHMAKER_HOST,
                       int timeoutMs = 3000,
                       const std::string& token = "");
+
+    // Query the matchmaker for all online servers that share the same token/group.
+    // Each returned entry contains the numeric code and the server's human-readable alias.
+    static bool QueryOnlineServers(const std::string& token,
+                                   CloudServerList& outServers,
+                                   const std::string& matchmakerHost = CLOUD_MATCHMAKER_HOST,
+                                   int timeoutMs = 3000);
 
     // Stop everything
     void Stop();
