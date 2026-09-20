@@ -23,6 +23,7 @@
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
 #include "cloud_connect.h"
+#include <commctrl.h>
 #include <thread>
 using namespace helper;
 extern HINSTANCE m_hInstResDLL;
@@ -183,6 +184,33 @@ SessionDialog::~SessionDialog()
 }
 
 BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK OnlineServersDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+constexpr UINT WM_ONLINE_SERVERS_READY = WM_APP + 42;
+
+struct OnlineServersQueryCtx {
+    HWND hwnd;
+    std::string token;
+    std::string host;
+    CloudServerList* list;
+};
+
+struct OnlineServersDlgData {
+    CloudServerList* list;
+    std::string selectedCode;
+};
+
+static std::basic_string<TCHAR> AnsiToTString(const std::string& s) {
+#ifdef UNICODE
+    if (s.empty()) return std::basic_string<TCHAR>();
+    int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), (int)s.size(), NULL, 0);
+    std::basic_string<TCHAR> out(len, 0);
+    MultiByteToWideChar(CP_ACP, 0, s.c_str(), (int)s.size(), &out[0], len);
+    return out;
+#else
+    return s;
+#endif
+}
+
 // It's exceedingly unlikely, but possible, that if two modal dialogs were
 // closed at the same time, the static variables used for transfer between
 // window procedure and this method could overwrite each other.
@@ -239,6 +267,40 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NOTIFY:
 		return _this->HandleNotify(hwnd, wParam, lParam);
 
+	case WM_ONLINE_SERVERS_READY:
+	{
+		OnlineServersQueryCtx* ctx = (OnlineServersQueryCtx*)lParam;
+		if (!ctx) return 0;
+		CloudServerList list = std::move(*ctx->list);
+		std::string token = ctx->token;
+		std::string host = ctx->host;
+		HWND parentHwnd = ctx->hwnd;
+		delete ctx->list;
+		delete ctx;
+
+		if (list.empty()) {
+			MessageBox(hwnd, _T("No online servers found for this group."), _T("Online servers"), MB_OK | MB_ICONINFORMATION);
+			SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T("No online servers"));
+		} else {
+			OnlineServersDlgData data{ &list, "" };
+			int ret = (int)DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_ONLINE_SERVERS_DLG),
+				NULL, (DLGPROC)OnlineServersDlgProc, (LPARAM)&data);
+			if (ret == IDC_REFRESH_SERVERS) {
+				auto ctx2 = new OnlineServersQueryCtx{ parentHwnd, token, host, new CloudServerList() };
+				std::thread([ctx2]() {
+					CloudProxyServer::QueryOnlineServers(ctx2->token, *ctx2->list, ctx2->host, 3000);
+					PostMessage(ctx2->hwnd, WM_ONLINE_SERVERS_READY, 0, (LPARAM)ctx2);
+				}).detach();
+			} else if (!data.selectedCode.empty()) {
+				SetDlgItemTextA(hwnd, IDC_HOSTNAME_EDIT, data.selectedCode.c_str());
+				// Trigger the same probe/validation as if the user typed it
+				PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE),
+					(LPARAM)GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
+			}
+		}
+		return 0;
+	}
+
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
@@ -248,6 +310,29 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDC_GETVIEWERTOKEN:
 			ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/viewer.php"), NULL, NULL, SW_SHOWNORMAL);
 			break;
+		case IDC_SHOW_ONLINE_SERVERS:
+		{
+			if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) != BST_CHECKED)
+				break;
+			char tokenBuf[256]{};
+			GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tokenBuf, sizeof(tokenBuf));
+			if (tokenBuf[0] == '\0') {
+				MessageBox(hwnd, _T("Enter a group token first."), _T("Online servers"), MB_OK | MB_ICONINFORMATION);
+				break;
+			}
+			char mmHostBuf[MAX_HOST_NAME_LEN]{};
+			WideCharToMultiByte(CP_UTF8, 0, _this->m_cloudMatchmakerHost, -1, mmHostBuf, MAX_HOST_NAME_LEN, NULL, NULL);
+			std::string mmHost = (mmHostBuf[0] != '\0') ? mmHostBuf : CLOUD_MATCHMAKER_HOST;
+			SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T("Querying online servers..."));
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_SHOW);
+
+			auto ctx = new OnlineServersQueryCtx{ hwnd, tokenBuf, mmHost, new CloudServerList() };
+			std::thread([ctx]() {
+				CloudProxyServer::QueryOnlineServers(ctx->token, *ctx->list, ctx->host, 3000);
+				PostMessage(ctx->hwnd, WM_ONLINE_SERVERS_READY, 0, (LPARAM)ctx);
+			}).detach();
+		}
+		break;
 		case IDC_RADIOBRIDGE:
 		case IDC_RADIOREPEATER:
 		case IDC_RADIODIRECT:
@@ -930,6 +1015,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		}
 		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
 		if (GetDlgItem(hwnd, IDC_GETVIEWERTOKEN)) { ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_HIDE); }
+		if (GetDlgItem(hwnd, IDC_SHOW_ONLINE_SERVERS)) { ShowWindow(GetDlgItem(hwnd, IDC_SHOW_ONLINE_SERVERS), SW_HIDE); }
 		break;
 	case IDC_RADIODIRECT:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -947,6 +1033,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		}
 		if (GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL)) { ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_HIDE); }
 		if (GetDlgItem(hwnd, IDC_GETVIEWERTOKEN)) { ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_HIDE); }
+		if (GetDlgItem(hwnd, IDC_SHOW_ONLINE_SERVERS)) { ShowWindow(GetDlgItem(hwnd, IDC_SHOW_ONLINE_SERVERS), SW_HIDE); }
 		break;
 	case IDC_RADIOBRIDGE:
 		EnableWindow(GetDlgItem(hwnd, IDC_PROXY_EDIT), false);
@@ -960,6 +1047,7 @@ void SessionDialog::ModeSwitch(HWND hwnd, WPARAM wParam)
 		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN), SW_SHOW);
 		ShowWindow(GetDlgItem(hwnd, IDC_CLOUDTOKEN_LABEL), SW_SHOW);
 		ShowWindow(GetDlgItem(hwnd, IDC_GETVIEWERTOKEN), SW_SHOW);
+		ShowWindow(GetDlgItem(hwnd, IDC_SHOW_ONLINE_SERVERS), SW_SHOW);
 		SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, m_cloudToken);
 		// Trigger probe if there's a valid code
 		PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE), 
@@ -1064,4 +1152,58 @@ void SessionDialog::SwitchLanguage(const wchar_t* langCode)
 	
 	// Close and reopen the dialog to refresh UI
 	EndDialog(SessHwnd, -2);  // Special code to indicate language change
+}
+
+BOOL CALLBACK OnlineServersDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	OnlineServersDlgData* data = nullptr;
+	if (uMsg == WM_INITDIALOG) {
+		data = (OnlineServersDlgData*)lParam;
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)data);
+		HWND hList = GetDlgItem(hwnd, IDC_SERVER_LIST);
+		for (size_t i = 0; i < data->list->size(); ++i) {
+			const auto& entry = (*data->list)[i];
+			std::basic_string<TCHAR> display;
+			if (!entry.alias.empty()) {
+				display = AnsiToTString(entry.alias) + _T("  (") + AnsiToTString(entry.code) + _T(")");
+			} else {
+				display = AnsiToTString(entry.code);
+			}
+			int idx = (int)SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)display.c_str());
+			SendMessage(hList, LB_SETITEMDATA, idx, (LPARAM)i);
+		}
+		if (!data->list->empty())
+			SendMessage(hList, LB_SETCURSEL, 0, 0);
+		return TRUE;
+	} else {
+		data = (OnlineServersDlgData*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	}
+
+	switch (uMsg) {
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDC_SERVER_LIST && HIWORD(wParam) == LBN_DBLCLK)
+			wParam = MAKEWPARAM(IDOK, BN_CLICKED);
+		switch (LOWORD(wParam)) {
+		case IDOK:
+		{
+			HWND hList = GetDlgItem(hwnd, IDC_SERVER_LIST);
+			int sel = (int)SendMessage(hList, LB_GETCURSEL, 0, 0);
+			if (sel != LB_ERR && data) {
+				size_t idx = (size_t)SendMessage(hList, LB_GETITEMDATA, sel, 0);
+				if (idx < data->list->size())
+					data->selectedCode = (*data->list)[idx].code;
+			}
+			EndDialog(hwnd, IDOK);
+			return TRUE;
+		}
+		case IDC_REFRESH_SERVERS:
+			EndDialog(hwnd, IDC_REFRESH_SERVERS);
+			return TRUE;
+		case IDCANCEL:
+			EndDialog(hwnd, IDCANCEL);
+			return TRUE;
+		}
+		break;
+	}
+	return FALSE;
 }

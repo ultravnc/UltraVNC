@@ -283,6 +283,7 @@ void SettingsManager::setDefaults()
 
 	_tcscpy_s(m_pref_cloudServer, _T("support1.uvnc.com"));
 	memset(m_pref_cloudToken, 0, sizeof(m_pref_cloudToken));
+	memset(m_pref_cloudAlias, 0, sizeof(m_pref_cloudAlias));
 	memset(m_pref_alternateShell, 0, 129);
 	m_pref_cloudEnabled = false;
 	m_pref_AllowUserSettingsWithPassword = false;
@@ -403,6 +404,7 @@ void SettingsManager::load()
 	iniFile.ReadString("cloud", "server_token", m_pref_cloudToken, sizeof(m_pref_cloudToken));
 	if (m_pref_cloudToken[0] == _T('\0'))
 		iniFile.ReadString("cloud", "token", m_pref_cloudToken, sizeof(m_pref_cloudToken));
+	iniFile.ReadString("cloud", "server_alias", m_pref_cloudAlias, sizeof(m_pref_cloudAlias));
 
 	iniFile.ReadString("admin", "alternate_shell", m_pref_alternateShell, 1024);
 
@@ -546,6 +548,7 @@ void SettingsManager::save()
 	iniFile.WriteString("admin", "cloudServer", m_pref_cloudServer);
 	iniFile.WriteInt("admin", "cloudEnabled", m_pref_cloudEnabled);
 	iniFile.WriteString("cloud", "server_token", m_pref_cloudToken);
+	iniFile.WriteString("cloud", "server_alias", m_pref_cloudAlias);
 
 	iniFile.WriteString("admin_auth", "group1", m_pref_group1);
 	iniFile.WriteString("admin_auth", "group2", m_pref_group2);

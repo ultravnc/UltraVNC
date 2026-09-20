@@ -2263,12 +2263,14 @@ BOOL vncServer::StartBridge()
 		matchmakerHost = CLOUD_SERVER_MATCHMAKER_HOST;
 
 	std::string token = settings->getCloudToken();
+	std::string alias = settings->getCloudAlias();
 
 	m_cloud_proxy = std::make_unique<CloudServerProxy>(
 		m_discovery_code,
 		(uint16_t)m_port,
 		matchmakerHost,
-		token
+		token,
+		alias
 	);
 
 	m_bridge_running = true;

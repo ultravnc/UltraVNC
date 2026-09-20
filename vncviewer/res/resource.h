@@ -355,6 +355,13 @@
 #define IDC_CLOUDTOKEN                  2084
 #define IDC_CLOUDTOKEN_LABEL            2085
 #define IDC_GETVIEWERTOKEN              2086
+#define IDC_SHOW_ONLINE_SERVERS         2087
+#define IDD_ONLINE_SERVERS_DLG          2088
+#define IDC_SERVER_LIST                 2089
+#define IDC_REFRESH_SERVERS             2090
+#define IDC_SHOW_ONLINE_SERVERS         2087
+#define IDD_ONLINE_SERVERS_DLG          2088
+#define IDC_SERVER_LIST                 2089
 #define IDC_STATIC_SPLIT                9000
 #define IDC_HOSTNAME_DEL                9001
 #define ID_SESSION_SET_CRECT            32777
