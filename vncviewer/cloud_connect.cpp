@@ -146,11 +146,16 @@ bool CloudProxyServer::WaitForMatch(CloudPeerInfo& peer, int timeoutSeconds, Clo
     timeval tv;
     auto startTime = steady_clock::now();
     auto lastAnnounce = startTime;
+    bool gotAnyResponse = false;
 
     while (true) {
         auto elapsed = duration_cast<seconds>(steady_clock::now() - startTime).count();
         if (elapsed >= timeoutSeconds) {
-            if (statusCb) statusCb(L"Timeout waiting for peer");
+            if (statusCb) {
+                statusCb(gotAnyResponse
+                    ? L"Server did not respond (offline or token mismatch)"
+                    : L"No response from matchmaker (check host/firewall)");
+            }
             return false;
         }
 
@@ -173,6 +178,7 @@ bool CloudProxyServer::WaitForMatch(CloudPeerInfo& peer, int timeoutSeconds, Clo
                                    (sockaddr*)&from, &fromLen);
 
             if (received == sizeof(pkt) && pkt.IsValid()) {
+                gotAnyResponse = true;
                 if (pkt.contype == 0) {
                     // Acknowledged - still waiting
                     if (statusCb) {
@@ -243,7 +249,7 @@ bool CloudProxyServer::DoRendezvous(const CloudPeerInfo& peer, CloudStatusCallba
     inet_pton(AF_INET, ip, &addr.sin_addr);
 
     if (UDT::ERROR == UDT::connect(udtSock, (sockaddr*)&addr, sizeof(addr))) {
-        if (statusCb) statusCb(L"UDT rendezvous failed");
+        if (statusCb) statusCb(L"NAT traversal failed (firewall or symmetric NAT)");
         UDT::close(udtSock);
         UDT::cleanup();
         return false;
@@ -256,7 +262,7 @@ bool CloudProxyServer::DoRendezvous(const CloudPeerInfo& peer, CloudStatusCallba
     int hs = UDT::send(udtSock, pk, 32, 0);
     int hr = UDT::recv(udtSock, pk, 32, 0);
     if (hs != 32 || hr != 32) {
-        if (statusCb) statusCb(L"UDT handshake failed");
+        if (statusCb) statusCb(L"Connected but handshake failed");
         UDT::close(udtSock);
         UDT::cleanup();
         return false;
@@ -380,31 +386,35 @@ void CloudProxyServer::Stop() {
     }
 }
 
-bool CloudProxyServer::Probe(const std::string& code,
-                              const std::string& matchmakerHost,
-                              int timeoutMs,
-                              const std::string& token) {
+CloudProbeResult CloudProxyServer::ProbeDetailed(const std::string& code,
+                                                  const std::string& matchmakerHost,
+                                                  int timeoutMs,
+                                                  const std::string& token) {
+    CloudProbeResult result{ false, L"Server offline / not found" };
     { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: code=%s token='%s' (len=%zu)\n", code.c_str(), token.c_str(), token.size()); OutputDebugStringA(_buf); }
     
     // Resolve matchmaker address
-    addrinfo hints{}, *result = nullptr;
+    addrinfo hints{}, *resultAddr = nullptr;
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_DGRAM;
     char portStr[8];
     sprintf_s(portStr, "%u", (unsigned)CLOUD_MATCHMAKER_PORT);
-    if (getaddrinfo(matchmakerHost.c_str(), portStr, &hints, &result) != 0 || !result) {
+    if (getaddrinfo(matchmakerHost.c_str(), portStr, &hints, &resultAddr) != 0 || !resultAddr) {
         OutputDebugStringA("[CloudNAT] Probe: getaddrinfo failed\n");
-        return false;
+        result.status = L"Cannot resolve matchmaker host";
+        return result;
     }
 
     sockaddr_in mmAddr{};
-    memcpy(&mmAddr, result->ai_addr, sizeof(mmAddr));
-    freeaddrinfo(result);
+    memcpy(&mmAddr, resultAddr->ai_addr, sizeof(mmAddr));
+    freeaddrinfo(resultAddr);
 
     // Temporary UDP socket
     SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock == INVALID_SOCKET)
-        return false;
+    if (sock == INVALID_SOCKET) {
+        result.status = L"Cannot create UDP socket";
+        return result;
+    }
 
     sockaddr_in bindAddr{};
     bindAddr.sin_family = AF_INET;
@@ -422,6 +432,11 @@ bool CloudProxyServer::Probe(const std::string& code,
     { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: pkt.group='%s' ts=%u\n", pkt.group, pkt.timestamp); OutputDebugStringA(_buf); }
     int sent = sendto(sock, (char*)&pkt, sizeof(pkt), 0, (sockaddr*)&mmAddr, sizeof(mmAddr));
     { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: sent %d bytes\n", sent); OutputDebugStringA(_buf); }
+    if (sent != (int)sizeof(pkt)) {
+        closesocket(sock);
+        result.status = L"Cannot reach matchmaker (send failed)";
+        return result;
+    }
 
     // Wait for PROBE_ONLINE(4) or PROBE_OFFLINE(5) response
     fd_set fds;
@@ -431,22 +446,40 @@ bool CloudProxyServer::Probe(const std::string& code,
     FD_ZERO(&fds);
     FD_SET(sock, &fds);
 
-    bool online = false;
     if (select(0, &fds, NULL, NULL, &tv) > 0) {
         CloudPacket resp;
         sockaddr_in from{};
         int fromLen = sizeof(from);
         int r = recvfrom(sock, (char*)&resp, sizeof(resp), 0, (sockaddr*)&from, &fromLen);
         if (r == sizeof(resp) && resp.IsValid()) {
-            online = (resp.contype == 4); // ConnType::PROBE_ONLINE
-            { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe response: contype=%d -> %s\n", resp.contype, online ? "ONLINE" : "OFFLINE"); OutputDebugStringA(_buf); }
+            if (resp.contype == 4) {
+                result.online = true;
+                result.status = L"Server online";
+            } else if (resp.contype == 5) {
+                result.online = false;
+                result.status = L"Server offline / not found";
+            } else {
+                result.online = false;
+                result.status = L"Unexpected response from matchmaker";
+            }
+            { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe response: contype=%d\n", resp.contype); OutputDebugStringA(_buf); }
         } else {
             { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: invalid response r=%d\n", r); OutputDebugStringA(_buf); }
+            result.status = L"Invalid response from matchmaker";
         }
+    } else {
+        result.status = L"No response from matchmaker (timeout)";
     }
 
     closesocket(sock);
-    return online;
+    return result;
+}
+
+bool CloudProxyServer::Probe(const std::string& code,
+                              const std::string& matchmakerHost,
+                              int timeoutMs,
+                              const std::string& token) {
+    return ProbeDetailed(code, matchmakerHost, timeoutMs, token).online;
 }
 
 bool CloudProxyServer::QueryOnlineServers(const std::string& token,
