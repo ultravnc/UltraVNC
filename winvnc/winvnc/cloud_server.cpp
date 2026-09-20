@@ -376,7 +376,7 @@ void CloudServerProxy::Run() {
         { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Matched! rendezvous with %s:%d\n", peer.externalIp, peer.externalPort); PushLog(_buf); }
         int udtSock = UDT::INVALID_SOCK;
         if (!DoRendezvous(peer, udtSock)) {
-            statusText_ = "Rendezvous failed, re-announcing...";
+            statusText_ = "NAT traversal failed (firewall or symmetric NAT), re-announcing...";
             status_ = csOffline;
             PushLog("[CloudNAT] DoRendezvous FAILED, re-announcing\n");
             closesocket(udpSocket_);

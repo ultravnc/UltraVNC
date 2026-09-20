@@ -386,9 +386,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							std::string token = tokenBuf;
 							std::thread([hwnd, hStatus, code, mmHost, token]() {
 								{ char _buf[256]; snprintf(_buf, sizeof(_buf), "[SessionDialog] Probe lambda token='%s' (len=%zu)\n", token.c_str(), token.size()); OutputDebugStringA(_buf); }
-								bool online = CloudProxyServer::Probe(code, mmHost, 3000, token);
-								SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
-								EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
+								CloudProbeResult res = CloudProxyServer::ProbeDetailed(code, mmHost, 3000, token);
+								SetWindowTextW(hStatus, res.status.c_str());
+								EnableWindow(GetDlgItem(hwnd, IDCONNECT), res.online);
 							}).detach();
 						}
 					}
@@ -595,9 +595,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tokenBuf102, sizeof(tokenBuf102));
 						std::string token102 = tokenBuf102;
 						std::thread([hwnd, hStatus, code, mmHost102, token102]() {
-							bool online = CloudProxyServer::Probe(code, mmHost102, 3000, token102);
-							SetWindowText(hStatus, online ? _T("Server online") : _T("Server offline / not found"));
-							EnableWindow(GetDlgItem(hwnd, IDCONNECT), online);
+							CloudProbeResult res = CloudProxyServer::ProbeDetailed(code, mmHost102, 3000, token102);
+							SetWindowTextW(hStatus, res.status.c_str());
+							EnableWindow(GetDlgItem(hwnd, IDCONNECT), res.online);
 						}).detach();
 					}
 				}

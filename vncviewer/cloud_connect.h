@@ -153,6 +153,13 @@ struct CloudPeerInfo {
     bool isLan;
 };
 
+// Result of a matchmaker probe. `status` is a human-readable reason for the
+// UI, e.g. "Server online", "Server offline", "No response from matchmaker".
+struct CloudProbeResult {
+    bool online;
+    std::wstring status;
+};
+
 // Status callback: called on connection state changes
 using CloudStatusCallback = std::function<void(const wchar_t* status)>;
 
@@ -175,6 +182,12 @@ public:
                       const std::string& matchmakerHost = CLOUD_MATCHMAKER_HOST,
                       int timeoutMs = 3000,
                       const std::string& token = "");
+
+    // Probe with a detailed status string for the UI.
+    static CloudProbeResult ProbeDetailed(const std::string& code,
+                                          const std::string& matchmakerHost = CLOUD_MATCHMAKER_HOST,
+                                          int timeoutMs = 3000,
+                                          const std::string& token = "");
 
     // Query the matchmaker for all online servers that share the same token/group.
     // Each returned entry contains the numeric code and the server's human-readable alias.
