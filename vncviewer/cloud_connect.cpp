@@ -15,6 +15,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <vector>
 #include <windows.h>  // For OutputDebugStringA
 
 using namespace std::chrono;
@@ -130,6 +131,7 @@ bool CloudProxyServer::Announce(const std::string& code) {
 
     pkt.localport = localUdpPort_;
     pkt.serverviewer = false;  // false = viewer
+    pkt.contype = token_.empty() ? CloudConn_AnnouncePublic : CloudConn_Announce;
     SignCloudPacket(pkt, token_);
     { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] AnnounceViewer: group='%s' ts=%u token_='%s'\n", pkt.group, pkt.timestamp, token_.c_str()); OutputDebugStringA(_buf); }
 
@@ -410,12 +412,12 @@ bool CloudProxyServer::Probe(const std::string& code,
     bindAddr.sin_port = 0;
     bind(sock, (sockaddr*)&bindAddr, sizeof(bindAddr));
 
-    // Send PROBE packet (contype=3)
+    // Send PROBE packet
     CloudPacket pkt;
     strncpy_s(pkt.name, code.c_str(), sizeof(pkt.name) - 1);
     strncpy_s(pkt.ident, CLOUD_PROTOCOL_IDENT, sizeof(pkt.ident) - 1);
     pkt.serverviewer = false;
-    pkt.contype = 3; // ConnType::PROBE
+    pkt.contype = token.empty() ? CloudConn_ProbePublic : CloudConn_Probe;
     SignCloudPacket(pkt, token);
     { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Probe: pkt.group='%s' ts=%u\n", pkt.group, pkt.timestamp); OutputDebugStringA(_buf); }
     int sent = sendto(sock, (char*)&pkt, sizeof(pkt), 0, (sockaddr*)&mmAddr, sizeof(mmAddr));
@@ -445,4 +447,92 @@ bool CloudProxyServer::Probe(const std::string& code,
 
     closesocket(sock);
     return online;
+}
+
+bool CloudProxyServer::QueryOnlineServers(const std::string& token,
+                                          CloudServerList& outServers,
+                                          const std::string& matchmakerHost,
+                                          int timeoutMs) {
+    outServers.clear();
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: token='%s' (len=%zu)\n", token.c_str(), token.size()); OutputDebugStringA(_buf); }
+
+    // Resolve matchmaker address
+    addrinfo hints{}, *result = nullptr;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    char portStr[8];
+    sprintf_s(portStr, "%u", (unsigned)CLOUD_MATCHMAKER_PORT);
+    if (getaddrinfo(matchmakerHost.c_str(), portStr, &hints, &result) != 0 || !result) {
+        OutputDebugStringA("[CloudNAT] QueryOnlineServers: getaddrinfo failed\n");
+        return false;
+    }
+
+    sockaddr_in mmAddr{};
+    memcpy(&mmAddr, result->ai_addr, sizeof(mmAddr));
+    freeaddrinfo(result);
+
+    // Temporary UDP socket
+    SOCKET sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock == INVALID_SOCKET)
+        return false;
+
+    sockaddr_in bindAddr{};
+    bindAddr.sin_family = AF_INET;
+    bindAddr.sin_addr.s_addr = INADDR_ANY;
+    bindAddr.sin_port = 0;
+    bind(sock, (sockaddr*)&bindAddr, sizeof(bindAddr));
+
+    // Send LIST_SERVERS request
+    CloudPacket pkt;
+    strncpy_s(pkt.name, "*", sizeof(pkt.name) - 1); // wildcard - list all servers in group
+    strncpy_s(pkt.ident, CLOUD_PROTOCOL_IDENT, sizeof(pkt.ident) - 1);
+    pkt.serverviewer = false;
+    pkt.contype = CloudConn_ListServersReq;
+    SignCloudPacket(pkt, token);
+    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: pkt.group='%s' ts=%u\n", pkt.group, pkt.timestamp); OutputDebugStringA(_buf); }
+    int sent = sendto(sock, (char*)&pkt, sizeof(pkt), 0, (sockaddr*)&mmAddr, sizeof(mmAddr));
+    if (sent != (int)sizeof(pkt)) {
+        closesocket(sock);
+        return false;
+    }
+
+    // Collect responses until LIST_SERVERS_END or timeout
+    fd_set fds;
+    timeval tv;
+    auto start = steady_clock::now();
+
+    while (duration_cast<milliseconds>(steady_clock::now() - start).count() < timeoutMs) {
+        FD_ZERO(&fds);
+        FD_SET(sock, &fds);
+        int remaining = timeoutMs - (int)duration_cast<milliseconds>(steady_clock::now() - start).count();
+        if (remaining <= 0) break;
+        tv.tv_sec = remaining / 1000;
+        tv.tv_usec = (remaining % 1000) * 1000;
+
+        if (select(0, &fds, NULL, NULL, &tv) <= 0)
+            continue;
+
+        CloudPacket resp;
+        sockaddr_in from{};
+        int fromLen = sizeof(from);
+        int r = recvfrom(sock, (char*)&resp, sizeof(resp), 0, (sockaddr*)&from, &fromLen);
+        if (r != sizeof(resp) || !resp.IsValid())
+            continue;
+
+        if (resp.contype == CloudConn_ListServersEnd) {
+            { char _buf[128]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: end marker, got %zu entries\n", outServers.size()); OutputDebugStringA(_buf); }
+            break;
+        }
+
+        if (resp.contype == CloudConn_ListServersEntry) {
+            CloudServerEntry entry;
+            entry.code = std::string(resp.name, strnlen(resp.name, sizeof(resp.name)));
+            entry.alias = std::string(resp.alias, strnlen(resp.alias, sizeof(resp.alias)));
+            outServers.push_back(entry);
+            { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: entry code='%s' alias='%s'\n", entry.code.c_str(), entry.alias.c_str()); OutputDebugStringA(_buf); }
+        }
+    }
+
+    closesocket(sock);
+    return true;
 }

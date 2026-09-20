@@ -12,6 +12,7 @@
 #include <functional>
 #include <mutex>
 #include <vector>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 
@@ -24,22 +25,40 @@
 constexpr uint16_t CLOUD_SERVER_MATCHMAKER_PORT = 5352;
 constexpr const char* CLOUD_SERVER_MATCHMAKER_HOST = "support1.uvnc.com";
 
+// Connection / announcement types used in CloudServerPacket::contype.
+// Values 0-5 are the original protocol. Public-code fast-connect variants
+// were added so the matchmaker can distinguish tokenless sessions.
+enum CloudServerConnType {
+    CloudServerConn_Announce         = 0,
+    CloudServerConn_Match_WAN        = 1,
+    CloudServerConn_Match_LAN        = 2,
+    CloudServerConn_Probe            = 3,
+    CloudServerConn_Probe_Online     = 4,
+    CloudServerConn_Probe_Offline    = 5,
+    CloudServerConn_AnnouncePublic   = 6,
+    CloudServerConn_ProbePublic      = 7,
+    CloudServerConn_ListServersReq   = 8,
+    CloudServerConn_ListServersEntry = 9,
+    CloudServerConn_ListServersEnd   = 11
+};
+
 #pragma pack(push, 1)
 struct CloudServerPacket {
     char name[32];
-    char group[32];
+    char group[32];       // token (from portal) used as HMAC key derivation input; "uvnc" when empty
     char ident[8];
     char localip[32];
     char externip[32];
     int32_t localport;
     int32_t externport;
-    int32_t contype;
+    int32_t contype;      // CloudServerConnType
     bool serverviewer;
     uint8_t _pad0;
     uint8_t _pad1;
     uint8_t _pad2;
     uint32_t timestamp;   // unix time (UTC) when packet was created
     uint8_t hmac[32];     // HMAC-SHA256 over packet body (hmac field zeroed)
+    char alias[32];       // human-readable server name/alias (display only)
 
     CloudServerPacket() { memset(this, 0, sizeof(*this)); }
 
@@ -92,18 +111,22 @@ inline bool SignCloudServerPacket(CloudServerPacket& pkt, const std::string& tok
     memset(tmp->hmac, 0, sizeof(tmp->hmac));
 
     // HMAC-SHA256(groupKey, buf) -> pkt.hmac
+    // Hash only the fields before the hmac (and before any trailing display-only
+    // fields such as alias), so adding new trailing fields does not break HMAC
+    // compatibility with older clients.
     {
         BCRYPT_ALG_HANDLE hAlg = nullptr;
         BCRYPT_HASH_HANDLE hHash = nullptr;
         DWORD hashObjSize = 0, cbData = 0;
         uint8_t* hashObj = nullptr;
         bool ok = false;
+        size_t signLen = offsetof(CloudServerPacket, hmac);
         if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_SHA256_ALGORITHM, nullptr, BCRYPT_ALG_HANDLE_HMAC_FLAG) == 0 &&
             BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH, (PBYTE)&hashObjSize, sizeof(DWORD), &cbData, 0) == 0) {
             hashObj = new uint8_t[hashObjSize];
             if (BCryptCreateHash(hAlg, &hHash, hashObj, hashObjSize,
                                  groupKey, 32, 0) == 0 &&
-                BCryptHashData(hHash, buf, sizeof(CloudServerPacket), 0) == 0 &&
+                BCryptHashData(hHash, buf, (ULONG)signLen, 0) == 0 &&
                 BCryptFinishHash(hHash, pkt.hmac, 32, 0) == 0) ok = true;
         }
         if (hHash) BCryptDestroyHash(hHash);
@@ -134,7 +157,8 @@ public:
     CloudServerProxy(const std::string& code,
                      uint16_t vncPort,
                      const std::string& matchmakerHost = CLOUD_SERVER_MATCHMAKER_HOST,
-                     const std::string& token = "");
+                     const std::string& token = "",
+                     const std::string& alias = "");
     ~CloudServerProxy();
 
     // Start: announces to matchmaker and enters wait+serve loop
@@ -167,6 +191,7 @@ private:
 
     std::string code_;
     std::string token_;
+    std::string alias_;
     uint16_t vncPort_;
     std::string matchmakerHost_;
 

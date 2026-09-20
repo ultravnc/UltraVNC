@@ -97,6 +97,21 @@ CloudDialog::DialogProc(HWND hwnd,
 		SetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer());
 		SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, settings->getCloudToken());
 		SetDlgItemText(hwnd, IDC_CLOUDCODE, _this->m_server->code);
+		{
+			char aliasBuf[64]{};
+			GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDALIAS), aliasBuf, sizeof(aliasBuf));
+			if (aliasBuf[0] == '\0') {
+				const char* savedAlias = settings->getCloudAlias();
+				if (savedAlias && savedAlias[0] != '\0') {
+					SetDlgItemTextA(hwnd, IDC_CLOUDALIAS, savedAlias);
+				} else {
+					char hostname[64]{};
+					DWORD len = sizeof(hostname);
+					if (GetComputerNameA(hostname, &len))
+						SetDlgItemTextA(hwnd, IDC_CLOUDALIAS, hostname);
+				}
+			}
+		}
 		SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_SETCHECK, settings->getUseBridge(), 0);
 
 		if (_this->m_server->isBridgeStarted()) {
@@ -245,6 +260,11 @@ CloudDialog::DialogProc(HWND hwnd,
 				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tok, sizeof(tok));
 				settings->setCloudToken(tok);
 			}
+			{
+				char alias[64]{};
+				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDALIAS), alias, sizeof(alias));
+				settings->setCloudAlias(alias);
+			}
 			BOOL autoStart = SendMessage(GetDlgItem(hwnd, IDC_CHECKCLOUD), BM_GETCHECK, 0, 0) == BST_CHECKED;
 			settings->setCloudEnabled(autoStart);
 			settings->setUseBridge(autoStart);
@@ -264,6 +284,11 @@ CloudDialog::DialogProc(HWND hwnd,
 				char tok[256]{};
 				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDTOKEN), tok, sizeof(tok));
 				settings->setCloudToken(tok);
+			}
+			{
+				char alias[64]{};
+				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDALIAS), alias, sizeof(alias));
+				settings->setCloudAlias(alias);
 			}
 			if (!_this->m_server->isCloudThreadRunning()) {
 				_this->m_server->cloudConnect(true, settings->getCloudServer());
