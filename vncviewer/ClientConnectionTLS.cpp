@@ -317,6 +317,13 @@ struct TLSSession
 	{
 		if (state == StateClosed || !SecIsValidHandle(&hContext))
 			return SetLastError("Connection closed");
+		if (state == StateHandshakeStart && inbuf.size > 0)
+		{
+			if (!Handshake(inbuf, outbuf))
+				return false;
+			if (!IsReady() || outbuf.GetAvailable() > 0)
+				return true;
+		}
 		bool done = false;
 		while (!done && inbuf.size > 0)
 		{
@@ -362,7 +369,7 @@ struct TLSSession
 				break;
 			case SEC_I_RENEGOTIATE:
 				state = StateHandshakeStart;
-				if (!Handshake(DynBuffer(), outbuf))
+				if (!Handshake(inbuf, outbuf))
 					return false;
 				done = true;
 				break;
@@ -539,8 +546,9 @@ struct TLSPlugin : public IPlugin
 	TLSSession		session;
 	DynBuffer	    encBuffer, decBuffer, decPlain;
 	int             wanted;
+	ClientConnection &connection;
 
-	TLSPlugin(TLSSession &s) : session(s) { }
+	TLSPlugin(TLSSession &s, ClientConnection &c) : session(s), connection(c) { }
 
 	virtual ~TLSPlugin() { }
 
@@ -573,8 +581,9 @@ struct TLSPlugin : public IPlugin
 			DynBuffer outBuffer;
 			if (!session.Receive(decBuffer, decPlain, outBuffer))
 				SetLastError(session.lastError);
-			if (outBuffer.size > 0)
-				SetLastError("Renegotiation request not implemented");
+			if (outBuffer.GetAvailable() > 0 &&
+				!connection.Write((char *)outBuffer.GetHead(), outBuffer.GetAvailable(), false))
+				SetLastError("TLS handshake response could not be sent");
 		}
 		if (decPlain.GetAvailable() >= wanted)
 		{
@@ -780,7 +789,7 @@ void ClientConnection::AuthVeNCrypt()
 			}
 		}
 		m_fUsePlugin = true;
-		m_pPluginInterface = new TLSPlugin(session);
+		m_pPluginInterface = new TLSPlugin(session, *this);
 	}
 	switch (subType)
 	{
