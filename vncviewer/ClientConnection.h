@@ -494,6 +494,7 @@ private:
 	// Modif sf@2002 - File Transfer
 	friend class FileTransfer;  
 	friend class TextChat;  
+	friend struct TLSPlugin;
 
 	// Modif sf@2002 - Server Scaling
 	bool SendServerScale(int nScale);
