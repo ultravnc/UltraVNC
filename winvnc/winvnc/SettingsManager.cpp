@@ -227,6 +227,8 @@ void SettingsManager::setDefaults()
 	m_pref_LoopbackOnly = false;
 	m_pref_AllowLoopback = true;
 	m_pref_AuthRequired = true;
+	m_pref_AllowLoopbackWithoutDSM = false;
+	m_pref_AllowLoopbackWithoutAuth = false;
 #ifdef SC_20
 	m_pref_AuthRequired = false;
 #endif // SC_20
@@ -310,6 +312,8 @@ void SettingsManager::load()
 	m_pref_ipv6_allowed = iniFile.ReadInt("admin", "UseIpv6", m_pref_ipv6_allowed);
 	m_pref_AllowLoopback = iniFile.ReadInt("admin", "AllowLoopback", m_pref_AllowLoopback);
 	m_pref_AuthRequired = iniFile.ReadInt("admin", "AuthRequired", m_pref_AuthRequired);
+	m_pref_AllowLoopbackWithoutDSM = iniFile.ReadInt("admin", "AllowLoopbackWithoutDSM", m_pref_AllowLoopbackWithoutDSM);
+	m_pref_AllowLoopbackWithoutAuth = iniFile.ReadInt("admin", "AllowLoopbackWithoutAuth", m_pref_AllowLoopbackWithoutAuth);
 	m_pref_ConnectPriority = iniFile.ReadInt("admin", "ConnectPriority", m_pref_ConnectPriority);
 	iniFile.ReadString("admin", "AuthHosts", m_pref_authhosts, 1280);
 	iniFile.ReadString("admin", "AuthHosts", m_pref_authhosts2, 1280);
@@ -516,6 +520,8 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "ReverseAuthRequired", m_pref_ReverseAuthRequired);
 	iniFile.WriteInt("admin", "ConnectPriority", m_pref_ConnectPriority);
 	iniFile.WriteInt("admin", "AuthRequired", m_pref_AuthRequired);
+	iniFile.WriteInt("admin", "AllowLoopbackWithoutDSM", m_pref_AllowLoopbackWithoutDSM);
+	iniFile.WriteInt("admin", "AllowLoopbackWithoutAuth", m_pref_AllowLoopbackWithoutAuth);
 	iniFile.WriteString("admin", "service_commandline", m_pref_service_commandline);
 	iniFile.WriteString("admin", "accept_reject_mesg", m_pref_accept_reject_mesg);
 	iniFile.WriteInt("poll", "TurboMode", m_pref_TurboMode);

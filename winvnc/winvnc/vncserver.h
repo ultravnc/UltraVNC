@@ -90,6 +90,13 @@ public:
 
 	virtual UINT AuthClientCount();
 	virtual UINT UnauthClientCount();
+	// Count of authenticated clients whose socket actually has the DSM plugin
+	// transform enabled. Distinct from AuthClientCount(), which counts ALL
+	// authenticated clients including ones that bypass DSM via
+	// AllowLoopbackWithoutDSM. Used to guard non-multithreaded DSM plugins
+	// against concurrent use without spuriously rejecting/affecting clients
+	// that aren't using the plugin at all.
+	virtual UINT DSMActiveClientCount();
 
 	virtual void KillAuthClients();
 	virtual void ListAuthClients(HWND hListBox);
