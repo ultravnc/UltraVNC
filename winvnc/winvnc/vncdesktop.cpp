@@ -2324,8 +2324,11 @@ BOOL vncDesktop::InitVideoDriver()
 		if (m_screenCapture != NULL) delete m_screenCapture;
 
 	}
-	if (IsWindows8OrGreater() && !VNC_OSVersion::getInstance()->OS_WINPE)
+	if (IsWindows8OrGreater())
 	{
+		// In WinPE with explorer.exe running, DWM is active and DDEngine
+		// (Desktop Duplication API) should work. If DDEngine fails to start
+		// (e.g. no DWM in plain WinPE), the code below falls back gracefully.
 		vnclog.Print(LL_INTERR, VNCLOG("Try DDEngine\n"));
 		m_screenCapture = new DeskDupEngine;
 	}
