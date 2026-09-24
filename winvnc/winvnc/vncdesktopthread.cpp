@@ -670,7 +670,10 @@ void vncDesktopThread::do_polling(HANDLE& threadHandle, rfb::Region2D& rgncache,
 
 		}
 	}
-	if (VNC_OSVersion::getInstance()->OS_WINPE) {
+	if (VNC_OSVersion::getInstance()->OS_WINPE && VNC_OSVersion::getInstance()->CaptureAlphaBlending()) {
+		// Only strip WS_EX_LAYERED when DWM composition is off (plain WinPE
+		// without explorer.exe). When DWM is active, layered windows are
+		// composited correctly and stripping them causes visual artifacts.
 		int timeSinceLastMouseMove = lTime - m_lLastUpdate;
 		if (timeSinceLastMouseMove > 5000) {
 			m_lLastUpdate = lTime;
