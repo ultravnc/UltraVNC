@@ -126,7 +126,12 @@ bool
 VNC_OSVersion::CaptureAlphaBlending()
 {
 	if (OS_WINPE) {
-		return true; //WINPE
+		// When DWM composition is active (e.g. explorer.exe running in WinPE),
+		// CAPTUREBLT causes a black screen. Only use CAPTUREBLT when DWM is off.
+		BOOL compositionEnabled = FALSE;
+		if (SUCCEEDED(DwmIsCompositionEnabled(&compositionEnabled)) && compositionEnabled)
+			return false;
+		return true;
 	}
 	if (OS_LAYER_ON == false) return false;
 	if (OS_XP) return true;
