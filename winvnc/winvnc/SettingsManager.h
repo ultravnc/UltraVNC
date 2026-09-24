@@ -103,6 +103,10 @@ public:
 	BOOL getAllowLoopback() { return m_pref_AllowLoopback; };
 	BOOL getAuthRequired() { return m_pref_AuthRequired; };
 	void setAuthRequired(BOOL value) { m_pref_AuthRequired = value; };
+	BOOL getAllowLoopbackWithoutDSM() { return m_pref_AllowLoopbackWithoutDSM; };
+	void setAllowLoopbackWithoutDSM(BOOL value) { m_pref_AllowLoopbackWithoutDSM = value; };
+	BOOL getAllowLoopbackWithoutAuth() { return m_pref_AllowLoopbackWithoutAuth; };
+	void setAllowLoopbackWithoutAuth(BOOL value) { m_pref_AllowLoopbackWithoutAuth = value; };
 	char* getAuthhosts() { return m_pref_authhosts; };
 	BOOL getDisableTrayIcon() { return m_pref_DisableTrayIcon; };
 	BOOL getRdpmode() { return m_pref_Rdpmode; };
@@ -365,6 +369,8 @@ private:
 	BOOL m_pref_LoopbackOnly;
 	BOOL m_pref_AllowLoopback;
 	BOOL m_pref_AuthRequired;
+	BOOL m_pref_AllowLoopbackWithoutDSM;
+	BOOL m_pref_AllowLoopbackWithoutAuth;
 	int m_pref_ConnectPriority;
 	char m_pref_authhosts[1280];
 	char m_pref_authhosts2[1280];
