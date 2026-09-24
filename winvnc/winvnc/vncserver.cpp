@@ -839,6 +839,20 @@ vncServer::UnauthClientCount()
 	return (UINT)m_unauthClients.size();
 }
 
+UINT
+vncServer::DSMActiveClientCount()
+{
+	vncClientList::iterator i;
+	UINT count = 0;
+	omni_mutex_lock l(m_clientsLock, 830);
+	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
+		vncClient* client = GetClient(*i);
+		if (client != NULL && client->m_socket != NULL && client->m_socket->IsUsePluginEnabled())
+			count++;
+	}
+	return count;
+}
+
 BOOL
 vncServer::UpdateWanted()
 {
