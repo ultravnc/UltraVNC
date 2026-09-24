@@ -1057,6 +1057,12 @@ BOOL vncClientThread::CheckEmptyPasswd()
 	// By default we disallow passwordless workstations!
 	if ((strlen(plain) == 0) && settings->getAuthRequired())
 	{
+		if (m_client->m_IsLoopback && settings->getAllowLoopbackWithoutAuth())
+		{
+			vnclog.Print(LL_LOGSCREEN, "Loopback connection: no password required due to AllowLoopbackWithoutAuth");
+			vnclog.Print(LL_CLIENTS, VNCLOG("loopback connection: allowing empty password because AllowLoopbackWithoutAuth is set\n"));
+			return TRUE;
+		}
 		vnclog.Print(LL_CONNERR, VNCLOG("no password specified for server - client rejected\n"));
 		SendConnFailed("This server does not have a valid password enabled."
 			"Until a password is set, incoming connections cannot be accepted.");
@@ -1379,7 +1385,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	{
 		vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
 
-		if (!m_auth && m_ms_logon)
+		if (m_client->m_IsLoopback && settings->getAllowLoopbackWithoutAuth())
+		{
+			auth_types.push_back(rfbNoAuth);
+			vnclog.Print(LL_LOGSCREEN, "Loopback connection: auth disabled by AllowLoopbackWithoutAuth");
+			vnclog.Print(LL_CLIENTS, VNCLOG("loopback connection: advertising rfbNoAuth because AllowLoopbackWithoutAuth is set\n"));
+		}
+		else if (!m_auth && m_ms_logon)
 		{
 			// Advertise only MS-Logon IV and III. MS-Logon II (31-bit DH with a
 			// time-seeded rand()) is retired: old viewers that still select it
@@ -1612,9 +1624,20 @@ BOOL vncClientThread::AuthenticateLegacyClient(bool isconnected)
 
 	CARD32 auth_type = rfbInvalidAuth;
 
+	// DSM plugin auth takes priority: if the plugin is actually active on this socket,
+	// its handshake is what keys the transform, so it must not be skipped even for
+	// loopback connections with AllowLoopbackWithoutAuth set. Only fall back to the
+	// loopback bypass when DSM is not in use for this connection (e.g. DSM disabled
+	// globally, or AllowLoopbackWithoutDSM already left the plugin disabled above).
 	if (m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
 		auth_type = rfbLegacy_SecureVNCPlugin;
+	}
+	else if (m_client->m_IsLoopback && settings->getAllowLoopbackWithoutAuth())
+	{
+		auth_type = rfbNoAuth;
+		vnclog.Print(LL_LOGSCREEN, "Loopback connection: legacy auth disabled by AllowLoopbackWithoutAuth");
+		vnclog.Print(LL_CLIENTS, VNCLOG("loopback connection: forcing rfbNoAuth because AllowLoopbackWithoutAuth is set\n"));
 	}
 	else if (m_ms_logon)
 	{
@@ -2506,7 +2529,15 @@ bool vncClientThread::InitSocket()
 
 	// sf@2002 - DSMPlugin
 	// Use Plugin only from this point (now BEFORE Protocol handshaking)
-	if (m_server->GetDSMPluginPointer()->IsEnabled())
+	bool usePlugin = m_server->GetDSMPluginPointer()->IsEnabled();
+	if (usePlugin && m_client->m_IsLoopback && settings->getAllowLoopbackWithoutDSM())
+	{
+		usePlugin = false;
+		vnclog.Print(LL_LOGSCREEN, "Loopback connection: DSM plugin disabled by AllowLoopbackWithoutDSM");
+		vnclog.Print(LL_CLIENTS, VNCLOG("loopback connection: not enabling DSM plugin (AllowLoopbackWithoutDSM is set)\n"));
+	}
+
+	if (usePlugin)
 	{
 		// sf@2007 - Current DSM code does not support multithreading
 		// Data mix is causing server crash and viewer drops when more than one viewer is copnnected at a time
@@ -2514,14 +2545,17 @@ bool vncClientThread::InitSocket()
 		// This is a dirty workaround. We ignore all Multi Viewer connection settings...
 		//adzm 2009-06-20 - Fixed this to use multi-threaded version, so therefore we can handle multiple
 		// clients with no issues.
-		if (!m_server->GetDSMPluginPointer()->SupportsMultithreaded() && m_server->AuthClientCount() > 0)
+		// Use DSMActiveClientCount() rather than AuthClientCount(): with AllowLoopbackWithoutDSM,
+		// authenticated clients may exist that are not using the plugin at all, and they must not
+		// trip (or satisfy) this single-DSM-connection guard.
+		if (!m_server->GetDSMPluginPointer()->SupportsMultithreaded() && m_server->DSMActiveClientCount() > 0)
 		{
 			vnclog.Print(LL_CLIENTS, VNCLOG("A connection using DSM already exist - client rejected to avoid crash \n"));
 			return false;
 		}
 
 		//adzm 2009-06-20 - TODO - Not sure about this. what about pending connections via the repeater?
-		if (m_server->AuthClientCount() == 0)
+		if (m_server->DSMActiveClientCount() == 0)
 			m_server->GetDSMPluginPointer()->ResetPlugin();	//SEC reset if needed
 		m_socket->EnableUsePlugin(true);
 		m_client->m_encodemgr.EnableQueuing(false);
