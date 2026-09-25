@@ -23,6 +23,7 @@
 #include "AboutBox.h"
 #include "UltraVNCHelperFunctions.h"
 #include "cloud_connect.h"
+#include "cloud_token_import.h"
 #include <commctrl.h>
 #include <thread>
 using namespace helper;
@@ -187,6 +188,7 @@ SessionDialog::~SessionDialog()
 BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK OnlineServersDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 constexpr UINT WM_ONLINE_SERVERS_READY = WM_APP + 42;
+constexpr UINT WM_TOKEN_IMPORT_DONE = WM_APP + 43;
 
 struct OnlineServersQueryCtx {
     HWND hwnd;
@@ -268,6 +270,24 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NOTIFY:
 		return _this->HandleNotify(hwnd, wParam, lParam);
 
+	case WM_TOKEN_IMPORT_DONE:
+	{
+		CloudTokenImportListener::Result* res = (CloudTokenImportListener::Result*)lParam;
+		if (!res) return 0;
+		if (res->ok) {
+			SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, res->token.c_str());
+			SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T("Viewer token imported"));
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_SHOW);
+			PostMessage(hwnd, WM_COMMAND, MAKEWPARAM(IDC_HOSTNAME_EDIT, CBN_EDITCHANGE),
+				(LPARAM)GetDlgItem(hwnd, IDC_HOSTNAME_EDIT));
+		} else {
+			MessageBox(hwnd, _T("Token import failed. Copy the token manually from the portal page."),
+				_T("Get token"), MB_OK | MB_ICONWARNING);
+		}
+		delete res;
+		return 0;
+	}
+
 	case WM_ONLINE_SERVERS_READY:
 	{
 		OnlineServersQueryCtx* ctx = (OnlineServersQueryCtx*)lParam;
@@ -309,8 +329,27 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ShowAboutBox();
 			break;
 		case IDC_GETVIEWERTOKEN:
-			ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/viewer.php"), NULL, NULL, SW_SHOWNORMAL);
-			break;
+		{
+			SetWindowText(GetDlgItem(hwnd, IDC_CLOUD_STATUS), _T("Waiting for portal login..."));
+			ShowWindow(GetDlgItem(hwnd, IDC_CLOUD_STATUS), SW_SHOW);
+			std::thread([hwnd]() {
+				CloudTokenImportListener imp;
+				uint16_t port = 0;
+				std::string state;
+				if (!imp.Start(port, state)) {
+					ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/viewer.php"), NULL, NULL, SW_SHOWNORMAL);
+					if (IsWindow(hwnd)) PostMessage(hwnd, WM_TOKEN_IMPORT_DONE, 0,
+						(LPARAM)new CloudTokenImportListener::Result{ false, "", "listener failed" });
+					return;
+				}
+				std::string url = CloudTokenImportListener::BuildPortalUrl("viewer", port, state);
+				ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				CloudTokenImportListener::Result* res = new CloudTokenImportListener::Result(imp.WaitForCallback(180000));
+				if (IsWindow(hwnd)) PostMessage(hwnd, WM_TOKEN_IMPORT_DONE, 0, (LPARAM)res);
+				else delete res;
+			}).detach();
+		}
+		break;
 		case IDC_SHOW_ONLINE_SERVERS:
 		{
 			if (SendMessage(GetDlgItem(hwnd, IDC_RADIOBRIDGE), BM_GETCHECK, 0, 0) != BST_CHECKED)
