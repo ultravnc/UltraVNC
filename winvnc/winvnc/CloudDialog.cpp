@@ -13,6 +13,10 @@
 #include "vncserver.h"
 #include "SettingsManager.h"
 #include "resource.h"
+#include "cloud_token_import.h"
+#include <thread>
+
+#define WM_TOKEN_IMPORT_DONE (WM_APP + 46)
 
 extern HINSTANCE	hInstResDLL;
 
@@ -275,8 +279,25 @@ CloudDialog::DialogProc(HWND hwnd,
 		}
 
 		case IDC_GETSERVERTOKEN:
-			ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/server.php"), NULL, NULL, SW_SHOWNORMAL);
+		{
+			std::thread([hwnd]() {
+				CloudTokenImportListener imp;
+				uint16_t port = 0;
+				std::string state;
+				if (!imp.Start(port, state)) {
+					ShellExecute(hwnd, _T("open"), _T("https://portal.uvnc.com/matchmaker/server.php"), NULL, NULL, SW_SHOWNORMAL);
+					if (IsWindow(hwnd)) PostMessage(hwnd, WM_TOKEN_IMPORT_DONE, 0,
+						(LPARAM)new CloudTokenImportListener::Result{ false, "", "listener failed" });
+					return;
+				}
+				std::string url = CloudTokenImportListener::BuildPortalUrl("server", port, state);
+				ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+				CloudTokenImportListener::Result* res = new CloudTokenImportListener::Result(imp.WaitForCallback(180000));
+				if (IsWindow(hwnd)) PostMessage(hwnd, WM_TOKEN_IMPORT_DONE, 0, (LPARAM)res);
+				else delete res;
+			}).detach();
 			return TRUE;
+		}
 		case IDC_STARTCLOUD:
 			ShowWindow(GetDlgItem(hwnd, IDC_CLOUDCODE), true);
 			GetDlgItemText(hwnd, IDC_CLOUDSERVER, settings->getCloudServer(), MAX_HOST_NAME_LEN);
@@ -300,6 +321,21 @@ CloudDialog::DialogProc(HWND hwnd,
 		}
 
 		break;
+
+	case WM_TOKEN_IMPORT_DONE:
+	{
+		CloudTokenImportListener::Result* res = (CloudTokenImportListener::Result*)lParam;
+		if (!res) return 0;
+		if (res->ok) {
+			SetDlgItemTextA(hwnd, IDC_CLOUDTOKEN, res->token.c_str());
+			settings->setCloudToken(res->token.c_str());
+		} else {
+			MessageBox(hwnd, "Token import failed. Copy the token manually from the portal page.",
+				"Get token", MB_OK | MB_ICONWARNING);
+		}
+		delete res;
+		return 0;
+	}
 
 	case WM_DESTROY:
 		KillTimer(hwnd, 120);
