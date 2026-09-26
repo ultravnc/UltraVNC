@@ -1210,6 +1210,8 @@ BOOL CALLBACK OnlineServersDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM l
 			} else {
 				display = AnsiToTString(entry.code);
 			}
+			{ char _buf[512]; snprintf(_buf, sizeof(_buf), "[SessionDialog] list entry %zu code='%s' alias='%s' display_len=%zu\n",
+				i, entry.code.c_str(), entry.alias.c_str(), display.size()); OutputDebugStringA(_buf); }
 			int idx = (int)SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)display.c_str());
 			SendMessage(hList, LB_SETITEMDATA, idx, (LPARAM)i);
 		}

@@ -562,7 +562,7 @@ bool CloudProxyServer::QueryOnlineServers(const std::string& token,
             entry.code = std::string(resp.name, strnlen(resp.name, sizeof(resp.name)));
             entry.alias = std::string(resp.alias, strnlen(resp.alias, sizeof(resp.alias)));
             outServers.push_back(entry);
-            { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: entry code='%s' alias='%s'\n", entry.code.c_str(), entry.alias.c_str()); OutputDebugStringA(_buf); }
+            { char _buf[512]; snprintf(_buf, sizeof(_buf), "[CloudNAT] QueryOnlineServers: entry code='%s' alias='%s' alias_len=%zu\n", entry.code.c_str(), entry.alias.c_str(), entry.alias.size()); OutputDebugStringA(_buf); }
         }
     }
 
