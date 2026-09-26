@@ -111,8 +111,10 @@ CloudDialog::DialogProc(HWND hwnd,
 				} else {
 					char hostname[64]{};
 					DWORD len = sizeof(hostname);
-					if (GetComputerNameA(hostname, &len))
+					if (GetComputerNameA(hostname, &len)) {
 						SetDlgItemTextA(hwnd, IDC_CLOUDALIAS, hostname);
+						settings->setCloudAlias(hostname);
+					}
 				}
 			}
 		}
@@ -309,6 +311,7 @@ CloudDialog::DialogProc(HWND hwnd,
 			{
 				char alias[64]{};
 				GetWindowTextA(GetDlgItem(hwnd, IDC_CLOUDALIAS), alias, sizeof(alias));
+				OutputDebugStringA((std::string("[CloudDialog] StartCloud alias='") + alias + "'\n").c_str());
 				settings->setCloudAlias(alias);
 			}
 			if (!_this->m_server->isCloudThreadRunning()) {

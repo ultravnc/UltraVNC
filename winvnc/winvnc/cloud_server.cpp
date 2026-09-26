@@ -125,7 +125,8 @@ bool CloudServerProxy::Announce() {
     strncpy_s(pkt.alias, alias_.c_str(), sizeof(pkt.alias) - 1);
     SignCloudServerPacket(pkt, token_);
 
-    { char _buf[256]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Announce: code=%s port=%d\n", pkt.name, localUdpPort_); PushLog(_buf); }
+    { char _buf[512]; snprintf(_buf, sizeof(_buf), "[CloudNAT] Announce: code=%s port=%d alias='%s' alias_len=%zu\n",
+        pkt.name, localUdpPort_, alias_.c_str(), alias_.size()); PushLog(_buf); }
     int sent = sendto(udpSocket_, (char*)&pkt, sizeof(pkt), 0,
                      (sockaddr*)&matchmakerAddr_, sizeof(matchmakerAddr_));
     if (sent != (int)sizeof(pkt))

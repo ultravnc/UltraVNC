@@ -2264,6 +2264,15 @@ BOOL vncServer::StartBridge()
 
 	std::string token = settings->getCloudToken();
 	std::string alias = settings->getCloudAlias();
+	if (alias.empty()) {
+		char hostname[64]{};
+		DWORD len = sizeof(hostname);
+		if (GetComputerNameA(hostname, &len)) {
+			alias = hostname;
+			settings->setCloudAlias(alias.c_str());
+		}
+	}
+	{ char _buf[512]; snprintf(_buf, sizeof(_buf), "[vncserver] cloudConnect: alias='%s' len=%zu\n", alias.c_str(), alias.size()); OutputDebugStringA(_buf); }
 
 	m_cloud_proxy = std::make_unique<CloudServerProxy>(
 		m_discovery_code,
