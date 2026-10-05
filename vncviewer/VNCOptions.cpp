@@ -209,6 +209,8 @@ VNCOptions::VNCOptions()
 	m_ignoreShapeUpdates = false;
 	m_cmdlnUser[0] = '\0';		// act : add user option on command line
 	m_clearPassword[0] = '\0';		// sf@2002
+	m_token[0] = '\0';				// VeNCrypt token (64 ASCII chars)
+	m_fUseTokenTLS = false;
 	m_quickoption = 1;				// sf@2002 - Auto Mode as default
 	m_fUseDSMPlugin = false;
 	m_oldplugin = false;
@@ -917,6 +919,16 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			}
 			WideCharToMultiByte(CP_ACP, 0, args[j], -1, m_clearPassword, _countof(m_clearPassword), NULL, NULL);
 		} // Modif sf@2002
+		// VeNCrypt token-TLS: 64-character token supplied on the command line
+		else if (SwitchMatch(args[j], _T("token")))
+		{
+			if (++j == i)
+			{
+				ArgError(sz_D24);
+				continue;
+			}
+			WideCharToMultiByte(CP_UTF8, 0, args[j], -1, m_token, _countof(m_token), NULL, NULL);
+		}
 		else if (SwitchMatch(args[j], _T("serverscale")))
 		{
 			if (++j == i)
@@ -1022,6 +1034,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 		{
 			//adzm 2010-05-12
 			m_fRequireEncryption = true;
+		}
+		else if (SwitchMatch(args[j], _T("usetokentls")))
+		{
+			// Prefer VeNCrypt TLS auth when the server offers it
+			m_fUseTokenTLS = true;
 		}
 		else if (SwitchMatch(args[j], _T("preemptiveupdates")))
 		{
@@ -1269,6 +1286,7 @@ void VNCOptions::SaveOptions(const wchar_t* fname)
 	saveInt(L"AutoAcceptIncoming", m_fAutoAcceptIncoming, fname);
 	saveInt(L"AutoAcceptNoDSM", m_fAutoAcceptNoDSM, fname);
 	saveInt(L"RequireEncryption", m_fRequireEncryption, fname);
+	saveInt(L"UseVeNCryptTLS", m_fUseTokenTLS, fname);
 	saveInt(L"UseOnlyDefaultConfigFile", m_UseOnlyDefaultConfigFile, fname);
 	saveInt(L"PreemptiveUpdates", m_preemptiveUpdates, fname);
 }
@@ -1386,6 +1404,7 @@ void VNCOptions::LoadOptions(const wchar_t* fname)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = readInt(L"RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
+	m_fUseTokenTLS = readInt(L"UseVeNCryptTLS", (int)m_fUseTokenTLS, fname) ? true : false;
 	m_UseOnlyDefaultConfigFile = readInt(L"UseOnlyDefaultConfigFile", (int)m_UseOnlyDefaultConfigFile, fname) ? true : false;
 	
 
