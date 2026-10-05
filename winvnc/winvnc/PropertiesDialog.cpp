@@ -32,11 +32,72 @@
 #include "winvnc.h"
 #include "UltraVNCService.h"
 #include "HelperFunctions.h"
+#include "SchannelTLS.h"
+#include <cryptuiapi.h>
+#include <commdlg.h>
 
 
 extern HINSTANCE	hInstResDLL;
 HWND PropertiesDialog::hEditLog = NULL;
 char PropertiesDialog::buffer[65536] = "";
+
+// SSL/TLS tab helpers: pick a certificate from the MY stores and put its
+// SHA1 thumbprint into an edit control, or create a self-signed certificate.
+static bool CertThumbprintHex(PCCERT_CONTEXT ctx, char* hex, size_t hexsize)
+{
+	BYTE sha1[20]{};
+	DWORD size = sizeof(sha1);
+	if (!ctx || hexsize < 41 ||
+		!CertGetCertificateContextProperty(ctx, CERT_HASH_PROP_ID, sha1, &size))
+		return false;
+	for (DWORD i = 0; i < 20; i++)
+		sprintf_s(hex + i * 2, 3, "%02x", sha1[i]);
+	hex[40] = 0;
+	return true;
+}
+
+static void SelectCertificateToEdit(HWND hwnd, int editId)
+{
+	HCERTSTORE hCollection = CertOpenStore(CERT_STORE_PROV_COLLECTION, 0, 0, 0, nullptr);
+	if (!hCollection)
+		return;
+	HCERTSTORE hLM = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+		CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_READONLY_FLAG, L"MY");
+	HCERTSTORE hCU = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+		CERT_SYSTEM_STORE_CURRENT_USER | CERT_STORE_READONLY_FLAG, L"MY");
+	if (hLM)
+		CertAddStoreToCollection(hCollection, hLM, 0, 0);
+	if (hCU)
+		CertAddStoreToCollection(hCollection, hCU, 0, 0);
+	PCCERT_CONTEXT ctx = CryptUIDlgSelectCertificateFromStore(hCollection, hwnd,
+		L"Select certificate", L"Select the certificate used for TLS connections",
+		CRYPTUI_SELECT_LOCATION_COLUMN, 0, nullptr);
+	if (ctx) {
+		char hex[41]{};
+		if (CertThumbprintHex(ctx, hex, sizeof(hex)))
+			SetDlgItemText(hwnd, editId, hex);
+		CertFreeCertificateContext(ctx);
+	}
+	CertCloseStore(hCollection, 0);
+	if (hLM)
+		CertCloseStore(hLM, 0);
+	if (hCU)
+		CertCloseStore(hCU, 0);
+	EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
+}
+
+static void GenerateSelfSignedToEdit(HWND hwnd, int editId)
+{
+	SchannelTLS tls;
+	char thumb[41]{};
+	if (tls.EnsureSelfSignedCert(thumb)) {
+		SetDlgItemText(hwnd, editId, thumb);
+		EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
+	}
+	else
+		MessageBoxA(hwnd, "Failed to create self-signed certificate (admin rights may be required).",
+			"UltraVNC Server", MB_OK | MB_ICONERROR);
+}
 
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -141,18 +202,20 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	TabCtrl_InsertItem(hTabControl, 7, &item);	
 	item.pszText = "Log";
 	TabCtrl_InsertItem(hTabControl, 8, &item);
+	item.pszText = "SSL/TLS";
+	TabCtrl_InsertItem(hTabControl, 9, &item);
 
 
 	if (showAdminPanel)
 	{
 		vnclog.Print(LL_INTWARN, VNCLOG("showAdminPanel\n"));
 		item.pszText = "Administration";
-		TabCtrl_InsertItem(hTabControl, 9, &item);
+		TabCtrl_InsertItem(hTabControl, 10, &item);
 	}
 	else if (standalone) 
 	{
 		item.pszText = "Service";
-		TabCtrl_InsertItem(hTabControl, 9, &item);
+		TabCtrl_InsertItem(hTabControl, 10, &item);
 	}
 
 	hTabAuthentication = CreateDialogParam(hInstResDLL,
@@ -200,6 +263,11 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		hwnd,
 		(DLGPROC)DlgProc,
 		(LONG_PTR)this);
+	hTabTLS = CreateDialogParam(hInstResDLL,
+		MAKEINTRESOURCE(IDD_FORM_TLS),
+		hwnd,
+		(DLGPROC)DlgProc,
+		(LONG_PTR)this);
 	hTabAdministration = CreateDialogParam(hInstResDLL,
 		MAKEINTRESOURCE(IDD_FORM_administration),
 		hwnd,
@@ -239,6 +307,9 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabLog, HWND_TOP, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top,
+		SWP_HIDEWINDOW);
+	SetWindowPos(hTabTLS, HWND_TOP, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top,
 		SWP_HIDEWINDOW);
 	SetWindowPos(hTabAdministration, HWND_TOP, rc.left, rc.top,
@@ -300,6 +371,10 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabLog);
 				return 0;
 			case 9:
+				ShowWindow(hTabTLS, SW_SHOW);
+				SetFocus(hTabTLS);
+				return 0;
+			case 10:
 				if (showAdminPanel) {
 					ShowWindow(hTabAdministration, SW_SHOW);
 					SetFocus(hTabAdministration);
@@ -351,6 +426,9 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabLog, SW_HIDE);
 				break;
 			case 9:
+				ShowWindow(hTabTLS, SW_HIDE);
+				break;
+			case 10:
 				if (showAdminPanel) {
 					ShowWindow(hTabAdministration, SW_HIDE);
 				}
@@ -988,6 +1066,23 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		}
 	}
 
+	// SSL/TLS tab
+	if (GetDlgItem(hwnd, IDC_TLS_NOVNC_PORT)) {
+		SetDlgItemInt(hwnd, IDC_TLS_NOVNC_PORT, settings->getTLSPort(), FALSE);
+		SetDlgItemText(hwnd, IDC_TLS_THUMBPRINT, settings->getTLSCertThumbprint());
+	}
+	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
+		BOOL bVeNCrypt = settings->getEnableVeNCryptTLS();
+		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE), BM_SETCHECK, bVeNCrypt, 0);
+		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
+		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+	}
+
 	SetForegroundWindow(hwnd);
 	EnableWindow(GetDlgItem(PropertiesDialogHwnd, IDC_APPLY), false);
 
@@ -1399,6 +1494,44 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		}
 	}
 	break;
+
+	case IDC_TLS_CERT_SELECT:
+		SelectCertificateToEdit(hwnd, IDC_TLS_THUMBPRINT);
+		return TRUE;
+	case IDC_TLS_CERT_GEN:
+		GenerateSelfSignedToEdit(hwnd, IDC_TLS_THUMBPRINT);
+		return TRUE;
+	case IDC_VENCRYPT_CERT_SELECT:
+		SelectCertificateToEdit(hwnd, IDC_VENCRYPT_THUMBPRINT);
+		return TRUE;
+	case IDC_VENCRYPT_CERT_GEN:
+		GenerateSelfSignedToEdit(hwnd, IDC_VENCRYPT_THUMBPRINT);
+		return TRUE;
+	case IDC_VENCRYPT_ENABLE:
+	{
+		BOOL bVeNCrypt = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+	}
+	return TRUE;
+	case IDC_VENCRYPT_DLL_BROWSE:
+	{
+		char file[MAX_PATH]{};
+		GetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, file, MAX_PATH);
+		OPENFILENAMEA ofn{};
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = hwnd;
+		ofn.lpstrFile = file;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.lpstrFilter = "DLL files (*.dll)\0*.dll\0All files (*.*)\0*.*\0";
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+		if (GetOpenFileNameA(&ofn))
+			SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, file);
+	}
+	return TRUE;
 
 	case IDC_CONNECT_SOCK:
 		// TightVNC 1.2.7 method
@@ -1984,6 +2117,27 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		}
 	}
 
+	// SSL/TLS tab
+	if (GetDlgItem(hwnd, IDC_TLS_NOVNC_PORT)) {
+		BOOL ok{};
+		UINT tlsPort = GetDlgItemInt(hwnd, IDC_TLS_NOVNC_PORT, &ok, FALSE);
+		if (ok)
+			settings->setTLSPort(tlsPort);
+		char thumb[64]{};
+		GetDlgItemText(hwnd, IDC_TLS_THUMBPRINT, thumb, sizeof(thumb));
+		settings->setTLSCertThumbprint(thumb);
+	}
+	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
+		settings->setEnableVeNCryptTLS(
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		char thumb[64]{};
+		GetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, thumb, sizeof(thumb));
+		settings->setVeNCryptTLSCertThumbprint(thumb);
+		char dllPath[MAX_PATH]{};
+		GetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, sizeof(dllPath));
+		settings->setVeNCryptTokenDLLPath(dllPath);
+	}
+
 	if (GetDlgItem(hwnd, IDC_DISABLE_INPUTS)) {
 		HWND hEnableRemoteInputs = GetDlgItem(hwnd, IDC_DISABLE_INPUTS);
 		if (m_server)
@@ -2343,6 +2497,7 @@ void PropertiesDialog::onApply(HWND hwnd)
 	SendMessage(hTabRules, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDC_APPLY, 0);
+	SendMessage(hTabTLS, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDC_APPLY, 0);
 	SendMessage(hTabService, WM_COMMAND, IDC_APPLY, 0);
 #ifndef SC_20
@@ -2360,6 +2515,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	SendMessage(hTabRules, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDOK, 0);
+	SendMessage(hTabTLS, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDOK, 0);
 	SendMessage(hTabService, WM_COMMAND, IDOK, 0);
 
@@ -2376,6 +2532,7 @@ void PropertiesDialog::onOK(HWND hwnd)
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
+	DestroyWindow(hTabTLS);
 	DestroyWindow(hTabAdministration);
 	DestroyWindow(hTabService);
 	EndDialog(hwnd, TRUE);
@@ -2391,6 +2548,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	SendMessage(hTabRules, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabCapture, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabLog, WM_COMMAND, IDCANCEL, 0);
+	SendMessage(hTabTLS, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabAdministration, WM_COMMAND, IDCANCEL, 0);
 	SendMessage(hTabService, WM_COMMAND, IDCANCEL, 0);
 	DestroyWindow(hTabAuthentication);
@@ -2402,6 +2560,7 @@ void PropertiesDialog::onCancel(HWND hwnd)
 	DestroyWindow(hTabRules);
 	DestroyWindow(hTabCapture);
 	DestroyWindow(hTabLog);
+	DestroyWindow(hTabTLS);
 	DestroyWindow(hTabAdministration);
 	DestroyWindow(hTabService);
 	EndDialog(hwnd, FALSE);

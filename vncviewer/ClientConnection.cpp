@@ -2996,7 +2996,10 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 
 			if (!auth_supported.empty()) {
 				std::vector<CARD8> auth_priority;
-				auth_priority.push_back(rfbUltraVNC);				
+				// If the user supplied a token, prefer native VeNCrypt TLS token auth.
+				if (m_opts->m_fUseTokenTLS || m_opts->m_token[0] != '\0')
+					auth_priority.push_back(rfbVeNCypt);
+				auth_priority.push_back(rfbUltraVNC);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
@@ -3004,7 +3007,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIIAuth);  // Prefer secure X25519 version
 			auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);  // Fallback to legacy 31-bit DH
-				auth_priority.push_back(rfbVeNCypt);
+				if (!m_opts->m_fUseTokenTLS && m_opts->m_token[0] == '\0')
+					auth_priority.push_back(rfbVeNCypt);
 				auth_priority.push_back(rfbRSAAES_256);
 				auth_priority.push_back(rfbRSAAES);
 				auth_priority.push_back(rfbRSAAESne_256);

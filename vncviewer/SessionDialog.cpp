@@ -132,6 +132,7 @@ SessionDialog::SessionDialog(VNCOptions* pOpt, ClientConnection* pCC, CDSMPlugin
 	fAutoAcceptIncoming = m_pOpt->m_fAutoAcceptIncoming;
 	fAutoAcceptNoDSM = m_pOpt->m_fAutoAcceptNoDSM;
 	fRequireEncryption = m_pOpt->m_fRequireEncryption;
+	fUseTokenTLS = m_pOpt->m_fUseTokenTLS;
 	fUseOnlyDefaultConfigFile = m_pOpt->m_UseOnlyDefaultConfigFile;
 	restricted = m_pOpt->m_restricted;
 	ipv6 = m_pOpt->m_ipv6;
@@ -695,6 +696,7 @@ bool SessionDialog::connect(HWND hwnd)
 	m_pOpt->m_fAutoAcceptIncoming = fAutoAcceptIncoming;
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
+	m_pOpt->m_fUseTokenTLS = fUseTokenTLS;
 	m_pOpt->m_UseOnlyDefaultConfigFile = fUseOnlyDefaultConfigFile;
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_ipv6 = ipv6;
