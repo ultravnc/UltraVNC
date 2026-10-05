@@ -203,6 +203,7 @@ void SessionDialog::SaveToFile(wchar_t *fname, bool asDefault)
 	saveInt(L"GiiEnable", giiEnable, fname);
 #endif
 	saveInt(L"RequireEncryption",	fRequireEncryption, fname);
+	saveInt(L"UseVeNCryptTLS",		fUseTokenTLS, fname);
 	saveInt(L"UseOnlyDefaultConfigFile", fUseOnlyDefaultConfigFile, fname);
 	saveInt(L"restricted",			restricted,		fname);  //hide menu
 	saveInt(L"ipv6",					ipv6, fname);  //hide menu
@@ -302,6 +303,7 @@ void SessionDialog::LoadFromFile(wchar_t *fname)
   fAutoAcceptIncoming = readInt(L"AutoAcceptIncoming", (int)fAutoAcceptIncoming, fname) ? true : false;
   fAutoAcceptNoDSM = readInt(L"AutoAcceptNoDSM", (int)fAutoAcceptNoDSM, fname) ? true : false;
   fRequireEncryption = readInt(L"RequireEncryption", (int)fRequireEncryption, fname) ? true : false;
+  fUseTokenTLS =		readInt(L"UseVeNCryptTLS", (int)fUseTokenTLS, fname) ? true : false;
   preemptiveUpdates = readInt(L"PreemptiveUpdates", (int)preemptiveUpdates, fname) ? true : false;
 
   GetPrivateProfileStringW(L"connection", L"proxyhost", L"", m_proxyhost, MAX_HOST_NAME_LEN, fname);

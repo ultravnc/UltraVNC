@@ -14,6 +14,7 @@
 #include "ClientConnection.h"
 #include "Exception.h"
 #include "AuthDialog.h"
+#include "rfb.h"
 
 #define SECURITY_WIN32
 #include <security.h>
@@ -607,13 +608,7 @@ private:
 	}
 };
 
-const int secTypePlain = 256;
-const int secTypeTLSNone = 257;
-const int secTypeTLSVnc = 258;
-const int secTypeTLSPlain = 259;
-const int secTypeX509None = 260;
-const int secTypeX509Vnc = 261;
-const int secTypeX509Plain = 262;
+// VeNCrypt subtype constants are now in rfb/rfbproto.h (secTypePlain, secTypeTLSNone, etc.).
 
 static const TCHAR *ThumbprintSection = _T("thumbprint");
 
@@ -656,7 +651,9 @@ void ClientConnection::AuthVeNCrypt()
 		throw WarningException(werror);
 	};
 
+	version = 0;
 	ReadExact((char *)&version, 2);
+	vnclog.Print(0, _T("AuthVeNCrypt: raw version bytes %02x %02x\n"), ((unsigned char*)&version)[0], ((unsigned char*)&version)[1]);
 	version = Swap16IfLE(version);
 	if (version >= 2)
 	{
@@ -689,6 +686,7 @@ void ClientConnection::AuthVeNCrypt()
 			case secTypeX509None:
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
+			case secTypeTokenTLS:
 				subType = temp;
 				break;
 			}
@@ -827,6 +825,36 @@ void ClientConnection::AuthVeNCrypt()
 			WriteExact((char *)&temp, 4);
 			WriteExact(_tlsUser, (int)strlen(_tlsUser));
 			WriteExact(_tlsPasswd, (int)strlen(_tlsPasswd));
+		}
+		break;
+	case secTypeTokenTLS:
+		{
+			char _tlsUser[256] = {0}, _tlsToken[65] = {0};
+			if (m_opts->m_token[0] == '\0')
+			{
+				AuthDialog ad;
+				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+				if (!ad.DoDialog(dtUserToken, m_host, m_port))
+					QuietException_helper(L"Authentication cancelled");
+				strcpy_s(_tlsUser, 256, ad.m_user);
+				strcpy_s(_tlsToken, 65, ad.m_passwd);
+			}
+			else
+			{
+				strcpy_s(_tlsUser, 256, m_opts->m_cmdlnUser);
+				strcpy_s(_tlsToken, 65, m_opts->m_token);
+			}
+			size_t tokenLen = strlen(_tlsToken);
+			if (tokenLen < 6 || tokenLen > 64)
+				return SetLastError("Token must be 6-64 ASCII characters");
+			temp = (int)strlen(_tlsUser);
+			temp = Swap32IfLE(temp);
+			WriteExact((char *)&temp, 4);
+			temp = (int)tokenLen;
+			temp = Swap32IfLE(temp);
+			WriteExact((char *)&temp, 4);
+			WriteExact(_tlsUser, (int)strlen(_tlsUser));
+			WriteExact(_tlsToken, (int)tokenLen);
 		}
 		break;
 	default:

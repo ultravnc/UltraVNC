@@ -357,6 +357,9 @@ static BOOL read_reg_string(HKEY key, LPCTSTR sub_key, LPCTSTR val_name, LPBYTE 
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR szCmdLine, int nCmdShow)
 {
+	vnclog.SetMode(Log::ToFile | Log::ToDebug);
+	vnclog.SetLevel(10);
+	vnclog.SetFile(_T("C:\\uvnc\\vncviewer.log"), false);
 	HMODULE hUser32 = LoadLibraryEx(_T("user32.dll"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	HMODULE shcoreDLL = LoadLibraryExW(_T("SHCORE.DLL"), NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	//Min  Vista

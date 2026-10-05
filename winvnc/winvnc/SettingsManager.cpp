@@ -159,6 +159,9 @@ void SettingsManager::setDefaults()
 	m_pref_EnableTLS = FALSE;
 	m_pref_TLSPort = 6080;
 	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
+	m_pref_EnableVeNCryptTLS = FALSE;
+	memset(m_pref_VeNCryptTLSCertThumbprint, 0, sizeof(m_pref_VeNCryptTLSCertThumbprint));
+	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
@@ -354,6 +357,9 @@ void SettingsManager::load()
 	m_pref_EnableTLS = iniFile.ReadInt("admin", "EnableTLS", m_pref_EnableTLS);
 	m_pref_TLSPort   = iniFile.ReadInt("admin", "TLSPort",   m_pref_TLSPort);
 	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
+	m_pref_EnableVeNCryptTLS = iniFile.ReadInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
+	iniFile.ReadString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint, sizeof(m_pref_VeNCryptTLSCertThumbprint));
+	iniFile.ReadString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath, sizeof(m_pref_VeNCryptTokenDLLPath));
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber = iniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = iniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
@@ -467,6 +473,9 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "EnableTLS", m_pref_EnableTLS);
 	iniFile.WriteInt("admin", "TLSPort",   (int)m_pref_TLSPort);
 	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
+	iniFile.WriteInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
+	iniFile.WriteString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint);
+	iniFile.WriteString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath);
 	iniFile.WriteInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	if (!m_pref_AutoPortSelect) {
 		iniFile.WriteInt("admin", "PortNumber", m_pref_PortNumber);

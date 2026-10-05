@@ -88,6 +88,9 @@ int AuthDialog::DoDialog(DialogType dialogType, TCHAR IN_host[MAX_HOST_NAME_LEN]
 		m_bPassphraseMode = true;
 		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG5), NULL, (DLGPROC)DlgProc1, (LONG_PTR)this);
 		break;
+	case dtUserToken:
+		result = DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_AUTH_DIALOG), NULL, (DLGPROC)DlgProc, (LONG_PTR)this);
+		break;
 	}
 	
 	// Restore status window after authentication if classname is used
@@ -117,6 +120,8 @@ BOOL CALLBACK AuthDialog::DlgProc(  HWND hwnd,  UINT uMsg,
 			
 			if (_this->dialogType == dtUserPassRSA)
 				Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 256);
+			else if (_this->dialogType == dtUserToken)
+				Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 64);
             else
 				Edit_LimitText(GetDlgItem(hwnd, IDC_PASSWD_EDIT), 32);
 			//CentreWindow(hwnd);

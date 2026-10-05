@@ -11,7 +11,7 @@
 
 #pragma once
 
-enum DialogType{dtUserPass, dtPass, dtUserPassNotEncryption, dtPassUpgrade, dtUserPassRSA, dtPassRSA};
+enum DialogType{dtUserPass, dtPass, dtUserPassNotEncryption, dtPassUpgrade, dtUserPassRSA, dtPassRSA, dtUserToken};
 
 class AuthDialog  
 {

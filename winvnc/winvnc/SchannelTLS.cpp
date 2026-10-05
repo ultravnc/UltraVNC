@@ -63,10 +63,12 @@ SchannelTLS::SchannelTLS()
     SecInvalidateHandle(&m_credHandle);
     SecInvalidateHandle(&m_ctxHandle);
     memset(&m_streamSizes, 0, sizeof(m_streamSizes));
+    InitializeCriticalSection(&m_csCrypto);
 }
 
 SchannelTLS::~SchannelTLS()
 {
+    DeleteCriticalSection(&m_csCrypto);
     if (m_ctxValid)  { DeleteSecurityContext(&m_ctxHandle);    m_ctxValid  = false; }
     if (m_credValid) { FreeCredentialsHandle(&m_credHandle);   m_credValid = false; }
     if (m_certCtx)   { CertFreeCertificateContext(m_certCtx);  m_certCtx   = nullptr; }
@@ -310,10 +312,7 @@ bool SchannelTLS::ServerHandshake(VSocket* sock)
     sc.dwVersion       = SCHANNEL_CRED_VERSION;
     sc.cCreds          = 1;
     sc.paCred          = &m_certCtx;
-#ifndef SP_PROT_TLS1_3_SERVER
-#define SP_PROT_TLS1_3_SERVER 0x00001000
-#endif
-    sc.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER | SP_PROT_TLS1_3_SERVER;
+    sc.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER;
     sc.dwFlags         = SCH_CRED_NO_SYSTEM_MAPPER | SCH_USE_STRONG_CRYPTO;
     sc.dwMinimumCipherStrength = 128;
 
@@ -529,7 +528,9 @@ bool SchannelTLS::Send(VSocket* sock, const char* buf, int len)
         desc.cBuffers  = 4;
         desc.pBuffers  = bufs;
 
+        EnterCriticalSection(&m_csCrypto);
         SECURITY_STATUS ss = EncryptMessage(&m_ctxHandle, 0, &desc, 0);
+        LeaveCriticalSection(&m_csCrypto);
         if (ss != SEC_E_OK)
         {
             vnclog.Print(LL_CONNERR, VNCLOG("TLS: EncryptMessage failed: %s\n"), HrStr(ss).c_str());
@@ -548,7 +549,7 @@ bool SchannelTLS::Send(VSocket* sock, const char* buf, int len)
 bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
 {
     *received = 0;
-    if (!m_ready) return false;
+    if (!m_ready) { vnclog.Print(LL_CONNERR, VNCLOG("TLS: Recv called but not ready\n")); return false; }
 
     // Drain any already-decrypted plaintext first
     if (!m_plainBuf.empty())
@@ -580,7 +581,9 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
             desc.cBuffers  = 4;
             desc.pBuffers  = bufs;
 
+            EnterCriticalSection(&m_csCrypto);
             SECURITY_STATUS ss = DecryptMessage(&m_ctxHandle, &desc, 0, nullptr);
+            LeaveCriticalSection(&m_csCrypto);
 
             if (ss == SEC_E_OK)
             {
@@ -590,7 +593,7 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
                 BYTE* extra = nullptr;
                 DWORD extraLen = 0;
 
-                for (int i = 1; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (bufs[i].BufferType == SECBUFFER_DATA)
                     {
@@ -604,21 +607,31 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
                     }
                 }
 
-                // Remaining undecrypted bytes
+                // plain and extra point inside m_rawBuf — copy plaintext out
+                // before the buffer is cleared or reassigned.
+                std::vector<BYTE> plainCopy;
+                if (plain && plainLen > 0)
+                    plainCopy.assign(plain, plain + plainLen);
+
+                // Remaining undecrypted bytes. extra points inside m_rawBuf,
+                // so assign() would self-alias: copy via a temp buffer.
                 if (extraLen > 0 && extra)
-                    m_rawBuf.assign(extra, extra + extraLen);
+                {
+                    std::vector<BYTE> keep(extra, extra + extraLen);
+                    m_rawBuf.swap(keep);
+                }
                 else
                     m_rawBuf.clear();
 
                 // Return plaintext to caller
-                if (plain && plainLen > 0)
+                if (!plainCopy.empty())
                 {
-                    int take = min(len, (int)plainLen);
-                    memcpy(buf, plain, take);
+                    int take = min(len, (int)plainCopy.size());
+                    memcpy(buf, plainCopy.data(), take);
                     *received = take;
                     // Buffer the rest
-                    if ((DWORD)take < plainLen)
-                        m_plainBuf.insert(m_plainBuf.end(), plain + take, plain + plainLen);
+                    if (take < (int)plainCopy.size())
+                        m_plainBuf.insert(m_plainBuf.end(), plainCopy.begin() + take, plainCopy.end());
                     return true;
                 }
                 // else: decrypted to nothing (heartbeat etc.) — loop
@@ -626,7 +639,7 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
             }
             else if (ss == SEC_I_CONTEXT_EXPIRED)
             {
-                // Peer sent close_notify
+                vnclog.Print(LL_CONNERR, VNCLOG("TLS: peer sent close_notify\n"));
                 return false;
             }
             else if (ss == SEC_E_INCOMPLETE_MESSAGE)
@@ -644,7 +657,10 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
         BYTE tmp[4096];
         DWORD got = 0;
         if (!RawRecv(sock, tmp, sizeof(tmp), &got) || got == 0)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("TLS: Recv abort, rawbuf=%u plainbuf=%u\n"), (unsigned)m_rawBuf.size(), (unsigned)m_plainBuf.size());
             return false;
+        }
         m_rawBuf.insert(m_rawBuf.end(), tmp, tmp + got);
     }
 }
@@ -705,7 +721,10 @@ bool SchannelTLS::RawSend(VSocket* sock, const BYTE* data, DWORD len)
     {
         int n = sock->Send((const char*)data + sent, (VCard)(len - sent));
         if (n <= 0)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("TLS: RawSend failed n=%d wsa=%d\n"), n, WSAGetLastError());
             return false;
+        }
         sent += (DWORD)n;
     }
     return true;
@@ -717,6 +736,7 @@ bool SchannelTLS::RawRecv(VSocket* sock, BYTE* data, DWORD len, DWORD* received)
     int n = sock->Read((char*)data, (int)len);
     if (n <= 0)
     {
+        vnclog.Print(LL_CONNERR, VNCLOG("TLS: RawRecv failed n=%d wsa=%d\n"), n, WSAGetLastError());
         *received = 0;
         return false;
     }

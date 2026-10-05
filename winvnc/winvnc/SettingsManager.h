@@ -73,6 +73,14 @@ public:
 	void setTLSPort(LONG v)            { m_pref_TLSPort = v; };
 	const char* getTLSCertThumbprint() { return m_pref_TLSCertThumbprint; };
 	void setTLSCertThumbprint(const char* v) { strncpy_s(m_pref_TLSCertThumbprint, v, 40); m_pref_TLSCertThumbprint[40] = 0; };
+
+	// Native VeNCrypt TLS + token authentication
+	BOOL getEnableVeNCryptTLS()                { return m_pref_EnableVeNCryptTLS; };
+	void setEnableVeNCryptTLS(BOOL v)          { m_pref_EnableVeNCryptTLS = v; };
+	const char* getVeNCryptTLSCertThumbprint() { return m_pref_VeNCryptTLSCertThumbprint; };
+	void setVeNCryptTLSCertThumbprint(const char* v) { strncpy_s(m_pref_VeNCryptTLSCertThumbprint, v, 40); m_pref_VeNCryptTLSCertThumbprint[40] = 0; };
+	const char* getVeNCryptTokenDLLPath()      { return m_pref_VeNCryptTokenDLLPath; };
+	void setVeNCryptTokenDLLPath(const char* v)      { strncpy_s(m_pref_VeNCryptTokenDLLPath, v, MAX_PATH - 1); m_pref_VeNCryptTokenDLLPath[MAX_PATH - 1] = 0; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -317,6 +325,10 @@ private:
 	BOOL m_pref_EnableTLS;
 	LONG m_pref_TLSPort;
 	char m_pref_TLSCertThumbprint[41];
+
+	BOOL m_pref_EnableVeNCryptTLS;
+	char m_pref_VeNCryptTLSCertThumbprint[41];
+	char m_pref_VeNCryptTokenDLLPath[MAX_PATH];
 
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;

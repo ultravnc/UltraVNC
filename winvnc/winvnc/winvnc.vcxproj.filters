@@ -81,6 +81,7 @@
     <ClCompile Include="vncntlm.cpp" />
     <ClCompile Include="vncOSVersion.cpp" />
     <ClCompile Include="SchannelTLS.cpp" />
+    <ClCompile Include="VeNCryptAuth.cpp" />
     <ClCompile Include="vncserver.cpp" />
     <ClCompile Include="vncsetauth.cpp" />
     <ClCompile Include="vncsockconnect.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="vncencodezrle.h" />
     <ClInclude Include="vnchttpconnect.h" />
     <ClInclude Include="SchannelTLS.h" />
+    <ClInclude Include="VeNCryptAuth.h" />
     <ClInclude Include="vncinsthandler.h" />
     <ClInclude Include="vnckeymap.h" />
     <ClInclude Include="vncListDlg.h" />
@@ -282,5 +284,6 @@
     <None Include="..\..\3rdparty\noVNC\vendor\pako\lib\zlib\trees.js" />
     <None Include="..\..\3rdparty\noVNC\vendor\pako\lib\zlib\zstream.js" />
     <None Include="res\webviewer_index.html" />
+    <None Include="..\..\3rdparty\noVNC\core\clipboard.js" />
   </ItemGroup>
 </Project>
