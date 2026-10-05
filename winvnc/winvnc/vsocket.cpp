@@ -1800,6 +1800,11 @@ VSocket::SendExactQueue(const char* buff, const VCard bufflen, unsigned char msg
 VBool
 VSocket::SendExactIPV6(const char *buff, const VCard bufflen)
 {
+	if (m_tlsCallbacks && m_tlsCallbacks->send)
+	{
+		if (bufflen <= 0) return VTrue;
+		return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
+	}
 	if (sock4 != INVALID_SOCKET) return SendExactSock(buff, bufflen, sock4);
 	if (sock6 != INVALID_SOCKET) return SendExactSock(buff, bufflen, sock6);
 	return false;
@@ -1813,6 +1818,9 @@ VSocket::SendExactSock(const char *buff, const VCard bufflen, SOCKET allsock)
 	if (bufflen <=0) {
 		return VTrue;
 	}
+	// Native TLS: encrypt and send directly, bypassing DSMPlugin.
+	if (m_tlsCallbacks && m_tlsCallbacks->send)
+		return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SendExact %i\n") ,bufflen);
 	// sf@2002 - DSMPlugin
 	VCard nBufflen = bufflen;
@@ -1905,6 +1913,11 @@ VSocket::SendExact(const char* buff, const VCard bufflen)
 VBool
 VSocket::SendExactQueueIPV6(const char *buff, const VCard bufflen)
 {
+	if (m_tlsCallbacks && m_tlsCallbacks->send)
+	{
+		if (bufflen <= 0) return VTrue;
+		return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
+	}
 	if (sock4 != INVALID_SOCKET) return SendExactQueueSock(buff, bufflen, sock4);
 	if (sock6 != INVALID_SOCKET) return SendExactQueueSock(buff, bufflen, sock6);
 	return false;
@@ -1961,6 +1974,9 @@ VSocket::SendExactQueueIPV4(const char *buff, const VCard bufflen)
 	if (bufflen <=0) {
 		return VTrue;
 	}
+	// Native TLS: send immediately; the queue is not used with TLS.
+	if (m_tlsCallbacks && m_tlsCallbacks->send)
+		return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SendExactQueue %i %i\n") ,bufflen,queuebuffersize);
 //	vnclog.Print(LL_SOCKERR, VNCLOG("socket size %i\n") ,bufflen);
 	// sf@2002 - DSMPlugin
@@ -2096,6 +2112,20 @@ VSocket::Read(char* buff, const VCard bufflen)
 VBool
 VSocket::ReadExactIPV6(char *buff, const VCard bufflen)
 {
+	if (m_tlsCallbacks && m_tlsCallbacks->recv)
+	{
+		if (bufflen <= 0) return VTrue;
+		VCard remaining = bufflen;
+		while (remaining > 0)
+		{
+			int got = 0;
+			if (!m_tlsCallbacks->recv(buff, (int)remaining, &got) || got == 0)
+				return VFalse;
+			buff += got;
+			remaining -= got;
+		}
+		return VTrue;
+	}
 	if (sock4 != INVALID_SOCKET) return ReadExactSock(buff, bufflen, sock4);
 	if (sock6 != INVALID_SOCKET) return ReadExactSock(buff, bufflen, sock6);
 	return false;
@@ -2205,15 +2235,35 @@ VSocket::ReadExactSock(char *buff, const VCard bufflen, SOCKET allsock)
 VBool
 VSocket::ReadExactIPV4(char *buff, const VCard bufflen)
 {	
-	if (sock==-1) 
+	if (sock==-1)
+	{
+		vnclog.Print(LL_CONNERR, VNCLOG("ReadExactIPV4: sock==-1 (closed)\n"));
 		return VFalse;
+	}
 	//adzm 2010-09
 	if (bufflen <=0) {
 		return VTrue;
 	}
+	// Native TLS: decrypt exactly bufflen bytes.
+	if (m_tlsCallbacks && m_tlsCallbacks->recv)
+	{
+		VCard remaining = bufflen;
+		while (remaining > 0)
+		{
+			int got = 0;
+			if (!m_tlsCallbacks->recv(buff, (int)remaining, &got) || got == 0)
+			{
+				vnclog.Print(LL_CONNERR, VNCLOG("ReadExactIPV4: TLS recv failed, remaining=%u got=%d\n"), (unsigned)remaining, got);
+				return VFalse;
+			}
+			buff += got;
+			remaining -= got;
+		}
+		return VTrue;
+	}
 	int n;
 	VCard currlen = bufflen;
-    
+
 	// sf@2002 - DSM Plugin
 	if (m_fUsePlugin && m_pDSMPlugin->IsEnabled())
 	{
@@ -2290,6 +2340,7 @@ VSocket::ReadExactIPV4(char *buff, const VCard bufflen)
 			} else {
 				if (WSAGetLastError() != WSAEWOULDBLOCK)
 				{
+					vnclog.Print(LL_SOCKERR, VNCLOG("ReadExact sock error: %d\n"), WSAGetLastError());
 					return VFalse;
 				}
 			}

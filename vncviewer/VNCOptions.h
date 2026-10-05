@@ -56,6 +56,8 @@ public:
 	bool	m_configSpecified;
 	char   m_cmdlnUser[256]; // act: add user option on command line
 	char   m_clearPassword[256]; // Modif sf@2002
+	char   m_token[65];          // VeNCrypt token (64 ASCII chars + null)
+	bool   m_fUseTokenTLS;       // Prefer VeNCrypt token-TLS auth
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
 	bool	m_restricted;
