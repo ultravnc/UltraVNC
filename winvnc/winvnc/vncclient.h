@@ -33,6 +33,7 @@ typedef SHORT vncClientId;
 #endif
 
 #include <list>
+#include <memory>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -58,6 +59,7 @@ typedef std::list<vncClientId> vncClientList;
 #include "common/Clipboard.h"
 
 #include "MouseSimulator.h"
+#include "VeNCryptAuth.h"
 
 // The vncClient class itself
 typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
@@ -670,6 +672,7 @@ public:
 	BOOL AuthVnc(std::string& auth_message);
 	BOOL AuthSCPrompt(std::string& auth_message); // adzm 2010-10
 	BOOL AuthSessionSelect(std::string& auth_message); // adzm 2010-10
+	BOOL AuthVeNCrypt(std::string& auth_message); // Native TLS + token auth
 
 	BOOL FilterClients_Blacklist();
 #ifndef SC_20
@@ -706,6 +709,7 @@ protected:
 	BOOL m_ms_logon;
 	int m_major;
 	int m_minor;
+	std::unique_ptr<VeNCryptAuth> m_veNCryptAuth; // owns native TLS session for this client
 #ifdef _Gii
 #ifdef _USE_DLL
 	PInitializeTouchInjection DLL_InitializeTouchInjection;

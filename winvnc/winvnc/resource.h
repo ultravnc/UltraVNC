@@ -210,6 +210,17 @@
 #define IDC_PORTHTTP                    1157
 #define IDC_PORTNO                      1158
 #define IDC_PORTHTTPS                   1299
+#define IDD_FORM_TLS                    1356
+#define IDC_TLS_NOVNC_PORT              1357
+#define IDC_TLS_THUMBPRINT              1358
+#define IDC_TLS_CERT_SELECT             1359
+#define IDC_TLS_CERT_GEN                1360
+#define IDC_VENCRYPT_ENABLE             1361
+#define IDC_VENCRYPT_THUMBPRINT         1362
+#define IDC_VENCRYPT_CERT_SELECT        1363
+#define IDC_VENCRYPT_CERT_GEN           1364
+#define IDC_VENCRYPT_DLLPATH            1365
+#define IDC_VENCRYPT_DLL_BROWSE         1366
 #define IDC_PORTNO_AUTO                 1159
 #define IDC_PORTNO_LABEL                1160
 #define IDC_PORTRFB                     1161
@@ -533,7 +544,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        211
 #define _APS_NEXT_COMMAND_VALUE         32906
-#define _APS_NEXT_CONTROL_VALUE         1356
+#define _APS_NEXT_CONTROL_VALUE         1367
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

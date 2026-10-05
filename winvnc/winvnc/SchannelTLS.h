@@ -84,4 +84,10 @@ private:
     std::vector<BYTE>       m_rawBuf;
     // Decrypted plaintext buffered for Recv()
     std::vector<BYTE>       m_plainBuf;
+
+    // SChannel contexts are not safe for concurrent use: the update thread
+    // calls EncryptMessage (Send) while the read thread calls DecryptMessage
+    // (Recv). Serialize the crypto calls; raw socket I/O stays unlocked so a
+    // blocking recv() does not stall sends.
+    CRITICAL_SECTION        m_csCrypto;
 };

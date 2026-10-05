@@ -110,6 +110,7 @@ public:
 	bool fAutoAcceptIncoming;
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
+	bool fUseTokenTLS;
 	bool fUseOnlyDefaultConfigFile;
 	bool restricted;
 	bool ipv6;

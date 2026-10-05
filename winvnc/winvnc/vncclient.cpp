@@ -1364,6 +1364,10 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth);
 	}
+	else if (settings->getEnableVeNCryptTLS())
+	{
+		auth_types.push_back(rfbVeNCypt);
+	}
 	else if ((settings->getScPrompt() || settings->getScExit()) && !bSCPromptActive)
 	{
 		// adzm 2010-10 - Add the SCPrompt pseudo-auth
@@ -1451,6 +1455,10 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		m_client->SetUltraViewer(true);
 		vnclog.Print(LL_LOGSCREEN, "UltraVNC Viewer");
 		auth_success = true;
+		break;
+	case rfbVeNCypt:
+		auth_success = AuthVeNCrypt(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "VeNCrypt token auth success = %d", auth_success);
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		auth_success = AuthSecureVNCPlugin(auth_message);
@@ -2247,6 +2255,32 @@ BOOL vncClientThread::AuthSessionSelect(std::string& auth_message)
 	*/
 }
 
+BOOL vncClientThread::AuthVeNCrypt(std::string& auth_message)
+{
+	// The VeNCrypt state machine performs the TLS handshake and then
+	// validates username+token through a configurable native DLL.
+	// On success the TLS callbacks are left installed on m_socket so the
+	// rest of the RFB session (including file transfer) stays encrypted.
+	auto auth = std::make_unique<VeNCryptAuth>(m_socket);
+	// secTypeX509Vnc runs the classic VNC challenge over the TLS channel;
+	// AuthVnc's SendExact/ReadExact go through the TLS callbacks once
+	// PerformTLSHandshake has installed them.
+	auth->VncAuthCallback = [this](std::string& msg) { return AuthVnc(msg) != FALSE; };
+
+	// Give the user time to accept the certificate and type credentials
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
+	BOOL ok = auth->Authenticate(auth_message);
+	// Restore handshake timeout
+	m_socket->SetTimeout(30000);
+
+	if (!ok)
+		return FALSE;
+
+	m_veNCryptAuth = std::move(auth);
+	return TRUE;
+}
+
 void
 ClearKeyState(BYTE key)
 {
@@ -2842,6 +2876,7 @@ vncClientThread::run(void* arg)
 			// Try to read a message ID
 			if (!m_socket->ReadExact((char*)&msg.type, sizeof(msg.type)))
 			{
+				vnclog.Print(LL_CONNERR, VNCLOG("client loop: msg.type read failed\n"));
 				m_client->cl_connected = FALSE;
 				break;
 			}
@@ -5094,6 +5129,7 @@ vncClientThread::run(void* arg)
 			break;
 		default:
 			// Unknown message, so fail!
+			vnclog.Print(LL_CONNERR, VNCLOG("client loop: unknown msg.type=%u - disconnecting\n"), (unsigned)msg.type);
 			m_client->cl_connected = FALSE;
 		}
 #ifndef SC_20
