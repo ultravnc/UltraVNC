@@ -25,6 +25,25 @@ namespace
     constexpr size_t MaxTokenLen = 64;
 
     typedef int (__cdecl *ValidateTokenFn)(const char* user, const char* token);
+    typedef int (__cdecl *IssueSessionTokenFn)(const char* user, char* outBuf, size_t outBufSize);
+
+    // Keep the token validator DLL loaded for the lifetime of the process. The
+    // DLL stores in-memory session tokens, so unloading it between calls would
+    // wipe the token table.
+    HMODULE g_hTokenValidatorDll = NULL;
+    std::mutex g_tokenDllMutex;
+
+    HMODULE GetTokenValidatorDll()
+    {
+        std::lock_guard<std::mutex> lock(g_tokenDllMutex);
+        if (!g_hTokenValidatorDll)
+        {
+            const char* dllPath = SettingsManager::getInstance()->getVeNCryptTokenDLLPath();
+            if (dllPath && dllPath[0])
+                g_hTokenValidatorDll = LoadLibraryA(dllPath);
+        }
+        return g_hTokenValidatorDll;
+    }
 }
 
 VeNCryptAuth::VeNCryptAuth(VSocket* socket)
@@ -80,7 +99,7 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         return false;
     }
 
-    if (m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc)
+    if (m_chosenType != secTypeTokenTLSv2 && m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc)
     {
         outFailureMessage = "Unsupported VeNCrypt subtype";
         return false;
@@ -116,6 +135,7 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: failed to read credentials\n"));
         return false;
     }
+    m_lastUsername = username;
 
     vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: credentials received, user='%s' userLen=%d tokenLen=%d\n"),
                  username.c_str(), (int)username.size(), (int)token.size());
@@ -128,6 +148,52 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
 
     vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: token validated OK\n"));
 
+    return true;
+}
+
+bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
+{
+    if (m_lastUsername.empty())
+    {
+        outFailureMessage = "No username available for session token";
+        return false;
+    }
+
+    HMODULE hModule = GetTokenValidatorDll();
+    if (!hModule)
+    {
+        outFailureMessage = "Failed to load token validation DLL";
+        return false;
+    }
+
+    IssueSessionTokenFn fn = (IssueSessionTokenFn)GetProcAddress(hModule, "issue_session_token");
+    if (!fn)
+    {
+        outFailureMessage = "Token validation DLL does not export issue_session_token";
+        return false;
+    }
+
+    char token[MaxTokenLen + 1] = {};
+    if (!fn(m_lastUsername.c_str(), token, sizeof(token)) || token[0] == '\0')
+    {
+        outFailureMessage = "Token validation DLL failed to issue a session token";
+        return false;
+    }
+
+    uint8_t len = (uint8_t)strlen(token);
+    if (!SendU8(len))
+    {
+        outFailureMessage = "Failed to send session token length";
+        return false;
+    }
+    if (!SendExact(token, len))
+    {
+        outFailureMessage = "Failed to send session token";
+        return false;
+    }
+
+    vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: issued %u-byte session token for user '%s'\n"),
+                 (unsigned)len, m_lastUsername.c_str());
     return true;
 }
 
@@ -158,8 +224,9 @@ bool VeNCryptAuth::SendSubTypes()
 {
     // Offer custom token-TLS plus standard TLS-plain (same wire format:
     // userLen, passLen, user, pass). Lets standard viewers (TigerVNC) connect.
-    uint8_t count = 5;
-    CARD32 subTypes[5] = { Swap32IfLE(secTypeTokenTLS), Swap32IfLE(secTypeTLSPlain), Swap32IfLE(secTypeTLSNone), Swap32IfLE(secTypeX509Plain), Swap32IfLE(secTypeX509Vnc) };
+    // TokenTLSv2 is offered first so new UltraVNC viewers can use session tokens.
+    uint8_t count = 6;
+    CARD32 subTypes[6] = { Swap32IfLE(secTypeTokenTLSv2), Swap32IfLE(secTypeTokenTLS), Swap32IfLE(secTypeTLSPlain), Swap32IfLE(secTypeTLSNone), Swap32IfLE(secTypeX509Plain), Swap32IfLE(secTypeX509Vnc) };
     return SendU8(count) && SendExact((char*)subTypes, sizeof(subTypes));
 }
 
@@ -269,19 +336,11 @@ bool VeNCryptAuth::ReadCredentials(std::string& outUsername, std::string& outTok
 bool VeNCryptAuth::ValidateToken(const char* username, const char* token,
                                  std::string& outFailureMessage)
 {
-    const char* dllPath = SettingsManager::getInstance()->getVeNCryptTokenDLLPath();
-    if (!dllPath || dllPath[0] == '\0')
-    {
-        outFailureMessage = "No token validation DLL configured";
-        return false;
-    }
-
-    HMODULE hModule = LoadLibraryA(dllPath);
+    HMODULE hModule = GetTokenValidatorDll();
     if (!hModule)
     {
         outFailureMessage = "Failed to load token validation DLL";
-        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: LoadLibraryA failed for %s: %lu\n"),
-                     dllPath, GetLastError());
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: token validator DLL not loaded\n"));
         return false;
     }
 
@@ -289,13 +348,10 @@ bool VeNCryptAuth::ValidateToken(const char* username, const char* token,
     if (!fn)
     {
         outFailureMessage = "Token validation DLL does not export validate_token";
-        FreeLibrary(hModule);
         return false;
     }
 
     int result = fn(username, token);
-    FreeLibrary(hModule);
-
     if (result == 0)
     {
         outFailureMessage = "Authentication failed";

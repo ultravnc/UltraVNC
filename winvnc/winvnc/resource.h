@@ -221,6 +221,8 @@
 #define IDC_VENCRYPT_CERT_GEN           1364
 #define IDC_VENCRYPT_DLLPATH            1365
 #define IDC_VENCRYPT_DLL_BROWSE         1366
+#define IDC_VENCRYPT_REQUIRE            1367
+#define IDC_VENCRYPT_MANAGE             1368
 #define IDC_PORTNO_AUTO                 1159
 #define IDC_PORTNO_LABEL                1160
 #define IDC_PORTRFB                     1161

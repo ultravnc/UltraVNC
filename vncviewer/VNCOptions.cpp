@@ -210,6 +210,7 @@ VNCOptions::VNCOptions()
 	m_cmdlnUser[0] = '\0';		// act : add user option on command line
 	m_clearPassword[0] = '\0';		// sf@2002
 	m_token[0] = '\0';				// VeNCrypt token (64 ASCII chars)
+	m_sessionToken[0] = '\0';		// Server-issued session token (not persisted)
 	m_fUseTokenTLS = false;
 	m_quickoption = 1;				// sf@2002 - Auto Mode as default
 	m_fUseDSMPlugin = false;

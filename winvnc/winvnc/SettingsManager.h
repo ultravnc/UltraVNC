@@ -77,6 +77,8 @@ public:
 	// Native VeNCrypt TLS + token authentication
 	BOOL getEnableVeNCryptTLS()                { return m_pref_EnableVeNCryptTLS; };
 	void setEnableVeNCryptTLS(BOOL v)          { m_pref_EnableVeNCryptTLS = v; };
+	BOOL getRequireVeNCryptTLS()               { return m_pref_RequireVeNCryptTLS; };
+	void setRequireVeNCryptTLS(BOOL v)         { m_pref_RequireVeNCryptTLS = v; };
 	const char* getVeNCryptTLSCertThumbprint() { return m_pref_VeNCryptTLSCertThumbprint; };
 	void setVeNCryptTLSCertThumbprint(const char* v) { strncpy_s(m_pref_VeNCryptTLSCertThumbprint, v, 40); m_pref_VeNCryptTLSCertThumbprint[40] = 0; };
 	const char* getVeNCryptTokenDLLPath()      { return m_pref_VeNCryptTokenDLLPath; };
@@ -327,6 +329,7 @@ private:
 	char m_pref_TLSCertThumbprint[41];
 
 	BOOL m_pref_EnableVeNCryptTLS;
+	BOOL m_pref_RequireVeNCryptTLS;
 	char m_pref_VeNCryptTLSCertThumbprint[41];
 	char m_pref_VeNCryptTokenDLLPath[MAX_PATH];
 

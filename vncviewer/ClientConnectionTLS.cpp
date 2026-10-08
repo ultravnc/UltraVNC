@@ -687,6 +687,7 @@ void ClientConnection::AuthVeNCrypt()
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
 			case secTypeTokenTLS:
+			case secTypeTokenTLSv2:
 				subType = temp;
 				break;
 			}
@@ -694,6 +695,7 @@ void ClientConnection::AuthVeNCrypt()
 	}
 	if (subType < 0)
 		return SetLastError("No valid sub-type");
+	m_lastVeNCryptSubType = subType;
 	temp = Swap32IfLE(subType);
 	WriteExact((char *)&temp, 4);
 
@@ -828,9 +830,21 @@ void ClientConnection::AuthVeNCrypt()
 		}
 		break;
 	case secTypeTokenTLS:
+	case secTypeTokenTLSv2:
 		{
 			char _tlsUser[256] = {0}, _tlsToken[65] = {0};
-			if (m_opts->m_token[0] == '\0')
+			bool usedSessionToken = false;
+
+			// TokenTLSv2: if we already have a server-issued session token, reuse it.
+			if (subType == secTypeTokenTLSv2 &&
+			    m_opts->m_sessionToken[0] != '\0' &&
+			    m_opts->m_cmdlnUser[0] != '\0')
+			{
+				strcpy_s(_tlsUser, 256, m_opts->m_cmdlnUser);
+				strcpy_s(_tlsToken, 65, m_opts->m_sessionToken);
+				usedSessionToken = true;
+			}
+			else if (m_opts->m_token[0] == '\0')
 			{
 				AuthDialog ad;
 				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
@@ -855,6 +869,11 @@ void ClientConnection::AuthVeNCrypt()
 			WriteExact((char *)&temp, 4);
 			WriteExact(_tlsUser, (int)strlen(_tlsUser));
 			WriteExact(_tlsToken, (int)tokenLen);
+
+			// Remember whether the session token was used so a later failure can
+			// clear it and fall back to prompting for a fresh TOTP.
+			if (usedSessionToken)
+				m_lastVeNCryptSubType |= 0x80000000;
 		}
 		break;
 	default:

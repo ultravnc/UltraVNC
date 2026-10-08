@@ -160,6 +160,7 @@ void SettingsManager::setDefaults()
 	m_pref_TLSPort = 6080;
 	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = FALSE;
+	m_pref_RequireVeNCryptTLS = FALSE;
 	memset(m_pref_VeNCryptTLSCertThumbprint, 0, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
 #else
@@ -358,6 +359,7 @@ void SettingsManager::load()
 	m_pref_TLSPort   = iniFile.ReadInt("admin", "TLSPort",   m_pref_TLSPort);
 	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = iniFile.ReadInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
+	m_pref_RequireVeNCryptTLS = iniFile.ReadInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
 	iniFile.ReadString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	iniFile.ReadString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath, sizeof(m_pref_VeNCryptTokenDLLPath));
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
@@ -474,6 +476,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "TLSPort",   (int)m_pref_TLSPort);
 	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
 	iniFile.WriteInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
+	iniFile.WriteInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
 	iniFile.WriteString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint);
 	iniFile.WriteString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath);
 	iniFile.WriteInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
