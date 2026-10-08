@@ -39,6 +39,13 @@ public:
     // Returns true on successful authentication, false on failure.
     bool Authenticate(std::string& outFailureMessage);
 
+    // The VeNCrypt subtype the client selected (e.g. secTypeTokenTLSv2).
+    uint32_t GetChosenType() const { return m_chosenType; }
+
+    // After a successful TokenTLSv2 authentication, generate a server-side
+    // session token for this user and send it to the client.
+    bool IssueAndSendSessionToken(std::string& outFailureMessage);
+
     // Called after the TLS handshake when the client picks secTypeX509Vnc:
     // runs the classic VNC challenge/response over the encrypted channel.
     // Set by the caller (vncClientThread::AuthVnc). If unset, subtype 261
@@ -66,5 +73,6 @@ private:
     std::mutex m_tlsMutex; // serializes Schannel Send/Recv (context not thread-safe)
     std::unique_ptr<VSocket::TLSCallbacks> m_tlsCallbacks;
     uint32_t m_chosenType;
+    std::string m_lastUsername;
     bool m_tlsActive;
 };
