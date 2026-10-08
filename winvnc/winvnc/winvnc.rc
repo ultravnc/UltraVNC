@@ -500,7 +500,7 @@ BEGIN
     PUSHBUTTON      "Browse...",IDC_VENCRYPT_DLL_BROWSE,239,136,40,12
     PUSHBUTTON      "Manage users...",IDC_VENCRYPT_MANAGE,288,136,55,12
     LTEXT           "Authentication: username + token / TOTP validated by the DLL.",IDC_STATIC,13,156,330,8
-    LTEXT           "Subtypes: X509Plain (262), X509Vnc (261), TLSPlain (259), TokenTLS (300)",IDC_STATIC,13,168,330,8
+    LTEXT           "Subtypes: TokenTLSv2 (301), TokenTLS (300), TLSPlain (259), X509Plain (262), X509Vnc (261)",IDC_STATIC,13,168,330,8
     LTEXT           "Empty thumbprint = auto-generate self-signed certificate.",IDC_STATIC,13,180,330,8
     LTEXT           "Applies to new connections; restart recommended.",IDC_STATIC,13,192,330,8
 END
