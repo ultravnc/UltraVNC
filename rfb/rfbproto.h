@@ -320,6 +320,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define secTypeX509Ident    267 // X509 TLS channel + Ident auth (not implemented)
 // UltraVNC vendor extension, outside the official subtype range:
 #define secTypeTokenTLS     300 // TLS channel + username/token via validation DLL
+#define secTypeTokenTLSv2   301 // TLS channel + username/token + session-token reconnect
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17

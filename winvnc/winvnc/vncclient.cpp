@@ -1359,14 +1359,17 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
 	// Include the SecureVNCPluginAuth type for those that support it but are not UltraVNC Viewers
-	if (!bSecureVNCPluginActive && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
+	// When VeNCrypt TLS is required, no plaintext auth methods are offered at all.
+	const bool bVeNCryptOnly = settings->getEnableVeNCryptTLS() && settings->getRequireVeNCryptTLS();
+
+	if (bVeNCryptOnly)
+	{
+		auth_types.push_back(rfbVeNCypt);
+	}
+	else if (!bSecureVNCPluginActive && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
 		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 		auth_types.push_back(rfbUltraVNC_SecureVNCPluginAuth);
-	}
-	else if (settings->getEnableVeNCryptTLS())
-	{
-		auth_types.push_back(rfbVeNCypt);
 	}
 	else if ((settings->getScPrompt() || settings->getScExit()) && !bSCPromptActive)
 	{
@@ -1410,6 +1413,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		}
 	}
 
+	// VeNCrypt TLS is offered in addition to the normal auth types, so viewers
+	// that don't select it can still connect with mslogon/plain VNC auth.
+	if (settings->getEnableVeNCryptTLS() && !bVeNCryptOnly)
+		auth_types.push_back(rfbVeNCypt);
+
 	// adzm 2010-09 - Send the auths
 	{
 		CARD8 authCount = (CARD8)auth_types.size();
@@ -1434,9 +1442,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// obviously needs to be one that we suggested in the first place
 	// BUT: if RequireMSLogonIII is set and viewer sends MS-Logon II (0x71), accept it
 	// so we can send a proper error message instead of just closing the connection
+	vnclog.Print(LL_INTINFO, "Client selected auth type: %d\n", (int)auth_accepted);
+
 	bool auth_type_valid = std::find(auth_types.begin(), auth_types.end(), auth_accepted) != auth_types.end();
 	bool is_mslogonii_fallback = (settings->getRequireMSLogonIII() && m_ms_logon && auth_accepted == rfbUltraVNC_MsLogonIIAuth);
-	
+
 	if (!auth_type_valid && !is_mslogonii_fallback) {
 		return FALSE;
 	}
@@ -1554,6 +1564,18 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	CARD32 auth_result_msg = Swap32IfLE(auth_result);
 	if (!m_socket->SendExactQueue((char*)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
+
+	// For TokenTLSv2 (subtype 301), issue and send a session token on success
+	// so the viewer can reconnect without prompting for a new TOTP code.
+	if (auth_success && auth_accepted == rfbVeNCypt && m_veNCryptAuth &&
+	    m_veNCryptAuth->GetChosenType() == secTypeTokenTLSv2)
+	{
+		std::string sessionMsg;
+		m_veNCryptAuth->IssueAndSendSessionToken(sessionMsg);
+		// A failure here is not fatal; the connection is already authenticated.
+		if (!sessionMsg.empty())
+			vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: session token issue failed: %s\n"), sessionMsg.c_str());
+	}
 
 	//adzm 2010-09 - Set handshake complete if integrated plugin finished auth
 	/*if ((auth_success || auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && (auth_accepted == rfbUltraVNC_SecureVNCPluginAuth_new || auth_accepted == rfbUltraVNC_SecureVNCPluginAuth) && m_socket->GetIntegratedPlugin()) {
