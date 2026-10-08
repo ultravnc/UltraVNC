@@ -11,6 +11,7 @@ It supports two credential formats:
 
 ```cpp
 extern "C" __declspec(dllexport) int __cdecl validate_token(const char* user, const char* token);
+extern "C" __declspec(dllexport) int __cdecl tv_get_capabilities(void);
 extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* user, char* outBuf, size_t outBufSize);
 extern "C" __declspec(dllexport) int __cdecl tv_has_management_ui(void);
 extern "C" __declspec(dllexport) int __cdecl tv_show_management_ui(HWND hwndParent);
@@ -18,9 +19,46 @@ extern "C" __declspec(dllexport) int __cdecl tv_get_last_error(char* buf, size_t
 ```
 
 * `validate_token` returns `1` to allow the connection, `0` to reject it.
+* `tv_get_capabilities` returns the `TV_CAP_*` feature bitmask (see below).
 * `issue_session_token` generates a server-side session token after a successful TOTP auth.
 * `tv_has_management_ui` / `tv_show_management_ui` let WinVNC display a dialog for user management.
 * `tv_get_last_error` is an optional diagnostic hook.
+
+## Capability negotiation
+
+The credential itself is opaque to WinVNC — the DLL receives `user + token` and
+decides what a valid token means (TOTP code, a customer-specific 64-byte token,
+a database lookup — anything). What the server *does* need to know is which
+optional protocol features the DLL implements. `tv_get_capabilities` reports
+that as a bitmask:
+
+```cpp
+#define TV_CAP_SESSION_TOKEN  0x01  // exports issue_session_token and
+                                    // validate_token accepts the tokens it issues
+#define TV_CAP_MANAGEMENT_UI  0x02  // exports tv_show_management_ui
+```
+
+WinVNC uses the flags as follows:
+
+* **`TV_CAP_SESSION_TOKEN`** — the server offers VeNCrypt subtype **301
+  (`TokenTLSv2`)** to viewers. Without this flag it only offers subtype **300
+  (`TokenTLS`)**, so a viewer that wants session tokens can never select a
+  feature the DLL cannot provide. The server uses the session-token exchange
+  only when the viewer actually selects 301 — a viewer that does not know 301
+  automatically negotiates 300.
+* **`TV_CAP_MANAGEMENT_UI`** — the WinVNC **Manage users...** button on the
+  SSL/TLS tab is enabled only when this flag is set.
+
+If a DLL does **not** export `tv_get_capabilities`, WinVNC falls back to
+probing the individual exports: `issue_session_token` implies
+`TV_CAP_SESSION_TOKEN`, and `tv_has_management_ui`/`tv_show_management_ui`
+imply `TV_CAP_MANAGEMENT_UI`. Keep the flags consistent with your exports.
+
+The DLL is loaded dynamically with `LoadLibrary`/`GetProcAddress` from the path
+in `VeNCryptTokenDLLPath`, kept loaded for the process lifetime (session tokens
+live in its memory), and called with the C ABI (`extern "C"`, `__cdecl`). All
+RFB traffic after authentication — including the UltraVNC file transfer —
+stays inside the TLS channel, so tokens never cross the wire unencrypted.
 
 ## TOTP mode
 
@@ -96,6 +134,29 @@ The WinVNC **Admin Properties → SSL/TLS** tab has a **Manage users...** button
 * Show QR again
 
 Alternate validator DLLs can implement `tv_has_management_ui` / `tv_show_management_ui` to provide their own user-management UI/options.
+
+## Writing your own validator DLL
+
+You can replace `TokenValidator.dll` with any DLL that exports the C ABI in `TokenValidatorPlugin.h`:
+
+| Export | Required | Purpose |
+|---|---|---|
+| `validate_token(user, token)` | **yes** | Accept/reject a credential. Return `1`/`0`. Enough for subtype 300. |
+| `tv_get_capabilities` | no | Returns the `TV_CAP_*` feature bitmask. If omitted, WinVNC probes the optional exports instead. |
+| `issue_session_token(user, outBuf, outBufSize)` | no | Issue a session token for TokenTLSv2 (301) reconnect. Advertise via `TV_CAP_SESSION_TOKEN`. |
+| `tv_has_management_ui` | no | Advertises whether a management dialog is available (legacy probe). |
+| `tv_show_management_ui` | no | Opens your validator-specific management dialog. Advertise via `TV_CAP_MANAGEMENT_UI`. |
+| `tv_get_last_error` | no | Diagnostic message buffer. |
+
+The DLL must be built for the same architecture as the `winvnc.exe` that loads it (x64 or x86) and the export names must match exactly with `__cdecl`.
+
+A minimal working skeleton is provided as `CustomValidatorSkeleton.cpp`. It shows a simple hard-coded validator, a session-token stub, and a placeholder management dialog. Copy it, rename it, and build it with:
+
+```cmd
+cl.exe -LD -FeMyTokenValidator.dll CustomValidatorSkeleton.cpp advapi32.lib bcrypt.lib crypt32.lib user32.lib gdi32.lib /EHsc
+```
+
+Then point `VeNCryptTokenDLLPath` to your DLL.
 
 ## Configure WinVNC
 

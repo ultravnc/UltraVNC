@@ -99,6 +99,43 @@ static void GenerateSelfSignedToEdit(HWND hwnd, int editId)
 			"UltraVNC Server", MB_OK | MB_ICONERROR);
 }
 
+// Ask the configured validator DLL whether it provides a management UI.
+// Prefers the tv_get_capabilities export; falls back to probing
+// tv_has_management_ui / tv_show_management_ui for DLLs that predate it.
+static bool ValidatorHasManagementUi(HWND hwnd)
+{
+	typedef int(__cdecl *TV_GET_CAPABILITIES)(void);
+	typedef int(__cdecl *TV_HAS_MANAGEMENT_UI)(void);
+	constexpr int TV_CAP_MANAGEMENT_UI = 0x02;
+
+	char dllPath[MAX_PATH]{};
+	GetDlgItemTextA(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, MAX_PATH);
+	if (!dllPath[0])
+		return false;
+	HMODULE hMod = LoadLibraryA(dllPath);
+	if (!hMod)
+		return false;
+
+	bool has = false;
+	TV_GET_CAPABILITIES caps = (TV_GET_CAPABILITIES)GetProcAddress(hMod, "tv_get_capabilities");
+	if (caps)
+		has = (caps() & TV_CAP_MANAGEMENT_UI) != 0;
+	else {
+		TV_HAS_MANAGEMENT_UI hasUi = (TV_HAS_MANAGEMENT_UI)GetProcAddress(hMod, "tv_has_management_ui");
+		has = (hasUi && hasUi()) || GetProcAddress(hMod, "tv_show_management_ui") != NULL;
+	}
+	FreeLibrary(hMod);
+	return has;
+}
+
+// The Manage-users button is only useful when the validator DLL exposes a UI.
+static void UpdateManageUsersButton(HWND hwnd)
+{
+	BOOL enabled = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED)
+		&& ValidatorHasManagementUi(hwnd);
+	EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_MANAGE), enabled);
+}
+
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK PropertiesDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1083,7 +1120,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_MANAGE), bVeNCrypt);
+		UpdateManageUsersButton(hwnd);
 	}
 
 	SetForegroundWindow(hwnd);
@@ -1519,9 +1556,14 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_MANAGE), bVeNCrypt);
+		UpdateManageUsersButton(hwnd);
 	}
 	return TRUE;
+
+	case IDC_VENCRYPT_DLLPATH:
+		if (subcommand == EN_CHANGE)
+			UpdateManageUsersButton(hwnd);
+		return TRUE;
 
 	case IDC_VENCRYPT_MANAGE:
 	{

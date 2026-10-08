@@ -554,6 +554,11 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
     return 1;
 }
 
+extern "C" __declspec(dllexport) int __cdecl tv_get_capabilities(void)
+{
+    return TV_CAP_SESSION_TOKEN | TV_CAP_MANAGEMENT_UI;
+}
+
 extern "C" __declspec(dllexport) int __cdecl tv_has_management_ui(void)
 {
     return 1;

@@ -26,6 +26,14 @@ namespace
 
     typedef int (__cdecl *ValidateTokenFn)(const char* user, const char* token);
     typedef int (__cdecl *IssueSessionTokenFn)(const char* user, char* outBuf, size_t outBufSize);
+    typedef int (__cdecl *GetCapabilitiesFn)(void);
+    typedef int (__cdecl *HasManagementUiFn)(void);
+
+    // Feature bits reported by the validator's tv_get_capabilities() export.
+    // Mirror of TokenValidatorPlugin.h (winvnc must not depend on that header's
+    // path; keep these values in sync).
+    constexpr int TV_CAP_SESSION_TOKEN = 0x01;
+    constexpr int TV_CAP_MANAGEMENT_UI = 0x02;
 
     // Keep the token validator DLL loaded for the lifetime of the process. The
     // DLL stores in-memory session tokens, so unloading it between calls would
@@ -43,6 +51,29 @@ namespace
                 g_hTokenValidatorDll = LoadLibraryA(dllPath);
         }
         return g_hTokenValidatorDll;
+    }
+
+    // Ask the configured validator DLL which optional features it supports.
+    // Prefers the tv_get_capabilities export; falls back to probing the
+    // individual optional exports for DLLs that predate it. Returns 0 when the
+    // DLL cannot be loaded.
+    int GetValidatorCapabilities()
+    {
+        HMODULE hDll = GetTokenValidatorDll();
+        if (!hDll)
+            return 0;
+
+        GetCapabilitiesFn fnCaps = (GetCapabilitiesFn)GetProcAddress(hDll, "tv_get_capabilities");
+        if (fnCaps)
+            return fnCaps();
+
+        int caps = 0;
+        if (GetProcAddress(hDll, "issue_session_token"))
+            caps |= TV_CAP_SESSION_TOKEN;
+        HasManagementUiFn fnHasUi = (HasManagementUiFn)GetProcAddress(hDll, "tv_has_management_ui");
+        if ((fnHasUi && fnHasUi()) || GetProcAddress(hDll, "tv_show_management_ui"))
+            caps |= TV_CAP_MANAGEMENT_UI;
+        return caps;
     }
 }
 
@@ -153,8 +184,12 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
 
 bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
 {
+    // The viewer unconditionally reads a token-length byte after a successful
+    // TokenTLSv2 auth. Every failure path must still send a zero-length token
+    // (SendU8(0)) or the viewer hangs waiting on the socket.
     if (m_lastUsername.empty())
     {
+        SendU8(0);
         outFailureMessage = "No username available for session token";
         return false;
     }
@@ -162,6 +197,7 @@ bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
     HMODULE hModule = GetTokenValidatorDll();
     if (!hModule)
     {
+        SendU8(0);
         outFailureMessage = "Failed to load token validation DLL";
         return false;
     }
@@ -169,6 +205,7 @@ bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
     IssueSessionTokenFn fn = (IssueSessionTokenFn)GetProcAddress(hModule, "issue_session_token");
     if (!fn)
     {
+        SendU8(0);
         outFailureMessage = "Token validation DLL does not export issue_session_token";
         return false;
     }
@@ -176,6 +213,7 @@ bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
     char token[MaxTokenLen + 1] = {};
     if (!fn(m_lastUsername.c_str(), token, sizeof(token)) || token[0] == '\0')
     {
+        SendU8(0);
         outFailureMessage = "Token validation DLL failed to issue a session token";
         return false;
     }
@@ -224,10 +262,21 @@ bool VeNCryptAuth::SendSubTypes()
 {
     // Offer custom token-TLS plus standard TLS-plain (same wire format:
     // userLen, passLen, user, pass). Lets standard viewers (TigerVNC) connect.
-    // TokenTLSv2 is offered first so new UltraVNC viewers can use session tokens.
-    uint8_t count = 6;
-    CARD32 subTypes[6] = { Swap32IfLE(secTypeTokenTLSv2), Swap32IfLE(secTypeTokenTLS), Swap32IfLE(secTypeTLSPlain), Swap32IfLE(secTypeTLSNone), Swap32IfLE(secTypeX509Plain), Swap32IfLE(secTypeX509Vnc) };
-    return SendU8(count) && SendExact((char*)subTypes, sizeof(subTypes));
+    // TokenTLSv2 (session tokens) is only offered when the configured
+    // validator DLL reports TV_CAP_SESSION_TOKEN; otherwise a viewer that
+    // selects 301 would wait forever for a session token the DLL cannot issue.
+    CARD32 subTypes[6];
+    int n = 0;
+    if (GetValidatorCapabilities() & TV_CAP_SESSION_TOKEN)
+        subTypes[n++] = Swap32IfLE(secTypeTokenTLSv2);
+    subTypes[n++] = Swap32IfLE(secTypeTokenTLS);
+    subTypes[n++] = Swap32IfLE(secTypeTLSPlain);
+    subTypes[n++] = Swap32IfLE(secTypeTLSNone);
+    subTypes[n++] = Swap32IfLE(secTypeX509Plain);
+    subTypes[n++] = Swap32IfLE(secTypeX509Vnc);
+
+    uint8_t count = (uint8_t)n;
+    return SendU8(count) && SendExact((char*)subTypes, (int)(sizeof(CARD32) * n));
 }
 
 bool VeNCryptAuth::ReadChosenType(uint32_t& outType)
