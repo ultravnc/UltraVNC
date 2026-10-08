@@ -22,8 +22,16 @@
 // Implements the VeNCrypt 0.2 security type (rfbVeNCrypt = 19) on top of the
 // existing SchannelTLS wrapper. Advertised subtypes (official numbering):
 //   secTypeX509Plain (262), secTypeX509Vnc (261), secTypeTLSPlain (259),
-//   secTypeTLSNone (257), plus the UltraVNC vendor subtype
-//   secTypeTokenTLS (300) -> TLS channel + username/token validation via DLL.
+//   secTypeTLSNone (257), plus the UltraVNC vendor subtypes:
+//   secTypeTokenTLS (300)   -> TLS channel + username/token validation via DLL.
+//   secTypeTokenTLSv2 (301) -> as 300, plus a server-issued session token the
+//                              viewer uses for reconnects without a new TOTP.
+//
+// Subtype 301 is only advertised when the configured validator DLL reports
+// TV_CAP_SESSION_TOKEN via tv_get_capabilities() (or exports
+// issue_session_token when the caps export is absent). The viewer's subtype
+// selection is the "viewer supports 301" signal; the session-token exchange
+// runs only when the viewer actually picked 301.
 //
 // The object owns the SchannelTLS session and the VSocket TLS callbacks for the
 // lifetime of the RFB connection.
@@ -43,7 +51,9 @@ public:
     uint32_t GetChosenType() const { return m_chosenType; }
 
     // After a successful TokenTLSv2 authentication, generate a server-side
-    // session token for this user and send it to the client.
+    // session token for this user and send it to the client. Always sends the
+    // token-length byte (0 on failure) because the viewer reads it
+    // unconditionally; failure is non-fatal to the authenticated connection.
     bool IssueAndSendSessionToken(std::string& outFailureMessage);
 
     // Called after the TLS handshake when the client picks secTypeX509Vnc:
