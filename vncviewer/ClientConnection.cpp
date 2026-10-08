@@ -405,6 +405,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_cmdlnUser[0] = '\0'; // act: add user option on command line
 	m_clearPasswd[0] = '\0'; // Modif sf@2002
 	m_usedSavedVncPassword = false;
+	m_lastVeNCryptSubType = 0;
 	// static window
 	m_BytesSend=0;
 	m_BytesRead=0;
@@ -3202,11 +3203,40 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L55);
 
 		g_passwordfailed=false;
+
+		// TokenTLSv2 (subtype 301): the server sends a session token after a
+		// successful authentication so the viewer can reconnect without prompting
+		// for a new TOTP code after a desktop switch / auto-reconnect.
+		if (authScheme == rfbVeNCypt && (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLSv2)
+		{
+			uint8_t tokenLen = 0;
+			ReadExact((char *)&tokenLen, sizeof(tokenLen));
+			if (tokenLen > 0 && tokenLen <= 64)
+			{
+				ReadExact(m_opts->m_sessionToken, tokenLen);
+				m_opts->m_sessionToken[tokenLen] = '\0';
+				vnclog.Print(0, _T("VeNCrypt: received %u-byte session token\n"), (unsigned)tokenLen);
+			}
+			else
+			{
+				m_opts->m_sessionToken[0] = '\0';
+			}
+		}
 		break;
 	case rfbVncAuthFailed:
 	case rfbVncAuthFailedEx:
 		vnclog.Print(0, _T("VNC authentication failed!"));
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L56);
+
+		// If we attempted TokenTLSv2 with a cached session token and it was rejected,
+		// clear the token so the next reconnect prompts for a fresh TOTP.
+		if (authScheme == rfbVeNCypt &&
+		    (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLSv2 &&
+		    (m_lastVeNCryptSubType & 0x80000000) != 0)
+		{
+			m_opts->m_sessionToken[0] = '\0';
+			vnclog.Print(0, _T("VeNCrypt: session token rejected, cleared for next reconnect\n"));
+		}
 
 		if (m_usedSavedVncPassword)
 		{
