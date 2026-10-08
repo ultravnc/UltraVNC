@@ -223,3 +223,14 @@ ultravnc_service/src/.opencppcov/
 vncviewer/vcpkg_installed/
 winvnc/winvnc/vcpkg_installed/
 rdr/vcpkg_installed/
+
+# TokenValidator build / runtime artifacts
+TokenValidator/*.obj
+TokenValidator/*.lib
+TokenValidator/*.exp
+TokenValidator/*.res
+TokenValidator/*.dll
+TokenValidator/*.exe
+TokenValidator/*.totp.ini
+TokenValidator/*_totp.bmp
+TokenValidator/__pycache__/

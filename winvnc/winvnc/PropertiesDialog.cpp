@@ -1074,13 +1074,16 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
 		BOOL bVeNCrypt = settings->getEnableVeNCryptTLS();
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE), BM_SETCHECK, bVeNCrypt, 0);
+		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), BM_SETCHECK, settings->getRequireVeNCryptTLS(), 0);
 		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
 		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_MANAGE), bVeNCrypt);
 	}
 
 	SetForegroundWindow(hwnd);
@@ -1510,13 +1513,51 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_VENCRYPT_ENABLE:
 	{
 		BOOL bVeNCrypt = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_MANAGE), bVeNCrypt);
 	}
 	return TRUE;
+
+	case IDC_VENCRYPT_MANAGE:
+	{
+		char dllPath[MAX_PATH]{};
+		GetDlgItemTextA(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, MAX_PATH);
+		if (!dllPath[0])
+		{
+			MessageBoxA(hwnd, "No TokenValidator DLL path is configured.", "Token Manager", MB_OK | MB_ICONWARNING);
+			return TRUE;
+		}
+
+		HMODULE hMod = LoadLibraryA(dllPath);
+		if (!hMod)
+		{
+			MessageBoxA(hwnd, "Failed to load the configured TokenValidator DLL.", "Token Manager", MB_OK | MB_ICONERROR);
+			return TRUE;
+		}
+
+		typedef int(__cdecl *TV_HAS_MANAGEMENT_UI)(void);
+		typedef int(__cdecl *TV_SHOW_MANAGEMENT_UI)(HWND);
+
+		TV_HAS_MANAGEMENT_UI hasUi = (TV_HAS_MANAGEMENT_UI)GetProcAddress(hMod, "tv_has_management_ui");
+		TV_SHOW_MANAGEMENT_UI showUi = (TV_SHOW_MANAGEMENT_UI)GetProcAddress(hMod, "tv_show_management_ui");
+
+		if (!hasUi || !showUi || !hasUi())
+		{
+			FreeLibrary(hMod);
+			MessageBoxA(hwnd, "The selected TokenValidator DLL does not provide a management UI.", "Token Manager", MB_OK | MB_ICONINFORMATION);
+			return TRUE;
+		}
+
+		showUi(hwnd);
+		FreeLibrary(hMod);
+	}
+	return TRUE;
+
 	case IDC_VENCRYPT_DLL_BROWSE:
 	{
 		char file[MAX_PATH]{};
@@ -2130,6 +2171,8 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
 		settings->setEnableVeNCryptTLS(
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setRequireVeNCryptTLS(
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		char thumb[64]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, thumb, sizeof(thumb));
 		settings->setVeNCryptTLSCertThumbprint(thumb);
