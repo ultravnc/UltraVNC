@@ -9,4 +9,9 @@ if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliar
 )
 rc /fo TokenValidator.res TokenValidator.rc
 cl.exe -LD -FeTokenValidator.dll TokenValidator.cpp TokenCore.cpp qrcodegen.cpp TokenValidator.res advapi32.lib bcrypt.lib crypt32.lib user32.lib gdi32.lib /EHsc
+if errorlevel 1 exit /b 1
 cl.exe -FeTokenSetup.exe TokenSetup.cpp TokenCore.cpp qrcodegen.cpp advapi32.lib bcrypt.lib crypt32.lib user32.lib gdi32.lib /EHsc
+if errorlevel 1 exit /b 1
+
+copy /Y TokenValidator.dll C:\uvnc\64\xp\
+call C:\uvnc\sign.bat "C:\uvnc\64\xp\TokenValidator.dll"
