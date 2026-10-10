@@ -1,3 +1,12 @@
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: MIT
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+//
+
 // TokenValidatorPlugin.h - public C ABI for UltraVNC TokenValidator DLLs.
 //
 // A validator DLL loaded by WinVNC must export at least validate_token().

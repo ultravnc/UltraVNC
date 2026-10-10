@@ -1,7 +1,16 @@
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+//
+
 // TokenCore.cpp - shared TOTP helpers for UltraVNC TokenValidator
 
 #include "TokenCore.h"
-#include "qrcodegen.hpp"
+#include "../3rdparty/qrcodegen/qrcodegen.hpp"
 
 #include <windows.h>
 #include <bcrypt.h>

@@ -1,3 +1,12 @@
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+//
+
 // TokenCore.h - shared helpers for UltraVNC TokenValidator
 //
 // TOTP secret management, QR rendering, and URI building used by both
