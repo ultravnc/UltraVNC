@@ -1,9 +1,18 @@
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+//
+
 // Native token validation DLL for UltraVNC VeNCrypt token auth.
 //
-// Supports two modes:
-//   1. Static 64-character token fallback (kept for compatibility/tests).
-//   2. TOTP (RFC 6238) codes from authenticator apps such as Microsoft
+// Supports two credential types:
+//   1. TOTP (RFC 6238) codes from authenticator apps such as Microsoft
 //      Authenticator, Google Authenticator, etc.
+//   2. Server-issued 64-character session tokens for reconnects.
 //
 // Exports:
 //   validate_token(user, token)
