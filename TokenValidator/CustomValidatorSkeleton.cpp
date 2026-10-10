@@ -1,3 +1,12 @@
+// This file is part of UltraVNC
+// https://github.com/ultravnc/UltraVNC
+// https://uvnc.com/
+//
+// SPDX-License-Identifier: MIT
+//
+// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+//
+
 // CustomValidatorSkeleton.cpp
 //
 // Minimal example of a replacement TokenValidator.dll for UltraVNC.

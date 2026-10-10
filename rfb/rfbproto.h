@@ -304,20 +304,18 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 // MS-Logon III: X25519 + AES-256-GCM, replaces weak 31-bit DH (FINDING-002)
 #define rfbUltraVNC_MsLogonIIIAuth 0x76
 
-// VeNCrypt subtypes (U32). Official values per GTK-VNC/QEMU/TigerVNC.
-// Keep in sync with vncviewer/ClientConnectionTLS.cpp.
-#define secTypePlain        256 // Plain username/password, no encryption
-#define secTypeTLSNone      257 // TLS channel, no further auth
-#define secTypeTLSVnc       258 // TLS channel + VNC password auth
-#define secTypeTLSPlain     259 // TLS channel + plain username/password
-#define secTypeX509None     260 // X509 TLS channel, no further auth
-#define secTypeX509Vnc      261 // X509 TLS channel + VNC password auth
-#define secTypeX509Plain    262 // X509 TLS channel + plain username/password
-#define secTypeTLSSASL      263 // TLS channel + SASL (not implemented)
-#define secTypeX509SASL     264 // X509 TLS channel + SASL (not implemented)
-#define secTypeIdent        265 // Ident auth (not implemented)
-#define secTypeTLSIdent     266 // TLS channel + Ident auth (not implemented)
-#define secTypeX509Ident    267 // X509 TLS channel + Ident auth (not implemented)
+#define secTypePlain        256
+#define secTypeTLSNone      257
+#define secTypeTLSVnc       258
+#define secTypeTLSPlain     259
+#define secTypeX509None     260
+#define secTypeX509Vnc      261
+#define secTypeX509Plain    262
+#define secTypeTLSSASL      263
+#define secTypeX509SASL     264
+#define secTypeIdent        265
+#define secTypeTLSIdent     266
+#define secTypeX509Ident    267
 // UltraVNC vendor extension, outside the official subtype range:
 #define secTypeTokenTLS     300 // TLS channel + username/token via validation DLL
 #define secTypeTokenTLSv2   301 // TLS channel + username/token + session-token reconnect
