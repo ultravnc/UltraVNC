@@ -285,7 +285,10 @@ bool VeNCryptAuth::ReadChosenType(uint32_t& outType)
     if (!ReadExact((char*)&value, sizeof(value)))
         return false;
     outType = Swap32IfLE(value);
-    // UltraVNC viewer expects a single 0x01 byte confirming the subtype is accepted.
+    // VeNCrypt spec (rfbproto 7.2.4): for TLS/X509 subtypes the server sends
+    // a 0x01 Ack before TLS starts. Implementations that exercise this
+    // (UltraVNC, QEMU, libvncclient, TigerVNC/KasmVNC via CSecurityTLS/
+    // SSecurityTLS) all send and expect it.
     return SendU8(0x01);
 }
 
@@ -361,9 +364,16 @@ bool VeNCryptAuth::ReadCredentials(std::string& outUsername, std::string& outTok
     if (!ReadExact((char*)&tokenLenBE, sizeof(tokenLenBE)))
         return false;
     CARD32 tokenLen = Swap32IfLE(tokenLenBE);
-    if (tokenLen < 6 || tokenLen > MaxTokenLen)
+    // The 6-64 range is the token-subtype contract. Standard Plain subtypes
+    // (259/262) carry a regular password — a generic client (TigerVNC,
+    // libvncclient) can't know about the token limit, so only a generous
+    // sanity bound applies there and the validator DLL decides validity.
+    const bool tokenSubtype = (m_chosenType == secTypeTokenTLS || m_chosenType == secTypeTokenTLSv2);
+    const CARD32 maxLen = tokenSubtype ? (CARD32)MaxTokenLen : 1024;
+    const CARD32 minLen = tokenSubtype ? 6u : 0u;
+    if (tokenLen < minLen || tokenLen > maxLen)
     {
-        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: bad credential length %u (expected 6-64)\n"), (unsigned)tokenLen);
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: bad credential length %u\n"), (unsigned)tokenLen);
         return false;
     }
 
