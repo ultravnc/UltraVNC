@@ -1,23 +1,7 @@
-// This file is part of UltraVNC
-// https://github.com/ultravnc/UltraVNC
-// https://uvnc.com/
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by TokenValidator.rc
 //
-// SPDX-License-Identifier: GPL-3.0-or-later
-//
-// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
-//
-
-// TokenRes.h - resource IDs for TokenValidator.dll management dialog
-
-#ifndef TOKEN_RES_H
-#define TOKEN_RES_H
-
-#ifndef IDC_STATIC
-#define IDC_STATIC                      -1
-#endif
-
-#define IDD_TVMANAGER                   2000
-
 #define IDC_TV_USER_LIST                1001
 #define IDC_TV_ADD                      1002
 #define IDC_TV_REMOVE                   1003
@@ -26,5 +10,17 @@
 #define IDC_TV_URI                      1006
 #define IDC_TV_QR_IMAGE                 1007
 #define IDC_TV_USERNAME                 1008
+#define IDD_TVMANAGER                   2000
+#define IDI_TOKENMANAGER                2001
+#define IDC_STATIC                      -1
 
-#endif // TOKEN_RES_H
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        102
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif
