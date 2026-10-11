@@ -49,16 +49,11 @@ S->C  u8 0x01                            subtype acknowledged (Ack)
 
 The `0x01` Ack is required by the current VeNCrypt spec (rfbproto section
 7.2.4: *"For TLS and X509 subtypes, the server then sends a one byte
-response"*). It applies only to TLS/X509 subtypes; since this server offers
-no plaintext subtypes, it is always sent.
-
-**Compatibility caveat:** the original `vencrypt.txt` draft lacked this byte
-and some implementations still follow it. TigerVNC/KasmVNC neither send nor
-read the Ack — TigerVNC viewers cannot connect to this server (the extra
-byte corrupts their TLS stream), and the UltraVNC viewer cannot connect to
-TigerVNC VeNCrypt servers (it waits for an Ack that never arrives). QEMU
-and libvncclient-based clients (Remmina, bVNC, Vinagre, …) read the Ack per
-spec and interoperate correctly.
+response"*) and is implemented by all major stacks — in TigerVNC/KasmVNC it
+lives in the TLS sub-security layer (`CSecurityTLS`/`SSecurityTLS`), not in
+the VeNCrypt negotiation class. The UltraVNC viewer additionally tolerates
+a *missing* Ack: it waits briefly and proceeds to TLS if none arrives, so
+it also works against hypothetical old-draft servers.
 
 Then the **TLS handshake** runs on the same socket. The server presents a
 certificate from its configured Windows certificate store (a self-signed
@@ -99,9 +94,11 @@ C->S  userLen bytes    username (UTF-8/ASCII)
 C->S  tokenLen bytes   token (ASCII, opaque to the server)
 ```
 
-Out-of-range lengths close the connection. The server passes both strings
-verbatim to the validator DLL's `validate_token()`; semantics (TOTP, session
-token, API key, …) belong to the DLL.
+Length limits: username 1–256 bytes always. The 6–64 token range is
+enforced only for the token subtypes (300/301); for the standard Plain
+subtypes (259/262) a sanity bound of ≤1024 applies so generic clients with
+ordinary passwords reach `validate_token` — validity is always decided by
+the DLL.
 
 ## 6. SecurityResult and session token
 

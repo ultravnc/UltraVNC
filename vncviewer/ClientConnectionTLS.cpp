@@ -701,10 +701,22 @@ void ClientConnection::AuthVeNCrypt()
 
 	// if standard RFB type negotiated -> no further msgs and no TLS session
 	if (subType >= 256) {
-		temp = 0;
-		ReadExact((char *)&temp, 1);
-		if (temp != 1)
-			return SetLastError("Server unsupported sub-type");
+		// VeNCrypt spec (rfbproto 7.2.4) requires a 0x01 Ack before TLS for
+		// TLS/X509 subtypes. All major implementations send it (QEMU,
+		// libvncserver, TigerVNC via SSecurityTLS). If a non-conformant
+		// server sends nothing, don't block forever — start TLS anyway.
+		fd_set fds;
+		FD_ZERO(&fds);
+		FD_SET(m_sock, &fds);
+		struct timeval tv = { 0, 300 * 1000 };
+		if (select(0, &fds, NULL, NULL, &tv) > 0)
+		{
+			temp = 0;
+			ReadExact((char *)&temp, 1);
+			if (temp != 1)
+				return SetLastError("Server unsupported sub-type");
+		}
+		// else: no Ack — old-draft server, proceed to TLS anyway
 
 		// start TLS on existing connection
 		TLSSession session;
