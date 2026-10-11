@@ -398,6 +398,17 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
     {
     case WM_INITDIALOG:
     {
+        // Title-bar icon: the UltraVNC icon embedded in this DLL.
+        HICON hIcon = (HICON)LoadImageW(g_hInst, MAKEINTRESOURCEW(IDI_TOKENMANAGER),
+                                      IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+                                      GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+        if (hIcon)
+            SendMessage(hDlg, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        HICON hIconBig = (HICON)LoadImageW(g_hInst, MAKEINTRESOURCEW(IDI_TOKENMANAGER),
+                                         IMAGE_ICON, GetSystemMetrics(SM_CXICON),
+                                         GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
+        if (hIconBig)
+            SendMessage(hDlg, WM_SETICON, ICON_BIG, (LPARAM)hIconBig);
         RefreshUserList(hDlg);
         SetDlgItemTextA(hDlg, IDC_TV_URI, "");
         return (INT_PTR)TRUE;

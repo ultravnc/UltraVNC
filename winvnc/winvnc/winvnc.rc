@@ -490,7 +490,8 @@ BEGIN
     LTEXT           "Port/certificate changes require a server restart.",IDC_STATIC,13,67,300,8
     GROUPBOX        "VeNCrypt TLS (native encrypted VNC)",IDC_STATIC,7,86,344,118
     CONTROL         "Enable VeNCrypt TLS",IDC_VENCRYPT_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,200,10
-    CONTROL         "Require TLS (reject plaintext auth methods)",IDC_VENCRYPT_REQUIRE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,220,100,135,10
+    CONTROL         "Require TLS (reject plaintext auth methods)",IDC_VENCRYPT_REQUIRE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,169,100,175,10
     LTEXT           "Certificate thumbprint:",IDC_STATIC,13,118,80,8
     EDITTEXT        IDC_VENCRYPT_THUMBPRINT,95,116,137,12,ES_AUTOHSCROLL
     PUSHBUTTON      "Select...",IDC_VENCRYPT_CERT_SELECT,239,116,40,12
