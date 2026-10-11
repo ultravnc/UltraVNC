@@ -891,7 +891,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 {
 	if (ultra)
 	{
-		int nr_buttons = 14;
+		int nr_buttons = 15;
 		TBADDBITMAP tbab;
 		TBBUTTON tbButtons []=
 		{
@@ -909,8 +909,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{11,ID_BUTTON_SW,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,11},
 			{12,ID_BUTTON_DESKTOP,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,12},
 			{13,ID_BUTTON_TEXTCHAT,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,13},
+			{14,ID_BUTTON_TYPECLIP,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,14},
 		};
-		static wchar_t*szTips[14] =
+		static wchar_t*szTips[15] =
 		{
 				sz_L2,
 				sz_L3,
@@ -926,6 +927,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				sz_L13,
 				sz_L14,
 				sz_L15,
+			(wchar_t*)L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
 		};
 		int stdidx;
 		HWND m_hwndTT;
@@ -1133,7 +1135,8 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 	}
 	else
 	{
-		int nr_buttons=9;
+		int nr_buttons=10;
+		int nr_bitmaps=15; // the icon strip, not the button count
 		TBADDBITMAP tbab;
 		TBBUTTON tbButtons []=
 		{
@@ -1146,8 +1149,9 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 			{6,ID_BUTTON_INFO,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,6},
 			{7,ID_BUTTON_END,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,7},
 			{8,ID_BUTTON_DBUTTON,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,8},
+			{14,ID_BUTTON_TYPECLIP,TBSTATE_ENABLED,TBSTYLE_BUTTON,0L,9},
 		};
-		static wchar_t *szTips[9] =
+		static wchar_t *szTips[10] =
 		{
 			sz_L2,
 				sz_L3,
@@ -1158,6 +1162,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				sz_L8,
 				sz_L9,
 				sz_L10,
+			(wchar_t*)L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
 		};
 		int stdidx;
 		HWND m_hwndTT;
@@ -1178,7 +1183,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
-				,nr_buttons
+				,nr_bitmaps
 				,(HINSTANCE)m_hInstResDLL
 				,IDB_BITMAPs
 				,(LPCTBBUTTON)&tbButtons
@@ -1196,7 +1201,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				//,WS_CHILD|WS_BORDER|WS_VISIBLE|TBSTYLE_TOOLTIPS|TBSTYLE_WRAPABLE|TB_AUTOSIZE
 				,WS_CHILD | TBSTYLE_WRAPABLE | WS_VISIBLE |TBSTYLE_TOOLTIPS |CCS_NORESIZE | TBSTYLE_FLAT | TBSTYLE_TRANSPARENT
 				,IDR_TOOLBAR
-				,nr_buttons
+				,nr_bitmaps
 				,(HINSTANCE)m_hInstResDLL
 				,IDB_BITMAPl
 				,(LPCTBBUTTON)&tbButtons
@@ -1575,6 +1580,9 @@ void ClientConnection::CreateDisplay()
 			AppendMenu(m_hPopupMenuKeyboard, MF_STRING, ID_CONN_ALTUP,		_T("Alt+Up"));
 		}
 		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuKeyboard, _T("Keyboard"));
+		// Top level of the window menu, so the Ctrl+Alt+Shift+V accelerator
+		// arrives as WM_SYSCOMMAND like the other window-menu commands.
+		AppendMenu(hsysmenu, MF_STRING, ID_CONN_TYPECLIPBOARD, _T("Type Clipboard as Keystrokes	Ctrl+Alt+Shift+V"));
 
 		// group connection options together
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
@@ -5373,6 +5381,85 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 }
 
 //
+// TypeClipboardAsKeystrokes
+//
+// Pasting does not work everywhere: the Windows sign-in / lock screen runs on
+// its own desktop with no clipboard, so a long password cannot be pasted
+// there. This types the LOCAL clipboard instead, one key event per
+// character.
+//
+// Every character goes as a Unicode keysym (0x01000000 | code point) rather
+// than as a key: the server then injects the exact character
+// (SendInput/KEYEVENTF_UNICODE, needs EnableUnicodeInput=1) whatever keyboard
+// layouts the two machines use. Sending plain Latin-1 keysyms would make the
+// server re-map them through ITS layout, which is where "@", "{" or "€" go
+// wrong.
+//
+void
+ClientConnection::TypeClipboardAsKeystrokes()
+{
+	std::wstring text;
+	if (OpenClipboard(m_hwndcn)) {
+		HANDLE h = GetClipboardData(CF_UNICODETEXT);
+		if (h != NULL) {
+			const wchar_t* p = static_cast<const wchar_t*>(GlobalLock(h));
+			if (p != NULL) {
+				text = p;
+				GlobalUnlock(h);
+			}
+		}
+		CloseClipboard();
+	}
+	// A copied password often carries a line break: typing it would press
+	// Enter and submit before the user has checked anything.
+	while (!text.empty() && (text.back() == L'\r' || text.back() == L'\n'))
+		text.pop_back();
+	if (text.empty()) {
+		MessageBeep(MB_ICONWARNING);
+		return;
+	}
+	const size_t kMaxChars = 4096;
+	if (text.size() > kMaxChars) {
+		MessageBox(m_hwndcn, _T("The clipboard holds more than 4096 characters - nothing was typed."),
+		           _T("Type Clipboard as Keystrokes"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	// The shortcut itself (Ctrl+Alt+Shift+V) may have sent these down to the
+	// server; typed characters would otherwise arrive as Ctrl+Alt+<char>.
+	const CARD32 modifiers[] = { XK_Shift_L, XK_Shift_R, XK_Control_L, XK_Control_R,
+	                             XK_Alt_L, XK_Alt_R, XK_Super_L, XK_Super_R };
+	for (CARD32 m : modifiers)
+		SendKeyEvent(m, false);
+	FlushWriteQueue(true, 5);
+
+	for (size_t i = 0; i < text.size(); ++i) {
+		const wchar_t c = text[i];
+		CARD32 keysym;
+		if (c == L'\r') {
+			if (i + 1 < text.size() && text[i + 1] == L'\n')
+				++i;
+			keysym = XK_Return;
+		} else if (c == L'\n') {
+			keysym = XK_Return;
+		} else if (c == L'\t') {
+			keysym = XK_Tab;
+		} else if (c < 0x20 || c == 0x7F) {
+			continue;  // other control characters have no key to press
+		} else if (c >= 0xD800 && c <= 0xDFFF) {
+			continue;  // beyond the BMP: the server's Unicode path is 16-bit
+		} else {
+			keysym = 0x01000000 | (CARD32)c;
+		}
+		SendKeyEvent(keysym, true);
+		SendKeyEvent(keysym, false);
+		FlushWriteQueue(true, 5);
+		// Paced, so a slow target (the sign-in screen) never drops one.
+		Sleep(8);
+	}
+}
+
+//
 // SendClientCutText
 //
 
@@ -8595,6 +8682,12 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						_this->FlushWriteQueue(true, 5);
 						return 0;
 
+					// Type the local clipboard as keystrokes (sign-in screen etc.)
+					case ID_CONN_TYPECLIPBOARD:
+						if (_this->m_opts->m_ViewOnly) return 0;
+						_this->TypeClipboardAsKeystrokes();
+						return 0;
+
 					// Send Ctrl-Alt-Del
 					case ID_CONN_CTLALTDEL:
 						if (_this->m_opts->m_ViewOnly) return 0;
@@ -9479,6 +9572,12 @@ LRESULT CALLBACK ClientConnection::WndProcTBwin(HWND hwnd, UINT iMsg, WPARAM wPa
 				if (LOWORD(wParam) == ID_BUTTON_END )
 				{
 					SendMessage(parent,WM_CLOSE,(WPARAM)0,(LPARAM)0);
+					return 0;
+				}
+
+				if (LOWORD(wParam) == ID_BUTTON_TYPECLIP )
+				{
+					SendMessage(parent,WM_SYSCOMMAND,(WPARAM)ID_CONN_TYPECLIPBOARD,(LPARAM)0);
 					return 0;
 				}
 

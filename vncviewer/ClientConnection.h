@@ -172,6 +172,9 @@ public:
 	int IsDormant(){ return m_dormant;};
 
 	void SendKeyEvent(CARD32 key, bool down);
+	// Types the LOCAL clipboard on the remote machine as Unicode key events
+	// (works where a clipboard cannot: e.g. the Windows sign-in screen).
+	void TypeClipboardAsKeystrokes();
 
 	// adzm 2010-09
 	void SendKeepAlive(bool bForce, bool bAsync);

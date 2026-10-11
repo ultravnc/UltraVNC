@@ -376,6 +376,8 @@
 #define ID_BUTTON_TEXTCHAT              50022
 #define IDS_WARNING                     50022
 #define ID_CLEAR_SAVED_PASSWORD         50025
+#define ID_CONN_TYPECLIPBOARD           50990
+#define ID_BUTTON_TYPECLIP              50991
 #define IDS_A1                          50023
 #define IDC_NULL                        50023
 #define ID_CLOSEAPP                     50023
