@@ -3229,14 +3229,13 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 
 		g_passwordfailed=false;
 
-		// TokenTLSv2 (subtype 301): the server sends a session token after a
-		// successful authentication so the viewer can reconnect without prompting
-		// for a new TOTP code after a desktop switch / auto-reconnect.
-		if (authScheme == rfbVeNCypt && (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLSv2)
+		// The versioned subtype-300 request asks for a session-token response.
+		if (authScheme == rfbVeNCypt && (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLS)
 		{
-			uint8_t tokenLen = 0;
-			ReadExact((char *)&tokenLen, sizeof(tokenLen));
-			if (tokenLen > 0 && tokenLen <= 64)
+			uint8_t response[3] = {};
+			ReadExact((char *)response, sizeof(response));
+			uint16_t tokenLen = ((uint16_t)response[1] << 8) | response[2];
+			if ((response[0] & uvncTokenResponseSession) && tokenLen > 0 && tokenLen <= 64)
 			{
 				ReadExact(m_opts->m_sessionToken, tokenLen);
 				m_opts->m_sessionToken[tokenLen] = '\0';
@@ -3253,10 +3252,10 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		vnclog.Print(0, _T("VNC authentication failed!"));
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,sz_L56);
 
-		// If we attempted TokenTLSv2 with a cached session token and it was rejected,
-		// clear the token so the next reconnect prompts for a fresh TOTP.
+		// If a cached session token was rejected, clear it so the next reconnect
+		// prompts for a fresh primary token.
 		if (authScheme == rfbVeNCypt &&
-		    (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLSv2 &&
+		    (m_lastVeNCryptSubType & 0xFFFF) == secTypeTokenTLS &&
 		    (m_lastVeNCryptSubType & 0x80000000) != 0)
 		{
 			m_opts->m_sessionToken[0] = '\0';

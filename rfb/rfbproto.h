@@ -316,9 +316,16 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define secTypeIdent        265
 #define secTypeTLSIdent     266
 #define secTypeX509Ident    267
-// UltraVNC vendor extension, outside the official subtype range:
-#define secTypeTokenTLS     300 // TLS channel + username/token via validation DLL
-#define secTypeTokenTLSv2   301 // TLS channel + username/token + session-token reconnect
+// UltraVNC private VeNCrypt extension, outside the official subtype range.
+// The encrypted payload begins with "UVNC", protocol version 1.0, an auth
+// method and feature flags; see TokenValidator/PROTOCOL.md.
+#define secTypeTokenTLS     300
+#define uvncTokenProtoMajor 1
+#define uvncTokenProtoMinor 0
+#define uvncTokenAuthPrimary 1
+#define uvncTokenAuthSession 2
+#define uvncTokenFlagRequestSession 0x01
+#define uvncTokenResponseSession 0x01
 
 //adzm 2010-05-10 - for backwards compatibility with pre-3.8
 #define rfbLegacy_SecureVNCPlugin 17
