@@ -5,7 +5,7 @@ This is a validation DLL for the new UltraVNC **VeNCrypt token-TLS** authenticat
 It supports two credential formats:
 
 * **TOTP code** – a 6- to 8-digit time-based one-time password from any authenticator app that implements RFC 6238, such as **Microsoft Authenticator**, Google Authenticator, or Authy.
-* **Session token** – a 64-character server-issued token used for reconnects without prompting for a new TOTP code (TokenTLSv2 only).
+* **Session token** – a 64-character server-issued token used by versioned subtype 300 for reconnects without prompting for a new TOTP code.
 
 ## Expected DLL exports
 
@@ -40,12 +40,10 @@ that as a bitmask:
 
 WinVNC uses the flags as follows:
 
-* **`TV_CAP_SESSION_TOKEN`** — the server offers VeNCrypt subtype **301
-  (`TokenTLSv2`)** to viewers. Without this flag it only offers subtype **300
-  (`TokenTLS`)**, so a viewer that wants session tokens can never select a
-  feature the DLL cannot provide. The server uses the session-token exchange
-  only when the viewer actually selects 301 — a viewer that does not know 301
-  automatically negotiates 300.
+* **`TV_CAP_SESSION_TOKEN`** — the validator can issue and accept reconnect
+  session tokens. The server always offers versioned subtype **300**; clients
+  request session-token issuance through its encrypted feature flags. Without
+  this capability the server returns an empty session-token response.
 * **`TV_CAP_MANAGEMENT_UI`** — the WinVNC **Manage users...** button on the
   SSL/TLS tab is enabled only when this flag is set.
 
@@ -55,8 +53,9 @@ probing the individual exports: `issue_session_token` implies
 imply `TV_CAP_MANAGEMENT_UI`. Keep the flags consistent with your exports.
 
 The DLL is loaded dynamically with `LoadLibrary`/`GetProcAddress` from the path
-in `VeNCryptTokenDLLPath`, kept loaded for the process lifetime (session tokens
-live in its memory), and called with the C ABI (`extern "C"`, `__cdecl`). All
+in `VeNCryptTokenDLLPath` and called with the C ABI (`extern "C"`, `__cdecl`).
+Session-token records use the same machine-protected INI so they survive a
+service desktop-process restart. All
 RFB traffic after authentication — including the UltraVNC file transfer —
 stays inside the TLS channel, so tokens never cross the wire unencrypted.
 
@@ -76,14 +75,16 @@ The per-user base32 secret is read from one of two places:
 
 The INI is encrypted with `CryptProtectData` (`CRYPTPROTECT_LOCAL_MACHINE`) and the secret is stored as a base64-encoded blob. The DLL automatically restricts the file ACL to `SYSTEM`, `BUILTIN\Administrators`, and the current user.
 
-## Session-token reconnect (TokenTLSv2)
+## Session-token reconnect (versioned subtype 300)
 
 After a successful TOTP authentication, the server calls `issue_session_token` to create a random 64-character token. The token is sent to the viewer inside the TLS tunnel.
 
 * The viewer stores it in memory and uses it on reconnects instead of a new TOTP code.
-* The token expires after **60 seconds** from the last disconnect.
-* Every successful reuse extends the lifetime by another 60 seconds.
-* Only **one active session token** is kept per user; issuing a new token revokes the previous one.
+* The token remains pending until it is used or replaced; it does not expire while the desktop connection remains active.
+* Only **one pending session token** is kept per user. Every successful reconnect immediately issues a replacement and revokes the token just used.
+* A fresh TOTP login also issues a replacement, revoking any abandoned token.
+* The server record is protected with machine-scope DPAPI and survives a WinVNC desktop-process restart.
+* The viewer token remains memory-only; closing the viewer still requires a fresh TOTP.
 * If the token is rejected, the viewer clears it and prompts for a fresh TOTP.
 
 ## Building
@@ -143,7 +144,7 @@ You can replace `TokenValidator.dll` with any DLL that exports the C ABI in `Tok
 |---|---|---|
 | `validate_token(user, token)` | **yes** | Accept/reject a credential. Return `1`/`0`. Enough for subtype 300. |
 | `tv_get_capabilities` | no | Returns the `TV_CAP_*` feature bitmask. If omitted, WinVNC probes the optional exports instead. |
-| `issue_session_token(user, outBuf, outBufSize)` | no | Issue a session token for TokenTLSv2 (301) reconnect. Advertise via `TV_CAP_SESSION_TOKEN`. |
+| `issue_session_token(user, outBuf, outBufSize)` | no | Issue a subtype-300 reconnect token. Advertise via `TV_CAP_SESSION_TOKEN`. |
 | `tv_has_management_ui` | no | Advertises whether a management dialog is available (legacy probe). |
 | `tv_show_management_ui` | no | Opens your validator-specific management dialog. Advertise via `TV_CAP_MANAGEMENT_UI`. |
 | `tv_get_last_error` | no | Diagnostic message buffer. |
@@ -179,7 +180,7 @@ Use the existing `-user` and `-token` switches, or check **Use TLS (VeNCrypt)** 
 vncviewer.exe 127.0.0.1 -user test -token 123456
 ```
 
-If `-token` is omitted, the viewer will prompt for username + token when the server advertises `secTypeTokenTLS` or `secTypeTokenTLSv2`. On reconnect after a desktop switch, the viewer reuses the stored session token automatically.
+If `-token` is omitted, the viewer prompts for username + token when the server advertises `secTypeTokenTLS` (300). On reconnect after a desktop switch, the viewer sends method 2 with the stored session token automatically.
 
 ## Connect from TigerVNC / TurboVNC / other viewers
 

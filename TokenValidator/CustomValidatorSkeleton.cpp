@@ -51,12 +51,12 @@ validate_token(const char* user, const char* token)
 }
 
 // ---------------------------------------------------------------------------
-// Optional export for TokenTLSv2 (subtype 301)
+// Optional export for versioned subtype-300 session-token reconnect
 // ---------------------------------------------------------------------------
 // Called after a successful validate_token() to issue a session token for
 // reconnects. The server sends this token back to the viewer.
 // If you do not need session-token reconnect, do not export this function;
-// WinVNC will simply not use TokenTLSv2 and fall back to TokenTLS.
+// WinVNC returns an empty session-token response when this export is absent.
 extern "C" __declspec(dllexport) int __cdecl
 issue_session_token(const char* user, char* outBuf, size_t outBufSize)
 {

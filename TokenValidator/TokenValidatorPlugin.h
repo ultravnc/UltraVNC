@@ -10,8 +10,8 @@
 // TokenValidatorPlugin.h - public C ABI for UltraVNC TokenValidator DLLs.
 //
 // A validator DLL loaded by WinVNC must export at least validate_token().
-// It may optionally export issue_session_token() to support TokenTLSv2
-// session-token reconnect, and tv_has_management_ui() / tv_show_management_ui()
+// It may optionally export issue_session_token() to support versioned
+// subtype-300 session-token reconnect, and tv_has_management_ui() / tv_show_management_ui()
 // to provide an in-product user/token management dialog.
 //
 // Build for the same architecture as the WinVNC executable that loads the DLL
@@ -63,7 +63,7 @@ typedef int (__cdecl *TV_ISSUE_SESSION_TOKEN)(const char* user, char* outBuf, si
 //
 // Optional exports:
 //   tv_get_capabilities      - reports TV_CAP_* feature flags.
-//   issue_session_token      - needed for TokenTLSv2 session-token reconnect.
+//   issue_session_token      - needed for subtype-300 session-token reconnect.
 //   tv_has_management_ui     - advertises that tv_show_management_ui exists.
 //   tv_show_management_ui    - opens the validator-specific management dialog.
 //   tv_get_last_error        - optional diagnostic message buffer.

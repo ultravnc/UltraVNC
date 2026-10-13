@@ -390,7 +390,7 @@ static bool SetSecureFileAcl(const char* path)
     return ok == TRUE;
 }
 
-static bool WriteEncryptedIni(const char* user, const std::string& secretUtf8)
+static bool WriteEncryptedIni(const char* section, const char* key, const std::string& secretUtf8)
 {
     const char* iniPath = GetIniPath();
     if (!iniPath || !iniPath[0])
@@ -421,7 +421,7 @@ static bool WriteEncryptedIni(const char* user, const std::string& secretUtf8)
     }
     LocalFree(out.pbData);
 
-    if (!WritePrivateProfileStringA("TOTP", user, base64.data(), iniPath))
+    if (!WritePrivateProfileStringA(section, key, base64.data(), iniPath))
         return false;
 
     // Harden the fallback INI so only SYSTEM, Administrators, and the current
@@ -430,14 +430,14 @@ static bool WriteEncryptedIni(const char* user, const std::string& secretUtf8)
     return true;
 }
 
-static bool ReadEncryptedIni(const char* user, std::string& secretOut)
+static bool ReadEncryptedIni(const char* section, const char* key, std::string& secretOut)
 {
     const char* iniPath = GetIniPath();
     if (!iniPath || !iniPath[0])
         return false;
 
     char base64[4096] = {};
-    if (!GetPrivateProfileStringA("TOTP", user, "", base64, sizeof(base64), iniPath))
+    if (!GetPrivateProfileStringA(section, key, "", base64, sizeof(base64), iniPath))
         return false;
 
     DWORD blobLen = 0;
@@ -460,12 +460,12 @@ static bool ReadEncryptedIni(const char* user, std::string& secretOut)
     return !secretOut.empty();
 }
 
-static bool DeleteEncryptedIni(const char* user)
+static bool DeleteEncryptedIni(const char* section, const char* key)
 {
     const char* iniPath = GetIniPath();
     if (!iniPath || !iniPath[0])
         return false;
-    return WritePrivateProfileStringA("TOTP", user, NULL, iniPath) != FALSE;
+    return WritePrivateProfileStringA(section, key, NULL, iniPath) != FALSE;
 }
 
 // ---------------------------------------------------------------------------
@@ -478,7 +478,7 @@ bool ReadTotpSecret(const std::string& user, std::string& secretOut)
         return false;
     if (ReadCredential(user.c_str(), secretOut))
         return true;
-    return ReadEncryptedIni(user.c_str(), secretOut);
+    return ReadEncryptedIni("TOTP", user.c_str(), secretOut);
 }
 
 bool WriteTotpSecret(const std::string& user, const std::string& secret)
@@ -487,7 +487,7 @@ bool WriteTotpSecret(const std::string& user, const std::string& secret)
         return false;
 
     bool ok1 = WriteCredential(user.c_str(), secret);
-    bool ok2 = WriteEncryptedIni(user.c_str(), secret);
+    bool ok2 = WriteEncryptedIni("TOTP", user.c_str(), secret);
     return ok1 || ok2;
 }
 
@@ -496,8 +496,27 @@ bool DeleteTotpSecret(const std::string& user)
     if (user.empty())
         return false;
     bool ok1 = DeleteCredential(user.c_str());
-    bool ok2 = DeleteEncryptedIni(user.c_str());
+    bool ok2 = DeleteEncryptedIni("TOTP", user.c_str());
     return ok1 || ok2;
+}
+
+bool ReadProtectedValue(const char* section, const std::string& key, std::string& valueOut)
+{
+    valueOut.clear();
+    return section && section[0] && !key.empty() &&
+           ReadEncryptedIni(section, key.c_str(), valueOut);
+}
+
+bool WriteProtectedValue(const char* section, const std::string& key, const std::string& value)
+{
+    return section && section[0] && !key.empty() && !value.empty() &&
+           WriteEncryptedIni(section, key.c_str(), value);
+}
+
+bool DeleteProtectedValue(const char* section, const std::string& key)
+{
+    return section && section[0] && !key.empty() &&
+           DeleteEncryptedIni(section, key.c_str());
 }
 
 std::vector<std::string> ListTotpUsers()

@@ -69,36 +69,49 @@ whatever both sides support.
 | 261   | secTypeX509Vnc    | classic VNC DES challenge/response            |
 | 259   | secTypeTLSPlain   | user + pass message (5), validated by DLL     |
 | 262   | secTypeX509Plain  | user + pass message (5), validated by DLL     |
-| 300   | secTypeTokenTLS   | user + token message (5), validated by DLL    |
-| 301   | secTypeTokenTLSv2 | same + session token issued on success (6)    |
+| 300   | secTypeTokenTLS   | private versioned UltraVNC token protocol     |
 
-Subtype 301 is offered **only** when the configured validator DLL reports the
-`TV_CAP_SESSION_TOKEN` capability (section 7). A server whose validator lacks
-that capability advertises 300 but never 301.
+Subtype 300 is an UltraVNC private extension, not an assigned VeNCrypt subtype.
+It is identified by an encrypted `UVNC` marker and protocol version. Primary
+and reconnect credentials are methods inside this single subtype.
 
 The `TLS*`/`X509*` pairs behave identically in this implementation — the
 certificate is always presented and the client is expected to verify it (the
 UltraVNC viewer shows a warning dialog with certificate details and thumbprint
 persistence on verification failure).
 
-## 5. Credential message (subtypes 259, 262, 300, 301)
+## 5. Authentication request
 
-Sent inside the TLS channel, immediately after the handshake. Uses the
-standard VeNCrypt "Plain" layout so generic clients can reuse their existing
-TLSPlain code path:
+### Standard subtypes 259 and 262
+
+These retain the standard VeNCrypt Plain layout:
 
 ```
-C->S  u32 userLen      1..256 bytes
-C->S  u32 tokenLen     6..64 bytes
-C->S  userLen bytes    username (UTF-8/ASCII)
-C->S  tokenLen bytes   token (ASCII, opaque to the server)
+C->S  u32 userLen + u32 passwordLen + user + password
 ```
 
-Length limits: username 1–256 bytes always. The 6–64 token range is
-enforced only for the token subtypes (300/301); for the standard Plain
-subtypes (259/262) a sanity bound of ≤1024 applies so generic clients with
-ordinary passwords reach `validate_token` — validity is always decided by
-the DLL.
+### Private subtype 300
+
+Immediately after TLS, the client sends:
+
+```
+C->S  char[4] magic       "UVNC" (bytes 55 56 4e 43)
+C->S  u8 major            1
+C->S  u8 minor            0
+C->S  u8 method           1 = primary token, 2 = reconnect session token
+C->S  u8 flags            bit 0 = request a new session token on success
+C->S  u32 userLen         1..256
+C->S  u32 credentialLen   6..64
+C->S  userLen bytes       username (UTF-8/ASCII)
+C->S  credentialLen bytes opaque credential
+```
+
+Unknown major versions, methods or flag bits are rejected. A server may accept
+a lower-or-equal minor version within major version 1. Token semantics remain
+the validator DLL's responsibility.
+
+For standard Plain subtypes (259/262), credentials may be 0..1024 bytes so
+generic clients reach `validate_token`; the DLL decides validity.
 
 ## 6. SecurityResult and session token
 
@@ -113,21 +126,22 @@ S->C  u32 reasonLen + reasonLen bytes   UTF-8 reason string
 On `result = 0` the client proceeds to `ClientInit` and the normal RFB session
 — framebuffer, input, file transfer — all inside TLS.
 
-**Subtype 301 only:** immediately after `SecurityResult = 0` the server sends:
+For subtype 300, when request flag bit 0 was set, immediately after
+`SecurityResult = 0` the server sends:
 
 ```
-S->C  u8 tokenLen + tokenLen bytes      session token
+S->C  u8 responseFlags    bit 0 = session token present
+S->C  u16 tokenLen        big-endian; currently 0..64
+S->C  tokenLen bytes      present only when responseFlags bit 0 is set
 ```
 
-`tokenLen` may be 0 (no token issued — e.g. DLL missing `issue_session_token`);
-the client must still read the length byte. The token is at most 64 bytes,
-in-memory only, and meant to be replayed as the `token` field on a subsequent
-connection instead of prompting the user again (e.g. after a desktop switch or
-auto-reconnect). Lifetime and acceptance policy are defined by the validator
-DLL; the reference TokenValidator.dll issues single-use tokens valid ~60 s.
-
-A client that does not want reconnect support simply selects subtype 300
-instead of 301.
+The response header is always sent when requested. Flags=0 and tokenLen=0 mean
+that issuance is unsupported or failed; authentication remains successful.
+A reconnect sends method 2 and may request another token. Lifetime and
+acceptance policy are defined by the validator DLL. The reference DLL stores
+one machine-protected pending token per user until it is used or replaced.
+Every successful reconnect immediately issues a replacement, and a service
+desktop-process restart does not invalidate the pending token.
 
 ## 7. Validator DLL contract
 
@@ -146,8 +160,8 @@ int  tv_get_last_error(char* buf, size_t bufSize);           /* optional     */
 Capability bits returned by `tv_get_capabilities()`:
 
 ```
-TV_CAP_SESSION_TOKEN  0x01   subtype 301 advertised; DLL issues + accepts
-                             session tokens in validate_token()
+TV_CAP_SESSION_TOKEN  0x01   DLL can issue and accept reconnect session tokens;
+                             subtype 300 remains advertised either way
 TV_CAP_MANAGEMENT_UI  0x02   the WinVNC "Manage users..." button is shown
                              and calls tv_show_management_ui()
 ```
@@ -162,8 +176,8 @@ subtype-300 token auth (no session tokens, no UI).
   after sending the subtype (section 3), run TLS, then send the
   standard `userLen/passLen/user/pass` message with the token in the `pass`
   field. Everything else is textbook RFB.
-* **Full compatibility (incl. reconnect):** implement subtype 301 as in
-  sections 5–6 — ~50 lines beyond TLSPlain.
+* **Full compatibility (including reconnect):** implement the versioned
+  subtype-300 request and response in sections 5–6.
 * **Not supported:** RealVNC's RSA-AES auth, noVNC/websockify (no VeNCrypt),
   viewers lacking a VeNCrypt stack.
 * **Token size:** 64 ASCII bytes max. Large credentials (JWT/OIDC tokens)

@@ -687,7 +687,6 @@ void ClientConnection::AuthVeNCrypt()
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
 			case secTypeTokenTLS:
-			case secTypeTokenTLSv2:
 				subType = temp;
 				break;
 			}
@@ -842,14 +841,11 @@ void ClientConnection::AuthVeNCrypt()
 		}
 		break;
 	case secTypeTokenTLS:
-	case secTypeTokenTLSv2:
 		{
 			char _tlsUser[256] = {0}, _tlsToken[65] = {0};
 			bool usedSessionToken = false;
 
-			// TokenTLSv2: if we already have a server-issued session token, reuse it.
-			if (subType == secTypeTokenTLSv2 &&
-			    m_opts->m_sessionToken[0] != '\0' &&
+			if (m_opts->m_sessionToken[0] != '\0' &&
 			    m_opts->m_cmdlnUser[0] != '\0')
 			{
 				strcpy_s(_tlsUser, 256, m_opts->m_cmdlnUser);
@@ -864,6 +860,7 @@ void ClientConnection::AuthVeNCrypt()
 					QuietException_helper(L"Authentication cancelled");
 				strcpy_s(_tlsUser, 256, ad.m_user);
 				strcpy_s(_tlsToken, 65, ad.m_passwd);
+				strcpy_s(m_opts->m_cmdlnUser, _countof(m_opts->m_cmdlnUser), ad.m_user);
 			}
 			else
 			{
@@ -873,6 +870,13 @@ void ClientConnection::AuthVeNCrypt()
 			size_t tokenLen = strlen(_tlsToken);
 			if (tokenLen < 6 || tokenLen > 64)
 				return SetLastError("Token must be 6-64 ASCII characters");
+			uint8_t uvncHeader[8] = {
+				'U', 'V', 'N', 'C',
+				uvncTokenProtoMajor, uvncTokenProtoMinor,
+				(uint8_t)(usedSessionToken ? uvncTokenAuthSession : uvncTokenAuthPrimary),
+				(uint8_t)uvncTokenFlagRequestSession
+			};
+			WriteExact((char *)uvncHeader, sizeof(uvncHeader));
 			temp = (int)strlen(_tlsUser);
 			temp = Swap32IfLE(temp);
 			WriteExact((char *)&temp, 4);
