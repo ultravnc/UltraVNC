@@ -37,7 +37,6 @@
 #include <time.h>
 #include <vector>
 #include <string>
-#include <unordered_map>
 #include <mutex>
 
 #pragma comment(lib, "bcrypt.lib")
@@ -457,19 +456,12 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 }
 
 // ---------------------------------------------------------------------------
-// Session-token helpers (in-memory, server-side only)
-// A session token is issued after a successful TOTP authentication and remains
-// valid for 60 seconds after each disconnect / validation. Every successful
-// reuse extends the lifetime by another 60 seconds.
+// Session-token helpers
+// A session token remains pending until it is used or replaced. DPAPI machine
+// protection lets a restarted service desktop process validate it.
 // ---------------------------------------------------------------------------
-struct SessionEntry
-{
-    std::string user;
-    time_t expiresAt;
-};
-
+constexpr const char* kSessionSection = "SessionTokens";
 std::mutex g_sessionMutex;
-std::unordered_map<std::string, SessionEntry> g_sessions;
 
 std::string GenerateSessionTokenString()
 {
@@ -501,23 +493,11 @@ bool ValidateSessionToken(const char* user, const char* token)
         return false;
 
     std::lock_guard<std::mutex> lock(g_sessionMutex);
-    auto it = g_sessions.find(token);
-    if (it == g_sessions.end())
+    std::string record;
+    if (!TokenCore::ReadProtectedValue(kSessionSection, user, record))
         return false;
 
-    time_t now = time(nullptr);
-    if (now > it->second.expiresAt)
-    {
-        g_sessions.erase(it);
-        return false;
-    }
-
-    if (it->second.user != user)
-        return false;
-
-    // Extend rolling lifetime.
-    it->second.expiresAt = now + 60;
-    return true;
+    return record == token;
 }
 
 } // anonymous namespace
@@ -554,20 +534,8 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
 
     {
         std::lock_guard<std::mutex> lock(g_sessionMutex);
-
-        // Only one active session token per user: revoke any previous token.
-        for (auto it = g_sessions.begin(); it != g_sessions.end();)
-        {
-            if (it->second.user == user)
-                it = g_sessions.erase(it);
-            else
-                ++it;
-        }
-
-        SessionEntry entry;
-        entry.user = user;
-        entry.expiresAt = time(nullptr) + 60;
-        g_sessions[token] = entry;
+        if (!TokenCore::WriteProtectedValue(kSessionSection, user, token))
+            return 0;
     }
 
     strncpy_s(outBuf, outBufSize, token.c_str(), _TRUNCATE);
