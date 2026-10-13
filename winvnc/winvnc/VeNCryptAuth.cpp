@@ -26,14 +26,6 @@ namespace
 
     typedef int (__cdecl *ValidateTokenFn)(const char* user, const char* token);
     typedef int (__cdecl *IssueSessionTokenFn)(const char* user, char* outBuf, size_t outBufSize);
-    typedef int (__cdecl *GetCapabilitiesFn)(void);
-    typedef int (__cdecl *HasManagementUiFn)(void);
-
-    // Feature bits reported by the validator's tv_get_capabilities() export.
-    // Mirror of TokenValidatorPlugin.h (winvnc must not depend on that header's
-    // path; keep these values in sync).
-    constexpr int TV_CAP_SESSION_TOKEN = 0x01;
-    constexpr int TV_CAP_MANAGEMENT_UI = 0x02;
 
     // Keep the token validator DLL loaded for the lifetime of the process. The
     // DLL stores in-memory session tokens, so unloading it between calls would
@@ -53,33 +45,12 @@ namespace
         return g_hTokenValidatorDll;
     }
 
-    // Ask the configured validator DLL which optional features it supports.
-    // Prefers the tv_get_capabilities export; falls back to probing the
-    // individual optional exports for DLLs that predate it. Returns 0 when the
-    // DLL cannot be loaded.
-    int GetValidatorCapabilities()
-    {
-        HMODULE hDll = GetTokenValidatorDll();
-        if (!hDll)
-            return 0;
-
-        GetCapabilitiesFn fnCaps = (GetCapabilitiesFn)GetProcAddress(hDll, "tv_get_capabilities");
-        if (fnCaps)
-            return fnCaps();
-
-        int caps = 0;
-        if (GetProcAddress(hDll, "issue_session_token"))
-            caps |= TV_CAP_SESSION_TOKEN;
-        HasManagementUiFn fnHasUi = (HasManagementUiFn)GetProcAddress(hDll, "tv_has_management_ui");
-        if ((fnHasUi && fnHasUi()) || GetProcAddress(hDll, "tv_show_management_ui"))
-            caps |= TV_CAP_MANAGEMENT_UI;
-        return caps;
-    }
 }
 
 VeNCryptAuth::VeNCryptAuth(VSocket* socket)
     : m_socket(socket)
     , m_chosenType(0)
+    , m_requestSessionToken(false)
     , m_tlsActive(false)
 {
 }
@@ -130,7 +101,7 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         return false;
     }
 
-    if (m_chosenType != secTypeTokenTLSv2 && m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc)
+    if (m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc)
     {
         outFailureMessage = "Unsupported VeNCrypt subtype";
         return false;
@@ -184,49 +155,36 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
 
 bool VeNCryptAuth::IssueAndSendSessionToken(std::string& outFailureMessage)
 {
-    // The viewer unconditionally reads a token-length byte after a successful
-    // TokenTLSv2 auth. Every failure path must still send a zero-length token
-    // (SendU8(0)) or the viewer hangs waiting on the socket.
-    if (m_lastUsername.empty())
-    {
-        SendU8(0);
-        outFailureMessage = "No username available for session token";
+    auto sendResponse = [this](uint8_t flags, const char* token, uint16_t len) -> bool {
+        uint8_t header[3] = { flags, (uint8_t)(len >> 8), (uint8_t)len };
+        return SendExact((const char*)header, sizeof(header)) &&
+               (len == 0 || SendExact(token, len));
+    };
+    auto fail = [&sendResponse, &outFailureMessage](const char* message) -> bool {
+        sendResponse(0, nullptr, 0);
+        outFailureMessage = message;
         return false;
-    }
+    };
+
+    if (m_lastUsername.empty())
+        return fail("No username available for session token");
 
     HMODULE hModule = GetTokenValidatorDll();
     if (!hModule)
-    {
-        SendU8(0);
-        outFailureMessage = "Failed to load token validation DLL";
-        return false;
-    }
+        return fail("Failed to load token validation DLL");
 
     IssueSessionTokenFn fn = (IssueSessionTokenFn)GetProcAddress(hModule, "issue_session_token");
     if (!fn)
-    {
-        SendU8(0);
-        outFailureMessage = "Token validation DLL does not export issue_session_token";
-        return false;
-    }
+        return fail("Token validation DLL does not export issue_session_token");
 
     char token[MaxTokenLen + 1] = {};
     if (!fn(m_lastUsername.c_str(), token, sizeof(token)) || token[0] == '\0')
-    {
-        SendU8(0);
-        outFailureMessage = "Token validation DLL failed to issue a session token";
-        return false;
-    }
+        return fail("Token validation DLL failed to issue a session token");
 
-    uint8_t len = (uint8_t)strlen(token);
-    if (!SendU8(len))
+    uint16_t len = (uint16_t)strlen(token);
+    if (!sendResponse(uvncTokenResponseSession, token, len))
     {
-        outFailureMessage = "Failed to send session token length";
-        return false;
-    }
-    if (!SendExact(token, len))
-    {
-        outFailureMessage = "Failed to send session token";
+        outFailureMessage = "Failed to send session token response";
         return false;
     }
 
@@ -260,15 +218,11 @@ bool VeNCryptAuth::ReadClientVersion()
 
 bool VeNCryptAuth::SendSubTypes()
 {
-    // Offer custom token-TLS plus standard TLS-plain (same wire format:
-    // userLen, passLen, user, pass). Lets standard viewers (TigerVNC) connect.
-    // TokenTLSv2 (session tokens) is only offered when the configured
-    // validator DLL reports TV_CAP_SESSION_TOKEN; otherwise a viewer that
-    // selects 301 would wait forever for a session token the DLL cannot issue.
-    CARD32 subTypes[6];
+    // Offer one versioned private token subtype plus standard VeNCrypt types.
+    // Session-token support is negotiated inside subtype 300, not by consuming
+    // another private subtype number.
+    CARD32 subTypes[5];
     int n = 0;
-    if (GetValidatorCapabilities() & TV_CAP_SESSION_TOKEN)
-        subTypes[n++] = Swap32IfLE(secTypeTokenTLSv2);
     subTypes[n++] = Swap32IfLE(secTypeTokenTLS);
     subTypes[n++] = Swap32IfLE(secTypeTLSPlain);
     subTypes[n++] = Swap32IfLE(secTypeTLSNone);
@@ -300,7 +254,7 @@ bool VeNCryptAuth::PerformTLSHandshake(std::string& outFailureMessage)
     const char* thumbprint = settings->getVeNCryptTLSCertThumbprint();
     if (thumbprint && thumbprint[0])
         certOk = m_tls.LoadCertByThumbprint(thumbprint);
-    else
+    if (!certOk)
     {
         char generatedThumbprint[41] = {};
         certOk = m_tls.EnsureSelfSignedCert(generatedThumbprint);
@@ -351,6 +305,36 @@ bool VeNCryptAuth::PerformTLSHandshake(std::string& outFailureMessage)
 
 bool VeNCryptAuth::ReadCredentials(std::string& outUsername, std::string& outToken)
 {
+    m_requestSessionToken = false;
+    if (m_chosenType == secTypeTokenTLS)
+    {
+        uint8_t header[8] = {};
+        if (!ReadExact((char*)header, sizeof(header)))
+            return false;
+        if (memcmp(header, "UVNC", 4) != 0 ||
+            header[4] != uvncTokenProtoMajor ||
+            header[5] > uvncTokenProtoMinor)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: invalid UVNC token protocol marker/version\n"));
+            return false;
+        }
+        if (header[6] != uvncTokenAuthPrimary &&
+            header[6] != uvncTokenAuthSession)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: unsupported UVNC token auth method %u\n"), (unsigned)header[6]);
+            return false;
+        }
+        if (header[7] & ~uvncTokenFlagRequestSession)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: unsupported UVNC token flags 0x%02x\n"), (unsigned)header[7]);
+            return false;
+        }
+        m_requestSessionToken = (header[7] & uvncTokenFlagRequestSession) != 0;
+        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: UVNC token protocol %u.%u method=%u flags=0x%02x\n"),
+                     (unsigned)header[4], (unsigned)header[5],
+                     (unsigned)header[6], (unsigned)header[7]);
+    }
+
     CARD32 userLenBE = 0, tokenLenBE = 0;
     if (!ReadExact((char*)&userLenBE, sizeof(userLenBE)))
         return false;
@@ -368,7 +352,7 @@ bool VeNCryptAuth::ReadCredentials(std::string& outUsername, std::string& outTok
     // (259/262) carry a regular password — a generic client (TigerVNC,
     // libvncclient) can't know about the token limit, so only a generous
     // sanity bound applies there and the validator DLL decides validity.
-    const bool tokenSubtype = (m_chosenType == secTypeTokenTLS || m_chosenType == secTypeTokenTLSv2);
+    const bool tokenSubtype = (m_chosenType == secTypeTokenTLS);
     const CARD32 maxLen = tokenSubtype ? (CARD32)MaxTokenLen : 1024;
     const CARD32 minLen = tokenSubtype ? 6u : 0u;
     if (tokenLen < minLen || tokenLen > maxLen)

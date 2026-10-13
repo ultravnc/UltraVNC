@@ -1564,14 +1564,15 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	if (!m_socket->SendExactQueue((char*)&auth_result_msg, sizeof(auth_result_msg)))
 		return FALSE;
 
-	// For TokenTLSv2 (subtype 301), issue and send a session token on success
-	// so the viewer can reconnect without prompting for a new TOTP code.
+	// Subtype 300 carries a versioned request flag for session-token issuance.
+	// Always send its response after SecurityResult so the viewer never blocks;
+	// unsupported issuance is encoded as an empty response.
 	if (auth_success && auth_accepted == rfbVeNCypt && m_veNCryptAuth &&
-	    m_veNCryptAuth->GetChosenType() == secTypeTokenTLSv2)
+	    m_veNCryptAuth->GetChosenType() == secTypeTokenTLS &&
+	    m_veNCryptAuth->ShouldSendTokenResponse())
 	{
 		std::string sessionMsg;
 		m_veNCryptAuth->IssueAndSendSessionToken(sessionMsg);
-		// A failure here is not fatal; the connection is already authenticated.
 		if (!sessionMsg.empty())
 			vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: session token issue failed: %s\n"), sessionMsg.c_str());
 	}

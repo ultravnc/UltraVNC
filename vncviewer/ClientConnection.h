@@ -655,7 +655,7 @@ private:
 	char m_clearPasswd[256]; // Modif sf@2002
 	bool m_usedSavedVncPassword;
 
-	// VeNCrypt state for session-token reconnect (TokenTLSv2, subtype 301).
+	// VeNCrypt state for versioned subtype-300 session-token reconnect.
 	int m_lastVeNCryptSubType;
 
 	rfbPixelFormat m_myFormat, m_pendingFormat;

@@ -22,16 +22,13 @@
 // Implements the VeNCrypt 0.2 security type (rfbVeNCrypt = 19) on top of the
 // existing SchannelTLS wrapper. Advertised subtypes (official numbering):
 //   secTypeX509Plain (262), secTypeX509Vnc (261), secTypeTLSPlain (259),
-//   secTypeTLSNone (257), plus the UltraVNC vendor subtypes:
-//   secTypeTokenTLS (300)   -> TLS channel + username/token validation via DLL.
-//   secTypeTokenTLSv2 (301) -> as 300, plus a server-issued session token the
-//                              viewer uses for reconnects without a new TOTP.
+//   secTypeTLSNone (257), plus the private UltraVNC subtype:
+//   secTypeTokenTLS (300) -> versioned "UVNC" payload with primary-token and
+//                            reconnect-session-token authentication methods.
 //
-// Subtype 301 is only advertised when the configured validator DLL reports
-// TV_CAP_SESSION_TOKEN via tv_get_capabilities() (or exports
-// issue_session_token when the caps export is absent). The viewer's subtype
-// selection is the "viewer supports 301" signal; the session-token exchange
-// runs only when the viewer actually picked 301.
+// The client requests session-token issuance with a protocol flag. The server
+// always returns a versioned response after successful subtype-300 auth; the
+// response contains a token only when the validator supports issuance.
 //
 // The object owns the SchannelTLS session and the VSocket TLS callbacks for the
 // lifetime of the RFB connection.
@@ -47,13 +44,12 @@ public:
     // Returns true on successful authentication, false on failure.
     bool Authenticate(std::string& outFailureMessage);
 
-    // The VeNCrypt subtype the client selected (e.g. secTypeTokenTLSv2).
     uint32_t GetChosenType() const { return m_chosenType; }
+    bool ShouldSendTokenResponse() const { return m_requestSessionToken; }
 
-    // After a successful TokenTLSv2 authentication, generate a server-side
-    // session token for this user and send it to the client. Always sends the
-    // token-length byte (0 on failure) because the viewer reads it
-    // unconditionally; failure is non-fatal to the authenticated connection.
+    // Send the subtype-300 response requested by the client. The response is
+    // always emitted; unsupported/failed token issuance is encoded as flags=0,
+    // length=0 so the authenticated connection remains usable.
     bool IssueAndSendSessionToken(std::string& outFailureMessage);
 
     // Called after the TLS handshake when the client picks secTypeX509Vnc:
@@ -84,5 +80,6 @@ private:
     std::unique_ptr<VSocket::TLSCallbacks> m_tlsCallbacks;
     uint32_t m_chosenType;
     std::string m_lastUsername;
+    bool m_requestSessionToken;
     bool m_tlsActive;
 };
