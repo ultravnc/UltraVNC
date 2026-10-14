@@ -50,7 +50,7 @@ bool SetIniPath(const char* modulePath)
         return false;
 
     memcpy(g_iniPath, modulePath, dirLen);
-    strcpy_s(g_iniPath + dirLen, MAX_PATH - dirLen, "TokenValidator.totp.ini");
+    strcpy_s(g_iniPath + dirLen, MAX_PATH - dirLen, "TokenValidator.credentials.ini");
     return true;
 }
 
@@ -517,6 +517,31 @@ bool DeleteProtectedValue(const char* section, const std::string& key)
 {
     return section && section[0] && !key.empty() &&
            DeleteEncryptedIni(section, key.c_str());
+}
+
+std::vector<std::string> ListProtectedKeys(const char* section)
+{
+    std::vector<std::string> keys;
+    const char* iniPath = GetIniPath();
+    if (!section || !section[0] || !iniPath || !iniPath[0])
+        return keys;
+
+    char buf[8192] = {};
+    if (GetPrivateProfileSectionA(section, buf, sizeof(buf), iniPath) == 0)
+        return keys;
+
+    for (const char* p = buf; *p; p += strlen(p) + 1)
+    {
+        std::string entry(p);
+        size_t eq = entry.find('=');
+        std::string key = (eq == std::string::npos) ? entry : entry.substr(0, eq);
+        if (!key.empty() &&
+            std::find(keys.begin(), keys.end(), key) == keys.end())
+        {
+            keys.push_back(key);
+        }
+    }
+    return keys;
 }
 
 std::vector<std::string> ListTotpUsers()
