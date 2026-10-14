@@ -36,6 +36,9 @@ namespace ScramSha256
     // validator DLL.
     bool ParseVerifier(const std::string& text, Verifier& v);
     std::string VerifierToString(const Verifier& v);
+    // Offline password check: re-derives StoredKey from password + stored
+    // salt/iterations and compares. Used by admin tooling.
+    bool CheckPassword(const std::string& password, const Verifier& v);
 
     // ---- Server side ----
     // Step 1: parse client-first. Accepts GS2 headers:
