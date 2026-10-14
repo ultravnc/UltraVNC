@@ -475,6 +475,52 @@ void OnClearPassword(HWND hDlg)
     UpdateFactorsLabel(hDlg, user);
 }
 
+void OnClearTotp(HWND hDlg)
+{
+    char user[256] = {};
+    if (!GetSelectedUser(hDlg, user, sizeof(user)))
+    {
+        MessageBoxA(hDlg, "Select a user first.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    std::vector<std::string> users = TokenCore::ListTotpUsers();
+    if (std::find(users.begin(), users.end(), user) == users.end())
+    {
+        MessageBoxA(hDlg, "No TOTP credential is stored for this user.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    char msg[300] = {};
+    sprintf_s(msg, "Remove only the TOTP credential for '%s'? SCRAM and session credentials are preserved.", user);
+    if (MessageBoxA(hDlg, msg, "Token Manager", MB_YESNO | MB_ICONQUESTION) != IDYES)
+        return;
+
+    if (!TokenCore::DeleteTotpSecret(user))
+    {
+        MessageBoxA(hDlg, "Failed to remove the TOTP credential.", "Token Manager", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    SetDlgItemTextA(hDlg, IDC_TV_URI, "");
+    RefreshUserList(hDlg);
+
+    HWND hList = GetDlgItem(hDlg, IDC_TV_USER_LIST);
+    int count = (int)SendMessageA(hList, LB_GETCOUNT, 0, 0);
+    for (int i = 0; i < count; ++i)
+    {
+        char item[256] = {};
+        SendMessageA(hList, LB_GETTEXT, i, (LPARAM)item);
+        StripListName(item);
+        if (strcmp(item, user) == 0)
+        {
+            SendMessageA(hList, LB_SETCURSEL, i, 0);
+            break;
+        }
+    }
+    UpdateFactorsLabel(hDlg, user);
+}
+
 void OnResetUser(HWND hDlg)
 {
     char user[256] = {};
@@ -576,6 +622,10 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 
         case IDC_TV_SHOWQR:
             OnShowQr(hDlg);
+            return (INT_PTR)TRUE;
+
+        case IDC_TV_DELTOTP:
+            OnClearTotp(hDlg);
             return (INT_PTR)TRUE;
 
         case IDC_TV_SETPASS:
