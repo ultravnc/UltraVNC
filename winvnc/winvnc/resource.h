@@ -40,10 +40,6 @@
 #define IDD_PATHS                       134
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
-#if defined(SC_20)
-	#define IDR_DLL1                    176
-	#define IDR_ENCRYPTIONDLL1          177
-#endif // SC_20
 #define IDD_FORM_AUTHENTICATION         139
 #define IDD_EDIT_IP_ACESS_CONTROL       140
 #define IDS_WARNING                     200
@@ -52,6 +48,7 @@
 #define IDD_ADMINPASSWORD               205
 #define IDD_CHANGE_PASSWORD             207
 #define IDD_FORM_Service                209
+#define IDD_DIALOG2                     211
 #define IDC_ACCEPTLOGO                  1001
 #define IDC_ACCEPT_IP                   1002
 #define IDC_ACCEPT_TIMEOUT              1003
@@ -209,20 +206,6 @@
 #define IDC_POLL_UNDER_CURSOR           1156
 #define IDC_PORTHTTP                    1157
 #define IDC_PORTNO                      1158
-#define IDC_PORTHTTPS                   1299
-#define IDD_FORM_TLS                    1356
-#define IDC_TLS_NOVNC_PORT              1357
-#define IDC_TLS_THUMBPRINT              1358
-#define IDC_TLS_CERT_SELECT             1359
-#define IDC_TLS_CERT_GEN                1360
-#define IDC_VENCRYPT_ENABLE             1361
-#define IDC_VENCRYPT_THUMBPRINT         1362
-#define IDC_VENCRYPT_CERT_SELECT        1363
-#define IDC_VENCRYPT_CERT_GEN           1364
-#define IDC_VENCRYPT_DLLPATH            1365
-#define IDC_VENCRYPT_DLL_BROWSE         1366
-#define IDC_VENCRYPT_REQUIRE            1367
-#define IDC_VENCRYPT_MANAGE             1368
 #define IDC_PORTNO_AUTO                 1159
 #define IDC_PORTNO_LABEL                1160
 #define IDC_PORTRFB                     1161
@@ -346,6 +329,7 @@
 #define IDC_FORCE_SHAPE                 1294
 #define IDC_TLS                         1297
 #define IDC_STATIC_HTTPPORT             1298
+#define IDC_PORTHTTPS                   1299
 #define IDR_WEBVIEWER_CORE_BASE64_JS    1300
 #define IDR_WEBVIEWER_CORE_CRYPTO_AES_JS 1301
 #define IDR_WEBVIEWER_CORE_CRYPTO_BIGINT_JS 1302
@@ -402,6 +386,39 @@
 #define IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_TREES_JS 1353
 #define IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS 1354
 #define IDR_WEBVIEWER_CORE_CLIPBOARD_JS 1355
+#define IDD_FORM_TLS                    1356
+#define IDC_TLS_NOVNC_PORT              1357
+#define IDC_TLS_THUMBPRINT              1358
+#define IDC_TLS_CERT_SELECT             1359
+#define IDC_TLS_CERT_GEN                1360
+#define IDC_VENCRYPT_ENABLE             1361
+#define IDC_VENCRYPT_THUMBPRINT         1362
+#define IDC_VENCRYPT_CERT_SELECT        1363
+#define IDC_VENCRYPT_CERT_GEN           1364
+#define IDC_VENCRYPT_DLLPATH            1365
+#define IDC_VENCRYPT_DLL_BROWSE         1366
+#define IDC_VENCRYPT_REQUIRE            1367
+#define IDC_VENCRYPT_MANAGE             1368
+#define IDC_NOVNC                       1369
+#define IDC_VENCRYPT_SUBTYPE_300        1370
+#define IDC_VENCRYPT_SUBTYPE_264        1371
+#define IDC_VENCRYPT_SUBTYPE_263        1372
+#define IDC_VENCRYPT_SUBTYPE_262        1373
+#define IDC_VENCRYPT_SUBTYPE_261        1374
+#define IDC_VENCRYPT_SUBTYPE_259        1375
+#define IDC_VENCRYPT_SUBTYPE_257        1376
+#define IDC_VENCRYPT_REQUIRE_PLUS       1377
+#define IDC_TLSINFO                     1378
+#define IDC_TLSINFO1                    1379
+#define IDC_TLSINFO2                    1380
+#define IDC_HTTPSPORT                   1381
+#define IDC_CERTTHUMBPRINT              1382
+#define IDC_STATIC_VeNCrypt             1383
+#define IDC_STATIC_THUMB                1384
+#define IDC_STATIC_TOKEN                1385
+#define IDC_STATIC_INFO4                1386
+#define IDC_STATIC_INFO5                1387
+#define IDC_STATIC_SUBTYPES             1388
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -544,9 +561,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        211
+#define _APS_NEXT_RESOURCE_VALUE        213
 #define _APS_NEXT_COMMAND_VALUE         32906
-#define _APS_NEXT_CONTROL_VALUE         1367
+#define _APS_NEXT_CONTROL_VALUE         1389
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -89,6 +89,8 @@ private:
     std::mutex m_tlsMutex; // serializes Schannel Send/Recv (context not thread-safe)
     std::unique_ptr<VSocket::TLSCallbacks> m_tlsCallbacks;
     uint32_t m_chosenType;
+    uint32_t m_offeredTypes[8];
+    int m_offeredCount;
     std::string m_lastUsername;
     bool m_requestSessionToken;
     bool m_tlsActive;

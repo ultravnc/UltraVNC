@@ -84,6 +84,7 @@ namespace
 VeNCryptAuth::VeNCryptAuth(VSocket* socket)
     : m_socket(socket)
     , m_chosenType(0)
+    , m_offeredCount(0)
     , m_requestSessionToken(false)
     , m_tlsActive(false)
 {
@@ -135,9 +136,22 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         return false;
     }
 
-    if (m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc && m_chosenType != secTypeTLSSASL && m_chosenType != secTypeX509SASL)
+    // The client may only pick a subtype we actually advertised. Rechecking
+    // here keeps the VeNCryptSubtypes allow-list enforced even against
+    // clients that ignore the offered list.
+    bool subtypeAllowed = false;
+    for (int i = 0; i < m_offeredCount; ++i)
     {
-        outFailureMessage = "Unsupported VeNCrypt subtype";
+        if (m_offeredTypes[i] == m_chosenType)
+        {
+            subtypeAllowed = true;
+            break;
+        }
+    }
+    if (!subtypeAllowed)
+    {
+        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: client requested unadvertised subtype %u\n"), m_chosenType);
+        outFailureMessage = "VeNCrypt subtype not allowed by server policy";
         return false;
     }
 
@@ -259,23 +273,74 @@ bool VeNCryptAuth::SendSubTypes()
     // Offer one versioned private token subtype plus standard VeNCrypt types.
     // Session-token support is negotiated inside subtype 300, not by consuming
     // another private subtype number.
-    CARD32 subTypes[7];
+    CARD32 subTypes[8];
     int n = 0;
+
+    // Admin-configured allow-list (VeNCryptSubtypes in [admin], space-separated
+    // subtype numbers). Supported subtypes not in the list are not advertised;
+    // an empty/unparseable list falls back to offering everything supported.
+    bool allowed[1024] = {};
+    const char* cfg = SettingsManager::getInstance()->getVeNCryptSubtypes();
+    bool cfgEmpty = true;
+    if (cfg)
+    {
+        const char* p = cfg;
+        while (*p)
+        {
+            while (*p == ' ' || *p == ',' || *p == ';' || *p == '\t')
+                ++p;
+            char* end = nullptr;
+            long v = strtol(p, &end, 10);
+            if (end == p)
+                break;
+            if (v >= 0 && v < 1024)
+            {
+                allowed[v] = true;
+                cfgEmpty = false;
+            }
+            p = end;
+        }
+    }
+    const bool requireTls = SettingsManager::getInstance()->getRequireVeNCryptTLS() != FALSE;
+    const bool requirePlus = SettingsManager::getInstance()->getVeNCryptRequireChannelBinding() != FALSE;
+    auto isAllowed = [&](uint32_t t) {
+        if (!cfgEmpty && !allowed[t])
+            return false;
+        if (requireTls && (t == secTypeTLSNone || t == secTypeTLSPlain || t == secTypeX509Plain))
+            return false;
+        if (requirePlus && t != secTypeTLSSASL && t != secTypeX509SASL)
+            return false;
+        return true;
+    };
+
     // SASL subtypes are only offered when the validator DLL can supply SCRAM
     // verifiers. Third-party SASL clients (QEMU/virt-viewer, TigerVNC) pick
     // these; the UltraVNC viewer picks its own preferred type from the list.
     const bool saslAvailable = (GetSaslLookup() != nullptr);
-    subTypes[n++] = Swap32IfLE(secTypeTokenTLS);
+    auto offer = [&](uint32_t t) {
+        m_offeredTypes[n] = t;
+        subTypes[n++] = Swap32IfLE(t);
+    };
+
+    if (isAllowed(secTypeTokenTLS))
+        offer(secTypeTokenTLS);
     if (saslAvailable)
     {
-        subTypes[n++] = Swap32IfLE(secTypeX509SASL);
-        subTypes[n++] = Swap32IfLE(secTypeTLSSASL);
+        if (isAllowed(secTypeX509SASL))
+            offer(secTypeX509SASL);
+        if (isAllowed(secTypeTLSSASL))
+            offer(secTypeTLSSASL);
     }
-    subTypes[n++] = Swap32IfLE(secTypeTLSPlain);
-    subTypes[n++] = Swap32IfLE(secTypeTLSNone);
-    subTypes[n++] = Swap32IfLE(secTypeX509Plain);
-    subTypes[n++] = Swap32IfLE(secTypeX509Vnc);
+    if (isAllowed(secTypeTLSPlain))
+        offer(secTypeTLSPlain);
+    if (isAllowed(secTypeTLSNone))
+        offer(secTypeTLSNone);
+    if (isAllowed(secTypeX509Plain))
+        offer(secTypeX509Plain);
+    if (isAllowed(secTypeX509Vnc))
+        offer(secTypeX509Vnc);
 
+    m_offeredCount = n;
     uint8_t count = (uint8_t)n;
     return SendU8(count) && SendExact((char*)subTypes, (int)(sizeof(CARD32) * n));
 }
@@ -467,12 +532,27 @@ bool VeNCryptAuth::RunSaslAuth(std::string& outFailureMessage)
 
     // Channel binding for SCRAM-SHA-256-PLUS: hash of our server certificate.
     // Offer -PLUS only when the hash is available; SCRAM-SHA-256 stays for
-    // clients that do not support channel binding (QEMU, TigerVNC).
+    // clients that do not support channel binding (QEMU, TigerVNC) unless the
+    // admin has explicitly required channel binding.
+    const bool requirePlus = SettingsManager::getInstance()->getVeNCryptRequireChannelBinding();
     std::vector<BYTE> cbData;
     const bool haveBinding = m_tls.GetEndpointBinding(cbData);
-    const std::string mechlist =
-        haveBinding ? "SCRAM-SHA-256-PLUS,SCRAM-SHA-256" : "SCRAM-SHA-256";
-    if (!haveBinding)
+    std::string mechlist;
+    if (requirePlus)
+    {
+        if (!haveBinding)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: SCRAM-SHA-256-PLUS required but endpoint binding unavailable\n"));
+            outFailureMessage = "SCRAM-SHA-256-PLUS required but endpoint binding unavailable";
+            return false;
+        }
+        mechlist = "SCRAM-SHA-256-PLUS";
+    }
+    else
+    {
+        mechlist = haveBinding ? "SCRAM-SHA-256-PLUS,SCRAM-SHA-256" : "SCRAM-SHA-256";
+    }
+    if (!haveBinding && !requirePlus)
         vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt SASL: no endpoint binding; -PLUS not offered\n"));
 
     // S->C mechlist
@@ -493,6 +573,12 @@ bool VeNCryptAuth::RunSaslAuth(std::string& outFailureMessage)
     {
         outFailureMessage = "Unsupported SASL mechanism";
         vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: rejected mech '%s'\n"), mech.c_str());
+        return false;
+    }
+    if (requirePlus && mech != "SCRAM-SHA-256-PLUS")
+    {
+        outFailureMessage = "SCRAM-SHA-256-PLUS required by server policy";
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: rejected non-PLUS mech '%s'\n"), mech.c_str());
         return false;
     }
     const bool clientPlus = (mech == "SCRAM-SHA-256-PLUS");

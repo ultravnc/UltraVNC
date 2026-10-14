@@ -161,8 +161,11 @@ void SettingsManager::setDefaults()
 	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = FALSE;
 	m_pref_RequireVeNCryptTLS = FALSE;
+	m_pref_VeNCryptRequireChannelBinding = FALSE;
 	memset(m_pref_VeNCryptTLSCertThumbprint, 0, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
+	// Default advertises every implemented subtype; admins restrict via the list.
+	strcpy_s(m_pref_VeNCryptSubtypes, "300 264 263 259 257 262 261");
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
@@ -360,8 +363,10 @@ void SettingsManager::load()
 	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = iniFile.ReadInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
 	m_pref_RequireVeNCryptTLS = iniFile.ReadInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
+	m_pref_VeNCryptRequireChannelBinding = iniFile.ReadInt("admin", "VeNCryptRequireChannelBinding", m_pref_VeNCryptRequireChannelBinding);
 	iniFile.ReadString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	iniFile.ReadString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath, sizeof(m_pref_VeNCryptTokenDLLPath));
+	iniFile.ReadString("admin", "VeNCryptSubtypes", m_pref_VeNCryptSubtypes, sizeof(m_pref_VeNCryptSubtypes));
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber = iniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = iniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
@@ -477,8 +482,10 @@ void SettingsManager::save()
 	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
 	iniFile.WriteInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
 	iniFile.WriteInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
+	iniFile.WriteInt("admin", "VeNCryptRequireChannelBinding", m_pref_VeNCryptRequireChannelBinding);
 	iniFile.WriteString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint);
 	iniFile.WriteString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath);
+	iniFile.WriteString("admin", "VeNCryptSubtypes", m_pref_VeNCryptSubtypes);
 	iniFile.WriteInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	if (!m_pref_AutoPortSelect) {
 		iniFile.WriteInt("admin", "PortNumber", m_pref_PortNumber);
