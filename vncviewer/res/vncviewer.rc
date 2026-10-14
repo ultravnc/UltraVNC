@@ -400,7 +400,7 @@ BEGIN
     LTEXT           "Server Name",IDC_VNCSERVER,101,12,101,9
     LTEXT           "Status",IDC_STATIC,12,54,46,9
     LTEXT           "Connection closed",IDC_STATUS,101,54,105,9
-    RTEXT           "",IDC_PLUGIN_STATUS,14,68,192,9
+    LTEXT           "",IDC_PLUGIN_STATUS,14,68,192,17
     PUSHBUTTON      "Cancel",IDQUIT,7,180,50,14
     LTEXT           "Speed",IDC_STATIC,12,85,31,8
     LTEXT           "123",IDC_SPEED,101,85,26,8
