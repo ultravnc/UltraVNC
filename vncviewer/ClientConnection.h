@@ -252,6 +252,9 @@ private:
 	void NegotiateProtocolVersion();
 	void AuthRSAAES(int keySize, bool encrypted);
 	void AuthVeNCrypt();
+	// QEMU-compatible SASL client exchange (VeNCrypt subtypes 263/264).
+	// Requires TLS to be active and the TLS plugin already installed.
+	void AuthSasl(uint8_t* cbData, size_t cbDataLen);
 	void AuthVnc();
 	void AuthSCPrompt(); // adzm 2010-10
 	void AuthSessionSelect(); // adzm 2010-10

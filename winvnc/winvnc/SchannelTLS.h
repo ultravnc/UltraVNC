@@ -60,6 +60,11 @@ public:
     // Clean TLS shutdown (sends close_notify).
     void Shutdown(VSocket* sock);
 
+    // RFC 5929 tls-server-end-point channel binding: raw hash bytes of the
+    // server certificate. Call after a successful ServerHandshake(); the hash
+    // is computed from the local certificate context (m_certCtx).
+    bool GetEndpointBinding(std::vector<BYTE>& outHash);
+
     // True after a successful ServerHandshake().
     bool IsReady() const { return m_ready; }
 

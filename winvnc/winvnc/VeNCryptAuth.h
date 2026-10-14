@@ -12,6 +12,7 @@
 #include "SchannelTLS.h"
 #include "vsocket.h"
 #include <cstdint>
+#include <vector>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -22,7 +23,11 @@
 // Implements the VeNCrypt 0.2 security type (rfbVeNCrypt = 19) on top of the
 // existing SchannelTLS wrapper. Advertised subtypes (official numbering):
 //   secTypeX509Plain (262), secTypeX509Vnc (261), secTypeTLSPlain (259),
-//   secTypeTLSNone (257), plus the private UltraVNC subtype:
+//   secTypeTLSNone (257), plus:
+//   secTypeX509SASL (264) / secTypeTLSSASL (263) -> QEMU-compatible SASL
+//                            framing with SCRAM-SHA-256 / SCRAM-SHA-256-PLUS
+//                            (tls-server-end-point channel binding). Offered
+//                            only when the validator DLL exports sasl_lookup.
 //   secTypeTokenTLS (300) -> versioned "UVNC" payload with primary-token and
 //                            reconnect-session-token authentication methods.
 //
@@ -66,6 +71,11 @@ private:
     bool PerformTLSHandshake(std::string& outFailureMessage);
     bool ReadCredentials(std::string& outUsername, std::string& outToken);
     bool ValidateToken(const char* username, const char* token, std::string& outFailureMessage);
+    // QEMU-compatible SASL exchange over the TLS channel (subtypes 263/264).
+    // Runs the mechlist/step framing and SCRAM-SHA-256(-PLUS) verification,
+    // then returns; the caller's rfbVncAuth result doubles as the SASL
+    // SecurityResult block (same u32 + reason format QEMU uses).
+    bool RunSaslAuth(std::string& outFailureMessage);
 
     bool SendU8(uint8_t value);
     bool SendU32(uint32_t value);

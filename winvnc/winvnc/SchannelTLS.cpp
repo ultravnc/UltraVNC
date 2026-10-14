@@ -11,6 +11,7 @@
 #include "SchannelTLS.h"
 #include "vsocket.h"
 #include "vnclog.h"
+#include "common/ChannelBinding.h"
 
 extern VNCLog vnclog;
 
@@ -663,6 +664,19 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
         }
         m_rawBuf.insert(m_rawBuf.end(), tmp, tmp + got);
     }
+}
+
+bool SchannelTLS::GetEndpointBinding(std::vector<BYTE>& outHash)
+{
+    // tls-server-end-point (RFC 5929): hash of the server certificate as sent
+    // in the TLS Certificate message. Computed locally from m_certCtx so it
+    // works identically regardless of whether the client sent a certificate.
+    if (!m_certCtx)
+    {
+        vnclog.Print(LL_CONNERR, VNCLOG("TLS: GetEndpointBinding with no certificate\n"));
+        return false;
+    }
+    return ChannelBinding::ServerEndPointHash(m_certCtx, outHash);
 }
 
 void SchannelTLS::Shutdown(VSocket* sock)

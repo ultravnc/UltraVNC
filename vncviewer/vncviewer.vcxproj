@@ -1663,6 +1663,11 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='RelIPv6|x64'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="ClientConnectionTLS.cpp" />
+    <ClCompile Include="..\common\Base64.cpp" />
+    <ClCompile Include="..\common\BcryptHelp.cpp" />
+    <ClCompile Include="..\common\ChannelBinding.cpp" />
+    <ClCompile Include="..\common\SaslWire.cpp" />
+    <ClCompile Include="..\common\ScramSha256.cpp" />
     <ClCompile Include="ClientConnectionUltra.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -2378,6 +2383,11 @@
     <ClInclude Include="..\common\Hyperlinks.h" />
     <ClInclude Include="..\common\mnemonic.h" />
     <ClInclude Include="..\common\UltraVncZ.h" />
+    <ClInclude Include="..\common\Base64.h" />
+    <ClInclude Include="..\common\BcryptHelp.h" />
+    <ClInclude Include="..\common\ChannelBinding.h" />
+    <ClInclude Include="..\common\SaslWire.h" />
+    <ClInclude Include="..\common\ScramSha256.h" />
     <ClInclude Include="..\rfb\zrleDecode.h" />
     <ClInclude Include="AboutBox.h" />
     <ClInclude Include="AccelKeys.h" />
