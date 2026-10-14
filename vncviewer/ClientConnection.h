@@ -660,6 +660,10 @@ private:
 
 	// VeNCrypt state for versioned subtype-300 session-token reconnect.
 	int m_lastVeNCryptSubType;
+	// Human-readable description of the negotiated VeNCrypt/TLS encryption and
+	// SASL mechanism, shown in the connection-info status window.
+	char m_veNCryptDesc[256];
+	char m_saslMech[64];
 
 	rfbPixelFormat m_myFormat, m_pendingFormat;
 	// protocol version in use.
