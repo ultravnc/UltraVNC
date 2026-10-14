@@ -129,6 +129,143 @@ static bool ValidatorHasManagementUi(HWND hwnd)
 }
 
 // The Manage-users button is only useful when the validator DLL exposes a UI.
+namespace
+{
+	struct VeNCryptSubtypeItem {
+		uint32_t type;
+		int idc;
+	};
+	const VeNCryptSubtypeItem kVeNCryptSubtypes[] = {
+		{ 300, IDC_VENCRYPT_SUBTYPE_300 },
+		{ 264, IDC_VENCRYPT_SUBTYPE_264 },
+		{ 263, IDC_VENCRYPT_SUBTYPE_263 },
+		{ 262, IDC_VENCRYPT_SUBTYPE_262 },
+		{ 261, IDC_VENCRYPT_SUBTYPE_261 },
+		{ 259, IDC_VENCRYPT_SUBTYPE_259 },
+		{ 257, IDC_VENCRYPT_SUBTYPE_257 },
+	};
+
+	void EnableVeNCryptSubtypes(HWND hwnd, BOOL enable)
+	{
+		for (const auto& it : kVeNCryptSubtypes)
+		{
+			HWND h = GetDlgItem(hwnd, it.idc);
+			if (h)
+				EnableWindow(h, enable);
+		}
+		const int labels[] = {
+			IDC_STATIC_THUMB, IDC_STATIC_TOKEN, IDC_STATIC_INFO4,
+			IDC_STATIC_INFO5, IDC_STATIC_SUBTYPES
+		};
+		for (int idc : labels)
+		{
+			HWND h = GetDlgItem(hwnd, idc);
+			if (h)
+				EnableWindow(h, enable);
+		}
+	}
+
+	void LoadVeNCryptSubtypes(HWND hwnd, const char* config)
+	{
+		bool allowed[1024] = {};
+		bool any = false;
+		if (config)
+		{
+			const char* p = config;
+			while (*p)
+			{
+				while (*p == ' ' || *p == ',' || *p == ';' || *p == '\t')
+					++p;
+				char* end = nullptr;
+				long v = strtol(p, &end, 10);
+				if (end == p)
+					break;
+				if (v >= 0 && v < 1024)
+				{
+					allowed[v] = true;
+					any = true;
+				}
+				p = end;
+			}
+		}
+		for (const auto& it : kVeNCryptSubtypes)
+		{
+			HWND h = GetDlgItem(hwnd, it.idc);
+			if (h)
+				SendMessage(h, BM_SETCHECK, any ? (allowed[it.type] ? BST_CHECKED : BST_UNCHECKED) : BST_CHECKED, 0);
+		}
+	}
+
+	void SaveVeNCryptSubtypes(HWND hwnd, char* outBuf, size_t outBufSize)
+	{
+		std::string s;
+		for (const auto& it : kVeNCryptSubtypes)
+		{
+			HWND h = GetDlgItem(hwnd, it.idc);
+			if (h && SendMessage(h, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			{
+				if (!s.empty())
+					s += ' ';
+				char tmp[16];
+				sprintf_s(tmp, "%lu", static_cast<unsigned long>(it.type));
+				s += tmp;
+			}
+		}
+		// If nothing is selected, fall back to the full default list; this keeps
+		// the UI from accidentally advertising zero subtypes.
+		if (s.empty())
+			s = "300 264 263 259 257 262 261";
+		strncpy_s(outBuf, outBufSize, s.c_str(), _TRUNCATE);
+	}
+
+	// Subtype availability depends on the "Require TLS" and "Require -PLUS"
+	// options: grey out subtypes that those options would reject at runtime.
+	void UpdateVeNCryptSubtypeAvailability(HWND hwnd)
+	{
+		const BOOL veNCryptEnabled = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL requireTls = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL requirePlus = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		for (const auto& it : kVeNCryptSubtypes)
+		{
+			HWND h = GetDlgItem(hwnd, it.idc);
+			if (!h)
+				continue;
+			BOOL enable = veNCryptEnabled;
+			// "Require TLS (reject plaintext auth methods)" disables no-auth and
+			// plaintext-credential subtypes: TLSNone (257), TLSPlain (259),
+			// X509Plain (262).
+			if (requireTls && (it.type == 257 || it.type == 259 || it.type == 262))
+				enable = FALSE;
+			// "Require SCRAM-SHA-256-PLUS" only leaves the two SASL subtypes.
+			if (requirePlus && (it.type != 263 && it.type != 264))
+				enable = FALSE;
+			EnableWindow(h, enable);
+		}
+	}
+
+	// The webclient HTTPS/TLS controls apply only when both the web client and
+	// TLS are enabled on the Connection tab.
+	void UpdateWebClientTlsAvailability(HWND hConnectionTab, HWND hTlsTab)
+	{
+		if (!hConnectionTab || !hTlsTab)
+			return;
+		const BOOL httpEnabled = (SendDlgItemMessage(hConnectionTab, IDC_CONNECT_HTTP, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL tlsEnabled = (SendDlgItemMessage(hConnectionTab, IDC_TLS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL enable = httpEnabled && tlsEnabled;
+		const int controls[] = {
+			IDC_NOVNC, IDC_HTTPSPORT, IDC_TLS_NOVNC_PORT, IDC_TLSINFO,
+			IDC_TLSINFO1, IDC_TLSINFO2, IDC_CERTTHUMBPRINT,
+			IDC_TLS_THUMBPRINT, IDC_TLS_CERT_SELECT, IDC_TLS_CERT_GEN
+		};
+		for (int idc : controls)
+		{
+			HWND h = GetDlgItem(hTlsTab, idc);
+			if (h)
+				EnableWindow(h, enable);
+		}
+	}
+}
+
 static void UpdateManageUsersButton(HWND hwnd)
 {
 	BOOL enabled = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -593,8 +730,12 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 			bConnectSock && !bAutoPort && !bValidDisplay && bConnectHttp);
 	}
 
-	if (GetDlgItem(hwnd, IDC_CONNECT_HTTP))
+	if (GetDlgItem(hwnd, IDC_CONNECT_HTTP)) {
 		SendMessage(GetDlgItem(hwnd, IDC_CONNECT_HTTP), BM_SETCHECK, settings->getHTTPConnect(), 0);
+		EnableWindow(GetDlgItem(hwnd, IDC_TLS), bConnectHttp);
+		EnableWindow(GetDlgItem(hwnd, IDC_STATIC_HTTPPORT), bConnectHttp);
+		EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), bConnectHttp);
+	}
 
 	if (GetDlgItem(hwnd, IDC_TLS)) {
 		BOOL bTLS = settings->getEnableTLS();
@@ -1112,6 +1253,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		BOOL bVeNCrypt = settings->getEnableVeNCryptTLS();
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE), BM_SETCHECK, bVeNCrypt, 0);
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), BM_SETCHECK, settings->getRequireVeNCryptTLS(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), BM_SETCHECK, settings->getVeNCryptRequireChannelBinding(), 0);
 		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
 		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), bVeNCrypt);
@@ -1120,6 +1262,11 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
+		LoadVeNCryptSubtypes(hwnd, settings->getVeNCryptSubtypes());
+		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
+		UpdateVeNCryptSubtypeAvailability(hwnd);
+		UpdateWebClientTlsAvailability(hTabIncoming, hwnd);
 		UpdateManageUsersButton(hwnd);
 	}
 
@@ -1517,9 +1664,14 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	}
 
 	case IDC_CONNECT_HTTP:
-		EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP),
-			(SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
-				BM_GETCHECK, 0, 0) == BST_CHECKED));
+	{
+		const BOOL httpEnabled = (SendDlgItemMessage(hwnd, IDC_CONNECT_HTTP,
+			BM_GETCHECK, 0, 0) == BST_CHECKED);
+		EnableWindow(GetDlgItem(hwnd, IDC_TLS), httpEnabled);
+		EnableWindow(GetDlgItem(hwnd, IDC_STATIC_HTTPPORT), httpEnabled);
+		EnableWindow(GetDlgItem(hwnd, IDC_PORTHTTP), httpEnabled);
+		UpdateWebClientTlsAvailability(hwnd, hTabTLS);
+	}
 		break;
 
 	case IDC_TLS:
@@ -1532,6 +1684,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 			if (bTLS)
 				SetDlgItemInt(hwnd, IDC_PORTHTTPS, settings->getTLSPort(), FALSE);
 		}
+		UpdateWebClientTlsAvailability(hwnd, hTabTLS);
 	}
 	break;
 
@@ -1556,9 +1709,20 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
+		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
+		UpdateVeNCryptSubtypeAvailability(hwnd);
 		UpdateManageUsersButton(hwnd);
 	}
 	return TRUE;
+
+	case IDC_VENCRYPT_REQUIRE:
+		UpdateVeNCryptSubtypeAvailability(hwnd);
+		return TRUE;
+
+	case IDC_VENCRYPT_REQUIRE_PLUS:
+		UpdateVeNCryptSubtypeAvailability(hwnd);
+		return TRUE;
 
 	case IDC_VENCRYPT_DLLPATH:
 		if (subcommand == EN_CHANGE)
@@ -2215,12 +2379,17 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		settings->setRequireVeNCryptTLS(
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setVeNCryptRequireChannelBinding(
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		char thumb[64]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, thumb, sizeof(thumb));
 		settings->setVeNCryptTLSCertThumbprint(thumb);
 		char dllPath[MAX_PATH]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, sizeof(dllPath));
 		settings->setVeNCryptTokenDLLPath(dllPath);
+		char subtypes[256]{};
+		SaveVeNCryptSubtypes(hwnd, subtypes, sizeof(subtypes));
+		settings->setVeNCryptSubtypes(subtypes);
 	}
 
 	if (GetDlgItem(hwnd, IDC_DISABLE_INPUTS)) {
