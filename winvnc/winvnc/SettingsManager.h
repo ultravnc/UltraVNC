@@ -79,10 +79,14 @@ public:
 	void setEnableVeNCryptTLS(BOOL v)          { m_pref_EnableVeNCryptTLS = v; };
 	BOOL getRequireVeNCryptTLS()               { return m_pref_RequireVeNCryptTLS; };
 	void setRequireVeNCryptTLS(BOOL v)         { m_pref_RequireVeNCryptTLS = v; };
+	BOOL getVeNCryptRequireChannelBinding()    { return m_pref_VeNCryptRequireChannelBinding; };
+	void setVeNCryptRequireChannelBinding(BOOL v) { m_pref_VeNCryptRequireChannelBinding = v; };
 	const char* getVeNCryptTLSCertThumbprint() { return m_pref_VeNCryptTLSCertThumbprint; };
 	void setVeNCryptTLSCertThumbprint(const char* v) { strncpy_s(m_pref_VeNCryptTLSCertThumbprint, v, 40); m_pref_VeNCryptTLSCertThumbprint[40] = 0; };
 	const char* getVeNCryptTokenDLLPath()      { return m_pref_VeNCryptTokenDLLPath; };
 	void setVeNCryptTokenDLLPath(const char* v)      { strncpy_s(m_pref_VeNCryptTokenDLLPath, v, MAX_PATH - 1); m_pref_VeNCryptTokenDLLPath[MAX_PATH - 1] = 0; };
+	const char* getVeNCryptSubtypes()          { return m_pref_VeNCryptSubtypes; };
+	void setVeNCryptSubtypes(const char* v)    { strncpy_s(m_pref_VeNCryptSubtypes, v, sizeof(m_pref_VeNCryptSubtypes) - 1); m_pref_VeNCryptSubtypes[sizeof(m_pref_VeNCryptSubtypes) - 1] = 0; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -330,8 +334,10 @@ private:
 
 	BOOL m_pref_EnableVeNCryptTLS;
 	BOOL m_pref_RequireVeNCryptTLS;
+	BOOL m_pref_VeNCryptRequireChannelBinding;
 	char m_pref_VeNCryptTLSCertThumbprint[41];
 	char m_pref_VeNCryptTokenDLLPath[MAX_PATH];
+	char m_pref_VeNCryptSubtypes[256];
 
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;

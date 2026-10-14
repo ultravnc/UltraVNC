@@ -79,7 +79,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
+    LTEXT           "Copyright ï¿½ 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
@@ -274,9 +274,9 @@ BEGIN
     CONTROL         "Auto",IDC_PORTNO_AUTO,"Button",BS_AUTORADIOBUTTON,304,19,34,9
     LTEXT           "RFB port",IDC_STATIC,193,17,36,8
     EDITTEXT        IDC_PORTRFB,252,16,29,12,ES_AUTOHSCROLL
-    LTEXT           "HTTP port",IDC_STATIC_HTTPPORT,193,30,38,10
+    LTEXT           "Web port",IDC_STATIC_HTTPPORT,193,30,38,10
     EDITTEXT        IDC_PORTHTTP,252,30,29,12,ES_AUTOHSCROLL
-    CONTROL         "Enable UltraVNC WebViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,28,122,10
+    CONTROL         "Enable UltraVNC WebViewer",IDC_CONNECT_HTTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,28,115,10
     CONTROL         "Do Nothing",IDC_LOCKSETTING_NOTHING,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,82,48,11
     CONTROL         "Lock Workstation (Windows 2000)",IDC_LOCKSETTING_LOCK,
                     "Button",BS_AUTORADIOBUTTON,94,82,120,11
@@ -474,36 +474,43 @@ BEGIN
     LTEXT           "Static",IDC_SERVICE_STATUS,17,100,217,31
 END
 
-IDD_FORM_TLS DIALOGEX 0, 0, 361, 211
+IDD_FORM_TLS DIALOGEX 0, 0, 361, 206
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    GROUPBOX        "Web client (noVNC) HTTPS / TLS",IDC_STATIC,7,7,344,73
-    LTEXT           "HTTPS port:",IDC_STATIC,13,21,45,8
-    EDITTEXT        IDC_TLS_NOVNC_PORT,60,19,40,12,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "(enable TLS on the Connection tab)",IDC_STATIC,106,21,180,8
-    LTEXT           "Certificate thumbprint:",IDC_STATIC,13,40,80,8
-    EDITTEXT        IDC_TLS_THUMBPRINT,95,38,137,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Select...",IDC_TLS_CERT_SELECT,239,38,40,12
-    PUSHBUTTON      "New self-signed",IDC_TLS_CERT_GEN,288,38,56,12
-    LTEXT           "Empty thumbprint = auto-generate self-signed certificate.",IDC_STATIC,13,55,300,8
-    LTEXT           "Port/certificate changes require a server restart.",IDC_STATIC,13,67,300,8
-    GROUPBOX        "VeNCrypt TLS (native encrypted VNC)",IDC_STATIC,7,86,344,118
-    CONTROL         "Enable VeNCrypt TLS",IDC_VENCRYPT_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,100,200,10
+    GROUPBOX        "VeNCrypt TLS (native encrypted VNC)",IDC_STATIC_VeNCrypt,6,3,349,125
+    CONTROL         "Enable VeNCrypt TLS",IDC_VENCRYPT_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,13,141,10
     CONTROL         "Require TLS (reject plaintext auth methods)",IDC_VENCRYPT_REQUIRE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,169,100,175,10
-    LTEXT           "Certificate thumbprint:",IDC_STATIC,13,118,80,8
-    EDITTEXT        IDC_VENCRYPT_THUMBPRINT,95,116,137,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Select...",IDC_VENCRYPT_CERT_SELECT,239,116,40,12
-    PUSHBUTTON      "New self-signed",IDC_VENCRYPT_CERT_GEN,288,116,56,12
-    LTEXT           "Token validator DLL:",IDC_STATIC,13,138,80,8
-    EDITTEXT        IDC_VENCRYPT_DLLPATH,95,136,137,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_VENCRYPT_DLL_BROWSE,239,136,40,12
-    PUSHBUTTON      "Manage users...",IDC_VENCRYPT_MANAGE,288,136,55,12
-    LTEXT           "Authentication: username + token / TOTP validated by the DLL.",IDC_STATIC,13,156,330,8
-    LTEXT           "Subtypes: TokenTLSv2 (301), TokenTLS (300), TLSPlain (259), X509Plain (262), X509Vnc (261)",IDC_STATIC,13,168,330,8
-    LTEXT           "Empty thumbprint = auto-generate self-signed certificate.",IDC_STATIC,13,180,330,8
-    LTEXT           "Applies to new connections; restart recommended.",IDC_STATIC,13,192,330,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,169,13,175,10
+    LTEXT           "Certificate thumbprint:",IDC_STATIC_THUMB,13,31,80,8
+    EDITTEXT        IDC_VENCRYPT_THUMBPRINT,95,29,137,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Select...",IDC_VENCRYPT_CERT_SELECT,239,29,40,12
+    PUSHBUTTON      "New self-signed",IDC_VENCRYPT_CERT_GEN,288,29,56,12
+    LTEXT           "Token validator DLL:",IDC_STATIC_TOKEN,15,47,80,10
+    EDITTEXT        IDC_VENCRYPT_DLLPATH,95,45,137,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_VENCRYPT_DLL_BROWSE,239,45,40,12
+    PUSHBUTTON      "Manage users...",IDC_VENCRYPT_MANAGE,288,45,55,12
+    GROUPBOX        "",IDC_STATIC,10,60,345,66
+    LTEXT           "Allowed VeNCrypt subtypes",IDC_STATIC_SUBTYPES,16,60,90,8
+    CONTROL         "TokenTLS (300)",IDC_VENCRYPT_SUBTYPE_300,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,111,82,10
+    CONTROL         "X509-SASL (264)",IDC_VENCRYPT_SUBTYPE_264,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,99,82,10
+    CONTROL         "TLS-SASL (263)",IDC_VENCRYPT_SUBTYPE_263,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,82,10
+    CONTROL         "X509-Plain (262)",IDC_VENCRYPT_SUBTYPE_262,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,109,99,82,10
+    CONTROL         "X509-Vnc (261)",IDC_VENCRYPT_SUBTYPE_261,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,75,82,10
+    CONTROL         "TLS-Plain (259)",IDC_VENCRYPT_SUBTYPE_259,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,109,75,82,10
+    CONTROL         "TLS-None (257)",IDC_VENCRYPT_SUBTYPE_257,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,109,87,82,10
+    CONTROL         "Require SCRAM-SHA-256-PLUS",IDC_VENCRYPT_REQUIRE_PLUS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,75,117,10
+    GROUPBOX        "Web client (noVNC) HTTPS / TLS",IDC_NOVNC,6,131,349,50
+    LTEXT           "HTTPS port:",IDC_HTTPSPORT,13,145,45,8
+    EDITTEXT        IDC_TLS_NOVNC_PORT,60,143,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "(enable TLS on the Connection tab)",IDC_TLSINFO,106,145,180,8
+    LTEXT           "Certificate thumbprint:",IDC_CERTTHUMBPRINT,13,164,80,8
+    EDITTEXT        IDC_TLS_THUMBPRINT,95,162,137,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Select...",IDC_TLS_CERT_SELECT,239,162,40,12
+    PUSHBUTTON      "New self-signed",IDC_TLS_CERT_GEN,288,162,56,12
+    LTEXT           "Empty thumbprint = auto-generate self-signed certificate.",IDC_TLSINFO1,171,185,184,18
+    LTEXT           "Port/certificate TLS changes require a server restart.",IDC_TLSINFO2,13,185,151,19
 END
 
 
@@ -683,15 +690,19 @@ BEGIN
 
     IDD_FORM_TLS, DIALOG
     BEGIN
+        VERTGUIDE, 12
+        VERTGUIDE, 19
         VERTGUIDE, 95
+        VERTGUIDE, 106
         VERTGUIDE, 232
         VERTGUIDE, 239
         VERTGUIDE, 279
         VERTGUIDE, 288
         VERTGUIDE, 344
+        VERTGUIDE, 355
         HORZGUIDE, 38
         HORZGUIDE, 116
-        HORZGUIDE, 136
+        HORZGUIDE, 132
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -781,7 +792,8 @@ END
 //
 
 IDR_WEBVIEWER_CORE_BASE64_JS JS                      "../../3rdparty/noVNC/core/base64.js"
-IDR_WEBVIEWER_CORE_CLIPBOARD_JS JS                   "../../3rdparty/noVNC/core/clipboard.js"
+
+IDR_WEBVIEWER_CORE_CLIPBOARD_JS JS                      "../../3rdparty/noVNC/core/clipboard.js"
 
 IDR_WEBVIEWER_CORE_CRYPTO_AES_JS JS                      "../../3rdparty/noVNC/core/crypto/aes.js"
 
@@ -898,23 +910,6 @@ IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS JS                      "../../3rd
 IDR_WEBVIEWER_INDEX_HTML HTML                    "res/webviewer_index.html"
 
 
-#ifndef APSTUDIO_INVOKED
-	#if defined(SC_20)
-	/////////////////////////////////////////////////////////////////////////////
-	//
-	// DLL
-	//
-
-	IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-	/////////////////////////////////////////////////////////////////////////////
-	//
-	// ENCRYPTIONDLL
-	//
-	IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-	#endif
-#endif
 /////////////////////////////////////////////////////////////////////////////
 //
 // AFX_DIALOG_LAYOUT
@@ -1246,6 +1241,71 @@ BEGIN
 END
 
 #endif    // English resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG2 DIALOGEX 0, 0, 695, 326
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,199,305,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,638,305,50,14
+    GROUPBOX        "Web client (noVNC) HTTPS / TLS",IDC_NOVNC,10,3,491,101
+    LTEXT           "HTTPS port:",IDC_HTTPSPORT,19,22,65,11
+    EDITTEXT        IDC_TLS_NOVNC_PORT,86,20,57,17,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "(enable TLS on the Connection tab)",IDC_TLSINFO,151,22,257,11
+    LTEXT           "Certificate thumbprint:",IDC_CERTTHUMBPRINT,19,48,114,11
+    EDITTEXT        IDC_TLS_THUMBPRINT,136,46,196,17,ES_AUTOHSCROLL
+    PUSHBUTTON      "Select...",IDC_TLS_CERT_SELECT,342,46,57,17
+    PUSHBUTTON      "New self-signed",IDC_TLS_CERT_GEN,411,46,80,17
+    LTEXT           "Empty thumbprint = auto-generate self-signed certificate.",IDC_TLSINFO1,19,69,429,11
+    LTEXT           "Port/certificate changes require a server restart.",IDC_TLSINFO2,19,86,429,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_DIALOG2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 688
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 319
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_DIALOG2 AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
