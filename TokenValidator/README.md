@@ -16,6 +16,7 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
 extern "C" __declspec(dllexport) int __cdecl tv_has_management_ui(void);
 extern "C" __declspec(dllexport) int __cdecl tv_show_management_ui(HWND hwndParent);
 extern "C" __declspec(dllexport) int __cdecl tv_get_last_error(char* buf, size_t bufSize);
+extern "C" __declspec(dllexport) int __cdecl sasl_lookup(const char* user, char* outBuf, size_t outBufSize);
 ```
 
 * `validate_token` returns `1` to allow the connection, `0` to reject it.
@@ -23,6 +24,11 @@ extern "C" __declspec(dllexport) int __cdecl tv_get_last_error(char* buf, size_t
 * `issue_session_token` generates a server-side session token after a successful TOTP auth.
 * `tv_has_management_ui` / `tv_show_management_ui` let WinVNC display a dialog for user management.
 * `tv_get_last_error` is an optional diagnostic hook.
+* `sasl_lookup` returns `1` and writes the user's stored SCRAM-SHA-256 verifier
+  string (`SCRAM-SHA-256$<iterations>:<salt_b64>$<StoredKey_b64>:<ServerKey_b64>`)
+  to `outBuf`, or `0` if the user has no SCRAM credential. Enables VeNCrypt
+  subtypes 263/264 (`TLS-SASL`/`X509-SASL`) with SCRAM-SHA-256 and
+  channel-bound SCRAM-SHA-256-PLUS.
 
 ## Capability negotiation
 
@@ -36,6 +42,7 @@ that as a bitmask:
 #define TV_CAP_SESSION_TOKEN  0x01  // exports issue_session_token and
                                     // validate_token accepts the tokens it issues
 #define TV_CAP_MANAGEMENT_UI  0x02  // exports tv_show_management_ui
+#define TV_CAP_SASL           0x04  // exports sasl_lookup (SCRAM verifier store)
 ```
 
 WinVNC uses the flags as follows:
@@ -46,6 +53,12 @@ WinVNC uses the flags as follows:
   this capability the server returns an empty session-token response.
 * **`TV_CAP_MANAGEMENT_UI`** — the WinVNC **Manage users...** button on the
   SSL/TLS tab is enabled only when this flag is set.
+* **`TV_CAP_SASL`** — the validator can return stored SCRAM-SHA-256 verifiers
+  via `sasl_lookup`. When set, WinVNC advertises VeNCrypt subtypes
+  **263** (`TLS-SASL`) and **264** (`X509-SASL`) and runs the SASL exchange
+  inside the TLS tunnel. `SCRAM-SHA-256-PLUS` (with `tls-server-end-point`
+  channel binding, RFC 5929) is preferred; `SCRAM-SHA-256` remains available
+  for QEMU/TigerVNC clients that do not implement channel binding.
 
 If a DLL does **not** export `tv_get_capabilities`, WinVNC falls back to
 probing the individual exports: `issue_session_token` implies
@@ -124,6 +137,28 @@ INI fallback: TokenValidator.totp.ini
 ```
 
 Open the BMP file and scan it with Microsoft Authenticator, or enter the base32 secret manually.
+
+## Provisioning a SCRAM password (SASL subtypes 263/264)
+
+Use the `sasl` verb to create a SCRAM-SHA-256 verifier for a user. The password
+is consumed interactively/at invocation and only the derived verifier
+(salt + iterations + StoredKey + ServerKey) is persisted — WinVNC never stores
+the plaintext password:
+
+```cmd
+TokenSetup.exe sasl alice <password>
+```
+
+The verifier is written to the `[SCRAM]` section of the encrypted INI
+(`TokenValidator.totp.ini`, DPAPI machine-scope) in PostgreSQL-style form:
+
+```
+SCRAM-SHA-256$4096:<salt_b64>$<StoredKey_b64>:<ServerKey_b64>
+```
+
+Viewers that support VeNCrypt SASL (UltraVNC viewer, QEMU/KVM, TigerVNC,
+virt-viewer) can then authenticate with `alice`/`<password>` using
+`SCRAM-SHA-256-PLUS` (channel-bound) or `SCRAM-SHA-256`.
 
 ## Manage users from WinVNC
 

@@ -2992,6 +2992,11 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     </ClCompile>
     <ClCompile Include="SchannelTLS.cpp" />
     <ClCompile Include="VeNCryptAuth.cpp" />
+    <ClCompile Include="..\..\common\Base64.cpp" />
+    <ClCompile Include="..\..\common\BcryptHelp.cpp" />
+    <ClCompile Include="..\..\common\ChannelBinding.cpp" />
+    <ClCompile Include="..\..\common\SaslWire.cpp" />
+    <ClCompile Include="..\..\common\ScramSha256.cpp" />
     <ClCompile Include="vncserver.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='SC_20_DEBUG|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -3268,6 +3273,11 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" c:\uvnc\64\xp</Command>
     <ClInclude Include="vnchttpconnect.h" />
     <ClInclude Include="SchannelTLS.h" />
     <ClInclude Include="VeNCryptAuth.h" />
+    <ClInclude Include="..\..\common\Base64.h" />
+    <ClInclude Include="..\..\common\BcryptHelp.h" />
+    <ClInclude Include="..\..\common\ChannelBinding.h" />
+    <ClInclude Include="..\..\common\SaslWire.h" />
+    <ClInclude Include="..\..\common\ScramSha256.h" />
     <ClInclude Include="vncinsthandler.h" />
     <ClInclude Include="vnckeymap.h" />
     <ClInclude Include="vncListDlg.h" />

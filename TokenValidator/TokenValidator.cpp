@@ -461,6 +461,7 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 // protection lets a restarted service desktop process validate it.
 // ---------------------------------------------------------------------------
 constexpr const char* kSessionSection = "SessionTokens";
+constexpr const char* kScramSection = "SCRAM"; // per-user "iter:saltB64:skB64:svkB64"
 std::mutex g_sessionMutex;
 
 std::string GenerateSessionTokenString()
@@ -542,9 +543,32 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
     return 1;
 }
 
+// Return the stored SCRAM-SHA-256 verifier for SASL subtypes 263/264.
+// The verifier string is key material: a stolen verifier lets an attacker
+// complete the server side but not recover the password, matching the
+// security model of PostgreSQL/pg_authid.
+extern "C" __declspec(dllexport) int __cdecl sasl_lookup(const char* user, char* outBuf, size_t outBufSize)
+{
+    if (!user || !*user || !outBuf || outBufSize == 0)
+        return 0;
+
+    std::string verifier;
+    {
+        std::lock_guard<std::mutex> lock(g_sessionMutex);
+        if (!TokenCore::ReadProtectedValue(kScramSection, user, verifier) ||
+            verifier.empty())
+            return 0;
+    }
+    if (verifier.size() >= outBufSize)
+        return 0;
+    memcpy(outBuf, verifier.data(), verifier.size());
+    outBuf[verifier.size()] = '\0';
+    return 1;
+}
+
 extern "C" __declspec(dllexport) int __cdecl tv_get_capabilities(void)
 {
-    return TV_CAP_SESSION_TOKEN | TV_CAP_MANAGEMENT_UI;
+    return TV_CAP_SESSION_TOKEN | TV_CAP_MANAGEMENT_UI | TV_CAP_SASL;
 }
 
 extern "C" __declspec(dllexport) int __cdecl tv_has_management_ui(void)

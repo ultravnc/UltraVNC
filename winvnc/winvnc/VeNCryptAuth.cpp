@@ -12,6 +12,8 @@
 #include "rfb.h"
 #include "SettingsManager.h"
 #include "vnclog.h"
+#include "common/ScramSha256.h"
+#include "common/SaslWire.h"
 #include <wincrypt.h>
 #include <windows.h>
 
@@ -23,9 +25,31 @@ namespace
     constexpr uint8_t VeNCryptMinorVersion = 2;
     constexpr size_t MaxUsernameLen = 256;
     constexpr size_t MaxTokenLen = 64;
+    // Verifier text form stored by the validator DLL:
+    // "<iterations>:<saltB64>:<storedKeyB64>:<serverKeyB64>"
+    constexpr size_t MaxVerifierLen = 512;
 
     typedef int (__cdecl *ValidateTokenFn)(const char* user, const char* token);
     typedef int (__cdecl *IssueSessionTokenFn)(const char* user, char* outBuf, size_t outBufSize);
+    typedef int (__cdecl *SaslLookupFn)(const char* user, char* outBuf, size_t outBufSize);
+
+    // SASL framing runs over the VSocket, which already has the TLS
+    // callbacks installed once PerformTLSHandshake() completes.
+    class SocketTransport : public ISaslTransport
+    {
+    public:
+        explicit SocketTransport(VSocket* socket) : m_socket(socket) {}
+        bool SendAll(const void* data, size_t len) override
+        {
+            return m_socket->SendExact((const char*)data, (const VCard)len) != VFalse;
+        }
+        bool RecvAll(void* data, size_t len) override
+        {
+            return m_socket->ReadExact((char*)data, (const VCard)len) != VFalse;
+        }
+    private:
+        VSocket* m_socket;
+    };
 
     // Keep the token validator DLL loaded for the lifetime of the process. The
     // DLL stores in-memory session tokens, so unloading it between calls would
@@ -43,6 +67,16 @@ namespace
                 g_hTokenValidatorDll = LoadLibraryA(dllPath);
         }
         return g_hTokenValidatorDll;
+    }
+
+    // The validator DLL exports sasl_lookup(user, outBuf, size) when it can
+    // supply SCRAM verifiers. Its presence gates offering subtypes 263/264.
+    SaslLookupFn GetSaslLookup()
+    {
+        HMODULE hModule = GetTokenValidatorDll();
+        if (!hModule)
+            return nullptr;
+        return (SaslLookupFn)GetProcAddress(hModule, "sasl_lookup");
     }
 
 }
@@ -101,7 +135,7 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         return false;
     }
 
-    if (m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc)
+    if (m_chosenType != secTypeTokenTLS && m_chosenType != secTypeTLSPlain && m_chosenType != secTypeTLSNone && m_chosenType != secTypeX509Plain && m_chosenType != secTypeX509Vnc && m_chosenType != secTypeTLSSASL && m_chosenType != secTypeX509SASL)
     {
         outFailureMessage = "Unsupported VeNCrypt subtype";
         return false;
@@ -109,6 +143,10 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
 
     if (!PerformTLSHandshake(outFailureMessage))
         return false;
+
+    // TLSSASL/X509SASL: QEMU-compatible SASL exchange over the TLS channel.
+    if (m_chosenType == secTypeTLSSASL || m_chosenType == secTypeX509SASL)
+        return RunSaslAuth(outFailureMessage);
 
     // TLSNone: encryption only, no credentials (interoperability test path)
     if (m_chosenType == secTypeTLSNone)
@@ -221,9 +259,18 @@ bool VeNCryptAuth::SendSubTypes()
     // Offer one versioned private token subtype plus standard VeNCrypt types.
     // Session-token support is negotiated inside subtype 300, not by consuming
     // another private subtype number.
-    CARD32 subTypes[5];
+    CARD32 subTypes[7];
     int n = 0;
+    // SASL subtypes are only offered when the validator DLL can supply SCRAM
+    // verifiers. Third-party SASL clients (QEMU/virt-viewer, TigerVNC) pick
+    // these; the UltraVNC viewer picks its own preferred type from the list.
+    const bool saslAvailable = (GetSaslLookup() != nullptr);
     subTypes[n++] = Swap32IfLE(secTypeTokenTLS);
+    if (saslAvailable)
+    {
+        subTypes[n++] = Swap32IfLE(secTypeX509SASL);
+        subTypes[n++] = Swap32IfLE(secTypeTLSSASL);
+    }
     subTypes[n++] = Swap32IfLE(secTypeTLSPlain);
     subTypes[n++] = Swap32IfLE(secTypeTLSNone);
     subTypes[n++] = Swap32IfLE(secTypeX509Plain);
@@ -401,6 +448,152 @@ bool VeNCryptAuth::ValidateToken(const char* username, const char* token,
         return false;
     }
 
+    return true;
+}
+
+// QEMU-compatible SASL server exchange for subtypes 263/264. Wire format
+// matches qemu ui/vnc-auth-sasl.c; the SecurityResult u32 (+ reason string)
+// is emitted by the caller as the regular RFB security result.
+bool VeNCryptAuth::RunSaslAuth(std::string& outFailureMessage)
+{
+    SaslLookupFn lookup = GetSaslLookup();
+    if (!lookup)
+    {
+        outFailureMessage = "Validator DLL does not support SASL (no sasl_lookup export)";
+        return false;
+    }
+
+    SocketTransport transport(m_socket);
+
+    // Channel binding for SCRAM-SHA-256-PLUS: hash of our server certificate.
+    // Offer -PLUS only when the hash is available; SCRAM-SHA-256 stays for
+    // clients that do not support channel binding (QEMU, TigerVNC).
+    std::vector<BYTE> cbData;
+    const bool haveBinding = m_tls.GetEndpointBinding(cbData);
+    const std::string mechlist =
+        haveBinding ? "SCRAM-SHA-256-PLUS,SCRAM-SHA-256" : "SCRAM-SHA-256";
+    if (!haveBinding)
+        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt SASL: no endpoint binding; -PLUS not offered\n"));
+
+    // S->C mechlist
+    if (!SaslWire::WriteString(&transport, mechlist))
+    {
+        outFailureMessage = "Failed to send SASL mechanism list";
+        return false;
+    }
+
+    // C->S mechanism name
+    std::string mech;
+    if (!SaslWire::ReadString(&transport, SaslWire::kMaxMechName, mech))
+    {
+        outFailureMessage = "Failed to read SASL mechanism";
+        return false;
+    }
+    if (mech != "SCRAM-SHA-256-PLUS" && mech != "SCRAM-SHA-256")
+    {
+        outFailureMessage = "Unsupported SASL mechanism";
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: rejected mech '%s'\n"), mech.c_str());
+        return false;
+    }
+    const bool clientPlus = (mech == "SCRAM-SHA-256-PLUS");
+    if (clientPlus && !haveBinding)
+    {
+        outFailureMessage = "Channel binding requested but unavailable";
+        return false;
+    }
+
+    // C->S client-first data block
+    std::vector<uint8_t> clientFirst;
+    bool isNull = false;
+    if (!SaslWire::ReadData(&transport, clientFirst, isNull) || isNull)
+    {
+        outFailureMessage = "Failed to read SASL initial response";
+        return false;
+    }
+
+    std::string user, clientFirstBare, clientNonce, gs2Header;
+    ScramSha256::CbFlag cbFlag;
+    if (!ScramSha256::ServerParseClientFirst(clientFirst, user, clientFirstBare,
+                                           clientNonce, gs2Header, cbFlag))
+    {
+        outFailureMessage = "Malformed SCRAM client-first message";
+        return false;
+    }
+    if (user.size() > MaxUsernameLen)
+    {
+        outFailureMessage = "SASL username too long";
+        return false;
+    }
+    // Anti-downgrade guard: client that supports binding chose plain SCRAM
+    // even though we advertised -PLUS.
+    if (cbFlag == ScramSha256::CB_SUPPORTED_NOT_USED && haveBinding)
+        vnclog.Print(LL_CONNERR,
+            VNCLOG("VeNCrypt SASL: client supports binding but chose non-PLUS (possible downgrade)\n"));
+    // GS2 header/mech must agree: p= header requires -PLUS mech and binding data.
+    if (cbFlag == ScramSha256::CB_USED && (!clientPlus || !haveBinding))
+    {
+        outFailureMessage = "SCRAM channel binding flag inconsistent with mechanism";
+        return false;
+    }
+
+    // Look up the SCRAM verifier in the validator DLL.
+    char verifierText[MaxVerifierLen + 1] = {};
+    if (!lookup(user.c_str(), verifierText, sizeof(verifierText)) ||
+        verifierText[0] == '\0')
+    {
+        outFailureMessage = "Authentication failed";
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: no verifier for user '%s'\n"), user.c_str());
+        return false;
+    }
+    ScramSha256::Verifier verifier;
+    if (!ScramSha256::ParseVerifier(verifierText, verifier))
+    {
+        outFailureMessage = "Validator returned malformed SCRAM verifier";
+        return false;
+    }
+    m_lastUsername = user;
+
+    // S->C server-first (incomplete: more data expected)
+    std::string serverFirst, fullNonce;
+    if (!ScramSha256::ServerBuildFirst(verifier, clientNonce, serverFirst, fullNonce) ||
+        !SaslWire::WriteStep(&transport, serverFirst.data(), serverFirst.size(), false))
+    {
+        outFailureMessage = "Failed to send SASL server-first";
+        return false;
+    }
+
+    // C->S client-final
+    std::vector<uint8_t> clientFinal;
+    if (!SaslWire::ReadData(&transport, clientFinal, isNull) || isNull)
+    {
+        outFailureMessage = "Failed to read SASL client-final";
+        return false;
+    }
+
+    std::string serverFinal;
+    static const std::vector<uint8_t> kEmptyCb;
+    const std::vector<uint8_t>& cbIn =
+        (cbFlag == ScramSha256::CB_USED) ? cbData : kEmptyCb;
+    if (!ScramSha256::ServerVerifyFinal(verifier, clientFinal, clientFirstBare,
+                                        serverFirst, fullNonce, gs2Header,
+                                        cbIn, serverFinal))
+    {
+        outFailureMessage = "Authentication failed";
+        vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt SASL: proof rejected for user '%s'\n"),
+                     user.c_str());
+        return false;
+    }
+
+    // S->C server-final, complete=1; caller emits the SecurityResult u32.
+    if (!SaslWire::WriteStep(&transport, serverFinal.data(), serverFinal.size(), true))
+    {
+        outFailureMessage = "Failed to send SASL server-final";
+        return false;
+    }
+
+    vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt SASL: user '%s' authenticated via %s%s\n"),
+                 user.c_str(), mech.c_str(),
+                 cbFlag == ScramSha256::CB_USED ? " (channel-bound)" : "");
     return true;
 }
 
