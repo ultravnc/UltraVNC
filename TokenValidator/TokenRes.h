@@ -10,6 +10,11 @@
 #define IDC_TV_URI                      1006
 #define IDC_TV_QR_IMAGE                 1007
 #define IDC_TV_USERNAME                 1008
+#define IDC_TV_PASSWORD                 1009
+#define IDC_TV_SETPASS                  1010
+#define IDC_TV_TESTPASS                 1011
+#define IDC_TV_DELPASS                  1012
+#define IDC_TV_FACTORS                  1013
 #define IDD_TVMANAGER                   2000
 #define IDI_TOKENMANAGER                2001
 #define IDC_STATIC                      -1

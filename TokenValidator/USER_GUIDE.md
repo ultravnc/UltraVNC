@@ -108,7 +108,7 @@ fresh code again. Tokens are never saved to disk.
 ## Notes for the admin
 
 * Secrets are stored on the server in **Windows Credential Manager**
-  (`UltraVNC_TOTP_<user>`) plus an encrypted `TokenValidator.totp.ini`
+  (`UltraVNC_TOTP_<user>`) plus an encrypted `TokenValidator.credentials.ini`
   fallback for service accounts — both stay on the server, never sent anywhere.
 * Each user needs their **own** username + their own phone app — codes are
   per-secret, so two people can't share one account usefully.

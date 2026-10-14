@@ -84,7 +84,7 @@ When the supplied credential is **6, 7, or 8 digits only**, the DLL validates it
 The per-user base32 secret is read from one of two places:
 
 1. **Windows Credential Manager** – target name `UltraVNC_TOTP_<username>`.
-2. **DPAPI-encrypted INI fallback** – `<TokenValidator DLL>.totp.ini`. This is useful when WinVNC runs as `SYSTEM`, because Credential Manager entries written by an interactive admin are not visible to the service.
+2. **DPAPI-encrypted INI fallback** – `<TokenValidator DLL>.credentials.ini`. This is useful when WinVNC runs as `SYSTEM`, because Credential Manager entries written by an interactive admin are not visible to the service.
 
 The INI is encrypted with `CryptProtectData` (`CRYPTPROTECT_LOCAL_MACHINE`) and the secret is stored as a base64-encoded blob. The DLL automatically restricts the file ACL to `SYSTEM`, `BUILTIN\Administrators`, and the current user.
 
@@ -133,32 +133,40 @@ Base32 secret: K5AZCCL5WAI5ABRALWHGATHGJJJPJK...
 Provisioning URI: otpauth://totp/UltraVNC:test?secret=K5AZCCL5WAI5ABRALWHGATHGJJJPJK...&issuer=UltraVNC
 QR code image: TokenSetup_test_totp.bmp
 Credential Manager target: UltraVNC_TOTP_test
-INI fallback: TokenValidator.totp.ini
+INI fallback: TokenValidator.credentials.ini
 ```
 
 Open the BMP file and scan it with Microsoft Authenticator, or enter the base32 secret manually.
 
 ## Provisioning a SCRAM password (SASL subtypes 263/264)
 
-Use the `sasl` verb to create a SCRAM-SHA-256 verifier for a user. The password
-is consumed interactively/at invocation and only the derived verifier
-(salt + iterations + StoredKey + ServerKey) is persisted — WinVNC never stores
-the plaintext password:
+Use the `-password` verb to create a SCRAM-SHA-256 verifier for a user. The
+password is consumed at invocation (or prompted without echo when omitted)
+and only the derived verifier (salt + iterations + StoredKey + ServerKey) is
+persisted — WinVNC never stores the plaintext password:
 
 ```cmd
-TokenSetup.exe sasl alice <password>
+TokenSetup.exe -password alice <password>
 ```
 
 The verifier is written to the `[SCRAM]` section of the encrypted INI
-(`TokenValidator.totp.ini`, DPAPI machine-scope) in PostgreSQL-style form:
-
-```
-SCRAM-SHA-256$4096:<salt_b64>$<StoredKey_b64>:<ServerKey_b64>
-```
+(`TokenValidator.credentials.ini`, DPAPI machine-scope) in the form
+`<iterations>:<salt_b64>:<StoredKey_b64>:<ServerKey_b64>`.
 
 Viewers that support VeNCrypt SASL (UltraVNC viewer, QEMU/KVM, TigerVNC,
 virt-viewer) can then authenticate with `alice`/`<password>` using
 `SCRAM-SHA-256-PLUS` (channel-bound) or `SCRAM-SHA-256`.
+
+## Listing and deleting users
+
+```cmd
+TokenSetup.exe list                :: all users + enrolled credential types
+TokenSetup.exe delete <user>       :: removes TOTP, SCRAM and session entries
+```
+
+The same lifecycle (set password, test password, clear password, remove user)
+is available in the WinVNC **Token Manager** dialog (`tv_show_management_ui`),
+which shows a per-user factor badge such as `alice [TOTP+SCRAM]`.
 
 ## Manage users from WinVNC
 
@@ -237,6 +245,6 @@ This mirrors how TurboVNC exposes TOTP via the OATH Toolkit (`pam_oath` / `users
   PsExec -s -i TokenSetup.exe test
   ```
 
-  If that is inconvenient, the encrypted INI fallback (`TokenValidator.totp.ini`) is read by the DLL as well.
+  If that is inconvenient, the encrypted INI fallback (`TokenValidator.credentials.ini`) is read by the DLL as well.
 * Session tokens are only valid while WinVNC keeps the validator DLL loaded. They are not persisted across server restarts.
 * For true two-factor authentication, combine TOTP with a separate password or rely on the Windows logon layer.

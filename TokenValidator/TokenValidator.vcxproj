@@ -88,12 +88,18 @@ if exist "C:\uvnc\sign.bat" call "C:\uvnc\sign.bat" "C:\uvnc\32\xp\$(TargetFileN
   <ItemGroup>
     <ClCompile Include="TokenValidator.cpp" />
     <ClCompile Include="TokenCore.cpp" />
+    <ClCompile Include="..\common\Base64.cpp" />
+    <ClCompile Include="..\common\BcryptHelp.cpp" />
+    <ClCompile Include="..\common\ScramSha256.cpp" />
     <ClCompile Include="..\3rdparty\qrcodegen\qrcodegen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TokenCore.h" />
     <ClInclude Include="TokenRes.h" />
     <ClInclude Include="TokenValidatorPlugin.h" />
+    <ClInclude Include="..\common\Base64.h" />
+    <ClInclude Include="..\common\BcryptHelp.h" />
+    <ClInclude Include="..\common\ScramSha256.h" />
     <ClInclude Include="..\3rdparty\qrcodegen\qrcodegen.hpp" />
   </ItemGroup>
   <ItemGroup>

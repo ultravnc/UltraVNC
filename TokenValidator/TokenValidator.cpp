@@ -9,10 +9,11 @@
 
 // Native token validation DLL for UltraVNC VeNCrypt token auth.
 //
-// Supports two credential types:
+// Supports three credential types:
 //   1. TOTP (RFC 6238) codes from authenticator apps such as Microsoft
 //      Authenticator, Google Authenticator, etc.
 //   2. Server-issued 64-character session tokens for reconnects.
+//   3. SCRAM-SHA-256 verifiers for SASL auth (VeNCrypt subtypes 263/264).
 //
 // Exports:
 //   validate_token(user, token)
@@ -21,12 +22,13 @@
 //
 // TOTP secrets are read from Windows Credential Manager first (target name
 // "UltraVNC_TOTP_<user>"), and fall back to a DPAPI-encrypted INI file next to
-// this DLL (<this DLL>.totp.ini) for service accounts such as SYSTEM whose
+// this DLL (<this DLL>.credentials.ini) for service accounts such as SYSTEM whose
 // Credential Manager vault is different from the interactive admin's vault.
 
 #include "TokenCore.h"
 #include "TokenValidatorPlugin.h"
 #include "TokenRes.h"
+#include "../common/ScramSha256.h"
 
 #include <windows.h>
 #include <bcrypt.h>
@@ -38,6 +40,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <algorithm>
 
 #pragma comment(lib, "bcrypt.lib")
 
@@ -193,13 +196,59 @@ void RefreshUserList(HWND hDlg)
 
     SendMessageA(hList, LB_RESETCONTENT, 0, 0);
 
-    std::vector<std::string> users = TokenCore::ListTotpUsers();
-    for (const auto& u : users)
+    // Union of TOTP (CredMan + INI) and SCRAM (INI) users, with a factor badge.
+    std::vector<std::string> totpUsers = TokenCore::ListTotpUsers();
+    std::vector<std::string> scramUsers = TokenCore::ListProtectedKeys("SCRAM");
+
+    std::vector<std::string> all = totpUsers;
+    for (const auto& s : scramUsers)
+        if (std::find(all.begin(), all.end(), s) == all.end())
+            all.push_back(s);
+
+    for (const auto& u : all)
     {
-        int idx = (int)SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)u.c_str());
+        bool hasTotp = std::find(totpUsers.begin(), totpUsers.end(), u) != totpUsers.end();
+        bool hasScram = std::find(scramUsers.begin(), scramUsers.end(), u) != scramUsers.end();
+        std::string display = u;
+        if (hasTotp && hasScram)      display += " [TOTP+SCRAM]";
+        else if (hasTotp)             display += " [TOTP]";
+        else if (hasScram)            display += " [SCRAM]";
+
+        int idx = (int)SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)display.c_str());
         if (idx != LB_ERR && strcmp(u.c_str(), prevUser) == 0)
             SendMessageA(hList, LB_SETCURSEL, idx, 0);
     }
+}
+
+// Strip display decorations (" [TOTP+SCRAM]", " (static fallback)") from a
+// listbox string, leaving the bare username.
+void StripListName(char* name)
+{
+    char* p = strstr(name, " [");
+    char* q = strstr(name, " (");
+    char* cut = (p && q) ? (p < q ? p : q) : (p ? p : q);
+    if (cut)
+        *cut = '\0';
+}
+
+void UpdateFactorsLabel(HWND hDlg, const char* user)
+{
+    if (!user || !*user)
+    {
+        SetDlgItemTextA(hDlg, IDC_TV_FACTORS, "");
+        return;
+    }
+    bool hasTotp = false, hasScram = false;
+    std::string tmp;
+    std::vector<std::string> t = TokenCore::ListTotpUsers();
+    hasTotp = std::find(t.begin(), t.end(), user) != t.end();
+    hasScram = TokenCore::ReadProtectedValue("SCRAM", user, tmp) && !tmp.empty();
+
+    std::string label = "Factors: ";
+    if (hasTotp) label += "TOTP ";
+    if (hasScram) label += "SCRAM";
+    if (!hasTotp && !hasScram) label += "none";
+    SetDlgItemTextA(hDlg, IDC_TV_FACTORS, label.c_str());
 }
 
 void OnUserSelectionChanged(HWND hDlg)
@@ -212,16 +261,15 @@ void OnUserSelectionChanged(HWND hDlg)
     if (idx == LB_ERR)
     {
         SetDlgItemTextA(hDlg, IDC_TV_URI, "");
+        UpdateFactorsLabel(hDlg, "");
         return;
     }
 
     char user[256] = {};
     SendMessageA(hList, LB_GETTEXT, idx, (LPARAM)user);
+    StripListName(user);
 
-    // Strip the read-only fallback marker if selected.
-    size_t len = strlen(user);
-    if (len > 20 && strcmp(user + len - 20, " (static fallback)") == 0)
-        user[len - 20] = '\0';
+    UpdateFactorsLabel(hDlg, user);
 
     std::string secret;
     if (TokenCore::ReadTotpSecret(user, secret) && !secret.empty())
@@ -245,11 +293,11 @@ bool GetSelectedUser(HWND hDlg, char* user, size_t userSize)
         return false;
 
     SendMessageA(hList, LB_GETTEXT, idx, (LPARAM)user);
-    size_t len = strlen(user);
-    if (len > 20 && strcmp(user + len - 20, " (static fallback)") == 0)
+    if (strstr(user, " (static fallback)"))
         return false; // read-only static fallback
+    StripListName(user);
 
-    return true;
+    return user[0] != '\0';
 }
 
 void OnAddUser(HWND hDlg)
@@ -325,13 +373,106 @@ void OnRemoveUser(HWND hDlg)
     }
 
     char msg[300] = {};
-    sprintf_s(msg, "Remove user '%s'? This will invalidate their authenticator.", user);
+    sprintf_s(msg, "Remove user '%s'? This deletes their TOTP secret, SCRAM verifier and pending session token.", user);
     if (MessageBoxA(hDlg, msg, "Token Manager", MB_YESNO | MB_ICONQUESTION) != IDYES)
         return;
 
     TokenCore::DeleteTotpSecret(user);
+    TokenCore::DeleteProtectedValue("SCRAM", user);
+    TokenCore::DeleteProtectedValue("SessionTokens", user);
     SetDlgItemTextA(hDlg, IDC_TV_URI, "");
+    UpdateFactorsLabel(hDlg, "");
     RefreshUserList(hDlg);
+}
+
+void OnSetPassword(HWND hDlg)
+{
+    char user[256] = {};
+    if (!GetSelectedUser(hDlg, user, sizeof(user)))
+    {
+        MessageBoxA(hDlg, "Select a user first.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    char password[256] = {};
+    GetDlgItemTextA(hDlg, IDC_TV_PASSWORD, password, sizeof(password));
+    if (!password[0])
+    {
+        MessageBoxA(hDlg, "Enter a password in the Password field.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    ScramSha256::Verifier v;
+    if (!ScramSha256::MakeVerifier(password, v) ||
+        !TokenCore::WriteProtectedValue("SCRAM", user, ScramSha256::VerifierToString(v)))
+    {
+        MessageBoxA(hDlg, "Failed to store the SCRAM verifier.", "Token Manager", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    // Never keep the plaintext around longer than needed.
+    SecureZeroMemory(password, sizeof(password));
+    SetDlgItemTextA(hDlg, IDC_TV_PASSWORD, "");
+
+    MessageBoxA(hDlg, "SCRAM password stored. The plaintext is not saved — only the verifier.",
+                "Token Manager", MB_OK | MB_ICONINFORMATION);
+    RefreshUserList(hDlg);
+    UpdateFactorsLabel(hDlg, user);
+}
+
+void OnTestPassword(HWND hDlg)
+{
+    char user[256] = {};
+    if (!GetSelectedUser(hDlg, user, sizeof(user)))
+    {
+        MessageBoxA(hDlg, "Select a user first.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    std::string text;
+    ScramSha256::Verifier v;
+    if (!TokenCore::ReadProtectedValue("SCRAM", user, text) ||
+        !ScramSha256::ParseVerifier(text, v))
+    {
+        MessageBoxA(hDlg, "No SCRAM credential stored for this user.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    char password[256] = {};
+    GetDlgItemTextA(hDlg, IDC_TV_PASSWORD, password, sizeof(password));
+    if (!password[0])
+    {
+        MessageBoxA(hDlg, "Enter the password to test in the Password field.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    bool ok = ScramSha256::CheckPassword(password, v);
+    SecureZeroMemory(password, sizeof(password));
+    SetDlgItemTextA(hDlg, IDC_TV_PASSWORD, "");
+
+    MessageBoxA(hDlg, ok ? "Password matches the stored verifier."
+                         : "Password does NOT match.",
+                "Token Manager", ok ? MB_OK | MB_ICONINFORMATION
+                                    : MB_OK | MB_ICONWARNING);
+}
+
+void OnClearPassword(HWND hDlg)
+{
+    char user[256] = {};
+    if (!GetSelectedUser(hDlg, user, sizeof(user)))
+    {
+        MessageBoxA(hDlg, "Select a user first.", "Token Manager", MB_OK | MB_ICONWARNING);
+        return;
+    }
+
+    char msg[300] = {};
+    sprintf_s(msg, "Remove the SCRAM password for '%s'? SASL authentication will stop working for this user.", user);
+    if (MessageBoxA(hDlg, msg, "Token Manager", MB_YESNO | MB_ICONQUESTION) != IDYES)
+        return;
+
+    TokenCore::DeleteProtectedValue("SCRAM", user);
+    RefreshUserList(hDlg);
+    UpdateFactorsLabel(hDlg, user);
 }
 
 void OnResetUser(HWND hDlg)
@@ -435,6 +576,18 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 
         case IDC_TV_SHOWQR:
             OnShowQr(hDlg);
+            return (INT_PTR)TRUE;
+
+        case IDC_TV_SETPASS:
+            OnSetPassword(hDlg);
+            return (INT_PTR)TRUE;
+
+        case IDC_TV_TESTPASS:
+            OnTestPassword(hDlg);
+            return (INT_PTR)TRUE;
+
+        case IDC_TV_DELPASS:
+            OnClearPassword(hDlg);
             return (INT_PTR)TRUE;
 
         case IDOK:

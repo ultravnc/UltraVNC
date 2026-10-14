@@ -38,6 +38,8 @@ bool ReadTotpSecret(const std::string& user, std::string& secretOut);
 bool WriteTotpSecret(const std::string& user, const std::string& secret);
 bool DeleteTotpSecret(const std::string& user);
 std::vector<std::string> ListTotpUsers();
+// List key names stored in a DPAPI-protected INI section (e.g. "SCRAM").
+std::vector<std::string> ListProtectedKeys(const char* section);
 bool ReadProtectedValue(const char* section, const std::string& key, std::string& valueOut);
 bool WriteProtectedValue(const char* section, const std::string& key, const std::string& value);
 bool DeleteProtectedValue(const char* section, const std::string& key);
