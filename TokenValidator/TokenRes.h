@@ -15,6 +15,7 @@
 #define IDC_TV_TESTPASS                 1011
 #define IDC_TV_DELPASS                  1012
 #define IDC_TV_FACTORS                  1013
+#define IDC_TV_DELTOTP                  1014
 #define IDD_TVMANAGER                   2000
 #define IDI_TOKENMANAGER                2001
 #define IDC_STATIC                      -1
