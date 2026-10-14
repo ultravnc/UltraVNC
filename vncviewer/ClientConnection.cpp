@@ -407,6 +407,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_clearPasswd[0] = '\0'; // Modif sf@2002
 	m_usedSavedVncPassword = false;
 	m_lastVeNCryptSubType = 0;
+	m_veNCryptDesc[0] = '\0';
+	m_saslMech[0] = '\0';
 	// static window
 	m_BytesSend=0;
 	m_BytesRead=0;
@@ -8428,7 +8430,14 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 					if (_this->m_pIntegratedPluginInterface) {
 						{ wchar_t _wdcs[256]; MultiByteToWideChar(CP_UTF8,0,_this->m_pIntegratedPluginInterface->DescribeCurrentSettings(),-1,_wdcs,256); SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,_wdcs); }
 					} else if (_this->m_pPluginInterface) {
-						SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(plugin default encryption)");
+						if (_this->m_veNCryptDesc[0])
+						{
+							wchar_t _wdcs[300];
+							MultiByteToWideChar(CP_UTF8,0,_this->m_veNCryptDesc,-1,_wdcs,_countof(_wdcs));
+							SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,_wdcs);
+						}
+						else
+							SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,L"(plugin default encryption)");
 					} else {
 						if (_this->m_opts->m_oldplugin)
 						{
@@ -8442,6 +8451,15 @@ LRESULT CALLBACK ClientConnection::GTGBS_StatusProc(HWND hwnd, UINT iMsg, WPARAM
 
 					//Problem, old plugins don't have xxPluginInterface
 					// they always say no encryption
+				}
+				else if (_this->m_pPluginInterface && _this->m_veNCryptDesc[0])
+				{
+					// TLS transport installed via VeNCrypt (no DSM plugin):
+					// show negotiated subtype, cipher suite and SASL mech.
+					SetDlgItemTextW(hwnd,IDC_STATUS,sz_L49);
+					wchar_t _wtls[300];
+					MultiByteToWideChar(CP_UTF8,0,_this->m_veNCryptDesc,-1,_wtls,_countof(_wtls));
+					SetDlgItemTextW(hwnd,IDC_PLUGIN_STATUS,_wtls);
 				}
 				else
 					SetDlgItemTextW(hwnd,IDC_STATUS,sz_L49);
