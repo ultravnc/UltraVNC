@@ -58,6 +58,20 @@ namespace ScramSha256
                BcryptHelp::HmacSha256(salted, 32, "Server Key", 10, v.serverKey);
     }
 
+    bool CheckPassword(const std::string& password, const Verifier& v)
+    {
+        if (v.salt.empty() || v.iterations == 0)
+            return false;
+        uint8_t salted[32], clientKey[32], storedKey[32];
+        if (!BcryptHelp::Pbkdf2Sha256(password.data(), password.size(),
+                                    v.salt.data(), (uint32_t)v.salt.size(),
+                                    v.iterations, salted, 32) ||
+            !BcryptHelp::HmacSha256(salted, 32, "Client Key", 10, clientKey) ||
+            !BcryptHelp::Sha256(clientKey, 32, storedKey))
+            return false;
+        return memcmp(storedKey, v.storedKey, 32) == 0;
+    }
+
     bool ParseVerifier(const std::string& text, Verifier& v)
     {
         // "<iterations>:<saltB64>:<storedKeyB64>:<serverKeyB64>"

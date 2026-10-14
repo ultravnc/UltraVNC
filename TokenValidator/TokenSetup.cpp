@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <vector>
+#include <algorithm>
 #include <conio.h>
 
 static bool SetStoragePathsFromExeDir()
@@ -67,11 +69,57 @@ int main(int argc, char* argv[])
     {
         fprintf(stderr, "Usage: %s <username> [base32-secret]\n", argv[0]);
         fprintf(stderr, "       %s -password <username> [password]   (provision SCRAM-SHA-256)\n", argv[0]);
+        fprintf(stderr, "       %s list                                  (list users + credential types)\n", argv[0]);
+        fprintf(stderr, "       %s delete <username>                   (remove all credentials)\n", argv[0]);
         fprintf(stderr, "If the base32 secret is omitted, a random 160-bit secret is generated.\n");
         return 1;
     }
 
     SetStoragePathsFromExeDir();
+
+    // ---------------- list all users and their credential types ----------------
+    if (strcmp(argv[1], "list") == 0)
+    {
+        std::vector<std::string> totp = TokenCore::ListTotpUsers();
+        std::vector<std::string> scram = TokenCore::ListProtectedKeys("SCRAM");
+        std::vector<std::string> sess = TokenCore::ListProtectedKeys("SessionTokens");
+
+        std::vector<std::string> all = totp;
+        for (const auto& u : scram)
+            if (std::find(all.begin(), all.end(), u) == all.end()) all.push_back(u);
+        for (const auto& u : sess)
+            if (std::find(all.begin(), all.end(), u) == all.end()) all.push_back(u);
+        std::sort(all.begin(), all.end());
+
+        if (all.empty())
+            printf("No users provisioned.\n");
+        for (const auto& u : all)
+        {
+            std::string factors;
+            if (std::find(totp.begin(), totp.end(), u) != totp.end()) factors += " TOTP";
+            if (std::find(scram.begin(), scram.end(), u) != scram.end()) factors += " SCRAM";
+            if (std::find(sess.begin(), sess.end(), u) != sess.end()) factors += " SESSION(pending)";
+            printf("%-24s %s\n", u.c_str(), factors.c_str());
+        }
+        printf("INI: %s\n", TokenCore::GetSecretStoreIniPath().c_str());
+        return 0;
+    }
+
+    // ---------------- delete a user across all credential types ----------------
+    if (strcmp(argv[1], "delete") == 0)
+    {
+        if (argc < 3)
+        {
+            fprintf(stderr, "Usage: %s delete <username>\n", argv[0]);
+            return 1;
+        }
+        const char* user = argv[2];
+        TokenCore::DeleteTotpSecret(user);
+        TokenCore::DeleteProtectedValue("SCRAM", user);
+        TokenCore::DeleteProtectedValue("SessionTokens", user);
+        printf("Removed TOTP, SCRAM and session credentials for '%s'\n", user);
+        return 0;
+    }
 
     // ---------------- SCRAM-SHA-256 password provisioning ----------------
     if (strcmp(argv[1], "-password") == 0)
