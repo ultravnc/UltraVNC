@@ -15,6 +15,9 @@
 #include "Exception.h"
 #include "AuthDialog.h"
 #include "rfb.h"
+#include "common/SaslWire.h"
+#include "common/ScramSha256.h"
+#include "common/ChannelBinding.h"
 
 #define SECURITY_WIN32
 #include <security.h>
@@ -676,18 +679,28 @@ void ClientConnection::AuthVeNCrypt()
 	for (int i = 0; i < size; i++)
 	{
 		ReadExact((char *)&temp, 4);
-		if (subType < 0)
 		{
 			temp = Swap32IfLE(temp);
+			// Prefer SASL subtypes (264 > 263 > others) so an updated viewer
+			// uses SCRAM(-PLUS) when the server offers it; servers that don't
+			// list SASL keep the previous first-supported-wins behaviour.
 			switch (temp)
 			{
+			case secTypeX509SASL:
+				subType = temp;   // strongest: SASL over X509 TLS
+				break;
+			case secTypeTLSSASL:
+				if (subType != secTypeX509SASL)
+					subType = temp;
+				break;
 			case rfbVncAuth:
 			case secTypePlain:
 			case secTypeX509None:
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
 			case secTypeTokenTLS:
-				subType = temp;
+				if (subType < 0)
+					subType = temp;
 				break;
 			}
 		}
@@ -697,6 +710,10 @@ void ClientConnection::AuthVeNCrypt()
 	m_lastVeNCryptSubType = subType;
 	temp = Swap32IfLE(subType);
 	WriteExact((char *)&temp, 4);
+
+	// tls-server-end-point (RFC 5929) channel binding data, filled after the
+	// TLS handshake when a certificate-bearing subtype was negotiated.
+	std::vector<BYTE> endpointHash;
 
 	// if standard RFB type negotiated -> no further msgs and no TLS session
 	if (subType >= 256) {
@@ -799,11 +816,19 @@ void ClientConnection::AuthVeNCrypt()
 				}
 			}
 		}
+		// Hash the certificate the server presented while session.pRemoteCert
+		// is still valid — TLSPlugin's move ctor takes ownership afterwards.
+		if (session.pRemoteCert)
+			ChannelBinding::ServerEndPointHash(session.pRemoteCert, endpointHash);
 		m_fUsePlugin = true;
 		m_pPluginInterface = new TLSPlugin(session, *this);
 	}
 	switch (subType)
 	{
+	case secTypeTLSSASL:
+	case secTypeX509SASL:
+		AuthSasl(endpointHash.empty() ? NULL : endpointHash.data(), endpointHash.size());
+		break;
 	case secTypeTLSNone:
 	case secTypeX509None:
 		// do nothing
@@ -895,4 +920,150 @@ void ClientConnection::AuthVeNCrypt()
 	default:
 		return SetLastError("Cannot complete sub-type authentication");
 	}
+}
+
+// ISaslTransport over ClientConnection::ReadExact/WriteExact. By this point
+// the TLSPlugin is installed, so all bytes are transparently encrypted.
+namespace
+{
+	class ConnTransport : public ISaslTransport
+	{
+	public:
+		explicit ConnTransport(ClientConnection* conn) : m_conn(conn) {}
+		bool SendAll(const void* data, size_t len) override
+		{
+			try { m_conn->WriteExact((char*)data, (int)len); }
+			catch (...) { return false; }
+			return true;
+		}
+		bool RecvAll(void* data, size_t len) override
+		{
+			try { m_conn->ReadExact((char*)data, (int)len); }
+			catch (...) { return false; }
+			return true;
+		}
+	private:
+		ClientConnection* m_conn;
+	};
+}
+
+// QEMU-compatible SASL client exchange for VeNCrypt subtypes 263/264.
+// The SASL SecurityResult u32 is read by the caller (AuthenticateServer).
+// cbData/cbDataLen: tls-server-end-point hash of the server cert, or empty.
+void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
+{
+	auto SetLastError = [](char *error)
+	{
+		vnclog.Print(0, _T("AuthSasl: %s\n"), error);
+		wchar_t werror[256];
+		MultiByteToWideChar(CP_UTF8, 0, error, -1, werror, 256);
+		throw WarningException(werror);
+	};
+
+	ConnTransport transport(this);
+	std::vector<uint8_t> cb(cbData, cbData + cbDataLen);
+
+	// S->C mechanism list
+	std::string mechlist;
+	if (!SaslWire::ReadString(&transport, SaslWire::kMaxSaslData, mechlist))
+		return SetLastError("Failed to read SASL mechanism list");
+	vnclog.Print(0, _T("AuthSasl: server mechs '%hs'\n"), mechlist.c_str());
+
+	// Pick a mechanism by token so "SCRAM-SHA-256" cannot match inside
+	// "SCRAM-SHA-256-PLUS". Prefer -PLUS when we have binding data, then
+	// plain SCRAM-SHA-256, then PLAIN as last resort.
+	bool hasPlus = false, hasScram = false, hasPlain = false;
+	{
+		size_t pos = 0;
+		while (pos <= mechlist.size())
+		{
+			size_t end = mechlist.find(',', pos);
+			if (end == std::string::npos) end = mechlist.size();
+			std::string m = mechlist.substr(pos, end - pos);
+			if (m == "SCRAM-SHA-256-PLUS") hasPlus = true;
+			else if (m == "SCRAM-SHA-256") hasScram = true;
+			else if (m == "PLAIN") hasPlain = true;
+			pos = end + 1;
+		}
+	}
+	std::string mech;
+	if (hasPlus && !cb.empty())
+		mech = "SCRAM-SHA-256-PLUS";
+	else if (hasScram)
+		mech = "SCRAM-SHA-256";
+	else if (hasPlain)
+		mech = "PLAIN";
+	else
+		return SetLastError("No usable SASL mechanism");
+	vnclog.Print(0, _T("AuthSasl: using mech '%hs'%s\n"), mech.c_str(),
+	             mech == "SCRAM-SHA-256-PLUS" ? " (channel-bound)" : "");
+	if (!SaslWire::WriteString(&transport, mech))
+		return SetLastError("Failed to send SASL mechanism");
+
+	// Credentials
+	char user[256] = {0}, passwd[256] = {0};
+	if (strlen(m_clearPasswd) == 0)
+	{
+		AuthDialog ad;
+		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+		if (!ad.DoDialog(dtUserPass, m_host, m_port))
+			QuietException_helper(L"Authentication cancelled");
+		strcpy_s(user, ad.m_user);
+		strcpy_s(passwd, ad.m_passwd);
+	}
+	else
+	{
+		strcpy_s(user, m_cmdlnUser);
+		strcpy_s(passwd, m_clearPasswd);
+	}
+
+	if (mech == "PLAIN")
+	{
+		// authzid \0 authcid \0 password
+		std::string init;
+		init.push_back('\0');
+		init += user;
+		init.push_back('\0');
+		init += passwd;
+		if (!SaslWire::WriteData(&transport, init.data(), init.size()))
+			return SetLastError("Failed to send PLAIN credentials");
+		// Server step reply: data + complete byte; SecurityResult follows.
+		std::vector<uint8_t> resp;
+		bool isNull = false, complete = false;
+		if (!SaslWire::ReadStep(&transport, resp, isNull, complete) || !complete)
+			return SetLastError("Malformed SASL step reply");
+		return;
+	}
+
+	// SCRAM-SHA-256(-PLUS): cbData is only bound into the exchange for the
+	// -PLUS mechanism; for plain SCRAM we still send the "y,," GS2 header to
+	// signal that we would have used binding had it been offered.
+	static const std::vector<uint8_t> kEmptyCb;
+	const std::vector<uint8_t>& cbForMech = (mech == "SCRAM-SHA-256-PLUS") ? cb : kEmptyCb;
+	bool supportsCb = !cb.empty();
+	std::string firstMsg, firstBare, nonce, gs2Header;
+	if (!ScramSha256::ClientFirst(user, cbForMech, supportsCb,
+	                              firstMsg, firstBare, nonce, gs2Header))
+		return SetLastError("SCRAM client-first failed");
+	if (!SaslWire::WriteData(&transport, firstMsg.data(), firstMsg.size()))
+		return SetLastError("Failed to send SCRAM client-first");
+
+	std::vector<uint8_t> serverFirst;
+	bool isNull = false, complete = false;
+	if (!SaslWire::ReadStep(&transport, serverFirst, isNull, complete) || isNull || complete)
+		return SetLastError("Malformed SCRAM server-first");
+
+	std::string finalMsg;
+	std::vector<uint8_t> expectedSig;
+	if (!ScramSha256::ClientFinal(serverFirst, passwd, firstBare, nonce,
+	                              gs2Header, cbForMech, finalMsg, expectedSig))
+		return SetLastError("SCRAM client-final failed");
+	if (!SaslWire::WriteData(&transport, finalMsg.data(), finalMsg.size()))
+		return SetLastError("Failed to send SCRAM client-final");
+
+	std::vector<uint8_t> serverFinal;
+	if (!SaslWire::ReadStep(&transport, serverFinal, isNull, complete) || !complete)
+		return SetLastError("Malformed SCRAM server-final");
+	if (!ScramSha256::ClientVerifyServerFinal(serverFinal, expectedSig.data()))
+		return SetLastError("SCRAM server signature invalid");
 }
