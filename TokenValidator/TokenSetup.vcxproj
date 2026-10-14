@@ -97,10 +97,16 @@ if exist "C:\uvnc\sign.bat" call "C:\uvnc\sign.bat" "C:\uvnc\32\xp\$(TargetFileN
     <ClCompile Include="TokenSetup.cpp" />
     <ClCompile Include="TokenCore.cpp" />
     <ClCompile Include="..\3rdparty\qrcodegen\qrcodegen.cpp" />
+    <ClCompile Include="..\common\Base64.cpp" />
+    <ClCompile Include="..\common\BcryptHelp.cpp" />
+    <ClCompile Include="..\common\ScramSha256.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TokenCore.h" />
     <ClInclude Include="..\3rdparty\qrcodegen\qrcodegen.hpp" />
+    <ClInclude Include="..\common\Base64.h" />
+    <ClInclude Include="..\common\BcryptHelp.h" />
+    <ClInclude Include="..\common\ScramSha256.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TokenSetup.manifest" />

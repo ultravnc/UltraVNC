@@ -22,11 +22,13 @@
 // can be scanned by Microsoft Authenticator, Google Authenticator, Authy, etc.
 
 #include "TokenCore.h"
+#include "../common/ScramSha256.h"
 
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <conio.h>
 
 static bool SetStoragePathsFromExeDir()
 {
@@ -64,11 +66,59 @@ int main(int argc, char* argv[])
     if (argc < 2)
     {
         fprintf(stderr, "Usage: %s <username> [base32-secret]\n", argv[0]);
+        fprintf(stderr, "       %s -password <username> [password]   (provision SCRAM-SHA-256)\n", argv[0]);
         fprintf(stderr, "If the base32 secret is omitted, a random 160-bit secret is generated.\n");
         return 1;
     }
 
     SetStoragePathsFromExeDir();
+
+    // ---------------- SCRAM-SHA-256 password provisioning ----------------
+    if (strcmp(argv[1], "-password") == 0)
+    {
+        if (argc < 3)
+        {
+            fprintf(stderr, "Usage: %s -password <username> [password]\n", argv[0]);
+            return 1;
+        }
+        const char* user = argv[2];
+        std::string password;
+        if (argc >= 4)
+        {
+            password = argv[3];
+        }
+        else
+        {
+            // Read without echo.
+            fprintf(stdout, "Password for %s: ", user);
+            fflush(stdout);
+            int c;
+            while ((c = _getch()) != '\r' && c != '\n' && c != EOF)
+                password.push_back((char)c);
+            fprintf(stdout, "\n");
+        }
+        if (password.empty())
+        {
+            fprintf(stderr, "Empty password\n");
+            return 1;
+        }
+        ScramSha256::Verifier v;
+        if (!ScramSha256::MakeVerifier(password, v))
+        {
+            fprintf(stderr, "Failed to derive SCRAM verifier\n");
+            return 1;
+        }
+        if (!TokenCore::WriteProtectedValue("SCRAM", user, ScramSha256::VerifierToString(v)))
+        {
+            fprintf(stderr, "Failed to store SCRAM verifier\n");
+            return 1;
+        }
+        printf("SCRAM-SHA-256 verifier stored for user '%s' (%u iterations)\n",
+               user, (unsigned)v.iterations);
+        printf("INI: %s\n", TokenCore::GetSecretStoreIniPath().c_str());
+        return 0;
+    }
+
 
     const char* user = argv[1];
     std::string secretBase32;
