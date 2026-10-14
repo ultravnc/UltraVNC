@@ -102,6 +102,7 @@ struct TLSSession
 	SecBuffer		inBuffers[5], outBuffers[5];
 	SecPkgContext_StreamSizes tlsSizes;
 	char			lastError[1024];
+	wchar_t			cipherSuite[128] = {};
 
 	TLSSession() : state(StateNew), hostName(nullptr), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
 	{ 
@@ -265,7 +266,10 @@ struct TLSSession
 					SecPkgContext_CipherInfo cipherInfo;
 					SecPkgContext_ConnectionInfo connInfo;
 					if (QueryContextAttributes(&hContext, SECPKG_ATTR_CIPHER_INFO, &cipherInfo) == S_OK)
+					{
 						vnclog.Print(0, _T("TLSSession: Using %ls (0x%X) ciphersuite\n"), cipherInfo.szCipherSuite, cipherInfo.dwCipherSuite);
+						wcsncpy_s(cipherSuite, _countof(cipherSuite), cipherInfo.szCipherSuite, _TRUNCATE);
+					}
 					if (QueryContextAttributes(&hContext, SECPKG_ATTR_CONNECTION_INFO, &connInfo) == S_OK)
 						vnclog.Print(0, _T("TLSSession: %s using %s cipher with %s hash and %s key-exchange\n"), GetAlgName(connInfo.dwProtocol), 
 							GetAlgName(connInfo.aiCipher), GetAlgName(connInfo.aiHash), GetAlgName(connInfo.aiExch));
@@ -822,12 +826,40 @@ void ClientConnection::AuthVeNCrypt()
 			ChannelBinding::ServerEndPointHash(session.pRemoteCert, endpointHash);
 		m_fUsePlugin = true;
 		m_pPluginInterface = new TLSPlugin(session, *this);
+
+		// Human-readable encryption summary for the status window, e.g.
+		// "VeNCrypt X509-SASL — TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384".
+		const char* subName =
+			subType == secTypeTLSNone   ? "TLS-None"   :
+			subType == secTypeTLSVnc    ? "TLS-Vnc"    :
+			subType == secTypeTLSPlain  ? "TLS-Plain"  :
+			subType == secTypeX509None  ? "X509-None"  :
+			subType == secTypeX509Vnc   ? "X509-Vnc"   :
+			subType == secTypeX509Plain ? "X509-Plain" :
+			subType == secTypeTLSSASL   ? "TLS-SASL"   :
+			subType == secTypeX509SASL  ? "X509-SASL"  :
+			subType == secTypeTokenTLS  ? "TokenTLS"   : "?";
+		char cipherA[128] = "TLS";
+		if (session.cipherSuite[0])
+			WideCharToMultiByte(CP_UTF8, 0, session.cipherSuite, -1, cipherA, sizeof(cipherA), NULL, NULL);
+		_snprintf_s(m_veNCryptDesc, _countof(m_veNCryptDesc), _TRUNCATE,
+		            "VeNCrypt %s\n%s", subName, cipherA);
 	}
 	switch (subType)
 	{
 	case secTypeTLSSASL:
 	case secTypeX509SASL:
 		AuthSasl(endpointHash.empty() ? NULL : endpointHash.data(), endpointHash.size());
+		if (m_saslMech[0])
+		{
+			// Insert " (MECH)" at end of the first line of m_veNCryptDesc
+			// (before the '\n' that prefixes the cipher suite).
+			char* nl = strchr(m_veNCryptDesc, '\n');
+			char tail[256];
+			snprintf(tail, sizeof(tail), " (%s)%s", m_saslMech, nl ? nl : "");
+			if (nl) *nl = '\0';
+			strncat_s(m_veNCryptDesc, _countof(m_veNCryptDesc), tail, _TRUNCATE);
+		}
 		break;
 	case secTypeTLSNone:
 	case secTypeX509None:
@@ -995,6 +1027,7 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 		mech = "PLAIN";
 	else
 		return SetLastError("No usable SASL mechanism");
+	strncpy_s(m_saslMech, _countof(m_saslMech), mech.c_str(), _TRUNCATE);
 	vnclog.Print(0, _T("AuthSasl: using mech '%hs'%s\n"), mech.c_str(),
 	             mech == "SCRAM-SHA-256-PLUS" ? " (channel-bound)" : "");
 	if (!SaslWire::WriteString(&transport, mech))
