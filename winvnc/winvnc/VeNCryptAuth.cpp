@@ -57,6 +57,26 @@ namespace
     HMODULE g_hTokenValidatorDll = NULL;
     std::mutex g_tokenDllMutex;
 
+    static bool IsAbsolutePath(const char* path)
+    {
+        return path && ((path[0] >= 'A' && path[0] <= 'Z') || (path[0] >= 'a' && path[0] <= 'z')) &&
+               path[1] == ':' && (path[2] == '\\' || path[2] == '/');
+    }
+
+    static HMODULE SafeLoadValidatorDll(const char* path)
+    {
+        if (!path || !path[0])
+            return NULL;
+        if (!IsAbsolutePath(path))
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: validator DLL path must be absolute (%s)\n"), path);
+            return NULL;
+        }
+        // Use LOAD_WITH_ALTERED_SEARCH_PATH so dependent DLLs are resolved from
+        // the validator DLL's directory rather than the WinVNC search path.
+        return LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    }
+
     HMODULE GetTokenValidatorDll()
     {
         std::lock_guard<std::mutex> lock(g_tokenDllMutex);
@@ -64,7 +84,7 @@ namespace
         {
             const char* dllPath = SettingsManager::getInstance()->getVeNCryptTokenDLLPath();
             if (dllPath && dllPath[0])
-                g_hTokenValidatorDll = LoadLibraryA(dllPath);
+                g_hTokenValidatorDll = SafeLoadValidatorDll(dllPath);
         }
         return g_hTokenValidatorDll;
     }
@@ -77,6 +97,28 @@ namespace
         if (!hModule)
             return nullptr;
         return (SaslLookupFn)GetProcAddress(hModule, "sasl_lookup");
+    }
+
+    bool IsTLSVeNCryptSubtype(uint32_t type)
+    {
+        switch (type)
+        {
+        case secTypeTLSNone:
+        case secTypeTLSVnc:
+        case secTypeTLSPlain:
+        case secTypeX509None:
+        case secTypeX509Vnc:
+        case secTypeX509Plain:
+        case secTypeTLSSASL:
+        case secTypeX509SASL:
+        case secTypeTLSIdent:
+        case secTypeX509Ident:
+        case secTypeTokenTLS:
+        case secTypeX509MsLogonIII:
+            return true;
+        default:
+            return false;
+        }
     }
 
 }
@@ -152,6 +194,12 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
     {
         vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: client requested unadvertised subtype %u\n"), m_chosenType);
         outFailureMessage = "VeNCrypt subtype not allowed by server policy";
+        return false;
+    }
+
+    if (IsTLSVeNCryptSubtype(m_chosenType) && !SendU8(0x01))
+    {
+        outFailureMessage = "Failed to acknowledge VeNCrypt subtype";
         return false;
     }
 
@@ -373,11 +421,7 @@ bool VeNCryptAuth::ReadChosenType(uint32_t& outType)
     if (!ReadExact((char*)&value, sizeof(value)))
         return false;
     outType = Swap32IfLE(value);
-    // VeNCrypt spec (rfbproto 7.2.4): for TLS/X509 subtypes the server sends
-    // a 0x01 Ack before TLS starts. Implementations that exercise this
-    // (UltraVNC, QEMU, libvncclient, TigerVNC/KasmVNC via CSecurityTLS/
-    // SSecurityTLS) all send and expect it.
-    return SendU8(0x01);
+    return true;
 }
 
 bool VeNCryptAuth::PerformTLSHandshake(std::string& outFailureMessage)
@@ -391,7 +435,7 @@ bool VeNCryptAuth::PerformTLSHandshake(std::string& outFailureMessage)
     if (!certOk)
     {
         char generatedThumbprint[41] = {};
-        certOk = m_tls.EnsureSelfSignedCert(generatedThumbprint);
+        certOk = m_tls.EnsureSelfSignedCert("CN=UltraVNC-VeNCrypt", "UltraVNC-VeNCrypt", generatedThumbprint);
         if (certOk)
         {
             settings->setVeNCryptTLSCertThumbprint(generatedThumbprint);
@@ -635,10 +679,15 @@ bool VeNCryptAuth::RunSaslAuth(std::string& outFailureMessage)
     // Anti-downgrade guard: client that supports binding chose plain SCRAM
     // even though we advertised -PLUS.
     if (cbFlag == ScramSha256::CB_SUPPORTED_NOT_USED && haveBinding)
+    {
         vnclog.Print(LL_CONNERR,
             VNCLOG("VeNCrypt SASL: client supports binding but chose non-PLUS (possible downgrade)\n"));
-    // GS2 header/mech must agree: p= header requires -PLUS mech and binding data.
-    if (cbFlag == ScramSha256::CB_USED && (!clientPlus || !haveBinding))
+        outFailureMessage = "SCRAM channel binding downgrade rejected";
+        return false;
+    }
+    // GS2 header/mech must agree: PLUS requires p= and p= requires PLUS.
+    if (clientPlus != (cbFlag == ScramSha256::CB_USED) ||
+        (cbFlag == ScramSha256::CB_USED && !haveBinding))
     {
         outFailureMessage = "SCRAM channel binding flag inconsistent with mechanism";
         return false;

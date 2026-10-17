@@ -111,6 +111,9 @@ uint32_t hotp(const BYTE* secret, size_t secretLen, uint64_t counter)
     return binary % 1000000;
 }
 
+constexpr const char* kTotpLastStepSection = "TotpLastStep";
+std::mutex g_totpMutex;
+
 bool validateTotp(const char* user, const char* code)
 {
     size_t codeLen = strlen(code);
@@ -132,12 +135,30 @@ bool validateTotp(const char* user, const char* code)
     uint32_t expected = static_cast<uint32_t>(atoi(code));
 
     // Allow current, previous and next time step to tolerate clock skew.
+    uint64_t matchedStep = 0;
+    bool matched = false;
     for (int64_t delta = -1; delta <= 1; ++delta)
     {
-        if (hotp(secret.data(), secret.size(), t + delta) == expected)
-            return true;
+        uint64_t step = t + delta;
+        if (hotp(secret.data(), secret.size(), step) == expected)
+        {
+            matchedStep = step;
+            matched = true;
+            break;
+        }
     }
-    return false;
+    if (!matched)
+        return false;
+
+    std::lock_guard<std::mutex> lock(g_totpMutex);
+    std::string lastText;
+    if (TokenCore::ReadProtectedValue(kTotpLastStepSection, user, lastText))
+    {
+        uint64_t lastStep = _strtoui64(lastText.c_str(), nullptr, 10);
+        if (matchedStep <= lastStep)
+            return false;
+    }
+    return TokenCore::WriteProtectedValue(kTotpLastStepSection, user, std::to_string(matchedStep));
 }
 
 bool isAllDigits(const char* s)
@@ -380,6 +401,7 @@ void OnRemoveUser(HWND hDlg)
     TokenCore::DeleteTotpSecret(user);
     TokenCore::DeleteProtectedValue("SCRAM", user);
     TokenCore::DeleteProtectedValue("SessionTokens", user);
+    TokenCore::DeleteProtectedValue("TotpLastStep", user);
     SetDlgItemTextA(hDlg, IDC_TV_URI, "");
     UpdateFactorsLabel(hDlg, "");
     RefreshUserList(hDlg);
@@ -665,6 +687,7 @@ INT_PTR CALLBACK TokenManagerDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 // ---------------------------------------------------------------------------
 constexpr const char* kSessionSection = "SessionTokens";
 constexpr const char* kScramSection = "SCRAM"; // per-user "iter:saltB64:skB64:svkB64"
+constexpr uint64_t kSessionTokenLifetimeSeconds = 12 * 60 * 60;
 std::mutex g_sessionMutex;
 
 std::string GenerateSessionTokenString()
@@ -701,7 +724,29 @@ bool ValidateSessionToken(const char* user, const char* token)
     if (!TokenCore::ReadProtectedValue(kSessionSection, user, record))
         return false;
 
-    return record == token;
+    size_t separator = record.rfind('|');
+    if (separator == std::string::npos)
+        return false;
+    std::string storedToken = record.substr(0, separator);
+    uint64_t issued = _strtoui64(record.c_str() + separator + 1, nullptr, 10);
+    uint64_t now = currentUnixTime();
+    if (issued == 0 || now < issued || now - issued > kSessionTokenLifetimeSeconds)
+    {
+        TokenCore::DeleteProtectedValue(kSessionSection, user);
+        return false;
+    }
+
+    size_t tokenLen = strlen(token);
+    if (storedToken.size() != tokenLen)
+        return false;
+    unsigned char diff = 0;
+    for (size_t i = 0; i < tokenLen; ++i)
+        diff |= static_cast<unsigned char>(storedToken[i] ^ token[i]);
+    if (diff != 0)
+        return false;
+
+    TokenCore::DeleteProtectedValue(kSessionSection, user);
+    return true;
 }
 
 } // anonymous namespace
@@ -738,7 +783,8 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
 
     {
         std::lock_guard<std::mutex> lock(g_sessionMutex);
-        if (!TokenCore::WriteProtectedValue(kSessionSection, user, token))
+        std::string record = token + "|" + std::to_string(currentUnixTime());
+        if (!TokenCore::WriteProtectedValue(kSessionSection, user, record))
             return 0;
     }
 

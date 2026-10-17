@@ -12,6 +12,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <stdio.h>
+#include <vector>
 #include "win32_helpers.h"
 #ifdef _VIEWER
 #include "../vncviewer/res/resource.h"
@@ -101,8 +102,11 @@ static void MoveDirLog(LPCWSTR msg, LPCWSTR path)
 }
 
 // Recursive worker on already-prefixed paths.
-static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
+static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL, unsigned depth)
 {
+    if (depth > 64)
+        return false;
+
     DWORD dstAttr = GetFileAttributesW(dstDirL);
     if (dstAttr == INVALID_FILE_ATTRIBUTES)
     {
@@ -118,10 +122,10 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
         return false; // can't merge a directory into a file
     }
 
-    WCHAR pattern[MAX_PATH * 4];
-    _snwprintf_s(pattern, _countof(pattern), _TRUNCATE, L"%s\\*", srcDirL);
+    std::vector<WCHAR> pattern(MAX_PATH * 4);
+    _snwprintf_s(pattern.data(), pattern.size(), _TRUNCATE, L"%s\\*", srcDirL);
     WIN32_FIND_DATAW fd;
-    HANDLE hFind = FindFirstFileW(pattern, &fd);
+    HANDLE hFind = FindFirstFileW(pattern.data(), &fd);
     if (hFind == INVALID_HANDLE_VALUE)
     {
         MoveDirLog(L"FindFirstFileW failed", srcDirL);
@@ -133,16 +137,16 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
         if (!wcscmp(fd.cFileName, L".") || !wcscmp(fd.cFileName, L".."))
             continue;
 
-        WCHAR srcChild[MAX_PATH * 4], dstChild[MAX_PATH * 4];
-        _snwprintf_s(srcChild, _countof(srcChild), _TRUNCATE, L"%s\\%s", srcDirL, fd.cFileName);
-        _snwprintf_s(dstChild, _countof(dstChild), _TRUNCATE, L"%s\\%s", dstDirL, fd.cFileName);
+        std::vector<WCHAR> srcChild(MAX_PATH * 4), dstChild(MAX_PATH * 4);
+        _snwprintf_s(srcChild.data(), srcChild.size(), _TRUNCATE, L"%s\\%s", srcDirL, fd.cFileName);
+        _snwprintf_s(dstChild.data(), dstChild.size(), _TRUNCATE, L"%s\\%s", dstDirL, fd.cFileName);
 
-        DWORD a = GetFileAttributesW(dstChild);
+        DWORD a = GetFileAttributesW(dstChild.data());
         if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (a != INVALID_FILE_ATTRIBUTES && !(a & FILE_ATTRIBUTE_DIRECTORY))
             {
-                MoveDirLog(L"source dir conflicts with destination file", dstChild);
+                MoveDirLog(L"source dir conflicts with destination file", dstChild.data());
                 ok = false; // file/dir name conflict
                 continue;
             }
@@ -150,13 +154,13 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
             // This is slower than a whole-subtree rename, but it works across
             // volumes and with long paths, and the source subdir is removed
             // by the recursive call once it is empty.
-            if (a == INVALID_FILE_ATTRIBUTES && !CreateDirectoryW(dstChild, NULL))
+            if (a == INVALID_FILE_ATTRIBUTES && !CreateDirectoryW(dstChild.data(), NULL))
             {
-                MoveDirLog(L"CreateDirectoryW failed for subdir", dstChild);
+                MoveDirLog(L"CreateDirectoryW failed for subdir", dstChild.data());
                 ok = false;
                 continue;
             }
-            if (!MoveDirContentsIntoImpl(srcChild, dstChild))
+            if (!MoveDirContentsIntoImpl(srcChild.data(), dstChild.data(), depth + 1))
                 ok = false;
         }
         else
@@ -165,16 +169,16 @@ static bool MoveDirContentsIntoImpl(LPCWSTR srcDirL, LPCWSTR dstDirL)
             {
                 if (a & FILE_ATTRIBUTE_DIRECTORY)
                 {
-                    MoveDirLog(L"source file conflicts with destination dir", dstChild);
+                    MoveDirLog(L"source file conflicts with destination dir", dstChild.data());
                     ok = false; // dir/file name conflict
                     continue;
                 }
                 if (a & FILE_ATTRIBUTE_READONLY)
-                    SetFileAttributesW(dstChild, a & ~FILE_ATTRIBUTE_READONLY);
+                    SetFileAttributesW(dstChild.data(), a & ~FILE_ATTRIBUTE_READONLY);
             }
-            if (!MoveFileExW(srcChild, dstChild, MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED))
+            if (!MoveFileExW(srcChild.data(), dstChild.data(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED))
             {
-                MoveDirLog(L"MoveFileExW failed", srcChild);
+                MoveDirLog(L"MoveFileExW failed", srcChild.data());
                 ok = false;
             }
         }
@@ -202,7 +206,7 @@ bool MoveDirContentsInto(LPCWSTR srcDir, LPCWSTR dstDir)
     _snwprintf_s(info, _countof(info), _TRUNCATE, L"[MoveDirContentsInto] %s -> %s\n", srcL, dstL);
     OutputDebugStringW(info);
 
-    return MoveDirContentsIntoImpl(srcL, dstL);
+    return MoveDirContentsIntoImpl(srcL, dstL, 0);
 }
 
 DynamicFnBase::DynamicFnBase(const TCHAR* dllName, const char* fnName) : fnPtr(0), dllHandle(0) {

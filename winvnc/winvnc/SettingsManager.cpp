@@ -368,7 +368,34 @@ void SettingsManager::load()
 	m_pref_VeNCryptRequireChannelBinding = iniFile.ReadInt("admin", "VeNCryptRequireChannelBinding", m_pref_VeNCryptRequireChannelBinding);
 	iniFile.ReadString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	iniFile.ReadString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath, sizeof(m_pref_VeNCryptTokenDLLPath));
-	iniFile.ReadString("admin", "VeNCryptSubtypes", m_pref_VeNCryptSubtypes, sizeof(m_pref_VeNCryptSubtypes));
+	if (!m_pref_VeNCryptTokenDLLPath[0])
+	{
+		// Default to TokenValidator.dll in the same directory as winvnc.exe.
+		char modulePath[MAX_PATH] = {};
+		if (GetModuleFileNameA(NULL, modulePath, MAX_PATH - 1) > 0)
+		{
+			char* lastSlash = strrchr(modulePath, '\\');
+			if (lastSlash)
+			{
+				const char* dllName =
+#ifdef _WIN64
+					"TokenValidator.dll";
+#else
+					"TokenValidator32.dll";
+#endif
+				if ((lastSlash + 1 - modulePath) + strlen(dllName) < MAX_PATH)
+				{
+					strcpy_s(lastSlash + 1, MAX_PATH - (lastSlash + 1 - modulePath), dllName);
+					if (GetFileAttributesA(modulePath) != INVALID_FILE_ATTRIBUTES)
+						strcpy_s(m_pref_VeNCryptTokenDLLPath, modulePath);
+				}
+			}
+		}
+	}
+	char veNCryptSubtypes[sizeof(m_pref_VeNCryptSubtypes)] = {};
+	iniFile.ReadString("admin", "VeNCryptSubtypes", veNCryptSubtypes, sizeof(veNCryptSubtypes));
+	if (veNCryptSubtypes[0])
+		strcpy_s(m_pref_VeNCryptSubtypes, veNCryptSubtypes);
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber = iniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = iniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));

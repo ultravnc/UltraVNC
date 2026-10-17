@@ -20,11 +20,29 @@ namespace ScramSha256
         std::string out;
         out.reserve(s.size());
         for (char c : s) {
-            if (c == '=') out += "=2D";
+            if (c == '=') out += "=3D";
             else if (c == ',') out += "=2C";
             else out += c;
         }
         return out;
+    }
+
+    static bool UnescapeName(const std::string& in, std::string& out)
+    {
+        out.clear();
+        out.reserve(in.size());
+        for (size_t i = 0; i < in.size(); ++i) {
+            if (in[i] != '=') {
+                out += in[i];
+                continue;
+            }
+            if (i + 2 >= in.size()) return false;
+            if (in.compare(i, 3, "=2C") == 0) out += ',';
+            else if (in.compare(i, 3, "=3D") == 0) out += '=';
+            else return false;
+            i += 2;
+        }
+        return true;
     }
 
     // Parse "attr=value" pairs from a SCRAM message.
@@ -84,7 +102,7 @@ namespace ScramSha256
 
         uint32_t iters = (uint32_t)strtoul(text.substr(0, p1).c_str(), NULL, 10);
         std::vector<uint8_t> salt, sk, svk;
-        if (iters == 0 ||
+        if (iters < 4096 || iters > 1000000 ||
             !Base64::Decode(text.substr(p1 + 1, p2 - p1 - 1), salt) ||
             !Base64::Decode(text.substr(p2 + 1, p3 - p2 - 1), sk) ||
             !Base64::Decode(text.substr(p3 + 1), svk))
@@ -136,7 +154,9 @@ namespace ScramSha256
         }
         outGs2Header = msg.substr(0, gs2End);
         outClientFirstBare = msg.substr(gs2End);
-        if (!GetAttr(outClientFirstBare, 'n', outUser) || outUser.empty())
+        std::string escapedUser;
+        if (!GetAttr(outClientFirstBare, 'n', escapedUser) || escapedUser.empty() ||
+            !UnescapeName(escapedUser, outUser) || outUser.empty())
             return false;
         return GetAttr(outClientFirstBare, 'r', outClientNonce) &&
                !outClientNonce.empty();
@@ -257,7 +277,7 @@ namespace ScramSha256
         if (!Base64::Decode(saltB64, salt) || salt.empty())
             return false;
         uint32_t iters = (uint32_t)strtoul(iterStr.c_str(), NULL, 10);
-        if (iters == 0) return false;
+        if (iters < 4096 || iters > 1000000) return false;
 
         // cbind-input = gs2Header + cbData (RFC 5802 section 6)
         std::vector<uint8_t> cbindInput(gs2Header.begin(), gs2Header.end());

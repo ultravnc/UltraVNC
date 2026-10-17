@@ -813,6 +813,7 @@ vncClientUpdateThread::run_undetached(void* arg)
 
 vncClientThread::~vncClientThread()
 {
+	m_veNCryptAuth.reset();
 	if (m_client != NULL && !m_deleted)
 		delete m_client;
 #ifdef _Gii
@@ -2302,11 +2303,8 @@ BOOL vncClientThread::AuthVeNCrypt(std::string& auth_message)
 	// Restore handshake timeout
 	m_socket->SetTimeout(30000);
 
-	if (!ok)
-		return FALSE;
-
 	m_veNCryptAuth = std::move(auth);
-	return TRUE;
+	return ok;
 }
 
 void
@@ -2513,6 +2511,7 @@ bool vncClientThread::TryReconnect()
 	}
 
 	if (m_socket) {
+		m_veNCryptAuth.reset();
 		m_socket->Close();
 		if (m_client && m_client->m_socket) {
 			m_client->m_socket = NULL;
@@ -5554,9 +5553,11 @@ vncClient::Kill(bool deleted)
 	vnclog.Print(LL_INTERR, VNCLOG("client Kill() called"));
 	if (m_pTextChat)
 		m_pTextChat->KillDialog();
+	if (m_thread_ClientThread)
+		((vncClientThread*)m_thread_ClientThread)->ReleaseVeNCrypt();
 	if (m_socket != NULL)
 		m_socket->Close();
-	if (deleted)
+	if (deleted && m_thread_ClientThread)
 		((vncClientThread*)m_thread_ClientThread)->m_deleted = true;
 	if (m_server->virtualDisplay)
 		m_server->virtualDisplay->disconnectDisplay(m_id, !m_server->AreThereMultipleViewers() && initialCapture_done);

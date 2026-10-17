@@ -40,6 +40,10 @@
 #define IDD_PATHS                       134
 #define IDD_TEXTCHAT_DLG                137
 #define IDD_USER_NAME                   138
+#if defined(SC_20)
+	#define IDR_DLL1                    176
+	#define IDR_ENCRYPTIONDLL1          177
+#endif // SC_20
 #define IDD_FORM_AUTHENTICATION         139
 #define IDD_EDIT_IP_ACESS_CONTROL       140
 #define IDS_WARNING                     200
@@ -421,6 +425,8 @@
 #define IDC_STATIC_SUBTYPES             1388
 #define IDC_VENCRYPT_ALLOW_LEGACY       1389
 #define IDC_VENCRYPT_SUBTYPE_301        1390
+#define IDD_SELECT_CERT                 1391
+#define IDC_SELECT_CERT_LIST            1392
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772

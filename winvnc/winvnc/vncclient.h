@@ -686,6 +686,7 @@ public:
 	// adzm 2010-08
 	virtual bool InitSocket();
 	virtual bool TryReconnect();
+	void ReleaseVeNCrypt() { m_veNCryptAuth.reset(); }
 
 	// The main thread function
 	virtual void run(void *arg);
