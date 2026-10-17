@@ -163,9 +163,28 @@ bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
     return false;
 }
 
-bool SchannelTLS::EnsureSelfSignedCert(char* outThumbprint)
+bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint)
 {
-    const wchar_t* CN = L"CN=UltraVNC-WebViewer";
+    // Use legacy defaults when callers pass nullptr.
+    const char* subjectA = subjectName ? subjectName : "CN=UltraVNC-WebViewer";
+    const char* containerA = containerName ? containerName : "UltraVNC-WebViewer";
+
+    // Convert subject/container to wide strings for the CryptoAPI calls.
+    auto ToW = [](const char* s) -> std::wstring {
+        if (!s) return std::wstring();
+        int len = MultiByteToWideChar(CP_ACP, 0, s, -1, nullptr, 0);
+        if (len <= 0) return std::wstring();
+        std::wstring w(len - 1, 0);
+        MultiByteToWideChar(CP_ACP, 0, s, -1, &w[0], len);
+        return w;
+    };
+    std::wstring subjectW = ToW(subjectA);
+    std::wstring containerW = ToW(containerA);
+    const wchar_t* CN = subjectW.c_str();
+
+    const char* simpleName = subjectA;
+    if (_strnicmp(subjectA, "CN=", 3) == 0)
+        simpleName = subjectA + 3;
 
     // Try Local Machine store first (requires admin/SYSTEM), fall back to Current User
     struct StoreCandidate { DWORD location; bool machineKeyset; const wchar_t* label; };
@@ -201,7 +220,7 @@ bool SchannelTLS::EnsureSelfSignedCert(char* outThumbprint)
     {
         char name[256] = {};
         CertGetNameStringA(cur, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, nullptr, name, sizeof(name));
-        if (strcmp(name, "UltraVNC-WebViewer") == 0)
+        if (_stricmp(name, simpleName) == 0)
         {
             FILETIME ftNow;
             GetSystemTimeAsFileTime(&ftNow);
@@ -243,7 +262,7 @@ bool SchannelTLS::EnsureSelfSignedCert(char* outThumbprint)
         end.wYear += 2;
 
         CRYPT_KEY_PROV_INFO keyProvInfo = {};
-        keyProvInfo.pwszContainerName = const_cast<LPWSTR>(L"UltraVNC-WebViewer");
+        keyProvInfo.pwszContainerName = const_cast<LPWSTR>(containerW.c_str());
         keyProvInfo.dwProvType        = PROV_RSA_SCHANNEL;
         keyProvInfo.dwFlags           = useMachineKeyset ? CRYPT_MACHINE_KEYSET : 0;
         keyProvInfo.dwKeySpec         = AT_KEYEXCHANGE;
@@ -308,26 +327,64 @@ bool SchannelTLS::ServerHandshake(VSocket* sock)
         return false;
     }
 
-    // Build SCHANNEL_CRED
-    SCHANNEL_CRED sc = {};
-    sc.dwVersion       = SCHANNEL_CRED_VERSION;
-    sc.cCreds          = 1;
-    sc.paCred          = &m_certCtx;
-    sc.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER;
-    sc.dwFlags         = SCH_CRED_NO_SYSTEM_MAPPER | SCH_USE_STRONG_CRYPTO;
-    sc.dwMinimumCipherStrength = 128;
-
-    // Acquire credentials
     TimeStamp tsExpiry;
-    SECURITY_STATUS ss = AcquireCredentialsHandleW(
+    SECURITY_STATUS ss;
+    bool credsAcquired = false;
+
+#ifdef SCH_CREDENTIALS_VERSION
+    // Modern path: disable only legacy protocols, let Schannel negotiate
+    // TLS 1.2 or TLS 1.3 depending on OS support.
+    SCH_CREDENTIALS newCred = {};
+    TLS_PARAMETERS tlsParams = {};
+    newCred.dwVersion = SCH_CREDENTIALS_VERSION;
+    newCred.cCreds = 1;
+    newCred.paCred = &m_certCtx;
+    newCred.dwFlags = SCH_CRED_NO_SYSTEM_MAPPER | SCH_USE_STRONG_CRYPTO;
+    newCred.cTlsParameters = 1;
+    newCred.pTlsParameters = &tlsParams;
+    tlsParams.grbitDisabledProtocols =
+        SP_PROT_SSL2_SERVER |
+        SP_PROT_SSL3_SERVER |
+        SP_PROT_TLS1_0_SERVER |
+        SP_PROT_TLS1_1_SERVER;
+
+    ss = AcquireCredentialsHandleW(
         nullptr, UNISP_NAME_W,
-        SECPKG_CRED_INBOUND, nullptr, &sc,
+        SECPKG_CRED_INBOUND, nullptr, &newCred,
         nullptr, nullptr, &m_credHandle, &tsExpiry);
 
-    if (ss != SEC_E_OK)
+    if (ss == SEC_E_OK)
     {
-        vnclog.Print(LL_CONNERR, VNCLOG("TLS: AcquireCredentialsHandle failed: %s\n"), HrStr(ss).c_str());
-        return false;
+        credsAcquired = true;
+        vnclog.Print(LL_CLIENTS, VNCLOG("TLS: acquired credentials via SCH_CREDENTIALS (TLS 1.2/1.3 enabled)\n"));
+    }
+    else
+    {
+        vnclog.Print(LL_INTINFO, VNCLOG("TLS: SCH_CREDENTIALS unavailable (%s), falling back to SCHANNEL_CRED\n"), HrStr(ss).c_str());
+    }
+#endif
+
+    if (!credsAcquired)
+    {
+        // Legacy path: TLS 1.2 only. Safe on older Windows and older SDKs.
+        SCHANNEL_CRED sc = {};
+        sc.dwVersion       = SCHANNEL_CRED_VERSION;
+        sc.cCreds          = 1;
+        sc.paCred          = &m_certCtx;
+        sc.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER;
+        sc.dwFlags         = SCH_CRED_NO_SYSTEM_MAPPER | SCH_USE_STRONG_CRYPTO;
+        sc.dwMinimumCipherStrength = 128;
+
+        ss = AcquireCredentialsHandleW(
+            nullptr, UNISP_NAME_W,
+            SECPKG_CRED_INBOUND, nullptr, &sc,
+            nullptr, nullptr, &m_credHandle, &tsExpiry);
+
+        if (ss != SEC_E_OK)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("TLS: AcquireCredentialsHandle failed: %s\n"), HrStr(ss).c_str());
+            return false;
+        }
     }
     m_credValid = true;
 
@@ -353,15 +410,26 @@ bool SchannelTLS::ServerHandshake(VSocket* sock)
         return false;
     }
 
+    // Log the negotiated protocol so admins can verify whether TLS 1.3 was used.
+    SecPkgContext_ConnectionInfo connInfo = {};
+    if (QueryContextAttributes(&m_ctxHandle, SECPKG_ATTR_CONNECTION_INFO, &connInfo) == SEC_E_OK)
+        vnclog.Print(LL_CLIENTS, VNCLOG("TLS: negotiated protocol 0x%08X, cipher 0x%08X\n"),
+            connInfo.dwProtocol, connInfo.aiCipher);
+
     m_ready = true;
     vnclog.Print(LL_CLIENTS, VNCLOG("TLS: handshake complete\n"));
     return true;
 }
 
-bool SchannelTLS::HandshakeLoop(VSocket* sock, bool firstCall, SecBuffer* pExtraData)
+bool SchannelTLS::HandshakeLoop(VSocket* sock, bool firstCall, SecBuffer* pExtraData,
+                                const BYTE* initialData, DWORD initialLen)
 {
     std::vector<BYTE> ioBuffer(IO_BUFFER_SIZE);
-    DWORD ioBufferUsed = 0;
+    if (initialLen > ioBuffer.size())
+        return false;
+    if (initialLen && initialData)
+        memcpy(ioBuffer.data(), initialData, initialLen);
+    DWORD ioBufferUsed = initialLen;
     SECURITY_STATUS ss = SEC_I_CONTINUE_NEEDED;
 
     while (ss == SEC_I_CONTINUE_NEEDED || ss == SEC_E_INCOMPLETE_MESSAGE || firstCall)
@@ -646,6 +714,40 @@ bool SchannelTLS::Recv(VSocket* sock, char* buf, int len, int* received)
             else if (ss == SEC_E_INCOMPLETE_MESSAGE)
             {
                 // Need more data — fall through to read more
+            }
+            else if (ss == SEC_I_RENEGOTIATE)
+            {
+                BYTE* extra = nullptr;
+                DWORD extraLen = 0;
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (bufs[i].BufferType == SECBUFFER_EXTRA)
+                    {
+                        extra = static_cast<BYTE*>(bufs[i].pvBuffer);
+                        extraLen = bufs[i].cbBuffer;
+                        break;
+                    }
+                }
+                std::vector<BYTE> handshakeData;
+                if (extra && extraLen)
+                    handshakeData.assign(extra, extra + extraLen);
+                m_rawBuf.clear();
+                SecBuffer postHandshakeExtra = {};
+                if (!HandshakeLoop(sock, true, &postHandshakeExtra,
+                                   handshakeData.empty() ? nullptr : handshakeData.data(),
+                                   static_cast<DWORD>(handshakeData.size())))
+                    return false;
+                if (postHandshakeExtra.cbBuffer && postHandshakeExtra.pvBuffer)
+                {
+                    BYTE* p = static_cast<BYTE*>(postHandshakeExtra.pvBuffer);
+                    m_rawBuf.assign(p, p + postHandshakeExtra.cbBuffer);
+                    LocalFree(postHandshakeExtra.pvBuffer);
+                }
+                SECURITY_STATUS qs = QueryContextAttributes(&m_ctxHandle,
+                    SECPKG_ATTR_STREAM_SIZES, &m_streamSizes);
+                if (qs != SEC_E_OK)
+                    return false;
+                continue;
             }
             else
             {

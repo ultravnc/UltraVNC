@@ -1,8 +1,8 @@
 # Encrypted VNC with token login — User guide
 
-This guide explains, step by step, how to turn on **encrypted VNC** (TLS) and
-log in with a **username + 6-digit code** from an authenticator app — the same
-kind of code banks use.
+This guide explains, step by step, how to turn on **encrypted VNC** (TLS 1.2
+or TLS 1.3) and log in with a **username + 6-digit code** from an
+authenticator app — the same kind of code banks use.
 
 No prior knowledge needed. Just follow the steps for your role:
 
@@ -27,13 +27,17 @@ The "checker" is a small file (`TokenValidator.dll`) that decides whether a
 login code is correct.
 
 1. Same **SSL/TLS** tab → field **Token validator DLL**.
-2. Click **Browse...** and select `TokenValidator.dll`
+2. If `TokenValidator.dll` is in the same folder as `winvnc.exe`, the path
+   is filled in automatically. Otherwise click **Browse...** and select it
    (for example `C:\uvnc\64\xp\TokenValidator.dll`).
+
+   The path must be absolute; relative paths are rejected for security.
 
 ### Step 3 — Create your first user
 
 1. Still on the SSL/TLS tab, click **Manage users...**
-   *(if the button is grey, the DLL path in step 2 is wrong or the DLL is missing).*
+   *(if the button is grey, the DLL path in step 2 is missing, not absolute, or
+   the DLL could not be loaded).*
 2. Click **Add**, type a username (e.g. `rudi`), OK.
 3. A **QR code** appears. Leave this window open for Part 3.
 
@@ -87,10 +91,11 @@ just use the new one.
 
 ### Reconnecting quickly
 
-If the connection drops (e.g. Windows logon screen switch) and you reconnect
-within **60 seconds**, the viewer remembers a one-time "session token" and you
-**don't need a new code** — it just connects. After 60 seconds, it asks for a
-fresh code again. Tokens are never saved to disk.
+If the connection drops (e.g. Windows logon screen switch) and you reconnect,
+the viewer remembers a one-time "session token" and you **don't need a new
+code** — it just connects. The token is valid for up to 12 hours and is consumed
+on use; a successful reconnect immediately receives a replacement token.
+Tokens are never saved to disk.
 
 ---
 
@@ -112,7 +117,10 @@ fresh code again. Tokens are never saved to disk.
   fallback for service accounts — both stay on the server, never sent anywhere.
 * Each user needs their **own** username + their own phone app — codes are
   per-secret, so two people can't share one account usefully.
-* The session token is random, 64 characters, in-memory only — it can't be
-  written down or reused later.
+* The session token is random and 64 characters. The viewer keeps it in memory;
+  the server stores a DPAPI-protected record for at most 12 hours. It is consumed
+  on use and replaced after a successful reconnect.
+* Connections use TLS 1.2 as a minimum; TLS 1.3 is negotiated automatically
+  on Windows 11 / Windows Server 2022 and later.
 * Full technical detail (DLL ABI, custom validators, build): see `README.md`
   in this folder.

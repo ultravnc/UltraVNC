@@ -16,7 +16,7 @@
 
 namespace ScramSha256
 {
-    // Escape per RFC 5802: '=' -> "=2D", ',' -> "=2C"
+    // Escape per RFC 5802: '=' -> "=3D", ',' -> "=2C"
     std::string EscapeName(const std::string& s);
 
     // Channel binding mode parsed from the GS2 header.

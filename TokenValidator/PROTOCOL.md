@@ -51,15 +51,19 @@ The `0x01` Ack is required by the current VeNCrypt spec (rfbproto section
 7.2.4: *"For TLS and X509 subtypes, the server then sends a one byte
 response"*) and is implemented by all major stacks — in TigerVNC/KasmVNC it
 lives in the TLS sub-security layer (`CSecurityTLS`/`SSecurityTLS`), not in
-the VeNCrypt negotiation class. The UltraVNC viewer additionally tolerates
-a *missing* Ack: it waits briefly and proceeds to TLS if none arrives, so
-it also works against hypothetical old-draft servers.
+the VeNCrypt negotiation class. The server sends the Ack only after it has
+verified that the client's chosen subtype was actually advertised by the
+current server policy; a subtype that was never offered is rejected before
+any Ack or TLS handshake is attempted. The UltraVNC viewer additionally
+tolerates a *missing* Ack: it waits briefly and proceeds to TLS if none
+arrives, so it also works against hypothetical old-draft servers.
 
 Then the **TLS handshake** runs on the same socket. The server presents a
 certificate from its configured Windows certificate store (a self-signed
 certificate is generated on first use if none is configured). No client
-certificate is required. Both TLS 1.2 and 1.3 work; the negotiated version is
-whatever both sides support.
+certificate is required. The minimum supported version is TLS 1.2; TLS 1.3 is
+negotiated when the underlying OS/Schannel supports it (Windows 11 / Windows
+Server 2022 and later). On older systems the connection falls back to TLS 1.2.
 
 ## 4. Subtypes
 
@@ -145,8 +149,8 @@ desktop-process restart does not invalidate the pending token.
 
 ## 7. Validator DLL contract
 
-The server loads the DLL named by the `VeNCryptTokenDLL` setting and resolves
-these exports (`extern "C"`, `__cdecl`):
+The server loads the DLL named by the `VeNCryptTokenDLLPath` setting and
+resolves these exports (`extern "C"`, `__cdecl`):
 
 ```c
 int  validate_token(const char* user, const char* token);   /* !=0 = valid   */
@@ -155,7 +159,13 @@ int  tv_get_capabilities(void);            /* bitmask below                */
 int  tv_has_management_ui(void);
 void tv_show_management_ui(HWND parent);
 int  tv_get_last_error(char* buf, size_t bufSize);           /* optional     */
+int  sasl_lookup(const char* user, char* out, size_t outSize);
 ```
+
+`VeNCryptTokenDLLPath` must be an absolute path. The DLL is loaded with
+`LoadLibraryEx` and `LOAD_WITH_ALTERED_SEARCH_PATH`, so dependent DLLs are
+resolved from the validator's own directory rather than the WinVNC search
+path.
 
 Capability bits returned by `tv_get_capabilities()`:
 
@@ -164,10 +174,14 @@ TV_CAP_SESSION_TOKEN  0x01   DLL can issue and accept reconnect session tokens;
                              subtype 300 remains advertised either way
 TV_CAP_MANAGEMENT_UI  0x02   the WinVNC "Manage users..." button is shown
                              and calls tv_show_management_ui()
+TV_CAP_SASL           0x04   DLL exports sasl_lookup() returning a stored
+                             SCRAM-SHA-256 verifier; enables subtypes 263/264
+                             (TLS-SASL/X509-SASL) with SCRAM-SHA-256 and
+                             channel-bound SCRAM-SHA-256-PLUS
 ```
 
 Only `validate_token` is mandatory. A DLL exporting nothing else yields plain
-subtype-300 token auth (no session tokens, no UI).
+subtype-300 token auth (no session tokens, no SASL, no UI).
 
 ## 8. Interoperability guide
 

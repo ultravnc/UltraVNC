@@ -13,8 +13,12 @@
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
 #endif
+// Enable the modern SCH_CREDENTIALS/TLS_PARAMETERS/CRYPTO_SETTINGS
+// definitions in schannel.h (available since Windows 10 1809 / Server 2019).
+#define SCHANNEL_USE_BLACKLISTS
 #include <wincrypt.h>
 #include <security.h>
+#include <winternl.h>   // UNICODE_STRING, required by CRYPTO_SETTINGS
 #include <schannel.h>
 #include <ncrypt.h>
 #include <vector>
@@ -42,9 +46,11 @@ public:
     // thumbprint: hex string, e.g. "a1b2c3..." (40 chars, no spaces).
     bool LoadCertByThumbprint(const char* thumbprint);
 
-    // Find or create a self-signed certificate stored under CN=UltraVNC-WebViewer
-    // in the local machine MY store. Saves the thumbprint to outThumbprint (41 chars).
-    bool EnsureSelfSignedCert(char* outThumbprint);
+    // Find or create a self-signed certificate with the given subject and key
+    // container in the local machine / current user MY store. Saves the
+    // thumbprint to outThumbprint (41 chars). Passing nullptr for subjectName
+    // or containerName uses the legacy noVNC defaults (CN=UltraVNC-WebViewer).
+    bool EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint);
 
     // Perform the server-side TLS handshake on an already-accepted socket.
     // Returns true on success, false on failure (socket should be closed).
@@ -74,7 +80,8 @@ private:
     bool RawRecv(VSocket* sock, BYTE* data, DWORD len, DWORD* received);
 
     // Token exchange during handshake
-    bool HandshakeLoop(VSocket* sock, bool firstCall, SecBuffer* pExtraData);
+    bool HandshakeLoop(VSocket* sock, bool firstCall, SecBuffer* pExtraData,
+                       const BYTE* initialData = nullptr, DWORD initialLen = 0);
 
     PCCERT_CONTEXT          m_certCtx;
     CredHandle              m_credHandle;
