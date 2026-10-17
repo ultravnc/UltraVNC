@@ -77,8 +77,10 @@ public:
 	// Native VeNCrypt TLS + token authentication
 	BOOL getEnableVeNCryptTLS()                { return m_pref_EnableVeNCryptTLS; };
 	void setEnableVeNCryptTLS(BOOL v)          { m_pref_EnableVeNCryptTLS = v; };
-	BOOL getRequireVeNCryptTLS()               { return m_pref_RequireVeNCryptTLS; };
-	void setRequireVeNCryptTLS(BOOL v)         { m_pref_RequireVeNCryptTLS = v; };
+	BOOL getVeNCryptAllowPlainAuth()           { return m_pref_VeNCryptAllowPlainAuth; };
+	void setVeNCryptAllowPlainAuth(BOOL v)     { m_pref_VeNCryptAllowPlainAuth = v; };
+	BOOL getVeNCryptAllowLegacyAuth()          { return m_pref_VeNCryptAllowLegacyAuth; };
+	void setVeNCryptAllowLegacyAuth(BOOL v)    { m_pref_VeNCryptAllowLegacyAuth = v; };
 	BOOL getVeNCryptRequireChannelBinding()    { return m_pref_VeNCryptRequireChannelBinding; };
 	void setVeNCryptRequireChannelBinding(BOOL v) { m_pref_VeNCryptRequireChannelBinding = v; };
 	const char* getVeNCryptTLSCertThumbprint() { return m_pref_VeNCryptTLSCertThumbprint; };
@@ -333,7 +335,8 @@ private:
 	char m_pref_TLSCertThumbprint[41];
 
 	BOOL m_pref_EnableVeNCryptTLS;
-	BOOL m_pref_RequireVeNCryptTLS;
+	BOOL m_pref_VeNCryptAllowPlainAuth;
+	BOOL m_pref_VeNCryptAllowLegacyAuth;
 	BOOL m_pref_VeNCryptRequireChannelBinding;
 	char m_pref_VeNCryptTLSCertThumbprint[41];
 	char m_pref_VeNCryptTokenDLLPath[MAX_PATH];

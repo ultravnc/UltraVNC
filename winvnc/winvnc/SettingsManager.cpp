@@ -160,12 +160,13 @@ void SettingsManager::setDefaults()
 	m_pref_TLSPort = 6080;
 	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = FALSE;
-	m_pref_RequireVeNCryptTLS = FALSE;
+	m_pref_VeNCryptAllowPlainAuth = FALSE;
+	m_pref_VeNCryptAllowLegacyAuth = FALSE;
 	m_pref_VeNCryptRequireChannelBinding = FALSE;
 	memset(m_pref_VeNCryptTLSCertThumbprint, 0, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
-	// Default advertises every implemented subtype; admins restrict via the list.
-	strcpy_s(m_pref_VeNCryptSubtypes, "300 264 263 259 257 262 261");
+	// Secure default: token and SASL only. Weaker methods are explicit opt-ins.
+	strcpy_s(m_pref_VeNCryptSubtypes, "301 300 264 263");
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
@@ -362,7 +363,8 @@ void SettingsManager::load()
 	m_pref_TLSPort   = iniFile.ReadInt("admin", "TLSPort",   m_pref_TLSPort);
 	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
 	m_pref_EnableVeNCryptTLS = iniFile.ReadInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
-	m_pref_RequireVeNCryptTLS = iniFile.ReadInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
+	m_pref_VeNCryptAllowPlainAuth = iniFile.ReadInt("admin", "VeNCryptAllowPlainAuth", m_pref_VeNCryptAllowPlainAuth);
+	m_pref_VeNCryptAllowLegacyAuth = iniFile.ReadInt("admin", "VeNCryptAllowLegacyAuth", m_pref_VeNCryptAllowLegacyAuth);
 	m_pref_VeNCryptRequireChannelBinding = iniFile.ReadInt("admin", "VeNCryptRequireChannelBinding", m_pref_VeNCryptRequireChannelBinding);
 	iniFile.ReadString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	iniFile.ReadString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath, sizeof(m_pref_VeNCryptTokenDLLPath));
@@ -481,7 +483,8 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "TLSPort",   (int)m_pref_TLSPort);
 	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
 	iniFile.WriteInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
-	iniFile.WriteInt("admin", "RequireVeNCryptTLS", m_pref_RequireVeNCryptTLS);
+	iniFile.WriteInt("admin", "VeNCryptAllowPlainAuth", m_pref_VeNCryptAllowPlainAuth);
+	iniFile.WriteInt("admin", "VeNCryptAllowLegacyAuth", m_pref_VeNCryptAllowLegacyAuth);
 	iniFile.WriteInt("admin", "VeNCryptRequireChannelBinding", m_pref_VeNCryptRequireChannelBinding);
 	iniFile.WriteString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint);
 	iniFile.WriteString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath);

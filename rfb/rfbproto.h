@@ -320,6 +320,8 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 // The encrypted payload begins with "UVNC", protocol version 1.0, an auth
 // method and feature flags; see TokenValidator/PROTOCOL.md.
 #define secTypeTokenTLS     300
+// UltraVNC-private X.509/TLS transport with MS-Logon III authentication.
+#define secTypeX509MsLogonIII 301
 #define uvncTokenProtoMajor 1
 #define uvncTokenProtoMinor 0
 #define uvncTokenAuthPrimary 1

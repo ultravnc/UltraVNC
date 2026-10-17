@@ -3813,8 +3813,8 @@ void ClientConnection::AuthMsLogonI()
 	}
 }
 
-// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
-// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+// MS-Logon III: X25519-derived credential protection replaces the weak
+// 31-bit DH exchange used by MS-Logon II.
 void ClientConnection::AuthMsLogonIII()
 {
 	// X25519 key exchange
@@ -3824,7 +3824,7 @@ void ClientConnection::AuthMsLogonIII()
 	unsigned char shared_secret[crypto_scalarmult_BYTES];
 	
 	// Credentials buffers
-	char user[256], passwd[64];
+	char user[256]{}, passwd[64]{};
 	
 	// Generate X25519 keypair
 	if (crypto_box_keypair(client_pk, client_sk) != 0) {
@@ -3842,7 +3842,7 @@ void ClientConnection::AuthMsLogonIII()
 	// Send client public key
 	WriteExact((char*)client_pk, sizeof(client_pk));
 	
-	// Derive AES-256 key from shared secret using SHA-256
+	// Derive credential key material from the shared secret using SHA-256
 	unsigned char aes_key[32];
 	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
 	
@@ -3901,8 +3901,7 @@ void ClientConnection::AuthMsLogonIII()
 		}
 	}
 	
-	// Encrypt credentials using AES-256-CFB (compatible with both sides)
-	// For production, AES-256-GCM would be preferred for authentication
+	// Protect credentials with the existing UltraVNC byte transform.
 	unsigned char key[8];
 	memcpy(key, aes_key, 8);  // Use first 8 bytes for compatibility with existing encryption
 	vncEncryptBytes2((unsigned char*)user, sizeof(user), key);

@@ -690,11 +690,15 @@ void ClientConnection::AuthVeNCrypt()
 			// list SASL keep the previous first-supported-wins behaviour.
 			switch (temp)
 			{
+			case secTypeX509MsLogonIII:
+				subType = temp;   // exclusive when server policy requires MS-Logon
+				break;
 			case secTypeX509SASL:
-				subType = temp;   // strongest: SASL over X509 TLS
+				if (subType != secTypeX509MsLogonIII)
+					subType = temp;   // strongest standard subtype: SASL over X509 TLS
 				break;
 			case secTypeTLSSASL:
-				if (subType != secTypeX509SASL)
+				if (subType != secTypeX509MsLogonIII && subType != secTypeX509SASL)
 					subType = temp;
 				break;
 			case rfbVncAuth:
@@ -838,7 +842,8 @@ void ClientConnection::AuthVeNCrypt()
 			subType == secTypeX509Plain ? "X509-Plain" :
 			subType == secTypeTLSSASL   ? "TLS-SASL"   :
 			subType == secTypeX509SASL  ? "X509-SASL"  :
-			subType == secTypeTokenTLS  ? "TokenTLS"   : "?";
+			subType == secTypeTokenTLS  ? "TokenTLS"   :
+			subType == secTypeX509MsLogonIII ? "X509-MSLogonIII" : "?";
 		char cipherA[128] = "TLS";
 		if (session.cipherSuite[0])
 			WideCharToMultiByte(CP_UTF8, 0, session.cipherSuite, -1, cipherA, sizeof(cipherA), NULL, NULL);
@@ -847,6 +852,9 @@ void ClientConnection::AuthVeNCrypt()
 	}
 	switch (subType)
 	{
+	case secTypeX509MsLogonIII:
+		AuthMsLogonIII();
+		break;
 	case secTypeTLSSASL:
 	case secTypeX509SASL:
 		AuthSasl(endpointHash.empty() ? NULL : endpointHash.data(), endpointHash.size());

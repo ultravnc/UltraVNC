@@ -181,6 +181,17 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
         return VncAuthCallback(outFailureMessage);
     }
 
+    if (m_chosenType == secTypeX509MsLogonIII)
+    {
+        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: X509-MSLogonIII subtype\n"));
+        if (!MsLogonIIIAuthCallback)
+        {
+            outFailureMessage = "MS-Logon III auth unavailable";
+            return false;
+        }
+        return MsLogonIIIAuthCallback(outFailureMessage);
+    }
+
     std::string username;
     std::string token;
     if (!ReadCredentials(username, token))
@@ -273,7 +284,7 @@ bool VeNCryptAuth::SendSubTypes()
     // Offer one versioned private token subtype plus standard VeNCrypt types.
     // Session-token support is negotiated inside subtype 300, not by consuming
     // another private subtype number.
-    CARD32 subTypes[8];
+    CARD32 subTypes[9];
     int n = 0;
 
     // Admin-configured allow-list (VeNCryptSubtypes in [admin], space-separated
@@ -301,12 +312,12 @@ bool VeNCryptAuth::SendSubTypes()
             p = end;
         }
     }
-    const bool requireTls = SettingsManager::getInstance()->getRequireVeNCryptTLS() != FALSE;
+    const bool allowPlain = SettingsManager::getInstance()->getVeNCryptAllowPlainAuth() != FALSE;
     const bool requirePlus = SettingsManager::getInstance()->getVeNCryptRequireChannelBinding() != FALSE;
     auto isAllowed = [&](uint32_t t) {
         if (!cfgEmpty && !allowed[t])
             return false;
-        if (requireTls && (t == secTypeTLSNone || t == secTypeTLSPlain || t == secTypeX509Plain))
+        if (!allowPlain && (t == secTypeTLSNone || t == secTypeTLSPlain || t == secTypeX509Plain))
             return false;
         if (requirePlus && t != secTypeTLSSASL && t != secTypeX509SASL)
             return false;
@@ -321,6 +332,17 @@ bool VeNCryptAuth::SendSubTypes()
         m_offeredTypes[n] = t;
         subTypes[n++] = Swap32IfLE(t);
     };
+
+    // MS-Logon is an exclusive server authentication policy. Updated clients
+    // use subtype 301; old clients require the explicit legacy-auth option.
+    if (SettingsManager::getInstance()->getRequireMSLogon())
+    {
+        if (cfgEmpty || allowed[secTypeX509MsLogonIII])
+            offer(secTypeX509MsLogonIII);
+        m_offeredCount = n;
+        uint8_t count = (uint8_t)n;
+        return SendU8(count) && SendExact((char*)subTypes, (int)(sizeof(CARD32) * n));
+    }
 
     if (isAllowed(secTypeTokenTLS))
         offer(secTypeTokenTLS);

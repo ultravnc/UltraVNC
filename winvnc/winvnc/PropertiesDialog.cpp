@@ -136,6 +136,7 @@ namespace
 		int idc;
 	};
 	const VeNCryptSubtypeItem kVeNCryptSubtypes[] = {
+		{ 301, IDC_VENCRYPT_SUBTYPE_301 },
 		{ 300, IDC_VENCRYPT_SUBTYPE_300 },
 		{ 264, IDC_VENCRYPT_SUBTYPE_264 },
 		{ 263, IDC_VENCRYPT_SUBTYPE_263 },
@@ -214,16 +215,16 @@ namespace
 		// If nothing is selected, fall back to the full default list; this keeps
 		// the UI from accidentally advertising zero subtypes.
 		if (s.empty())
-			s = "300 264 263 259 257 262 261";
+			s = "301 300 264 263";
 		strncpy_s(outBuf, outBufSize, s.c_str(), _TRUNCATE);
 	}
 
-	// Subtype availability depends on the "Require TLS" and "Require -PLUS"
-	// options: grey out subtypes that those options would reject at runtime.
-	void UpdateVeNCryptSubtypeAvailability(HWND hwnd)
+	// Subtype availability depends on the plain/no-auth and -PLUS policy
+	// options: grey out subtypes that those options reject at runtime.
+	void UpdateVeNCryptSubtypeAvailability(HWND hwnd, BOOL msLogon)
 	{
 		const BOOL veNCryptEnabled = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
-		const BOOL requireTls = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL allowPlain = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		const BOOL requirePlus = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		for (const auto& it : kVeNCryptSubtypes)
 		{
@@ -231,16 +232,32 @@ namespace
 			if (!h)
 				continue;
 			BOOL enable = veNCryptEnabled;
-			// "Require TLS (reject plaintext auth methods)" disables no-auth and
-			// plaintext-credential subtypes: TLSNone (257), TLSPlain (259),
-			// X509Plain (262).
-			if (requireTls && (it.type == 257 || it.type == 259 || it.type == 262))
-				enable = FALSE;
-			// "Require SCRAM-SHA-256-PLUS" only leaves the two SASL subtypes.
-			if (requirePlus && (it.type != 263 && it.type != 264))
-				enable = FALSE;
+			if (msLogon)
+			{
+				const BOOL msLogonSubtype = it.type == 301;
+				SendMessage(h, BM_SETCHECK,
+					veNCryptEnabled && msLogonSubtype ? BST_CHECKED : BST_UNCHECKED, 0);
+				enable = enable && msLogonSubtype;
+			}
+			else
+			{
+				if (it.type == 301)
+				{
+					SendMessage(h, BM_SETCHECK, BST_UNCHECKED, 0);
+					enable = FALSE;
+				}
+				// Plain/no-auth is opt-in: TLSNone (257), TLSPlain (259), and
+				// X509Plain (262) remain unavailable unless explicitly allowed.
+				if (!allowPlain && (it.type == 257 || it.type == 259 || it.type == 262))
+					enable = FALSE;
+				// "Require SCRAM-SHA-256-PLUS" only leaves the two SASL subtypes.
+				if (requirePlus && (it.type != 263 && it.type != 264))
+					enable = FALSE;
+			}
 			EnableWindow(h, enable);
 		}
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), veNCryptEnabled && !msLogon);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), veNCryptEnabled && !msLogon);
 	}
 
 	// The webclient HTTPS/TLS controls apply only when both the web client and
@@ -545,6 +562,8 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabLog);
 				return 0;
 			case 9:
+				UpdateVeNCryptSubtypeAvailability(hTabTLS,
+					SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				ShowWindow(hTabTLS, SW_SHOW);
 				SetFocus(hTabTLS);
 				return 0;
@@ -1252,20 +1271,23 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
 		BOOL bVeNCrypt = settings->getEnableVeNCryptTLS();
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE), BM_SETCHECK, bVeNCrypt, 0);
-		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), BM_SETCHECK, settings->getRequireVeNCryptTLS(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), BM_SETCHECK, settings->getVeNCryptAllowPlainAuth(), 0);
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), BM_SETCHECK, settings->getVeNCryptRequireChannelBinding(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_LEGACY), BM_SETCHECK, settings->getVeNCryptAllowLegacyAuth(), 0);
 		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
 		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_LEGACY), bVeNCrypt);
 		LoadVeNCryptSubtypes(hwnd, settings->getVeNCryptSubtypes());
 		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
-		UpdateVeNCryptSubtypeAvailability(hwnd);
+		UpdateVeNCryptSubtypeAvailability(hwnd,
+			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		UpdateWebClientTlsAvailability(hTabIncoming, hwnd);
 		UpdateManageUsersButton(hwnd);
 	}
@@ -1703,25 +1725,29 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	case IDC_VENCRYPT_ENABLE:
 	{
 		BOOL bVeNCrypt = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_LEGACY), bVeNCrypt);
 		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
-		UpdateVeNCryptSubtypeAvailability(hwnd);
+		UpdateVeNCryptSubtypeAvailability(hwnd,
+			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		UpdateManageUsersButton(hwnd);
 	}
 	return TRUE;
 
-	case IDC_VENCRYPT_REQUIRE:
-		UpdateVeNCryptSubtypeAvailability(hwnd);
+	case IDC_VENCRYPT_ALLOW_PLAIN:
+		UpdateVeNCryptSubtypeAvailability(hwnd,
+			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		return TRUE;
 
 	case IDC_VENCRYPT_REQUIRE_PLUS:
-		UpdateVeNCryptSubtypeAvailability(hwnd);
+		UpdateVeNCryptSubtypeAvailability(hwnd,
+			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		return TRUE;
 
 	case IDC_VENCRYPT_DLLPATH:
@@ -2377,8 +2403,10 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 	if (GetDlgItem(hwnd, IDC_VENCRYPT_ENABLE)) {
 		settings->setEnableVeNCryptTLS(
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
-		settings->setRequireVeNCryptTLS(
-			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setVeNCryptAllowPlainAuth(
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setVeNCryptAllowLegacyAuth(
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_LEGACY, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		settings->setVeNCryptRequireChannelBinding(
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		char thumb[64]{};

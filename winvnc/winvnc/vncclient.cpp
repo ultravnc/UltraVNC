@@ -1359,8 +1359,9 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
 	// Include the SecureVNCPluginAuth type for those that support it but are not UltraVNC Viewers
-	// When VeNCrypt TLS is required, no plaintext auth methods are offered at all.
-	const bool bVeNCryptOnly = settings->getEnableVeNCryptTLS() && settings->getRequireVeNCryptTLS();
+	// VeNCrypt is fail-closed by default. Legacy top-level authentication is
+	// advertised only when the administrator explicitly allows it.
+	const bool bVeNCryptOnly = settings->getEnableVeNCryptTLS() && !settings->getVeNCryptAllowLegacyAuth();
 
 	if (bVeNCryptOnly)
 	{
@@ -1468,7 +1469,10 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		break;
 	case rfbVeNCypt:
 		auth_success = AuthVeNCrypt(auth_message);
-		vnclog.Print(LL_LOGSCREEN, "VeNCrypt token auth success = %d", auth_success);
+		if (auth_success && m_veNCryptAuth &&
+			m_veNCryptAuth->GetChosenType() == secTypeX509MsLogonIII)
+			auth_is_mslogon = TRUE;
+		vnclog.Print(LL_LOGSCREEN, "VeNCrypt auth success = %d", auth_success);
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth_new:
 		auth_success = AuthSecureVNCPlugin(auth_message);
@@ -2002,8 +2006,8 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	}
 }
 
-// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
-// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+// MS-Logon III: X25519-derived credential protection replaces the weak
+// 31-bit DH exchange used by MS-Logon II.
 BOOL
 vncClientThread::AuthMsLogonIII(std::string& auth_message)
 {
@@ -2013,7 +2017,7 @@ vncClientThread::AuthMsLogonIII(std::string& auth_message)
 	unsigned char client_pk[crypto_scalarmult_BYTES];
 	unsigned char shared_secret[crypto_scalarmult_BYTES];
 	
-	char user[256], passwd[64];
+	char user[256]{}, passwd[64]{};
 	
 	// Generate X25519 keypair
 	if (crypto_box_keypair(server_pk, server_sk) != 0) {
@@ -2038,7 +2042,7 @@ vncClientThread::AuthMsLogonIII(std::string& auth_message)
 		return FALSE;
 	}
 	
-	// Derive AES-256 key from shared secret
+	// Derive credential key material from the shared secret
 	unsigned char aes_key[32];
 	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
 	
@@ -2289,6 +2293,7 @@ BOOL vncClientThread::AuthVeNCrypt(std::string& auth_message)
 	// AuthVnc's SendExact/ReadExact go through the TLS callbacks once
 	// PerformTLSHandshake has installed them.
 	auth->VncAuthCallback = [this](std::string& msg) { return AuthVnc(msg) != FALSE; };
+	auth->MsLogonIIIAuthCallback = [this](std::string& msg) { return AuthMsLogonIII(msg) != FALSE; };
 
 	// Give the user time to accept the certificate and type credentials
 	m_socket->SetTimeout(120000);
