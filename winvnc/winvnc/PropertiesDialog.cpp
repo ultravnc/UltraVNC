@@ -56,47 +56,202 @@ static bool CertThumbprintHex(PCCERT_CONTEXT ctx, char* hex, size_t hexsize)
 	return true;
 }
 
+struct CertSelectEntry {
+	PCCERT_CONTEXT ctx;
+	std::string display;
+	bool machine;
+};
+
+struct CertSelectData {
+	std::vector<CertSelectEntry> entries;
+	char outThumbprint[41]{};
+	bool ok = false;
+};
+
+static INT_PTR CALLBACK SelectCertDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	CertSelectData* data = reinterpret_cast<CertSelectData*>(GetWindowLongPtr(hwnd, DWLP_USER));
+
+	switch (msg) {
+	case WM_INITDIALOG:
+	{
+		data = reinterpret_cast<CertSelectData*>(lParam);
+		SetWindowLongPtr(hwnd, DWLP_USER, reinterpret_cast<LONG_PTR>(data));
+		HWND hList = GetDlgItem(hwnd, IDC_SELECT_CERT_LIST);
+		for (size_t i = 0; i < data->entries.size(); ++i) {
+			int idx = (int)SendMessageA(hList, LB_ADDSTRING, 0, (LPARAM)data->entries[i].display.c_str());
+			if (idx != LB_ERR)
+				SendMessage(hList, LB_SETITEMDATA, idx, (LPARAM)i);
+		}
+		if (!data->entries.empty())
+			SendMessage(hList, LB_SETCURSEL, 0, 0);
+		return TRUE;
+	}
+	case WM_COMMAND:
+	{
+		int id = LOWORD(wParam);
+		if (id == IDOK || (id == IDC_SELECT_CERT_LIST && HIWORD(wParam) == LBN_DBLCLK)) {
+			HWND hList = GetDlgItem(hwnd, IDC_SELECT_CERT_LIST);
+			int sel = (int)SendMessage(hList, LB_GETCURSEL, 0, 0);
+			if (sel != LB_ERR && data) {
+				LPARAM itemData = SendMessage(hList, LB_GETITEMDATA, sel, 0);
+				size_t idx = static_cast<size_t>(itemData);
+				if (idx < data->entries.size() &&
+				    CertThumbprintHex(data->entries[idx].ctx, data->outThumbprint, sizeof(data->outThumbprint))) {
+					data->ok = true;
+				}
+			}
+			EndDialog(hwnd, data && data->ok ? IDOK : IDCANCEL);
+			return TRUE;
+		}
+		if (id == IDCANCEL) {
+			EndDialog(hwnd, IDCANCEL);
+			return TRUE;
+		}
+	}
+	break;
+	}
+	return FALSE;
+}
+
 static void SelectCertificateToEdit(HWND hwnd, int editId)
 {
-	HCERTSTORE hCollection = CertOpenStore(CERT_STORE_PROV_COLLECTION, 0, 0, 0, nullptr);
-	if (!hCollection)
-		return;
 	HCERTSTORE hLM = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
 		CERT_SYSTEM_STORE_LOCAL_MACHINE | CERT_STORE_READONLY_FLAG, L"MY");
 	HCERTSTORE hCU = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
 		CERT_SYSTEM_STORE_CURRENT_USER | CERT_STORE_READONLY_FLAG, L"MY");
-	if (hLM)
-		CertAddStoreToCollection(hCollection, hLM, 0, 0);
-	if (hCU)
-		CertAddStoreToCollection(hCollection, hCU, 0, 0);
-	PCCERT_CONTEXT ctx = CryptUIDlgSelectCertificateFromStore(hCollection, hwnd,
-		L"Select certificate", L"Select the certificate used for TLS connections",
-		CRYPTUI_SELECT_LOCATION_COLUMN, 0, nullptr);
-	if (ctx) {
-		char hex[41]{};
-		if (CertThumbprintHex(ctx, hex, sizeof(hex)))
-			SetDlgItemText(hwnd, editId, hex);
-		CertFreeCertificateContext(ctx);
-	}
-	CertCloseStore(hCollection, 0);
+
+	CertSelectData data;
+	FILETIME ftNow;
+	GetSystemTimeAsFileTime(&ftNow);
+
+	auto addFromStore = [&](HCERTSTORE hStore, bool machine) {
+		if (!hStore)
+			return;
+		PCCERT_CONTEXT cur = nullptr;
+		while ((cur = CertEnumCertificatesInStore(hStore, cur)) != nullptr) {
+			if (CompareFileTime(&cur->pCertInfo->NotAfter, &ftNow) <= 0)
+				continue;
+			DWORD keyProvLen = 0;
+			if (!CertGetCertificateContextProperty(cur, CERT_KEY_PROV_INFO_PROP_ID, nullptr, &keyProvLen))
+				continue;
+			char subject[256] = {};
+			CertGetNameStringA(cur, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, nullptr, subject, sizeof(subject));
+			char expiry[64] = {};
+			SYSTEMTIME st;
+			FileTimeToSystemTime(&cur->pCertInfo->NotAfter, &st);
+			GetDateFormatA(LOCALE_USER_DEFAULT, DATE_SHORTDATE, &st, nullptr, expiry, sizeof(expiry));
+			const char* loc = machine ? "LocalMachine" : "CurrentUser";
+			char buf[512];
+			snprintf(buf, sizeof(buf), "[%s] %s (expires %s)", loc, subject, expiry);
+			PCCERT_CONTEXT dup = CertDuplicateCertificateContext(cur);
+			if (dup)
+				data.entries.push_back({ dup, buf, machine });
+		}
+	};
+	addFromStore(hLM, true);
+	addFromStore(hCU, false);
+
 	if (hLM)
 		CertCloseStore(hLM, 0);
 	if (hCU)
 		CertCloseStore(hCU, 0);
-	EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
+
+	if (data.entries.empty()) {
+		MessageBoxA(hwnd, "No usable certificates with private keys were found in the Local Machine or Current User Personal stores.",
+			"Select certificate", MB_OK | MB_ICONINFORMATION);
+		return;
+	}
+
+	if (DialogBoxParam(hInstResDLL, MAKEINTRESOURCE(IDD_SELECT_CERT), hwnd,
+		(DLGPROC)SelectCertDlgProc, (LONG_PTR)&data) == IDOK && data.ok) {
+		SetDlgItemText(hwnd, editId, data.outThumbprint);
+		EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
+	}
+
+	for (auto& e : data.entries)
+		CertFreeCertificateContext(e.ctx);
 }
 
 static void GenerateSelfSignedToEdit(HWND hwnd, int editId)
 {
+	const char* subject = "CN=UltraVNC-WebViewer";
+	const char* container = "UltraVNC-WebViewer";
+	if (editId == IDC_VENCRYPT_THUMBPRINT) {
+		subject = "CN=UltraVNC-VeNCrypt";
+		container = "UltraVNC-VeNCrypt";
+	}
+
+	const char* simpleName = subject;
+	if (_strnicmp(subject, "CN=", 3) == 0)
+		simpleName = subject + 3;
+
+	// Delete any existing matching self-signed certificates so the button
+	// actually produces a fresh certificate each time.
+	HCERTSTORE hLM = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+		CERT_SYSTEM_STORE_LOCAL_MACHINE, L"MY");
+	HCERTSTORE hCU = CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, 0,
+		CERT_SYSTEM_STORE_CURRENT_USER, L"MY");
+	for (HCERTSTORE hStore : { hLM, hCU }) {
+		if (!hStore)
+			continue;
+		std::vector<PCCERT_CONTEXT> toDelete;
+		PCCERT_CONTEXT cur = nullptr;
+		while ((cur = CertEnumCertificatesInStore(hStore, cur)) != nullptr) {
+			char name[256] = {};
+			CertGetNameStringA(cur, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, nullptr, name, sizeof(name));
+			if (_stricmp(name, simpleName) == 0) {
+				PCCERT_CONTEXT dup = CertDuplicateCertificateContext(cur);
+				if (dup)
+					toDelete.push_back(dup);
+			}
+		}
+		for (PCCERT_CONTEXT ctx : toDelete)
+			CertDeleteCertificateFromStore(ctx);
+	}
+	if (hLM)
+		CertCloseStore(hLM, 0);
+	if (hCU)
+		CertCloseStore(hCU, 0);
+
 	SchannelTLS tls;
 	char thumb[41]{};
-	if (tls.EnsureSelfSignedCert(thumb)) {
+	if (tls.EnsureSelfSignedCert(subject, container, thumb)) {
 		SetDlgItemText(hwnd, editId, thumb);
 		EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
 	}
 	else
 		MessageBoxA(hwnd, "Failed to create self-signed certificate (admin rights may be required).",
 			"UltraVNC Server", MB_OK | MB_ICONERROR);
+}
+
+// Helpers for loading the validator DLL safely from the admin UI.
+// Only absolute paths are accepted, and dependent DLLs are resolved from the
+// validator DLL's directory rather than the WinVNC search path.
+static bool IsAbsolutePathA(const char* path)
+{
+	return path && ((path[0] >= 'A' && path[0] <= 'Z') || (path[0] >= 'a' && path[0] <= 'z')) &&
+		   path[1] == ':' && (path[2] == '\\' || path[2] == '/');
+}
+
+static HMODULE SafeLoadValidatorDllA(HWND hwnd, const char* dllPath, bool showErrors)
+{
+	if (!dllPath || !dllPath[0])
+	{
+		if (showErrors)
+			MessageBoxA(hwnd, "No TokenValidator DLL path is configured.", "Token Manager", MB_OK | MB_ICONWARNING);
+		return NULL;
+	}
+	if (!IsAbsolutePathA(dllPath))
+	{
+		if (showErrors)
+			MessageBoxA(hwnd, "TokenValidator DLL path must be absolute.", "Token Manager", MB_OK | MB_ICONWARNING);
+		return NULL;
+	}
+	HMODULE hMod = LoadLibraryExA(dllPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+	if (!hMod && showErrors)
+		MessageBoxA(hwnd, "Failed to load the configured TokenValidator DLL.", "Token Manager", MB_OK | MB_ICONERROR);
+	return hMod;
 }
 
 // Ask the configured validator DLL whether it provides a management UI.
@@ -110,9 +265,7 @@ static bool ValidatorHasManagementUi(HWND hwnd)
 
 	char dllPath[MAX_PATH]{};
 	GetDlgItemTextA(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, MAX_PATH);
-	if (!dllPath[0])
-		return false;
-	HMODULE hMod = LoadLibraryA(dllPath);
+	HMODULE hMod = SafeLoadValidatorDllA(hwnd, dllPath, false);
 	if (!hMod)
 		return false;
 
@@ -407,23 +560,23 @@ bool PropertiesDialog::InitDialog(HWND hwnd)
 	item.mask = TCIF_TEXT;
 	item.pszText = "Security";
 	TabCtrl_InsertItem(hTabControl, 0, &item);
-	item.pszText = "Connection";
-	TabCtrl_InsertItem(hTabControl, 1, &item);
-	item.pszText = "Input/FT";
-	TabCtrl_InsertItem(hTabControl, 2, &item);
-	item.pszText = "Misc";
-	TabCtrl_InsertItem(hTabControl, 3, &item);
-	item.pszText = "Notifications";
-	TabCtrl_InsertItem(hTabControl, 4, &item);
-	item.pszText = "Network";
-	TabCtrl_InsertItem(hTabControl, 5, &item);
-	item.pszText = "Rules";
-	TabCtrl_InsertItem(hTabControl, 6, &item);
-	item.pszText = "Capture";
-	TabCtrl_InsertItem(hTabControl, 7, &item);	
-	item.pszText = "Log";
-	TabCtrl_InsertItem(hTabControl, 8, &item);
 	item.pszText = "SSL/TLS";
+	TabCtrl_InsertItem(hTabControl, 1, &item);
+	item.pszText = "Connection";
+	TabCtrl_InsertItem(hTabControl, 2, &item);
+	item.pszText = "Input/FT";
+	TabCtrl_InsertItem(hTabControl, 3, &item);
+	item.pszText = "Misc";
+	TabCtrl_InsertItem(hTabControl, 4, &item);
+	item.pszText = "Notifications";
+	TabCtrl_InsertItem(hTabControl, 5, &item);
+	item.pszText = "Network";
+	TabCtrl_InsertItem(hTabControl, 6, &item);
+	item.pszText = "Rules";
+	TabCtrl_InsertItem(hTabControl, 7, &item);
+	item.pszText = "Capture";
+	TabCtrl_InsertItem(hTabControl, 8, &item);	
+	item.pszText = "Log";
 	TabCtrl_InsertItem(hTabControl, 9, &item);
 
 
@@ -556,47 +709,47 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				SetFocus(hTabAuthentication);
 				return 0;
 			case 1:
-				ShowWindow(hTabIncoming, SW_SHOW);
-				SetFocus(hTabIncoming);
-				return 0;
-
-			case 2:
-				ShowWindow(hTabInput, SW_SHOW);
-				SetFocus(hTabInput);
-				return 0;
-
-			case 3:
-				ShowWindow(hTabMisc, SW_SHOW);
-				SetFocus(hTabMisc);
-				return 0;
-
-			case 4:
-				ShowWindow(hTabNotifications, SW_SHOW);
-				SetFocus(hTabNotifications);
-				return 0;
-
-			case 5:
-				ShowWindow(hTabNetwork, SW_SHOW);
-				SetFocus(hTabNetwork);
-				return 0;
-
-			case 6:
-				ShowWindow(hTabRules, SW_SHOW);
-				SetFocus(hTabRules);
-				return 0;
-			case 7:
-				ShowWindow(hTabCapture, SW_SHOW);
-				SetFocus(hTabCapture);
-				return 0;
-			case 8:
-				ShowWindow(hTabLog, SW_SHOW);
-				SetFocus(hTabLog);
-				return 0;
-			case 9:
 				UpdateVeNCryptSubtypeAvailability(hTabTLS,
 					SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 				ShowWindow(hTabTLS, SW_SHOW);
 				SetFocus(hTabTLS);
+				return 0;
+
+			case 2:
+				ShowWindow(hTabIncoming, SW_SHOW);
+				SetFocus(hTabIncoming);
+				return 0;
+
+			case 3:
+				ShowWindow(hTabInput, SW_SHOW);
+				SetFocus(hTabInput);
+				return 0;
+
+			case 4:
+				ShowWindow(hTabMisc, SW_SHOW);
+				SetFocus(hTabMisc);
+				return 0;
+
+			case 5:
+				ShowWindow(hTabNotifications, SW_SHOW);
+				SetFocus(hTabNotifications);
+				return 0;
+
+			case 6:
+				ShowWindow(hTabNetwork, SW_SHOW);
+				SetFocus(hTabNetwork);
+				return 0;
+			case 7:
+				ShowWindow(hTabRules, SW_SHOW);
+				SetFocus(hTabRules);
+				return 0;
+			case 8:
+				ShowWindow(hTabCapture, SW_SHOW);
+				SetFocus(hTabCapture);
+				return 0;
+			case 9:
+				ShowWindow(hTabLog, SW_SHOW);
+				SetFocus(hTabLog);
 				return 0;
 			case 10:
 				if (showAdminPanel) {
@@ -621,36 +774,36 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 				ShowWindow(hTabAuthentication, SW_HIDE);
 				break;
 			case 1:
-				ShowWindow(hTabIncoming, SW_HIDE);
+				ShowWindow(hTabTLS, SW_HIDE);
 				break;
 
 			case 2:
-				ShowWindow(hTabInput, SW_HIDE);
+				ShowWindow(hTabIncoming, SW_HIDE);
 				break;
 
 			case 3:
-				ShowWindow(hTabMisc, SW_HIDE);
+				ShowWindow(hTabInput, SW_HIDE);
 				break;
 
 			case 4:
-				ShowWindow(hTabNotifications, SW_HIDE);
+				ShowWindow(hTabMisc, SW_HIDE);
 				break;
 
 			case 5:
-				ShowWindow(hTabNetwork, SW_HIDE);
+				ShowWindow(hTabNotifications, SW_HIDE);
 				break;
 
 			case 6:
-				ShowWindow(hTabRules, SW_HIDE);
+				ShowWindow(hTabNetwork, SW_HIDE);
 				break;
 			case 7:
-				ShowWindow(hTabCapture, SW_HIDE);
+				ShowWindow(hTabRules, SW_HIDE);
 				break;
 			case 8:
-				ShowWindow(hTabLog, SW_HIDE);
+				ShowWindow(hTabCapture, SW_HIDE);
 				break;
 			case 9:
-				ShowWindow(hTabTLS, SW_HIDE);
+				ShowWindow(hTabLog, SW_HIDE);
 				break;
 			case 10:
 				if (showAdminPanel) {
@@ -1801,18 +1954,9 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	{
 		char dllPath[MAX_PATH]{};
 		GetDlgItemTextA(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, MAX_PATH);
-		if (!dllPath[0])
-		{
-			MessageBoxA(hwnd, "No TokenValidator DLL path is configured.", "Token Manager", MB_OK | MB_ICONWARNING);
-			return TRUE;
-		}
-
-		HMODULE hMod = LoadLibraryA(dllPath);
+		HMODULE hMod = SafeLoadValidatorDllA(hwnd, dllPath, true);
 		if (!hMod)
-		{
-			MessageBoxA(hwnd, "Failed to load the configured TokenValidator DLL.", "Token Manager", MB_OK | MB_ICONERROR);
 			return TRUE;
-		}
 
 		typedef int(__cdecl *TV_HAS_MANAGEMENT_UI)(void);
 		typedef int(__cdecl *TV_SHOW_MANAGEMENT_UI)(HWND);
