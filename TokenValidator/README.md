@@ -65,12 +65,17 @@ probing the individual exports: `issue_session_token` implies
 `TV_CAP_SESSION_TOKEN`, and `tv_has_management_ui`/`tv_show_management_ui`
 imply `TV_CAP_MANAGEMENT_UI`. Keep the flags consistent with your exports.
 
-The DLL is loaded dynamically with `LoadLibrary`/`GetProcAddress` from the path
-in `VeNCryptTokenDLLPath` and called with the C ABI (`extern "C"`, `__cdecl`).
-Session-token records use the same machine-protected INI so they survive a
-service desktop-process restart. All
-RFB traffic after authentication — including the UltraVNC file transfer —
+The DLL is loaded dynamically with `LoadLibraryEx`/`GetProcAddress` from the
+path in `VeNCryptTokenDLLPath` and called with the C ABI (`extern "C"`,
+`__cdecl`). `VeNCryptTokenDLLPath` must be an **absolute** path; WinVNC uses
+`LOAD_WITH_ALTERED_SEARCH_PATH` so dependent DLLs resolve from the validator's
+directory rather than the WinVNC search path. Session-token records use the
+same machine-protected INI so they survive a service desktop-process restart.
+All RFB traffic after authentication — including the UltraVNC file transfer —
 stays inside the TLS channel, so tokens never cross the wire unencrypted.
+
+TLS 1.2 is the minimum version. TLS 1.3 is negotiated automatically on
+Windows 11 / Windows Server 2022 and later; older systems fall back to TLS 1.2.
 
 ## TOTP mode
 
@@ -93,8 +98,8 @@ The INI is encrypted with `CryptProtectData` (`CRYPTPROTECT_LOCAL_MACHINE`) and 
 After a successful TOTP authentication, the server calls `issue_session_token` to create a random 64-character token. The token is sent to the viewer inside the TLS tunnel.
 
 * The viewer stores it in memory and uses it on reconnects instead of a new TOTP code.
-* The token remains pending until it is used or replaced; it does not expire while the desktop connection remains active.
-* Only **one pending session token** is kept per user. Every successful reconnect immediately issues a replacement and revokes the token just used.
+* The token remains pending until it is used, replaced, or reaches its 12-hour expiry.
+* Only **one pending session token** is kept per user. It is consumed on successful validation, and every successful reconnect immediately issues a replacement.
 * A fresh TOTP login also issues a replacement, revoking any abandoned token.
 * The server record is protected with machine-scope DPAPI and survives a WinVNC desktop-process restart.
 * The viewer token remains memory-only; closing the viewer still requires a fresh TOTP.
@@ -213,6 +218,10 @@ RequireVeNCryptTLS=0
 VeNCryptTokenDLLPath=C:\path\to\TokenValidator.dll
 ```
 
+`VeNCryptTokenDLLPath` must be an absolute path; relative paths are rejected.
+If the setting is empty, WinVNC defaults to `TokenValidator.dll` in the same
+folder as `winvnc.exe` (or `TokenValidator32.dll` for the x86 build), provided
+the file exists.
 If `VeNCryptTLSCertThumbprint` is omitted, WinVNC will generate/use a self-signed certificate and persist its thumbprint automatically.
 
 ## Connect from UltraVNC Viewer

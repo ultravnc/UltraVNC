@@ -103,8 +103,9 @@ struct TLSSession
 	SecPkgContext_StreamSizes tlsSizes;
 	char			lastError[1024];
 	wchar_t			cipherSuite[128] = {};
+	bool			modernCredentials;
 
-	TLSSession() : state(StateNew), hostName(nullptr), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0)
+	TLSSession() : state(StateNew), hostName(nullptr), isServer(false), pLocalCert(NULL), pRemoteCert(NULL), contextReq(0), modernCredentials(false)
 	{ 
 		SecInvalidateHandle(&hCredentials);
 		SecInvalidateHandle(&hContext);
@@ -169,13 +170,14 @@ struct TLSSession
 			SCHANNEL_CRED cred = { 0 };
 			cred.dwVersion = SCHANNEL_CRED_VERSION;
 			cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION;
+			cred.grbitEnabledProtocols = isServer ? SP_PROT_TLS1_2_SERVER : SP_PROT_TLS1_2_CLIENT;
 			if (pLocalCert)
 			{
 				cred.cCreds = 1;
 				cred.paCred = &pLocalCert;
 				contextReq |= ISC_REQ_USE_SUPPLIED_CREDS;
 			}
-			if (TRUE) // Win11+ only
+			if (TRUE) // SCH_CREDENTIALS is available on Windows 10 1809+ / Server 2019+
 			{
 				SCH_CREDENTIALS newCred = { 0 };
 				TLS_PARAMETERS params = { 0 };
@@ -185,15 +187,30 @@ struct TLSSession
 				newCred.dwFlags = cred.dwFlags | SCH_USE_STRONG_CRYPTO;
 				newCred.cTlsParameters = 1;
 				newCred.pTlsParameters = &params;
-				if (cred.grbitEnabledProtocols)
-					params.grbitDisabledProtocols = ~cred.grbitEnabledProtocols;
+				// Disable only legacy protocols; let Schannel negotiate TLS 1.2 or 1.3.
+				if (isServer)
+					params.grbitDisabledProtocols =
+						SP_PROT_SSL2_SERVER |
+						SP_PROT_SSL3_SERVER |
+						SP_PROT_TLS1_0_SERVER |
+						SP_PROT_TLS1_1_SERVER;
+				else
+					params.grbitDisabledProtocols =
+						SP_PROT_SSL2_CLIENT |
+						SP_PROT_SSL3_CLIENT |
+						SP_PROT_TLS1_0_CLIENT |
+						SP_PROT_TLS1_1_CLIENT;
 				hr = AcquireCredentialsHandleW(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
 					&newCred, NULL, NULL, &hCredentials, NULL);
+				modernCredentials = SUCCEEDED(hr);
 			}
 			else hr = -1;
 			if (FAILED(hr))
+			{
 				hr = AcquireCredentialsHandleW(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
 					&cred, NULL, NULL, &hCredentials, NULL);
+				modernCredentials = false;
+			}
 			if (FAILED(hr))
 				return SetLastError("AcquireCredentialsHandleW failed", hr);
 		}
@@ -208,6 +225,7 @@ struct TLSSession
 				inBuffers[0].cbBuffer = inbuf.GetAvailable();
 				pIn = &inDesc;
 			}
+			bool initialClientCall = !isServer && !SecIsValidHandle(&hContext) && pIn == NULL;
 			if (isServer)
 				hr = AcceptSecurityContext(&hCredentials, SecIsValidHandle(&hContext) ? &hContext : NULL, pIn, contextReq,
 					SECURITY_NATIVE_DREP, &hContext, &outDesc, &contextAttr, NULL);
@@ -218,6 +236,35 @@ struct TLSSession
 			{
 				memset(inBuffers, 0, sizeof(inBuffers));
 				break;
+			}
+			if (hr == SEC_E_INVALID_TOKEN && modernCredentials && initialClientCall)
+			{
+				if (SecIsValidHandle(&hContext))
+				{
+					DeleteSecurityContext(&hContext);
+					SecInvalidateHandle(&hContext);
+				}
+				FreeCredentialsHandle(&hCredentials);
+				SecInvalidateHandle(&hCredentials);
+				SCHANNEL_CRED legacyCred = { 0 };
+				legacyCred.dwVersion = SCHANNEL_CRED_VERSION;
+				legacyCred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION;
+				legacyCred.grbitEnabledProtocols = isServer ? SP_PROT_TLS1_2_SERVER : SP_PROT_TLS1_2_CLIENT;
+				if (pLocalCert)
+				{
+					legacyCred.cCreds = 1;
+					legacyCred.paCred = &pLocalCert;
+				}
+				hr = AcquireCredentialsHandleW(NULL, UNISP_NAME, (isServer ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND), NULL,
+					&legacyCred, NULL, NULL, &hCredentials, NULL);
+				if (FAILED(hr))
+					return SetLastError("AcquireCredentialsHandleW failed", hr);
+				modernCredentials = false;
+				for (DWORD i = 0; i < outDesc.cBuffers; i++)
+					if (outBuffers[i].pvBuffer)
+						FreeContextBuffer(outBuffers[i].pvBuffer);
+				memset(outBuffers, 0, sizeof(outBuffers));
+				continue;
 			}
 			inbuf.size = 0;
 			if (FAILED(hr))
@@ -652,7 +699,7 @@ void ClientConnection::AuthVeNCrypt()
 	int version, temp, size, subType;
 	auto SetLastError = [](char *error)
 	{
-		vnclog.Print(0, _T("AuthVeNCrypt: %s\n"), error);
+		vnclog.Print(0, _T("AuthVeNCrypt: %hs\n"), error);
 		wchar_t werror[256];
 		MultiByteToWideChar(CP_UTF8, 0, error, -1, werror, 256);
 		throw WarningException(werror);
@@ -726,21 +773,12 @@ void ClientConnection::AuthVeNCrypt()
 	// if standard RFB type negotiated -> no further msgs and no TLS session
 	if (subType >= 256) {
 		// VeNCrypt spec (rfbproto 7.2.4) requires a 0x01 Ack before TLS for
-		// TLS/X509 subtypes. All major implementations send it (QEMU,
-		// libvncserver, TigerVNC via SSecurityTLS). If a non-conformant
-		// server sends nothing, don't block forever — start TLS anyway.
-		fd_set fds;
-		FD_ZERO(&fds);
-		FD_SET(m_sock, &fds);
-		struct timeval tv = { 0, 300 * 1000 };
-		if (select(0, &fds, NULL, NULL, &tv) > 0)
-		{
-			temp = 0;
-			ReadExact((char *)&temp, 1);
-			if (temp != 1)
-				return SetLastError("Server unsupported sub-type");
-		}
-		// else: no Ack — old-draft server, proceed to TLS anyway
+		// TLS/X509 subtypes. Read it with the normal connection timeout so a
+		// delayed Ack cannot be mistaken for the first byte of a TLS record.
+		temp = 0;
+		ReadExact((char *)&temp, 1);
+		if (temp != 1)
+			return SetLastError("Server unsupported sub-type");
 
 		// start TLS on existing connection
 		TLSSession session;
@@ -1011,8 +1049,8 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 
 	// Pick a mechanism by token so "SCRAM-SHA-256" cannot match inside
 	// "SCRAM-SHA-256-PLUS". Prefer -PLUS when we have binding data, then
-	// plain SCRAM-SHA-256, then PLAIN as last resort.
-	bool hasPlus = false, hasScram = false, hasPlain = false;
+	// plain SCRAM-SHA-256.
+	bool hasPlus = false, hasScram = false;
 	{
 		size_t pos = 0;
 		while (pos <= mechlist.size())
@@ -1022,7 +1060,6 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 			std::string m = mechlist.substr(pos, end - pos);
 			if (m == "SCRAM-SHA-256-PLUS") hasPlus = true;
 			else if (m == "SCRAM-SHA-256") hasScram = true;
-			else if (m == "PLAIN") hasPlain = true;
 			pos = end + 1;
 		}
 	}
@@ -1031,8 +1068,6 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 		mech = "SCRAM-SHA-256-PLUS";
 	else if (hasScram)
 		mech = "SCRAM-SHA-256";
-	else if (hasPlain)
-		mech = "PLAIN";
 	else
 		return SetLastError("No usable SASL mechanism");
 	strncpy_s(m_saslMech, _countof(m_saslMech), mech.c_str(), _TRUNCATE);
@@ -1056,24 +1091,6 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 	{
 		strcpy_s(user, m_cmdlnUser);
 		strcpy_s(passwd, m_clearPasswd);
-	}
-
-	if (mech == "PLAIN")
-	{
-		// authzid \0 authcid \0 password
-		std::string init;
-		init.push_back('\0');
-		init += user;
-		init.push_back('\0');
-		init += passwd;
-		if (!SaslWire::WriteData(&transport, init.data(), init.size()))
-			return SetLastError("Failed to send PLAIN credentials");
-		// Server step reply: data + complete byte; SecurityResult follows.
-		std::vector<uint8_t> resp;
-		bool isNull = false, complete = false;
-		if (!SaslWire::ReadStep(&transport, resp, isNull, complete) || !complete)
-			return SetLastError("Malformed SASL step reply");
-		return;
 	}
 
 	// SCRAM-SHA-256(-PLUS): cbData is only bound into the exchange for the

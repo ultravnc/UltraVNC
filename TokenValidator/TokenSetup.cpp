@@ -117,6 +117,7 @@ int main(int argc, char* argv[])
         TokenCore::DeleteTotpSecret(user);
         TokenCore::DeleteProtectedValue("SCRAM", user);
         TokenCore::DeleteProtectedValue("SessionTokens", user);
+        TokenCore::DeleteProtectedValue("TotpLastStep", user);
         printf("Removed TOTP, SCRAM and session credentials for '%s'\n", user);
         return 0;
     }
