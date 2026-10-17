@@ -226,6 +226,8 @@ namespace
 		const BOOL veNCryptEnabled = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		const BOOL allowPlain = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		const BOOL requirePlus = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		if (requirePlus)
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_SETCHECK, BST_UNCHECKED, 0);
 		for (const auto& it : kVeNCryptSubtypes)
 		{
 			HWND h = GetDlgItem(hwnd, it.idc);
@@ -241,23 +243,51 @@ namespace
 			}
 			else
 			{
-				if (it.type == 301)
+				if (requirePlus)
+				{
+					const BOOL saslSubtype = it.type == 263 || it.type == 264;
+					SendMessage(h, BM_SETCHECK, saslSubtype ? BST_CHECKED : BST_UNCHECKED, 0);
+					enable = enable && saslSubtype;
+				}
+				else if (it.type == 301)
 				{
 					SendMessage(h, BM_SETCHECK, BST_UNCHECKED, 0);
 					enable = FALSE;
 				}
-				// Plain/no-auth is opt-in: TLSNone (257), TLSPlain (259), and
-				// X509Plain (262) remain unavailable unless explicitly allowed.
-				if (!allowPlain && (it.type == 257 || it.type == 259 || it.type == 262))
+				else if (!allowPlain && (it.type == 257 || it.type == 259 || it.type == 262))
+				{
+					SendMessage(h, BM_SETCHECK, BST_UNCHECKED, 0);
 					enable = FALSE;
-				// "Require SCRAM-SHA-256-PLUS" only leaves the two SASL subtypes.
-				if (requirePlus && (it.type != 263 && it.type != 264))
-					enable = FALSE;
+				}
 			}
 			EnableWindow(h, enable);
 		}
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), veNCryptEnabled && !msLogon);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), veNCryptEnabled && !msLogon && !requirePlus);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), veNCryptEnabled && !msLogon);
+	}
+
+	void UpdateVncPasswordAvailability(HWND hSecurityTab, HWND hTlsTab)
+	{
+		if (!hSecurityTab || !hTlsTab)
+			return;
+		const BOOL veNCrypt = (SendDlgItemMessage(hTlsTab, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL allowLegacy = (SendDlgItemMessage(hTlsTab, IDC_VENCRYPT_ALLOW_LEGACY, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL x509Vnc = (SendDlgItemMessage(hTlsTab, IDC_VENCRYPT_SUBTYPE_261, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL enable = !veNCrypt || allowLegacy || x509Vnc;
+		const int controls[] = {
+			IDC_PASSWORD_LABEL, IDC_PASSWORD_LABEL2, IDC_SAVEPASSWORDSECURE,
+			IDC_CHANGEPASSWORD, IDC_CHANGEPASSWORDVO, IDC_AUTHREQUIRED
+		};
+		for (int idc : controls)
+		{
+			HWND h = GetDlgItem(hSecurityTab, idc);
+			if (h)
+				EnableWindow(h, enable);
+		}
+		const BOOL canClear = enable &&
+			(SendDlgItemMessage(hSecurityTab, IDC_AUTHREQUIRED, BM_GETCHECK, 0, 0) != BST_CHECKED);
+		EnableWindow(GetDlgItem(hSecurityTab, IDC_CLEARPASSWORD), canClear);
+		EnableWindow(GetDlgItem(hSecurityTab, IDC_CLEARPASSWORDVO), canClear);
 	}
 
 	// The webclient HTTPS/TLS controls apply only when both the web client and
@@ -521,6 +551,7 @@ int PropertiesDialog::HandleNotify(HWND hwndDlg, WPARAM wParam, LPARAM lParam)
 			int i = TabCtrl_GetCurFocus(hTabControl);
 			switch (i) {
 			case 0:
+				UpdateVncPasswordAvailability(hTabAuthentication, hTabTLS);
 				ShowWindow(hTabAuthentication, SW_SHOW);
 				SetFocus(hTabAuthentication);
 				return 0;
@@ -1288,6 +1319,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
 		UpdateVeNCryptSubtypeAvailability(hwnd,
 			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		UpdateVncPasswordAvailability(hTabAuthentication, hwnd);
 		UpdateWebClientTlsAvailability(hTabIncoming, hwnd);
 		UpdateManageUsersButton(hwnd);
 	}
@@ -1736,18 +1768,28 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		EnableVeNCryptSubtypes(hwnd, bVeNCrypt);
 		UpdateVeNCryptSubtypeAvailability(hwnd,
 			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		UpdateVncPasswordAvailability(hTabAuthentication, hwnd);
 		UpdateManageUsersButton(hwnd);
 	}
 	return TRUE;
 
 	case IDC_VENCRYPT_ALLOW_PLAIN:
+		if (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_SETCHECK, BST_UNCHECKED, 0);
 		UpdateVeNCryptSubtypeAvailability(hwnd,
 			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		return TRUE;
 
 	case IDC_VENCRYPT_REQUIRE_PLUS:
+		if (SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_SETCHECK, BST_UNCHECKED, 0);
 		UpdateVeNCryptSubtypeAvailability(hwnd,
 			SendDlgItemMessage(hTabAuthentication, IDC_MSLOGON_CHECKD, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		return TRUE;
+
+	case IDC_VENCRYPT_ALLOW_LEGACY:
+	case IDC_VENCRYPT_SUBTYPE_261:
+		UpdateVncPasswordAvailability(hTabAuthentication, hwnd);
 		return TRUE;
 
 	case IDC_VENCRYPT_DLLPATH:
@@ -1901,11 +1943,15 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 
 		EnableWindow(GetDlgItem(hwnd, IDC_NEW_MSLOGON), bMSLogonChecked);
 		EnableWindow(GetDlgItem(hwnd, IDC_MSLOGON), bMSLogonChecked);
+		UpdateVeNCryptSubtypeAvailability(hTabTLS, bMSLogonChecked);
+		UpdateVncPasswordAvailability(hwnd, hTabTLS);
+		return TRUE;
 	}
 	case IDC_AUTHREQUIRED:{
 		bool checked = (SendMessage(GetDlgItem(hwnd, IDC_AUTHREQUIRED), BM_GETCHECK, 0, 0) == BST_CHECKED);
-		EnableWindow(GetDlgItem(hwnd, IDC_CLEARPASSWORD), checked == 0);
-		EnableWindow(GetDlgItem(hwnd, IDC_CLEARPASSWORDVO), checked == 0);
+		bool vncPasswordEnabled = IsWindowEnabled(GetDlgItem(hwnd, IDC_AUTHREQUIRED)) != FALSE;
+		EnableWindow(GetDlgItem(hwnd, IDC_CLEARPASSWORD), vncPasswordEnabled && checked == 0);
+		EnableWindow(GetDlgItem(hwnd, IDC_CLEARPASSWORDVO), vncPasswordEnabled && checked == 0);
 	}
 
 
