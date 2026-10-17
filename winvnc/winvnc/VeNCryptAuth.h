@@ -30,6 +30,7 @@
 //                            only when the validator DLL exports sasl_lookup.
 //   secTypeTokenTLS (300) -> versioned "UVNC" payload with primary-token and
 //                            reconnect-session-token authentication methods.
+//   secTypeX509MsLogonIII (301) -> MS-Logon III authentication inside TLS.
 //
 // The client requests session-token issuance with a protocol flag. The server
 // always returns a versioned response after successful subtype-300 auth; the
@@ -63,6 +64,9 @@ public:
     // is accepted but fails with "VNC auth unavailable".
     std::function<bool(std::string&)> VncAuthCallback;
 
+    // Called after TLS is installed for the private X509-MSLogonIII subtype.
+    std::function<bool(std::string&)> MsLogonIIIAuthCallback;
+
 private:
     bool SendVeNCryptVersion();
     bool ReadClientVersion();
@@ -89,7 +93,7 @@ private:
     std::mutex m_tlsMutex; // serializes Schannel Send/Recv (context not thread-safe)
     std::unique_ptr<VSocket::TLSCallbacks> m_tlsCallbacks;
     uint32_t m_chosenType;
-    uint32_t m_offeredTypes[8];
+    uint32_t m_offeredTypes[9];
     int m_offeredCount;
     std::string m_lastUsername;
     bool m_requestSessionToken;

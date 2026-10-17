@@ -3854,7 +3854,7 @@ void ClientConnection::AuthMsLogonIII()
 	// Send client public key
 	WriteExact((char*)client_pk, sizeof(client_pk));
 	
-	// Derive AES-256 key from shared secret using SHA-256
+	// Derive credential key material from the shared secret using SHA-256
 	unsigned char aes_key[32];
 	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
 	

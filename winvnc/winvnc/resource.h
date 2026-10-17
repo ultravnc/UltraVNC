@@ -397,7 +397,7 @@
 #define IDC_VENCRYPT_CERT_GEN           1364
 #define IDC_VENCRYPT_DLLPATH            1365
 #define IDC_VENCRYPT_DLL_BROWSE         1366
-#define IDC_VENCRYPT_REQUIRE            1367
+#define IDC_VENCRYPT_ALLOW_PLAIN        1367
 #define IDC_VENCRYPT_MANAGE             1368
 #define IDC_NOVNC                       1369
 #define IDC_VENCRYPT_SUBTYPE_300        1370
@@ -419,6 +419,8 @@
 #define IDC_STATIC_INFO4                1386
 #define IDC_STATIC_INFO5                1387
 #define IDC_STATIC_SUBTYPES             1388
+#define IDC_VENCRYPT_ALLOW_LEGACY       1389
+#define IDC_VENCRYPT_SUBTYPE_301        1390
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
@@ -563,7 +565,7 @@
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        213
 #define _APS_NEXT_COMMAND_VALUE         32906
-#define _APS_NEXT_CONTROL_VALUE         1389
+#define _APS_NEXT_CONTROL_VALUE         1391
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
