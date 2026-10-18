@@ -239,8 +239,13 @@ DWORD WINAPI do_repeater_wait(LPVOID lpParam)
 			if ( 1 < f_debug )		
 				report_bytes( "<<<", rbuf, rbuf_len);
 			rbuf_len += len;
-			if (server) 
+			if (server)
 				{
+					// While waiting, the server re-sends its 12-byte protocol
+					// version after each keepalive. Drop the duplicate so the
+					// viewer gets exactly one version string.
+					if (sendkepalive && rbuf_len - len >= 12)
+						rbuf_len -= len;
 					if (len!=12) sendkepalive=false;
 					Servers[nummer].timestamp=GetTickCount();
 					Servers[nummer].size_buffer=rbuf_len;
