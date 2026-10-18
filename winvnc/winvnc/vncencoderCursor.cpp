@@ -99,6 +99,41 @@ IsMagentaLikePixel(BYTE *pixel, int bytes_pixel)
 	return FALSE;
 }
 
+static BOOL
+HasCursorAlpha(const BYTE *pixels, int width, int height, int stride, int bytes_pixel)
+{
+	if (bytes_pixel != 4)
+		return FALSE;
+	for (int y = 0; y < height; y++)
+		for (int x = 0; x < width; x++)
+			if (pixels[y * stride + x * 4 + 3] != 0)
+				return TRUE;
+	return FALSE;
+}
+
+static BOOL
+RestoreAlphaCursorPixel(BYTE *pixel)
+{
+	const int alpha = pixel[3];
+	if (alpha == 0) {
+		memset(pixel, 0, 4);
+		return FALSE;
+	}
+
+	// DrawIconEx blended the cursor over magenta. Remove that
+	// background before converting its alpha to RichCursor's one-bit mask.
+	// Do not classify these pixels by color: anti-aliased black outlines can
+	// look magenta after blending and would otherwise be discarded.
+	for (int channel = 0; channel < 3; channel++) {
+		int value = pixel[channel] - (channel == 1 ? 0 : 255 - alpha);
+		if (value < 0) value = 0;
+		value = (value * 255 + alpha / 2) / alpha;
+		pixel[channel] = (BYTE)(value > 255 ? 255 : value);
+	}
+	pixel[3] = 255;
+	return TRUE;
+}
+
 BOOL
 vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 {
@@ -244,6 +279,7 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 			while (bytes_row % sizeof(DWORD))
 				bytes_row++;
 			const int packed_width_bytes = workMaskWidthBytes;
+			const BOOL hasAlpha = HasCursorAlpha(cbits, width, height, bytes_row, bytes_pixel);
 			
 			for (int y = 0; y < height; y++) {
 				BYTE *srcRow = cbits + y * bytes_row;
@@ -266,7 +302,8 @@ vncEncoder::SendCursorShape(VSocket *outConn, vncDesktop *desktop)
 						isMagenta = (pixel16 == 0xF81F || pixel16 == 0x7C1F);
 					}
 					
-					if (!isMagenta) {
+					const BOOL visible = hasAlpha ? RestoreAlphaCursorPixel(pixel) : !isMagenta;
+					if (visible) {
 						// Visible pixel - set mask bit
 						dstRow[dstByteIdx] |= bitmask;
 					} else {
@@ -392,6 +429,7 @@ vncEncoder::FixCursorMask(BYTE *mbits, BYTE *cbits,
         int bytes_row = width * bytes_pixel;
         while (bytes_row % sizeof(DWORD))
             bytes_row++;
+        const BOOL hasAlpha = HasCursorAlpha(cbits, width, height, bytes_row, bytes_pixel);
 
         BYTE bitmask;
         for (y = 0; y < height; y++) {
@@ -399,7 +437,9 @@ vncEncoder::FixCursorMask(BYTE *mbits, BYTE *cbits,
             for (x = 0; x < width; x++) {
                 BYTE *pixel = &cbits[y * bytes_row + x * bytes_pixel];
 
-                if (IsMagentaLikePixel(pixel, bytes_pixel)) {
+                const BOOL visible = hasAlpha ? RestoreAlphaCursorPixel(pixel)
+                    : !IsMagentaLikePixel(pixel, bytes_pixel);
+                if (!visible) {
                     // Transparent - clear mask bit and set color to black
                     mbits[y * packed_width_bytes + x / 8] &= ~bitmask;
                     memset(pixel, 0, bytes_pixel);
