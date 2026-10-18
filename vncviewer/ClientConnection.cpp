@@ -470,6 +470,7 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_emulatingMiddleButton = false;
 
     oldPointerX = oldPointerY = oldButtonMask = 0;
+	m_accumWheelDelta = m_accumHWheelDelta = 0;
 
 	// Create a buffer for various network operations
 	CheckBufferSize(INITIALNETBUFSIZE);
@@ -5199,15 +5200,16 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 //
 inline void ClientConnection::ProcessMouseWheel(int delta)
 {
-  int wheelMask = rfbWheelUpMask;
-  if (delta < 0) {
-    wheelMask = rfbWheelDownMask;
-    delta = -delta;
+  m_accumWheelDelta += delta;
+  while (m_accumWheelDelta >= 120) {
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelUpMask);
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelUpMask);
+    m_accumWheelDelta -= 120;
   }
-  while (delta > 0) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | wheelMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~wheelMask);
-    delta -= 120;
+  while (m_accumWheelDelta <= -120) {
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelDownMask);
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelDownMask);
+    m_accumWheelDelta += 120;
   }
 }
 
@@ -5216,15 +5218,16 @@ inline void ClientConnection::ProcessMouseWheel(int delta)
 //
 inline void ClientConnection::ProcessMouseWheelHorizontal(int delta)
 {
-  int wheelMask = rfbWheelRightMask;
-  if (delta < 0) {
-    wheelMask = rfbWheelLeftMask;
-    delta = -delta;
+  m_accumHWheelDelta += delta;
+  while (m_accumHWheelDelta >= 120) {
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelRightMask);
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelRightMask);
+    m_accumHWheelDelta -= 120;
   }
-  while (delta > 0) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | wheelMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~wheelMask);
-    delta -= 120;
+  while (m_accumHWheelDelta <= -120) {
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelLeftMask);
+    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelLeftMask);
+    m_accumHWheelDelta += 120;
   }
 }
 

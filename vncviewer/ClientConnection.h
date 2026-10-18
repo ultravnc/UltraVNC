@@ -740,6 +740,7 @@ private:
 //	int m_FTtimer;
 
 	int oldPointerX, oldPointerY, oldButtonMask;
+	int m_accumWheelDelta, m_accumHWheelDelta;
 	
 	unsigned int kbitsPerSecond;
 	unsigned int avg_kbitsPerSecond;
