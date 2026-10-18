@@ -927,7 +927,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				sz_L13,
 				sz_L14,
 				sz_L15,
-			(wchar_t*)L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
+			L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
 		};
 		int stdidx;
 		HWND m_hwndTT;
@@ -1162,7 +1162,7 @@ void ClientConnection::CreateButtons(BOOL mini,BOOL ultra)
 				sz_L8,
 				sz_L9,
 				sz_L10,
-			(wchar_t*)L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
+			L"Type clipboard as keystrokes (Ctrl+Alt+Shift+V)",
 		};
 		int stdidx;
 		HWND m_hwndTT;
@@ -1645,6 +1645,14 @@ void ClientConnection::UpdateMenuItems()
 	CheckMenuItem(hsysmenu,
 				  ID_VIEWONLYTOGGLE,
 				  MF_BYCOMMAND | (m_opts->m_ViewOnly ? MF_CHECKED :MF_UNCHECKED));
+
+	EnableMenuItem(hsysmenu,
+				   ID_CONN_TYPECLIPBOARD,
+				   m_opts->m_ViewOnly ? MF_DISABLED : MF_ENABLED);
+
+	if (m_hwndTB)
+		SendMessage(m_hwndTB, TB_ENABLEBUTTON, (WPARAM)ID_BUTTON_TYPECLIP,
+		            MAKELONG(!m_opts->m_ViewOnly, 0));
 
 	// display menu
 	CheckMenuItem(m_hPopupMenuDisplay,
@@ -5398,6 +5406,9 @@ ClientConnection::SendKeyEvent(CARD32 key, bool down)
 void
 ClientConnection::TypeClipboardAsKeystrokes()
 {
+	if (m_opts->m_ViewOnly)
+		return;
+
 	std::wstring text;
 	if (OpenClipboard(m_hwndcn)) {
 		HANDLE h = GetClipboardData(CF_UNICODETEXT);
@@ -5433,6 +5444,8 @@ ClientConnection::TypeClipboardAsKeystrokes()
 		SendKeyEvent(m, false);
 	FlushWriteQueue(true, 5);
 
+	constexpr CARD32 kUnicodeKeysymBase = 0x01000000;
+
 	for (size_t i = 0; i < text.size(); ++i) {
 		const wchar_t c = text[i];
 		CARD32 keysym;
@@ -5446,10 +5459,24 @@ ClientConnection::TypeClipboardAsKeystrokes()
 			keysym = XK_Tab;
 		} else if (c < 0x20 || c == 0x7F) {
 			continue;  // other control characters have no key to press
-		} else if (c >= 0xD800 && c <= 0xDFFF) {
-			continue;  // beyond the BMP: the server's Unicode path is 16-bit
 		} else {
-			keysym = 0x01000000 | (CARD32)c;
+			CARD32 codePoint = static_cast<CARD32>(c);
+			if (c >= 0xD800 && c <= 0xDBFF) {
+				// High surrogate: decode the UTF-16 pair into the real code point.
+				if (i + 1 >= text.size())
+					continue;
+				const wchar_t low = text[i + 1];
+				if (low < 0xDC00 || low > 0xDFFF)
+					continue;
+				codePoint = 0x10000 +
+				            ((static_cast<CARD32>(c) - 0xD800) << 10) +
+				            (static_cast<CARD32>(low) - 0xDC00);
+				++i;
+			} else if (c >= 0xDC00 && c <= 0xDFFF) {
+				// Lone low surrogate: nothing to press.
+				continue;
+			}
+			keysym = kUnicodeKeysymBase | codePoint;
 		}
 		SendKeyEvent(keysym, true);
 		SendKeyEvent(keysym, false);
