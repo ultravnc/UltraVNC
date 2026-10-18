@@ -6280,6 +6280,7 @@ int FileTransfer::DoFTConfirmDialog(LPWSTR szTitle, LPWSTR szComment)
 	extern HINSTANCE m_hInstResDLL;
 	wcscpy_s(m_szFTConfirmTitle, szTitle);
 	wcscpy_s(m_szFTConfirmComment, szComment);
+	m_nConfirmAnswer = CONFIRM_NO;
 	return DialogBoxParam(m_hInstResDLL, DIALOG_MAKEINTRESOURCE(IDD_FTCONFIRM_DLG), hWnd, (DLGPROC) FTConfirmDlgProc, (LONG_PTR) this);
 }
 
