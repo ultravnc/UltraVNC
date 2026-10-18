@@ -84,6 +84,10 @@ AccelKeys::AccelKeys()
 	AccelTable[i].key =0x4E;
 	AccelTable[i++].cmd = ID_NEWCONN;
 
+	AccelTable[i].fVirt = FVIRTKEY | FCONTROL | FALT | FNOINVERT | FSHIFT;
+	AccelTable[i].key = 0x56; // V: type the clipboard as keystrokes
+	AccelTable[i++].cmd = ID_CONN_TYPECLIPBOARD;
+
 	m_hAccelTable = CreateAcceleratorTable((LPACCEL)AccelTable, i);
 }
 
