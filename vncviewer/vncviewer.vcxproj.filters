@@ -215,6 +215,9 @@
     <ClInclude Include="..\rfb\dh.h">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="..\rfb\HighResolutionWheel.h">
+      <Filter>header</Filter>
+    </ClInclude>
     <ClInclude Include="directx\directxviewer.h">
       <Filter>header</Filter>
     </ClInclude>
@@ -297,6 +300,9 @@
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="FpsCounter.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="WheelInput.h">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="keysym.h">

@@ -2387,12 +2387,14 @@
     <ClInclude Include="..\common\Clipboard.h" />
     <ClInclude Include="Daemon.h" />
     <ClInclude Include="..\rfb\dh.h" />
+    <ClInclude Include="..\rfb\HighResolutionWheel.h" />
     <ClInclude Include="..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="directx\directxviewer.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FileTransfer.h" />
     <ClInclude Include="FpsCounter.h" />
+    <ClInclude Include="WheelInput.h" />
     <ClInclude Include="FullScreenTitleBar.h" />
     <ClInclude Include="FullScreenTitleBarConst.h" />
     <ClInclude Include="KeyMap.h" />

@@ -484,6 +484,7 @@ protected:
 	bool			m_ForceCursorShape;
 	bool			m_unicode;
 	bool			m_supportsUnicodeTextChat;
+	bool			m_supportsHighResolutionWheel;
 	bool			m_supportsChatFileTransfer;
 	int				m_capability;
 	vncClientId		m_id;

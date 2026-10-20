@@ -67,6 +67,7 @@ extern "C" {
 using namespace helper;
 
 #include "UltraVNCHelperFunctions.h"
+#include "rfb/HighResolutionWheel.h"
 extern HINSTANCE m_hInstResDLL;
 
 // [v1.0.2-jp1 fix]
@@ -74,9 +75,9 @@ extern HINSTANCE m_hInstResDLL;
 
 #define INITIALNETBUFSIZE 4096
 #ifdef _XZ
-#define MAX_ENCODINGS (LASTENCODING+67)
+#define MAX_ENCODINGS (LASTENCODING+68)
 #else
-#define MAX_ENCODINGS (LASTENCODING+52)
+#define MAX_ENCODINGS (LASTENCODING+53)
 #endif
 #define VWR_WND_CLASS_NAME _T("VNCviewer")
 #define VWR_WND_CLASS_NAME_VIEWER _T("VNCviewerwindow")
@@ -425,6 +426,8 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_LastSentTick = 0;
 	m_bKillThread = false;
 	m_running = false;
+	m_wheelGeneration = 0;
+	m_wheelConnectionActive = false;
 	m_pendingFormatChange = false;
 
 	// sf@2002 - v1.1.2 - Data Stream Modification Plugin handling
@@ -470,7 +473,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_emulatingMiddleButton = false;
 
     oldPointerX = oldPointerY = oldButtonMask = 0;
-	m_accumWheelDelta = m_accumHWheelDelta = 0;
 
 	// Create a buffer for various network operations
 	CheckBufferSize(INITIALNETBUFSIZE);
@@ -768,6 +770,7 @@ void ClientConnection::Run()
 // sf@2007 - Autoreconnect
 void ClientConnection::DoConnection(bool reconnect)
 {
+	ResetWheelInput();
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_pDSMPlugin->IsEnabled())
 	{
@@ -817,6 +820,11 @@ void ClientConnection::DoConnection(bool reconnect)
 	SetupPixelFormat();
 
     SetFormatAndEncodings();
+
+	{
+		omni_mutex_lock lock(m_wheelMutex);
+		m_wheelConnectionActive = true;
+	}
 
 	reconnectcounter=m_reconnectcounter;
 
@@ -4604,6 +4612,7 @@ void ClientConnection::SetFormatAndEncodings()
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingpseudoSession);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingMonitorInfo);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingUnicodeTextChat);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingHighResolutionWheel);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingChatFileTransfer);
 
 	// adzm - 2010-07 - Extended clipboard
@@ -4721,6 +4730,7 @@ void ClientConnection::Createdib()
 // Close the socket, kill the thread.
 void ClientConnection::KillThread()
 {
+	ResetWheelInput();
 	m_bKillThread = true;
 	m_running = false;
 
@@ -4741,6 +4751,7 @@ void ClientConnection::KillThread()
 // We also need to cleanup some parts, especially those dealing with data streams
 void ClientConnection::SuspendThread()
 {
+	ResetWheelInput();
 	m_bKillThread = true;
 	m_running = false;
 
@@ -5195,40 +5206,65 @@ inline void ClientConnection::SubProcessPointerEvent(int x, int y, DWORD keyflag
 	}
 }
 
-//
-// RealVNC 335 method
-//
-inline void ClientConnection::ProcessMouseWheel(int delta)
+// Wheel state changes and sends are serialized with reconnect/reset. A server
+// acknowledgment is posted to the UI thread, which also processes input.
+void ClientConnection::ResetWheelInput()
 {
-  m_accumWheelDelta += delta;
-  while (m_accumWheelDelta >= 120) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelUpMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelUpMask);
-    m_accumWheelDelta -= 120;
-  }
-  while (m_accumWheelDelta <= -120) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelDownMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelDownMask);
-    m_accumWheelDelta += 120;
-  }
+	omni_mutex_lock lock(m_wheelMutex);
+	++m_wheelGeneration;
+	m_wheelConnectionActive = false;
+	m_wheelInput.Reset();
 }
 
-//
-// UltraVNC horizontal wheel method
-//
-inline void ClientConnection::ProcessMouseWheelHorizontal(int delta)
+bool ClientConnection::WheelInputAllowed() const
 {
-  m_accumHWheelDelta += delta;
-  while (m_accumHWheelDelta >= 120) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelRightMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelRightMask);
-    m_accumHWheelDelta -= 120;
-  }
-  while (m_accumHWheelDelta <= -120) {
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | rfbWheelLeftMask);
-    SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~rfbWheelLeftMask);
-    m_accumHWheelDelta += 120;
-  }
+	return m_wheelConnectionActive && m_running && !m_opts->m_ViewOnly && !m_remote_mouse_disable &&
+		!(m_pFileTransfer->m_fFileTransferRunning &&
+			(m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) &&
+		!(m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible);
+}
+
+void ClientConnection::SetWheelSupport(WPARAM generation, bool enabled)
+{
+	omni_mutex_lock lock(m_wheelMutex);
+	if (!m_wheelConnectionActive || generation != m_wheelGeneration) return;
+	m_wheelInput.SetPrecise(enabled);
+	if (enabled && m_wheelInput.HasPending() && WheelInputAllowed()) {
+		FlushThrottledMouseMove();
+		m_wheelInput.FlushPending([this](bool precise, unsigned axis, int delta) {
+			SendWheelEvent(precise, axis, delta);
+		});
+		FlushWriteQueue(true, 5);
+	}
+}
+
+void ClientConnection::ProcessMouseWheel(unsigned axis, int delta)
+{
+	omni_mutex_lock lock(m_wheelMutex);
+	if (!delta || !WheelInputAllowed()) return;
+	// Put a previously throttled move before the wheel, using its scaled position.
+	FlushThrottledMouseMove();
+	m_wheelInput.Process(axis, delta, [this](bool precise, unsigned axis, int delta) {
+		SendWheelEvent(precise, axis, delta);
+	});
+}
+
+void ClientConnection::SendWheelEvent(bool precise, unsigned axis, int delta)
+{
+	if (precise) {
+		// A cached position can lie beyond an edge after a framebuffer resize.
+		int x = maximum(0, minimum(oldPointerX, (int)m_si.framebufferWidth - 1));
+		int y = maximum(0, minimum(oldPointerY, (int)m_si.framebufferHeight - 1));
+		rfbHighResolutionWheelMsg msg = MakeHighResolutionWheel(axis, delta, x, y);
+		WriteExactQueue_timeout((char*)&msg, sz_rfbHighResolutionWheelMsg,
+			rfbHighResolutionWheel, 5);
+	} else {
+		int mask = axis == rfbWheelVertical ?
+			(delta > 0 ? rfbWheelUpMask : rfbWheelDownMask) :
+			(delta > 0 ? rfbWheelRightMask : rfbWheelLeftMask);
+		SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask | mask);
+		SendPointerEvent(oldPointerX, oldPointerY, oldButtonMask & ~mask);
+	}
 }
 
 //
@@ -5742,6 +5778,13 @@ void* ClientConnection::run_undetached(void* arg) {
 		{
 			while (!m_bKillThread)
 			{
+				// Snapshot before reading: a disconnect during ReadExact must not
+				// relabel an old acknowledgment with the next connection's generation.
+				ULONG_PTR wheelGeneration = 0;
+				{
+					omni_mutex_lock lock(m_wheelMutex);
+					if (m_wheelConnectionActive) wheelGeneration = m_wheelGeneration;
+				}
 				// sf@2002 - DSM Plugin
 				if (!m_fUsePlugin)
 				{
@@ -5857,7 +5900,7 @@ void* ClientConnection::run_undetached(void* arg) {
 
                 case rfbServerState:
                 {
-                    ReadServerState();
+                    ReadServerState(wheelGeneration);
                     ::PostMessage(m_hwndMain, RebuildToolbarMessage, 0, 0);
                 }
                     break;
@@ -6998,7 +7041,7 @@ void ClientConnection::ReadMonitorInfo()
 	nbrMonitors = mi.nbr;
 }
 
-void ClientConnection::ReadServerState()
+void ClientConnection::ReadServerState(ULONG_PTR wheelGeneration)
 {
     rfbServerStateMsg ss;
     memset(&ss, 0, sizeof ss);
@@ -7045,6 +7088,14 @@ void ClientConnection::ReadServerState()
 			m_idle_timer = 0;
 		}
 		break;
+
+	case rfbHighResolutionWheelState:
+	{
+		omni_mutex_lock lock(m_wheelMutex);
+		PostMessage(m_hwndcn, WM_HIGHRESOLUTIONWHEEL, wheelGeneration,
+			value == rfbServerState_Enabled);
+		break;
+	}
 
 	case rfbUnicodeTextChatState:
 		m_supportsUnicodeTextChat = (value == rfbServerState_Enabled);
@@ -9384,7 +9435,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					// RealVNC 335 method
 				case WM_MOUSEWHEEL:
 					if (!_this->m_opts->m_ViewOnly) {
-						_this->ProcessMouseWheel((SHORT)HIWORD(wParam));
+						_this->ProcessMouseWheel(rfbWheelVertical, GET_WHEEL_DELTA_WPARAM(wParam));
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 					}
@@ -9393,7 +9444,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 				// UltraVNC horizontal wheel
 			case WM_MOUSEHWHEEL:
 				if (!_this->m_opts->m_ViewOnly) {
-					_this->ProcessMouseWheelHorizontal((SHORT)HIWORD(wParam));
+					_this->ProcessMouseWheel(rfbWheelHorizontal, GET_WHEEL_DELTA_WPARAM(wParam));
 					//adzm 2010-09
 					_this->FlushWriteQueue(true, 5);
 				}
@@ -9734,6 +9785,10 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 			case WM_UPDATEREMOTECLIPBOARD:
 				_this->UpdateRemoteClipboard(wParam);
+				return 0;
+
+			case WM_HIGHRESOLUTIONWHEEL:
+				_this->SetWheelSupport(wParam, lParam != 0);
 				return 0;
 
 			case WM_NOTIFYPLUGINSTREAMING:

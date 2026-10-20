@@ -105,6 +105,7 @@
     <ClInclude Include="..\..\common\win32_helpers.h" />
     <ClInclude Include="..\..\common\ZipUnzip\MiniZipNG.h" />
     <ClInclude Include="..\..\rfb\dh.h" />
+    <ClInclude Include="..\..\rfb\HighResolutionWheel.h" />
     <ClInclude Include="..\..\DSMPlugin\DSMPlugin.h" />
     <ClInclude Include="HelperFunctions.h" />
     <ClInclude Include="HideDesktop.h" />

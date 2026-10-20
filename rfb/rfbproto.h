@@ -447,6 +447,8 @@ typedef struct {
 
 #define rfbRequestSession 20
 #define rfbSetSession 21
+// Provisional assignment; see the HighResolutionWheel message below.
+#define rfbHighResolutionWheel 22
 #define rfbSetDesktopSize 251
 #define rfbMonitorInfo 252
 #define rfbSetMonitor 254
@@ -506,6 +508,7 @@ typedef struct {
 #define rfbEncodingMonitorInfo              0xFFFF8005
 #define rfbEncodingUnicodeTextChat          0xFFFF8006
 #define rfbEncodingChatFileTransfer         0xFFFF8007
+#define rfbEncodingHighResolutionWheel      0xFFFF8008
 
 // Same encoder number as in tight 
 /*
@@ -1322,6 +1325,7 @@ typedef struct {
 #define rfbKeepAliveInterval        2
 #define rfbIdleInputTimeout				3
 #define rfbUnicodeTextChatState     4
+#define rfbHighResolutionWheelState  5
 
 typedef struct {
     CARD8   type;          /* always rfbServerState */
@@ -1551,6 +1555,69 @@ typedef struct {
 
 #define sz_rfbPointerEventMsg 6
 
+/*-----------------------------------------------------------------------------
+ * HighResolutionWheel - client-to-server high-resolution wheel input.
+ *
+ * Negotiation:
+ * The viewer advertises rfbEncodingServerState and
+ * rfbEncodingHighResolutionWheel in SetEncodings. A supporting server waits
+ * until it has read the entire list, then sends rfbServerState with state
+ * rfbHighResolutionWheelState and value rfbServerState_Enabled. Encoding order
+ * does not matter. The viewer MUST NOT send this message before receiving the
+ * enabled acknowledgment. A missing acknowledgment or any other value selects
+ * legacy PointerEvent wheel buttons. No protocol-version change is needed.
+ *
+ * Support is per connection and remains valid until disconnect, even if a
+ * later SetEncodings list omits the capability (queued input remains valid).
+ * Negotiation does not grant permission to inject remote mouse input.
+ *
+ * Until acknowledgment, the viewer accumulates signed units per axis and
+ * emits a press/release pair for each complete +/-120 units, retaining signed
+ * remainders. On enabling this extension, pending remainders are sent once,
+ * ordered by when each axis acquired a remainder, before subsequent input.
+ * Input restrictions still apply; blocked remainders wait for the next
+ * permitted wheel event. Disconnect/reconnect clears remainders and support.
+ * Accumulated remainders cannot reconstruct the original fractional event
+ * interleaving; subsequent precise events are sent separately in input order.
+ *
+ * Wire format (exactly 8 bytes, all multi-byte fields big-endian):
+ *   Offset  Size  Field
+ *      0      1   type: rfbHighResolutionWheel (22)
+ *      1      1   axis: 0 vertical, 1 horizontal
+ *      2      2   delta: signed two's-complement 16-bit Windows wheel units
+ *      4      2   x: framebuffer X coordinate, as in PointerEvent
+ *      6      2   y: framebuffer Y coordinate, as in PointerEvent
+ * For example, horizontal -15 at (0x1234, 0xabcd): 16 01 ff f1 12 34 ab cd.
+ * CARD16 delta stores signed wire bits for byte swapping. All signed 16-bit
+ * deltas are valid; zero is a no-op. Coordinates must be inside the framebuffer.
+ * Invalid axes/coordinates or unnegotiated messages close the connection after
+ * consuming the fixed message. Truncation closes it without injecting input.
+ *
+ * 120 units represent one traditional wheel detent. Positive vertical deltas
+ * scroll up; positive horizontal deltas scroll right. The server passes the
+ * original signed delta to SendInput using MOUSEEVENTF_WHEEL or
+ * MOUSEEVENTF_HWHEEL, without multiplication, quantization or button changes.
+ * Coordinates use the viewer's cached scaled pointer position and the server's
+ * existing PointerEvent coordinate conversion and input permission checks.
+ * Pending pointer movement precedes wheel output on the existing input queue,
+ * including DSM transports. Windows/application policies can still make visible
+ * scrolling differ from local scrolling; no smoothing or acceleration is added.
+ *
+ * Provisional assignments: message 22, encoding 0xFFFF8008 (-32760), state 5.
+ * State 5 is internal to UltraVNC's ServerState extension.
+ */
+#define rfbWheelVertical 0
+#define rfbWheelHorizontal 1
+typedef struct {
+    CARD8 type;                  /* always rfbHighResolutionWheel */
+    CARD8 axis;                  /* rfbWheelVertical or rfbWheelHorizontal */
+    CARD16 delta;                /* signed two's-complement wheel units */
+    CARD16 x;                    /* framebuffer coordinates, as PointerEvent */
+    CARD16 y;
+} rfbHighResolutionWheelMsg;
+
+#define sz_rfbHighResolutionWheelMsg 8
+
 
 
 /*-----------------------------------------------------------------------------
@@ -1645,6 +1712,7 @@ typedef union {
     rfbFramebufferUpdateRequestMsg fur;
     rfbKeyEventMsg ke;
     rfbPointerEventMsg pe;
+    rfbHighResolutionWheelMsg wheel;
     rfbClientCutTextMsg cct;
 	rfbSetScaleMsg ssc;
 	rfbPalmVNCSetScaleFactorMsg pssf;
