@@ -5804,13 +5804,14 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker& update)
 		m_nScale = m_encodemgr.m_buffer->GetScale();
 		rfbExtDesktopSizeMsg edsHdr{};
 		rfbExtDesktopScreen eds{};
+		bool sizeUpdateSent = false;
 
 		if (m_use_ExtDesktopSize && m_firstExtDesktop) {
 			HDESK desktop = GetThreadDesktop(GetCurrentThreadId());
 			DWORD dummy;
 			char new_name[256]{};
 			if (GetUserObjectInformation(desktop, UOI_NAME, &new_name, 256, &dummy) &&
-				strcmp(new_name, "Default") == 0 && desktopSelector::InputDesktopSelected() != 2) {
+				strcmp(new_name, "Default") == 0) {
 				//Send ExtDesktopSize pseudo - rectangle to inform the client we support size changes through setDesktopSize
 				hdr.encoding = Swap32IfLE(rfbEncodingExtDesktopSize);
 				hdr.r.w = Swap16IfLE(m_encodemgr.m_buffer->m_desktop->m_scrinfo.framebufferWidth * m_nScale_viewer / m_nScale);
@@ -5836,6 +5837,7 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker& update)
 				m_socket->SendExact((char*)&eds, sizeof(eds));
 				m_use_ExtDesktopSize = false;
 				m_firstExtDesktop = false;
+				sizeUpdateSent = true;
 			}
 		}
 		else if (m_use_NewSWSize) {
@@ -5865,9 +5867,19 @@ vncClient::SendUpdate(rfb::SimpleUpdateTracker& update)
 				SendRFBMsgQueue(rfbFramebufferUpdate, (BYTE*)&header, sz_rfbFramebufferUpdateMsg);
 				m_socket->SendExact((char*)&hdr, sizeof(hdr));
 			}
+			sizeUpdateSent = true;
 		}
-		m_NewSWUpdateWaiting = false;
-		return TRUE;
+		if (sizeUpdateSent) {
+			m_NewSWUpdateWaiting = false;
+			return TRUE;
+		}
+		// The size-change rectangle could not be sent because the thread is not
+		// on the Default desktop (e.g. attached to a secure desktop). Keep the
+		// ExtendedDesktopSize update pending so it is retried once the Default
+		// desktop is back, and fall through so the queued image update is
+		// still sent.
+		if (!(m_use_ExtDesktopSize && m_firstExtDesktop))
+			m_NewSWUpdateWaiting = false;
 	}
 
 	// Find out how many rectangles in total will be updated
