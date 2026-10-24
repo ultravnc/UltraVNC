@@ -448,7 +448,9 @@ typedef struct {
 #define rfbRequestSession 20
 #define rfbSetSession 21
 // Provisional assignment; see the HighResolutionWheel message below.
-#define rfbHighResolutionWheel 22
+// 100 sits in the largest unused client-to-server range (81-126), away from
+// both low-numbered legacy types and the 248-255 extension allocation front.
+#define rfbHighResolutionWheel 100
 #define rfbSetDesktopSize 251
 #define rfbMonitorInfo 252
 #define rfbSetMonitor 254
@@ -1582,12 +1584,12 @@ typedef struct {
  *
  * Wire format (exactly 8 bytes, all multi-byte fields big-endian):
  *   Offset  Size  Field
- *      0      1   type: rfbHighResolutionWheel (22)
+ *      0      1   type: rfbHighResolutionWheel (100)
  *      1      1   axis: 0 vertical, 1 horizontal
  *      2      2   delta: signed two's-complement 16-bit Windows wheel units
  *      4      2   x: framebuffer X coordinate, as in PointerEvent
  *      6      2   y: framebuffer Y coordinate, as in PointerEvent
- * For example, horizontal -15 at (0x1234, 0xabcd): 16 01 ff f1 12 34 ab cd.
+ * For example, horizontal -15 at (0x1234, 0xabcd): 64 01 ff f1 12 34 ab cd.
  * CARD16 delta stores signed wire bits for byte swapping. All signed 16-bit
  * deltas are valid; zero is a no-op. Coordinates must be inside the framebuffer.
  * Invalid axes/coordinates or unnegotiated messages close the connection after
@@ -1603,7 +1605,7 @@ typedef struct {
  * including DSM transports. Windows/application policies can still make visible
  * scrolling differ from local scrolling; no smoothing or acceleration is added.
  *
- * Provisional assignments: message 22, encoding 0xFFFF8008 (-32760), state 5.
+ * Provisional assignments: message 100, encoding 0xFFFF8008 (-32760), state 5.
  * State 5 is internal to UltraVNC's ServerState extension.
  */
 #define rfbWheelVertical 0
