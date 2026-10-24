@@ -58,6 +58,7 @@ extern "C"
 #include <memory>
 #include "./directx/directxviewer.h"
 #include "FpsCounter.h"
+#include "WheelInput.h"
 #include "shellscalingapi.h"
 
 #ifdef _Gii
@@ -285,8 +286,15 @@ private:
 	//adzm 2010-09 - Now returns false if not processed
 	bool ProcessPointerEvent(int x, int y, DWORD keyflags, UINT msg);
  	void SubProcessPointerEvent(int x, int y, DWORD keyflags);
-	void ProcessMouseWheel(int delta); // RealVNC 335 method
-	void ProcessMouseWheelHorizontal(int delta); // UltraVNC horizontal wheel
+	void ProcessMouseWheel(unsigned axis, int delta);
+	bool WheelInputAllowed() const;
+	void SendWheelEvent(bool precise, unsigned axis, int delta);
+	void SetWheelSupport(WPARAM generation, bool enabled);
+	void ResetWheelInput();
+	omni_mutex m_wheelMutex;
+	WheelInput m_wheelInput;
+	ULONG_PTR m_wheelGeneration;
+	bool m_wheelConnectionActive; // Protected by m_wheelMutex.
 	void SendPointerEvent(int x, int y, int buttonMask);
     void ProcessKeyEvent(int virtkey, DWORD keyData);
 	//adzm 2010-09 - Ensure the mouse is moved to the last known spot
@@ -515,7 +523,7 @@ private:
 	int EncodingStatusWindow,OldEncodingStatusWindow;
 
     // 21 March 2008 jdp
-    void ReadServerState();
+    void ReadServerState(ULONG_PTR wheelGeneration);
 	// Utilities
 	void ReadMonitorInfo();
 
@@ -740,7 +748,6 @@ private:
 //	int m_FTtimer;
 
 	int oldPointerX, oldPointerY, oldButtonMask;
-	int m_accumWheelDelta, m_accumHWheelDelta;
 	
 	unsigned int kbitsPerSecond;
 	unsigned int avg_kbitsPerSecond;

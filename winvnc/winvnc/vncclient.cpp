@@ -53,6 +53,7 @@
 #include "vncmenu.h"
 
 #include "rfb/dh.h"
+#include "rfb/HighResolutionWheel.h"
 #include "vncauth.h"
 
 #include <sodium.h> // For X25519 key exchange (MS-Logon III)
@@ -2869,6 +2870,8 @@ vncClientThread::run(void* arg)
 			{
 				int x;
 				BOOL encoding_set = FALSE;
+				bool highResolutionWheelRequested = false;
+				bool serverStateRequested = false;
 #ifdef _Gii
 				BOOL gii_set = FALSE;
 #endif
@@ -2917,6 +2920,11 @@ vncClientThread::run(void* arg)
 					if (Swap32IfLE(encoding) == rfbEncodingQueueEnable) {
 						m_client->m_encodemgr.AvailableQueueEnabled(TRUE);
 						vnclog.Print(LL_INTINFO, VNCLOG("XOR protocol extension enabled\n"));
+						continue;
+					}
+
+					if (Swap32IfLE(encoding) == rfbEncodingHighResolutionWheel) {
+						highResolutionWheelRequested = true;
 						continue;
 					}
 
@@ -3010,6 +3018,7 @@ vncClientThread::run(void* arg)
 					}
 					// 21 March 2008 jdp - client wants server state updates
 					if (Swap32IfLE(encoding) == rfbEncodingServerState) {
+						serverStateRequested = true;
 						m_client->m_wants_ServerStateUpdates = true;
 						settings->EnableServerStateUpdates(true);
 						vnclog.Print(LL_INTINFO, VNCLOG("ServerState protocol extension enabled\n"));
@@ -3109,6 +3118,12 @@ vncClientThread::run(void* arg)
 
 						m_client->cl_connected = FALSE;
 					}
+				}
+
+				// Acknowledge only after reading the entire list, regardless of order.
+				if (m_client->cl_connected && highResolutionWheelRequested && serverStateRequested) {
+					m_client->m_supportsHighResolutionWheel = true;
+					m_client->SendServerStateUpdate(rfbHighResolutionWheelState, rfbServerState_Enabled);
 				}
 
 				if (!m_client->m_use_PointerPos) {					
@@ -3597,10 +3612,34 @@ vncClientThread::run(void* arg)
 			m_client->TriggerUpdate();
 			break;
 
+		case rfbHighResolutionWheel:
 		case rfbPointerEvent:
-			// Read the rest of the message:
-			if (m_socket->ReadExact(((char*)&msg) + nTO, sz_rfbPointerEventMsg - nTO))
+		{
+			const bool preciseWheel = msg.type == rfbHighResolutionWheel;
+			const int size = preciseWheel ? sz_rfbHighResolutionWheelMsg : sz_rfbPointerEventMsg;
+			unsigned wheelAxis = rfbWheelVertical;
+			int wheelDelta = 0;
+			// Use the same DSM-aware type offset as the legacy pointer path.
+			if (m_socket->ReadExact(((char*)&msg) + nTO, size - nTO))
 			{
+				if (preciseWheel) {
+					unsigned x, y;
+					rfb::Rect bounds = m_client->m_encodemgr.m_buffer->GetViewerSize();
+					if (!m_client->m_supportsHighResolutionWheel ||
+						!DecodeHighResolutionWheel(msg.wheel, bounds.width(), bounds.height(),
+							wheelAxis, wheelDelta, x, y)) {
+						vnclog.Print(LL_CONNERR, VNCLOG("Invalid or unnegotiated high-resolution wheel message\n"));
+						m_client->cl_connected = FALSE;
+						break;
+					}
+					if (!wheelDelta) break;
+					// Reuse pointer permissions, collaboration, scaling and injection below.
+					// Wheel input does not change the state of any mouse button.
+					msg.pe.type = rfbPointerEvent;
+					msg.pe.buttonMask = m_client->m_ptrevent.buttonMask;
+					msg.pe.x = Swap16IfLE(x);
+					msg.pe.y = Swap16IfLE(y);
+				}
 				if (PreConnect) break;
 				if (m_client->m_pointerenabled)
 				{
@@ -3669,9 +3708,13 @@ vncClientThread::run(void* arg)
 						}
 					}
 
-					// Treat buttons 4 and 5 presses as mouse wheel events
+					// Preserve precise deltas; legacy wheel buttons represent full detents.
 					DWORD wheel_movement = 0;
-					if (m_client->m_encodemgr.IsMouseWheelTight())
+					if (preciseWheel) {
+						flags |= wheelAxis == rfbWheelVertical ? MOUSEEVENTF_WHEEL : MOUSEEVENTF_HWHEEL;
+						wheel_movement = (DWORD)wheelDelta;
+					}
+					else if (m_client->m_encodemgr.IsMouseWheelTight())
 					{
 						if ((msg.pe.buttonMask & rfbButton4Mask) != 0 &&
 							(m_client->m_ptrevent.buttonMask & rfbButton4Mask) == 0)
@@ -3732,12 +3775,23 @@ vncClientThread::run(void* arg)
 						unsigned long x = ((msg.pe.x + (m_client->monitor_Offsetx)) * 65535) / (screenX - 1);
 						unsigned long y = ((msg.pe.y + (m_client->monitor_Offsety)) * 65535) / (screenY - 1);
 						// Do the pointer event
-						::mouse_event(flags, (DWORD)x, (DWORD)y, wheel_movement, m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0);
+						if (preciseWheel) {
+							INPUT evt{};
+							evt.type = INPUT_MOUSE;
+							evt.mi.dx = x;
+							evt.mi.dy = y;
+							evt.mi.dwFlags = flags;
+							evt.mi.mouseData = wheel_movement;
+							evt.mi.dwExtraInfo = m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0;
+							::SendInput(1, &evt, sizeof(evt));
+						}
+						else
+							::mouse_event(flags, (DWORD)x, (DWORD)y, wheel_movement, m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0);
 						//							vnclog.Print(LL_INTINFO, VNCLOG("########mouse_event :%i %i \n"),x,y);
 					}
 					else
 					{//second or spanned
-						if (m_client->Sendinput.isValid())
+						if (m_client->Sendinput.isValid() || preciseWheel)
 						{
 							INPUT evt{};
 							evt.type = INPUT_MOUSE;
@@ -3756,7 +3810,10 @@ vncClientThread::run(void* arg)
 							evt.mi.dwExtraInfo = m_server->SendExtraMouse() ? DWEXTRA_VNC_REMOTE : 0;
 							evt.mi.mouseData = wheel_movement;
 							evt.mi.time = 0;
-							(*m_client->Sendinput)(1, &evt, sizeof(evt));
+							if (m_client->Sendinput.isValid())
+								(*m_client->Sendinput)(1, &evt, sizeof(evt));
+							else
+								::SendInput(1, &evt, sizeof(evt));
 						}
 						else
 						{
@@ -3793,7 +3850,11 @@ vncClientThread::run(void* arg)
 					m_client->TriggerUpdate();
 				}
 			}
+			else if (preciseWheel) {
+				m_client->cl_connected = FALSE;
+			}
 			break;
+		}
 
 		case rfbClientCutText:
 			// Read the rest of the message:
@@ -5187,6 +5248,7 @@ vncClient::vncClient() : m_clipboard(ClipboardSettings::defaultServerCaps), Send
 	m_session_supported = false;
 	m_fFileSessionOpen = false;
 	m_supportsUnicodeTextChat = false;
+	m_supportsHighResolutionWheel = false;
 	m_supportsChatFileTransfer = false;
 	m_pBuff = 0;
 	m_pCompBuff = 0;
