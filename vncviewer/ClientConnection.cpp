@@ -6918,7 +6918,9 @@ void ClientConnection::ReadServerCutText()
 
 	if (len < 0 && m_clipboard.settings.m_bSupportsEx) {
 		vnclog.Print(6, _T("Read remote extended clipboard change\n"));
-		len = abs(len);
+		if (len < -ExtendedClipboardDataMessage::maxPayload || len > -sz_rfbExtendedClipboardData)
+			throw WarningException(L"Invalid Extended Clipboard length");
+		len = -len;
 		if (len > 104857600 || len < 0) {
 			// Restore encoder buffer state before early return
 			m_fReadFromNetRectBuf = saved_fReadFromNetRectBuf;
@@ -6931,6 +6933,8 @@ void ClientConnection::ReadServerCutText()
 		extendedClipboardDataMessage.EnsureBufferLength(len, false);
 
 		ReadExact((char*)extendedClipboardDataMessage.GetBuffer(), len);
+		if (!extendedClipboardDataMessage.SetReceivedLength(len))
+			throw WarningException(L"Invalid Extended Clipboard message");
 
 		DWORD action = extendedClipboardDataMessage.GetFlags() & clipActionMask;
 
@@ -6943,7 +6947,9 @@ void ClientConnection::ReadServerCutText()
 			case clipCaps:
 				{
 					omni_mutex_lock l(m_clipMutex);
-					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, true);
+					m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
+					m_clipboard.m_hasExtendedCRC = false;
+					m_clipboard.ResetTransferState();
 
 					//adzm 2010-09
 					//UpdateRemoteClipboardCaps();
@@ -6960,8 +6966,7 @@ void ClientConnection::ReadServerCutText()
 
 							if (newClipboard.Restore(m_hwndcn, extendedClipboardDataMessage)) {
 								vnclog.Print(6, _T("Successfuly restored new clipboard data\n"));
-								m_clipboard.m_crc = newClipboard.m_crc;
-								m_clipboard.m_notifiedRemoteFormats = 0;
+								m_clipboard.AcceptRemoteData(newClipboard);
 							} else {
 								vnclog.Print(6, _T("Failed to set new clipboard data\n"));
 							}
@@ -6971,8 +6976,13 @@ void ClientConnection::ReadServerCutText()
 				break;
 			case clipNotify:
 				{
-					omni_mutex_lock l(m_clipMutex);
-					m_clipboard.m_notifiedRemoteFormats = (extendedClipboardDataMessage.GetFlags() & clipFormatMask);
+					CARD32 formats = extendedClipboardDataMessage.GetFlags() & clipFormatMask;
+					{
+						omni_mutex_lock l(m_clipMutex);
+						m_clipboard.m_notifiedRemoteFormats = formats;
+						m_clipboard.m_requestedRemoteFormats = 0;
+					}
+					RequestRemoteClipboard(formats, true);
 				}
 				break;
 			case clipRequest:
@@ -6980,14 +6990,14 @@ void ClientConnection::ReadServerCutText()
 					ClipboardData clipboardData;
 
 					// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
-					if (clipboardData.Load(NULL)) {
-						omni_mutex_lock l(m_clipMutex);
-						m_clipboard.UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
+					if (clipboardData.Load(NULL, true)) {
 						PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARD, extendedClipboardDataMessage.GetFlags(), NULL);						
 					}
 				}
 				break;
-			case clipPeek:		// irrelevant coming from server
+			case clipPeek:		// respond with the currently available formats
+				PostMessage(m_hwndcn, WM_UPDATEREMOTECLIPBOARD, clipPeek, NULL);
+				break;
 			default:
 				// unsupported or not implemented
 				break;
@@ -9005,9 +9015,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						// implemented.
 						_this->m_clipboard.settings.m_nLimitText =
 							_this->m_clipboard.settings.m_nLimitText == 0 ?
-								(_this->m_clipboard.settings.m_nRequestedLimitText == 0 ?
-									ClipboardSettings::defaultLimit
-								: _this->m_clipboard.settings.m_nRequestedLimitText)
+								ClipboardSettings::defaultLimitText
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -9015,9 +9023,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_CLIPBOARD_RTF:
 						_this->m_clipboard.settings.m_nLimitRTF =
 							_this->m_clipboard.settings.m_nLimitRTF == 0 ?
-								(_this->m_clipboard.settings.m_nRequestedLimitRTF == 0 ?
-									ClipboardSettings::defaultLimit
-								: _this->m_clipboard.settings.m_nRequestedLimitRTF)
+								ClipboardSettings::defaultLimitRTF
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP
@@ -9025,9 +9031,7 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 					case ID_CLIPBOARD_HTML:
 						_this->m_clipboard.settings.m_nLimitHTML =
 							_this->m_clipboard.settings.m_nLimitHTML == 0 ?
-								(_this->m_clipboard.settings.m_nRequestedLimitHTML == 0 ?
-									ClipboardSettings::defaultLimit
-								: _this->m_clipboard.settings.m_nRequestedLimitHTML)
+								ClipboardSettings::defaultLimitHTML
 							: 0;
 						_this->UpdateRemoteClipboardCaps(true);
 						//_this->UpdateMenuItems(); // Handled in WM_INITMENUPOPUP

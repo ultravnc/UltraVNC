@@ -195,7 +195,7 @@ public:
 	// Clipboard manipulation
 	void SetClipText(LPSTR text);
 	// adzm - 2010-07 - Extended clipboard
-	void SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage);
+	bool SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, ClipboardData& data);
 
 	// Method to obtain the DIBsection buffer if fast blits are enabled
 	// If they're disabled, it'll return NULL

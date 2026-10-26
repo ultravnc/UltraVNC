@@ -1069,7 +1069,10 @@ void
 vncServer::UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient)
 {
 	ClipboardData clipboardData;
-	if (clipboardData.Load(hwndOwner)) {
+	ClipboardData extendedData;
+	bool loaded = clipboardData.Load(hwndOwner);
+	bool extendedLoaded = extendedData.Load(hwndOwner, true);
+	if (loaded || extendedLoaded) {
 		vncClientList::iterator i;
 		omni_mutex_lock l(m_clientsLock, 48);
 		// Post this update to all the connected clients
@@ -1077,7 +1080,12 @@ vncServer::UpdateClipTextEx(HWND hwndOwner, vncClient* excludeClient)
 			// Post the update
 			vncClient* client = GetClient(*i);
 			if (client != excludeClient) {
-				client->UpdateClipTextEx(clipboardData);
+				if (client->SupportsExtendedClipboard()) {
+					if (extendedLoaded)
+						client->UpdateClipTextEx(extendedData);
+				} else if (loaded) {
+					client->UpdateClipTextEx(clipboardData);
+				}
 			}
 		}
 	}
@@ -1132,9 +1140,17 @@ vncServer::UpdateLocalClipText(LPSTR text)
 void
 vncServer::UpdateLocalClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, vncClient* sourceClient)
 {
-	omni_mutex_lock l(m_desktopLock, 53);
-	if (m_desktop != NULL)
-		m_desktop->SetClipTextEx(extendedClipboardDataMessage);
+	ClipboardData data;
+	bool restored;
+	{
+		omni_mutex_lock l(m_desktopLock, 53);
+		restored = m_desktop != NULL && m_desktop->SetClipTextEx(extendedClipboardDataMessage, data);
+	}
+	if (restored) {
+		if (sourceClient)
+			sourceClient->AcceptClipboardData(data);
+		UpdateClipTextEx(NULL, sourceClient);
+	}
 }
 
 // Name and port number handling

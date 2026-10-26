@@ -77,10 +77,13 @@ void ClientConnection::UpdateRemoteClipboard(CARD32 overrideFlags)
 	omni_mutex_lock l(m_clipMutex);
 	
 	if (m_clipboard.settings.m_bSupportsEx) {
+		if (m_opts->m_DisableClipboard || m_opts->m_ViewOnly || !m_running ||
+			(m_pFileTransfer && (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)))
+			return;
 		ClipboardData newClipboard;
 
-		if (newClipboard.Load(NULL)) {
-			if (newClipboard.m_crc == m_clipboard.m_crc && overrideFlags == 0) {
+		if (newClipboard.Load(NULL, true)) {
+			if (m_clipboard.m_hasExtendedCRC && newClipboard.ExtendedCRC() == m_clipboard.m_extendedCRC && overrideFlags == 0) {
 				vnclog.Print(6, _T("Ignoring extended SendClientCutText due to identical data\n"));
 				return;
 			}
@@ -203,14 +206,19 @@ void ClientConnection::UpdateRemoteClipboardCaps(bool bSavePreferences)
 	WriteExact((char*)(extendedClipboardDataMessage.GetData()), extendedClipboardDataMessage.GetDataLength());
 }
 
-void ClientConnection::RequestRemoteClipboard()
+void ClientConnection::RequestRemoteClipboard(CARD32 formats, bool automatic)
 {
-	if (!m_clipboard.settings.m_bSupportsEx) return;
-
+	omni_mutex_lock l(m_clipMutex);
+	if (!m_clipboard.settings.m_bSupportsEx || m_opts->m_DisableClipboard || m_opts->m_ViewOnly || !m_running ||
+		(m_pFileTransfer && (m_pFileTransfer->m_fFileTransferRunning || m_pFileTransfer->m_fFileUploadRunning || m_pFileTransfer->m_fFileDownloadRunning)))
+		return;
+	formats = m_clipboard.RequestFormats(formats, automatic);
+	if (!formats)
+		return;
 	ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 	int actualLen = extendedClipboardDataMessage.GetDataLength();
-	extendedClipboardDataMessage.AddFlag(clipRequest | clipText | clipRTF | clipHTML | clipDIB);
+	extendedClipboardDataMessage.AddFlag(clipRequest | formats);
 
 	rfbClientCutTextMsg message;
 	memset(&message, 0, sizeof(rfbClientCutTextMsg));

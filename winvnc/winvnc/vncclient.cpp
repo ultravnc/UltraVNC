@@ -3866,9 +3866,11 @@ vncClientThread::run(void* arg)
 				if (length > 104857600) // 100 MBytes max
 					break;
 				if (length < 0 && m_client->m_clipboard.settings.m_bSupportsEx) {
-					length = abs(length);
-					if (length > 104857600 || length < 0)
+					if (length < -ExtendedClipboardDataMessage::maxPayload || length > -sz_rfbExtendedClipboardData) {
+						m_client->cl_connected = FALSE;
 						break;
+					}
+					length = -length;
 					ExtendedClipboardDataMessage extendedClipboardDataMessage;
 
 					extendedClipboardDataMessage.EnsureBufferLength(length, false);
@@ -3878,6 +3880,10 @@ vncClientThread::run(void* arg)
 						break;
 					}
 
+					if (!extendedClipboardDataMessage.SetReceivedLength(length)) {
+						m_client->cl_connected = FALSE;
+						break;
+					}
 					DWORD action = extendedClipboardDataMessage.GetFlags() & clipActionMask;
 
 					// clipCaps may be combined with other actions
@@ -3887,7 +3893,12 @@ vncClientThread::run(void* arg)
 
 					switch (action) {
 					case clipCaps:
-						m_client->m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage, true);
+						{
+							omni_mutex_lock l(m_client->GetUpdateLock(), 82);
+							m_client->m_clipboard.settings.HandleCapsPacket(extendedClipboardDataMessage);
+							m_client->m_clipboard.m_hasExtendedCRC = false;
+							m_client->m_clipboard.ResetTransferState();
+						}
 						break;
 					case clipProvide:
 						m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
@@ -3898,12 +3909,31 @@ vncClientThread::run(void* arg)
 						ClipboardData clipboardData;
 
 						// only need an owner window when setting clipboard data -- by using NULL we can rely on fewer locks
-						if (clipboardData.Load(NULL)) {
+						if (!m_client->m_fFileSessionOpen && !m_server->IsThereFileTransBusy() && clipboardData.Load(NULL, true)) {
 							m_client->UpdateClipTextEx(clipboardData, extendedClipboardDataMessage.GetFlags());
 						}
 					}
 					break;
-					case clipNotify:	// irrelevant coming from viewer
+					case clipNotify:	// request formats permitted by local automatic-transfer policy
+						{
+							if (m_client->m_fFileSessionOpen || m_server->IsThereFileTransBusy())
+								break;
+							omni_mutex_lock l(m_client->GetUpdateLock(), 82);
+							m_client->m_clipboard.m_notifiedRemoteFormats = extendedClipboardDataMessage.GetFlags() & clipFormatMask;
+							m_client->m_clipboard.m_requestedRemoteFormats = 0;
+							CARD32 formats = m_client->m_clipboard.RequestFormats(m_client->m_clipboard.m_notifiedRemoteFormats, false);
+							if (formats) {
+								ExtendedClipboardDataMessage request;
+								request.AddFlag(clipRequest | formats);
+								rfbServerCutTextMsg header = {};
+								header.type = rfbServerCutText;
+								header.length = Swap32IfLE(-request.GetDataLength());
+								if (!m_client->SendRFBMsgQueue(rfbServerCutText, (BYTE*)&header, sizeof(header)) ||
+									!m_socket->SendExact((char*)request.GetData(), request.GetDataLength()))
+									m_client->cl_connected = FALSE;
+							}
+						}
+						break;
 					default:
 						// unsupported or not implemented
 						break;
@@ -5611,6 +5641,12 @@ vncClient::UpdateClipText(const char* text)
 	TriggerUpdateThread();
 }
 */
+
+void vncClient::AcceptClipboardData(const ClipboardData& data)
+{
+	omni_mutex_lock l(GetUpdateLock(), 95);
+	m_clipboard.AcceptRemoteData(data);
+}
 
 // adzm - 2010-07 - Extended clipboard
 void

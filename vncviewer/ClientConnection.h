@@ -441,7 +441,7 @@ private:
 	// adzm - 2010-07 - Extended clipboard
 	void UpdateRemoteClipboard(CARD32 overrideFlags = 0);
 	void UpdateRemoteClipboardCaps(bool bSavePreferences = false);
-	void RequestRemoteClipboard();
+	void RequestRemoteClipboard(CARD32 formats = clipText | clipRTF | clipHTML | clipDIB, bool automatic = false);
 	void UpdateLocalClipboard(char *buf, int len);
 	void SendClientCutText(char *str, int len);
 	void ReadServerCutText();

@@ -51,6 +51,10 @@ struct ExtendedClipboardDataMessage {
 	CARD32 ReadInt();
 
 	void EnsureBufferLength(int len, bool bGrowBeyond = true);
+	bool SetReceivedLength(int len);
+	int GetRemainingLength();
+	bool IsValid();
+	static const int maxPayload = 100 * 1024 * 1024;
 
 	int CountFormats();
 	CARD32 GetFlags();
@@ -58,6 +62,7 @@ struct ExtendedClipboardDataMessage {
 protected:
 
 	int m_nInternalLength;
+	int m_nReceivedLength;
 	BYTE* m_pCurrentPos;
 	BYTE* m_pData;
 };
@@ -90,10 +95,10 @@ struct ClipboardSettings {
 	int m_nLimitHTML;
 	int m_nLimitDIB;
 
-	int m_nRequestedLimitText;
-	int m_nRequestedLimitRTF;
-	int m_nRequestedLimitHTML;
-	int m_nRequestedLimitDIB;
+	CARD32 m_nRequestedLimitText;
+	CARD32 m_nRequestedLimitRTF;
+	CARD32 m_nRequestedLimitHTML;
+	CARD32 m_nRequestedLimitDIB;
 
 	CARD32 m_myCaps;
 
@@ -101,7 +106,8 @@ struct ClipboardSettings {
 
 	void PrepareCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage);
 
-	void HandleCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage, bool bSetLimits);
+	bool HandleCapsPacket(ExtendedClipboardDataMessage& extendedDataMessage);
+	CARD32 AutomaticFormats() const;
 };
 
 struct ClipboardHolder {
@@ -131,7 +137,10 @@ struct ClipboardData {
 
 	void FreeData();
 
-	bool Load(HWND hwndOwner); // will return false on failure
+	bool Load(HWND hwndOwner, bool allowEmpty = false); // will return false on failure
+	CARD32 Formats() const;
+	DWORD ExtendedCRC() const;
+	bool Decode(ExtendedClipboardDataMessage& message);
 
 	bool Restore(HWND hwndOwner, ExtendedClipboardDataMessage& extendedClipboardDataMessage);
 };
@@ -140,6 +149,14 @@ struct Clipboard {
 	Clipboard(CARD32 caps);
 
 	bool UpdateClipTextEx(ClipboardData& clipboardData, CARD32 overrideFlags = 0); // returns true if something changed
+
+	bool UpdateExtended(ClipboardData& data, CARD32 overrideFlags);
+	void AcceptRemoteData(const ClipboardData& data);
+	void ResetTransferState();
+	CARD32 RequestFormats(CARD32 formats, bool automatic);
+	CARD32 m_requestedRemoteFormats;
+	DWORD m_extendedCRC;
+	bool m_hasExtendedCRC;
 
 	ClipboardSettings settings;
 	DWORD m_crc;

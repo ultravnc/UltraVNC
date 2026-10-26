@@ -2029,22 +2029,14 @@ void vncDesktop::SetClipText(LPSTR rfbStr)
 }
 
 // adzm - 2010-07 - Extended clipboard
-void vncDesktop::SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage)
+bool vncDesktop::SetClipTextEx(ExtendedClipboardDataMessage& extendedClipboardDataMessage, ClipboardData& data)
 {
-	bool bRestored = false;
-	{
-		ClipboardData newClipboard;
-
-		if (newClipboard.Restore(Window(), extendedClipboardDataMessage)) {
-			vnclog.Print(LL_INTINFO, VNCLOG("Set extended clipboard data\n"));
-
-			bRestored = true;
-			newClipboard.FreeData();
-		}
-		else {
-			vnclog.Print(LL_INTWARN, VNCLOG("Failed to set extended clipboard data\n"));
-		}
-	}
+	bool restored = data.Restore(Window(), extendedClipboardDataMessage);
+	if (restored)
+		vnclog.Print(LL_INTINFO, VNCLOG("Set extended clipboard data\n"));
+	else
+		vnclog.Print(LL_INTWARN, VNCLOG("Failed to set extended clipboard data\n"));
+	return restored;
 }
 
 // INTERNAL METHODS
