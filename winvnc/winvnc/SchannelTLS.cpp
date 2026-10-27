@@ -18,6 +18,11 @@ extern VNCLog vnclog;
 // IO_BUFFER_SIZE for raw token exchange during handshake
 static const DWORD IO_BUFFER_SIZE = 32768;
 
+// OpenSSL 3 (security level 2) and GnuTLS reject certificates with RSA keys
+// below 2048 bits during verification. Older builds created 1024-bit keys.
+static const DWORD MinCertKeyBits = 2048;
+static const DWORD NewCertKeyBits = 3072;
+
 // -----------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------
@@ -88,6 +93,12 @@ static PCCERT_CONTEXT FindCertInStore(HCERTSTORE hStore, const BYTE* sha1, DWORD
                                       0, CERT_FIND_SHA1_HASH, &blob, nullptr);
 }
 
+static DWORD CertKeyBits(PCCERT_CONTEXT ctx)
+{
+    return CertGetPublicKeyLength(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+                                  &ctx->pCertInfo->SubjectPublicKeyInfo);
+}
+
 bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
 {
     if (!thumbprint || strlen(thumbprint) != 40)
@@ -133,6 +144,16 @@ bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
                 return false;
             }
 
+            const DWORD keyBits = CertKeyBits(m_certCtx);
+            if (keyBits < MinCertKeyBits)
+            {
+                vnclog.Print(LL_CONNERR, VNCLOG("TLS: certificate key too weak (%lu bits, need %lu)\n"),
+                             keyBits, MinCertKeyBits);
+                CertFreeCertificateContext(m_certCtx);
+                m_certCtx = nullptr;
+                return false;
+            }
+
             // Verify private key accessible
             HCRYPTPROV_OR_NCRYPT_KEY_HANDLE hKey = 0;
             DWORD keySpec = 0;
@@ -163,8 +184,11 @@ bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
     return false;
 }
 
-bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint)
+bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint, DWORD keyBits)
 {
+    if (keyBits != 2048 && keyBits != 3072 && keyBits != 4096)
+        keyBits = NewCertKeyBits;
+
     // Use legacy defaults when callers pass nullptr.
     const char* subjectA = subjectName ? subjectName : "CN=UltraVNC-WebViewer";
     const char* containerA = containerName ? containerName : "UltraVNC-WebViewer";
@@ -224,7 +248,8 @@ bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* cont
         {
             FILETIME ftNow;
             GetSystemTimeAsFileTime(&ftNow);
-            if (CompareFileTime(&cur->pCertInfo->NotAfter, &ftNow) > 0)
+            if (CompareFileTime(&cur->pCertInfo->NotAfter, &ftNow) > 0 &&
+                CertKeyBits(cur) >= MinCertKeyBits)
             {
                 existing = CertDuplicateCertificateContext(cur);
                 CertFreeCertificateContext(cur);
@@ -261,23 +286,52 @@ bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* cont
         end = start;
         end.wYear += 2;
 
+        // Create the RSA key explicitly: letting CertCreateSelfSignCertificate
+        // generate it uses the provider default, which is 1024 bits for the
+        // legacy Schannel CSP. A separate key name keeps old 1024-bit
+        // containers (still referenced by old certificates) untouched.
+        const std::wstring keyName = containerW + L"-RSA" + std::to_wstring(keyBits);
+        const DWORD machineFlag = useMachineKeyset ? NCRYPT_MACHINE_KEY_FLAG : 0;
+        NCRYPT_PROV_HANDLE hProv = 0;
+        NCRYPT_KEY_HANDLE hKey = 0;
+        SECURITY_STATUS st = NCryptOpenStorageProvider(&hProv, MS_KEY_STORAGE_PROVIDER, 0);
+        if (st == ERROR_SUCCESS)
+            st = NCryptCreatePersistedKey(hProv, &hKey, NCRYPT_RSA_ALGORITHM, keyName.c_str(),
+                                          AT_KEYEXCHANGE, NCRYPT_OVERWRITE_KEY_FLAG | machineFlag);
+        if (st == ERROR_SUCCESS)
+            st = NCryptSetProperty(hKey, NCRYPT_LENGTH_PROPERTY, (PBYTE)&keyBits, sizeof(keyBits), 0);
+        if (st == ERROR_SUCCESS)
+            st = NCryptFinalizeKey(hKey, 0);
+        if (st != ERROR_SUCCESS)
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("TLS: RSA key generation failed: %s\n"), HrStr(st).c_str());
+            if (hKey) NCryptFreeObject(hKey);
+            if (hProv) NCryptFreeObject(hProv);
+            CertCloseStore(hStore, 0);
+            return false;
+        }
+
         CRYPT_KEY_PROV_INFO keyProvInfo = {};
-        keyProvInfo.pwszContainerName = const_cast<LPWSTR>(containerW.c_str());
-        keyProvInfo.dwProvType        = PROV_RSA_SCHANNEL;
-        keyProvInfo.dwFlags           = useMachineKeyset ? CRYPT_MACHINE_KEYSET : 0;
+        keyProvInfo.pwszContainerName = const_cast<LPWSTR>(keyName.c_str());
+        keyProvInfo.pwszProvName      = const_cast<LPWSTR>(MS_KEY_STORAGE_PROVIDER);
+        keyProvInfo.dwProvType        = 0;
+        keyProvInfo.dwFlags           = machineFlag;
         keyProvInfo.dwKeySpec         = AT_KEYEXCHANGE;
 
         CRYPT_ALGORITHM_IDENTIFIER sigAlg = {};
         sigAlg.pszObjId = const_cast<LPSTR>(szOID_RSA_SHA256RSA);
 
         PCCERT_CONTEXT newCtx = CertCreateSelfSignCertificate(
-            (HCRYPTPROV_OR_NCRYPT_KEY_HANDLE)0, &nameBlob,
+            hKey, &nameBlob,
             0, &keyProvInfo, &sigAlg,
             &start, &end, nullptr);
+        const DWORD createErr = GetLastError();
+        NCryptFreeObject(hKey);
+        NCryptFreeObject(hProv);
 
         if (!newCtx)
         {
-            vnclog.Print(LL_CONNERR, VNCLOG("TLS: self-signed cert creation failed: %lu\n"), GetLastError());
+            vnclog.Print(LL_CONNERR, VNCLOG("TLS: self-signed cert creation failed: %lu\n"), createErr);
             CertCloseStore(hStore, 0);
             return false;
         }
