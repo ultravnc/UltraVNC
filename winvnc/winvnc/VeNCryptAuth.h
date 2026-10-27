@@ -24,7 +24,7 @@
 // existing SchannelTLS wrapper. Advertised subtypes (official numbering):
 //   secTypeX509Plain (262), secTypeX509Vnc (261), secTypeTLSPlain (259),
 //   secTypeTLSNone (257), plus:
-//   secTypeX509SASL (264) / secTypeTLSSASL (263) -> QEMU-compatible SASL
+//   secTypeX509SASL (263) / secTypeTLSSASL (264) -> QEMU-compatible SASL
 //                            framing with SCRAM-SHA-256 / SCRAM-SHA-256-PLUS
 //                            (tls-server-end-point channel binding). Offered
 //                            only when the validator DLL exports sasl_lookup.

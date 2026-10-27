@@ -313,8 +313,10 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define secTypeX509None     260
 #define secTypeX509Vnc      261
 #define secTypeX509Plain    262
-#define secTypeTLSSASL      263
-#define secTypeX509SASL     264
+// SASL subtype numbers follow QEMU, gtk-vnc and libvncserver/libvncclient.
+// rfbproto.rst lists them the other way round; no implementation uses that.
+#define secTypeX509SASL     263
+#define secTypeTLSSASL      264
 #define secTypeIdent        265
 #define secTypeTLSIdent     266
 #define secTypeX509Ident    267

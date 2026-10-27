@@ -166,7 +166,7 @@ void SettingsManager::setDefaults()
 	memset(m_pref_VeNCryptTLSCertThumbprint, 0, sizeof(m_pref_VeNCryptTLSCertThumbprint));
 	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
 	// Secure default: token and SASL only. Weaker methods are explicit opt-ins.
-	strcpy_s(m_pref_VeNCryptSubtypes, "301 300 264 263");
+	strcpy_s(m_pref_VeNCryptSubtypes, "301 300 263 264");
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
