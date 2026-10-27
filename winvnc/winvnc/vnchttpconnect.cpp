@@ -685,7 +685,7 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 			if (!certOk)
 			{
 				char thumbprint[41];
-				certOk = tls->EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint);
+				certOk = tls->EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint, settings->getTLSCertKeyBits());
 				if (certOk)
 				{
 					settings->setTLSCertThumbprint(thumbprint);

@@ -435,7 +435,7 @@ bool VeNCryptAuth::PerformTLSHandshake(std::string& outFailureMessage)
     if (!certOk)
     {
         char generatedThumbprint[41] = {};
-        certOk = m_tls.EnsureSelfSignedCert("CN=UltraVNC-VeNCrypt", "UltraVNC-VeNCrypt", generatedThumbprint);
+        certOk = m_tls.EnsureSelfSignedCert("CN=UltraVNC-VeNCrypt", "UltraVNC-VeNCrypt", generatedThumbprint, settings->getTLSCertKeyBits());
         if (certOk)
         {
             settings->setVeNCryptTLSCertThumbprint(generatedThumbprint);
