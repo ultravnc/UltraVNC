@@ -27,7 +27,7 @@ extern "C" __declspec(dllexport) int __cdecl sasl_lookup(const char* user, char*
 * `sasl_lookup` returns `1` and writes the user's stored SCRAM-SHA-256 verifier
   string (`SCRAM-SHA-256$<iterations>:<salt_b64>$<StoredKey_b64>:<ServerKey_b64>`)
   to `outBuf`, or `0` if the user has no SCRAM credential. Enables VeNCrypt
-  subtypes 263/264 (`TLS-SASL`/`X509-SASL`) with SCRAM-SHA-256 and
+  subtypes 263/264 (`X509-SASL`/`TLS-SASL`) with SCRAM-SHA-256 and
   channel-bound SCRAM-SHA-256-PLUS.
 
 ## Capability negotiation
@@ -55,7 +55,7 @@ WinVNC uses the flags as follows:
   SSL/TLS tab is enabled only when this flag is set.
 * **`TV_CAP_SASL`** — the validator can return stored SCRAM-SHA-256 verifiers
   via `sasl_lookup`. When set, WinVNC advertises VeNCrypt subtypes
-  **263** (`TLS-SASL`) and **264** (`X509-SASL`) and runs the SASL exchange
+  **263** (`X509-SASL`) and **264** (`TLS-SASL`) and runs the SASL exchange
   inside the TLS tunnel. `SCRAM-SHA-256-PLUS` (with `tls-server-end-point`
   channel binding, RFC 5929) is preferred; `SCRAM-SHA-256` remains available
   for QEMU/TigerVNC clients that do not implement channel binding.

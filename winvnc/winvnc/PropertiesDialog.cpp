@@ -368,7 +368,7 @@ namespace
 		// If nothing is selected, fall back to the full default list; this keeps
 		// the UI from accidentally advertising zero subtypes.
 		if (s.empty())
-			s = "301 300 264 263";
+			s = "301 300 263 264";
 		strncpy_s(outBuf, outBufSize, s.c_str(), _TRUNCATE);
 	}
 
