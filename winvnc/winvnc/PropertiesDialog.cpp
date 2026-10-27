@@ -305,12 +305,9 @@ namespace
 	const VeNCryptSubtypeItem kVeNCryptSubtypes[] = {
 		{ 301, IDC_VENCRYPT_SUBTYPE_301 },
 		{ 300, IDC_VENCRYPT_SUBTYPE_300 },
-		{ 264, IDC_VENCRYPT_SUBTYPE_264 },
 		{ 263, IDC_VENCRYPT_SUBTYPE_263 },
 		{ 262, IDC_VENCRYPT_SUBTYPE_262 },
 		{ 261, IDC_VENCRYPT_SUBTYPE_261 },
-		{ 259, IDC_VENCRYPT_SUBTYPE_259 },
-		{ 257, IDC_VENCRYPT_SUBTYPE_257 },
 	};
 
 	void EnableVeNCryptSubtypes(HWND hwnd, BOOL enable)
@@ -382,7 +379,7 @@ namespace
 		// If nothing is selected, fall back to the full default list; this keeps
 		// the UI from accidentally advertising zero subtypes.
 		if (s.empty())
-			s = "301 300 263 264";
+			s = "301 300 263";
 		strncpy_s(outBuf, outBufSize, s.c_str(), _TRUNCATE);
 	}
 
@@ -412,7 +409,7 @@ namespace
 			{
 				if (requirePlus)
 				{
-					const BOOL saslSubtype = it.type == 263 || it.type == 264;
+					const BOOL saslSubtype = it.type == 263;
 					SendMessage(h, BM_SETCHECK, saslSubtype ? BST_CHECKED : BST_UNCHECKED, 0);
 					enable = enable && saslSubtype;
 				}
@@ -421,7 +418,7 @@ namespace
 					SendMessage(h, BM_SETCHECK, BST_UNCHECKED, 0);
 					enable = FALSE;
 				}
-				else if (!allowPlain && (it.type == 257 || it.type == 259 || it.type == 262))
+				else if (!allowPlain && it.type == 262)
 				{
 					SendMessage(h, BM_SETCHECK, BST_UNCHECKED, 0);
 					enable = FALSE;

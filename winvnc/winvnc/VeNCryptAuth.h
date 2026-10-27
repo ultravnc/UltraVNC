@@ -22,15 +22,18 @@
 //
 // Implements the VeNCrypt 0.2 security type (rfbVeNCrypt = 19) on top of the
 // existing SchannelTLS wrapper. Advertised subtypes (official numbering):
-//   secTypeX509Plain (262), secTypeX509Vnc (261), secTypeTLSPlain (259),
-//   secTypeTLSNone (257), plus:
-//   secTypeX509SASL (263) / secTypeTLSSASL (264) -> QEMU-compatible SASL
+//   secTypeX509Plain (262), secTypeX509Vnc (261), plus:
+//   secTypeX509SASL (263)  -> QEMU-compatible SASL
 //                            framing with SCRAM-SHA-256 / SCRAM-SHA-256-PLUS
 //                            (tls-server-end-point channel binding). Offered
 //                            only when the validator DLL exports sasl_lookup.
 //   secTypeTokenTLS (300) -> versioned "UVNC" payload with primary-token and
 //                            reconnect-session-token authentication methods.
 //   secTypeX509MsLogonIII (301) -> MS-Logon III authentication inside TLS.
+//
+// The anonymous-TLS subtypes (TLSNone 257, TLSVnc 258, TLSPlain 259,
+// TLSSASL 264) are not offered: standard clients use anonymous DH cipher
+// suites for them, which Schannel does not support.
 //
 // The client requests session-token issuance with a protocol flag. The server
 // always returns a versioned response after successful subtype-300 auth; the
@@ -75,7 +78,7 @@ private:
     bool PerformTLSHandshake(std::string& outFailureMessage);
     bool ReadCredentials(std::string& outUsername, std::string& outToken);
     bool ValidateToken(const char* username, const char* token, std::string& outFailureMessage);
-    // QEMU-compatible SASL exchange over the TLS channel (subtypes 263/264).
+    // QEMU-compatible SASL exchange over the TLS channel (subtype 263).
     // Runs the mechlist/step framing and SCRAM-SHA-256(-PLUS) verification,
     // then returns; the caller's rfbVncAuth result doubles as the SASL
     // SecurityResult block (same u32 + reason format QEMU uses).

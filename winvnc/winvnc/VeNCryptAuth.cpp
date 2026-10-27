@@ -90,7 +90,7 @@ namespace
     }
 
     // The validator DLL exports sasl_lookup(user, outBuf, size) when it can
-    // supply SCRAM verifiers. Its presence gates offering subtypes 263/264.
+    // supply SCRAM verifiers. Its presence gates offering subtype 263.
     SaslLookupFn GetSaslLookup()
     {
         HMODULE hModule = GetTokenValidatorDll();
@@ -103,16 +103,9 @@ namespace
     {
         switch (type)
         {
-        case secTypeTLSNone:
-        case secTypeTLSVnc:
-        case secTypeTLSPlain:
-        case secTypeX509None:
         case secTypeX509Vnc:
         case secTypeX509Plain:
-        case secTypeTLSSASL:
         case secTypeX509SASL:
-        case secTypeTLSIdent:
-        case secTypeX509Ident:
         case secTypeTokenTLS:
         case secTypeX509MsLogonIII:
             return true;
@@ -206,16 +199,9 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
     if (!PerformTLSHandshake(outFailureMessage))
         return false;
 
-    // TLSSASL/X509SASL: QEMU-compatible SASL exchange over the TLS channel.
-    if (m_chosenType == secTypeTLSSASL || m_chosenType == secTypeX509SASL)
+    // X509SASL: QEMU-compatible SASL exchange over the TLS channel.
+    if (m_chosenType == secTypeX509SASL)
         return RunSaslAuth(outFailureMessage);
-
-    // TLSNone: encryption only, no credentials (interoperability test path)
-    if (m_chosenType == secTypeTLSNone)
-    {
-        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: TLSNone subtype - skipping token auth\n"));
-        return true;
-    }
 
     // X509Vnc: TLS channel + classic VNC challenge/response
     if (m_chosenType == secTypeX509Vnc)
@@ -365,9 +351,9 @@ bool VeNCryptAuth::SendSubTypes()
     auto isAllowed = [&](uint32_t t) {
         if (!cfgEmpty && !allowed[t])
             return false;
-        if (!allowPlain && (t == secTypeTLSNone || t == secTypeTLSPlain || t == secTypeX509Plain))
+        if (!allowPlain && t == secTypeX509Plain)
             return false;
-        if (requirePlus && t != secTypeTLSSASL && t != secTypeX509SASL)
+        if (requirePlus && t != secTypeX509SASL)
             return false;
         return true;
     };
@@ -394,17 +380,8 @@ bool VeNCryptAuth::SendSubTypes()
 
     if (isAllowed(secTypeTokenTLS))
         offer(secTypeTokenTLS);
-    if (saslAvailable)
-    {
-        if (isAllowed(secTypeX509SASL))
-            offer(secTypeX509SASL);
-        if (isAllowed(secTypeTLSSASL))
-            offer(secTypeTLSSASL);
-    }
-    if (isAllowed(secTypeTLSPlain))
-        offer(secTypeTLSPlain);
-    if (isAllowed(secTypeTLSNone))
-        offer(secTypeTLSNone);
+    if (saslAvailable && isAllowed(secTypeX509SASL))
+        offer(secTypeX509SASL);
     if (isAllowed(secTypeX509Plain))
         offer(secTypeX509Plain);
     if (isAllowed(secTypeX509Vnc))
@@ -526,8 +503,8 @@ bool VeNCryptAuth::ReadCredentials(std::string& outUsername, std::string& outTok
     if (!ReadExact((char*)&tokenLenBE, sizeof(tokenLenBE)))
         return false;
     CARD32 tokenLen = Swap32IfLE(tokenLenBE);
-    // The 6-64 range is the token-subtype contract. Standard Plain subtypes
-    // (259/262) carry a regular password — a generic client (TigerVNC,
+    // The 6-64 range is the token-subtype contract. The standard Plain subtype
+    // (262) carries a regular password — a generic client (TigerVNC,
     // libvncclient) can't know about the token limit, so only a generous
     // sanity bound applies there and the validator DLL decides validity.
     const bool tokenSubtype = (m_chosenType == secTypeTokenTLS);
@@ -582,7 +559,7 @@ bool VeNCryptAuth::ValidateToken(const char* username, const char* token,
     return true;
 }
 
-// QEMU-compatible SASL server exchange for subtypes 263/264. Wire format
+// QEMU-compatible SASL server exchange for subtype 263. Wire format
 // matches qemu ui/vnc-auth-sasl.c; the SecurityResult u32 (+ reason string)
 // is emitted by the caller as the regular RFB security result.
 bool VeNCryptAuth::RunSaslAuth(std::string& outFailureMessage)

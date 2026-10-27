@@ -405,12 +405,9 @@
 #define IDC_VENCRYPT_MANAGE             1368
 #define IDC_NOVNC                       1369
 #define IDC_VENCRYPT_SUBTYPE_300        1370
-#define IDC_VENCRYPT_SUBTYPE_264        1371
 #define IDC_VENCRYPT_SUBTYPE_263        1372
 #define IDC_VENCRYPT_SUBTYPE_262        1373
 #define IDC_VENCRYPT_SUBTYPE_261        1374
-#define IDC_VENCRYPT_SUBTYPE_259        1375
-#define IDC_VENCRYPT_SUBTYPE_257        1376
 #define IDC_VENCRYPT_REQUIRE_PLUS       1377
 #define IDC_TLSINFO                     1378
 #define IDC_TLSINFO1                    1379
