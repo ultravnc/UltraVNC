@@ -83,6 +83,8 @@ public:
 	void setVeNCryptAllowLegacyAuth(BOOL v)    { m_pref_VeNCryptAllowLegacyAuth = v; };
 	BOOL getVeNCryptRequireChannelBinding()    { return m_pref_VeNCryptRequireChannelBinding; };
 	void setVeNCryptRequireChannelBinding(BOOL v) { m_pref_VeNCryptRequireChannelBinding = v; };
+	DWORD getTLSCertKeyBits() { return (m_pref_TLSCertKeyBits == 2048 || m_pref_TLSCertKeyBits == 4096) ? m_pref_TLSCertKeyBits : 3072; };
+	void setTLSCertKeyBits(DWORD v) { m_pref_TLSCertKeyBits = v; };
 	const char* getVeNCryptTLSCertThumbprint() { return m_pref_VeNCryptTLSCertThumbprint; };
 	void setVeNCryptTLSCertThumbprint(const char* v) { strncpy_s(m_pref_VeNCryptTLSCertThumbprint, v, 40); m_pref_VeNCryptTLSCertThumbprint[40] = 0; };
 	const char* getVeNCryptTokenDLLPath()      { return m_pref_VeNCryptTokenDLLPath; };
@@ -333,6 +335,7 @@ private:
 	BOOL m_pref_EnableTLS;
 	LONG m_pref_TLSPort;
 	char m_pref_TLSCertThumbprint[41];
+	DWORD m_pref_TLSCertKeyBits;
 
 	BOOL m_pref_EnableVeNCryptTLS;
 	BOOL m_pref_VeNCryptAllowPlainAuth;

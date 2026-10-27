@@ -50,7 +50,9 @@ public:
     // container in the local machine / current user MY store. Saves the
     // thumbprint to outThumbprint (41 chars). Passing nullptr for subjectName
     // or containerName uses the legacy noVNC defaults (CN=UltraVNC-WebViewer).
-    bool EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint);
+    // keyBits selects the RSA key size for a newly generated key (2048, 3072
+    // or 4096; other values fall back to 3072).
+    bool EnsureSelfSignedCert(const char* subjectName, const char* containerName, char* outThumbprint, DWORD keyBits = 3072);
 
     // Perform the server-side TLS handshake on an already-accepted socket.
     // Returns true on success, false on failure (socket should be closed).

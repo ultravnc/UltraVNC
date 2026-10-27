@@ -427,6 +427,7 @@
 #define IDC_VENCRYPT_SUBTYPE_301        1390
 #define IDD_SELECT_CERT                 1391
 #define IDC_SELECT_CERT_LIST            1392
+#define IDC_VENCRYPT_KEYBITS            1393
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772

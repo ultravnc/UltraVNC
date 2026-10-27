@@ -159,6 +159,7 @@ void SettingsManager::setDefaults()
 	m_pref_EnableTLS = FALSE;
 	m_pref_TLSPort = 6080;
 	memset(m_pref_TLSCertThumbprint, 0, sizeof(m_pref_TLSCertThumbprint));
+	m_pref_TLSCertKeyBits = 3072;
 	m_pref_EnableVeNCryptTLS = FALSE;
 	m_pref_VeNCryptAllowPlainAuth = FALSE;
 	m_pref_VeNCryptAllowLegacyAuth = FALSE;
@@ -362,6 +363,7 @@ void SettingsManager::load()
 	m_pref_EnableTLS = iniFile.ReadInt("admin", "EnableTLS", m_pref_EnableTLS);
 	m_pref_TLSPort   = iniFile.ReadInt("admin", "TLSPort",   m_pref_TLSPort);
 	iniFile.ReadString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint, sizeof(m_pref_TLSCertThumbprint));
+	m_pref_TLSCertKeyBits = iniFile.ReadInt("admin", "TLSCertKeyBits", m_pref_TLSCertKeyBits);
 	m_pref_EnableVeNCryptTLS = iniFile.ReadInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
 	m_pref_VeNCryptAllowPlainAuth = iniFile.ReadInt("admin", "VeNCryptAllowPlainAuth", m_pref_VeNCryptAllowPlainAuth);
 	m_pref_VeNCryptAllowLegacyAuth = iniFile.ReadInt("admin", "VeNCryptAllowLegacyAuth", m_pref_VeNCryptAllowLegacyAuth);
@@ -509,6 +511,7 @@ void SettingsManager::save()
 	iniFile.WriteInt("admin", "EnableTLS", m_pref_EnableTLS);
 	iniFile.WriteInt("admin", "TLSPort",   (int)m_pref_TLSPort);
 	iniFile.WriteString("admin", "TLSCertThumbprint", m_pref_TLSCertThumbprint);
+	iniFile.WriteInt("admin", "TLSCertKeyBits", (int)m_pref_TLSCertKeyBits);
 	iniFile.WriteInt("admin", "EnableVeNCryptTLS", m_pref_EnableVeNCryptTLS);
 	iniFile.WriteInt("admin", "VeNCryptAllowPlainAuth", m_pref_VeNCryptAllowPlainAuth);
 	iniFile.WriteInt("admin", "VeNCryptAllowLegacyAuth", m_pref_VeNCryptAllowLegacyAuth);

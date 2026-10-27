@@ -504,10 +504,11 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 			bool certOk = false;
 			if (m_tlsCertThumbprint[0])
 				certOk = tls.LoadCertByThumbprint(m_tlsCertThumbprint);
-			else
+			// Missing, expired or too-weak certificate: fall back to a fresh self-signed one.
+			if (!certOk)
 			{
 				char thumbprint[41];
-				certOk = tls.EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint);
+				certOk = tls.EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint, settings->getTLSCertKeyBits());
 				if (certOk)
 				{
 					settings->setTLSCertThumbprint(thumbprint);

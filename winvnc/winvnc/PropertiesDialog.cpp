@@ -173,6 +173,20 @@ static void SelectCertificateToEdit(HWND hwnd, int editId)
 		CertFreeCertificateContext(e.ctx);
 }
 
+// Key sizes offered for newly generated self-signed certificates.
+static const DWORD kSelfSignedKeyBits[] = { 2048, 3072, 4096 };
+
+static DWORD SelectedSelfSignedKeyBits(HWND hwnd)
+{
+	DWORD keyBits = settings ? settings->getTLSCertKeyBits() : 3072;
+	if (HWND hBits = GetDlgItem(hwnd, IDC_VENCRYPT_KEYBITS)) {
+		const LRESULT sel = SendMessage(hBits, CB_GETCURSEL, 0, 0);
+		if (sel >= 0 && sel < (LRESULT)(sizeof(kSelfSignedKeyBits) / sizeof(kSelfSignedKeyBits[0])))
+			keyBits = kSelfSignedKeyBits[sel];
+	}
+	return keyBits;
+}
+
 static void GenerateSelfSignedToEdit(HWND hwnd, int editId)
 {
 	const char* subject = "CN=UltraVNC-WebViewer";
@@ -216,7 +230,7 @@ static void GenerateSelfSignedToEdit(HWND hwnd, int editId)
 
 	SchannelTLS tls;
 	char thumb[41]{};
-	if (tls.EnsureSelfSignedCert(subject, container, thumb)) {
+	if (tls.EnsureSelfSignedCert(subject, container, thumb, SelectedSelfSignedKeyBits(hwnd))) {
 		SetDlgItemText(hwnd, editId, thumb);
 		EnableWindow(GetDlgItem(GetParent(hwnd), IDC_APPLY), true);
 	}
@@ -1460,6 +1474,18 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_LEGACY), BM_SETCHECK, settings->getVeNCryptAllowLegacyAuth(), 0);
 		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
 		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
+		if (HWND hBits = GetDlgItem(hwnd, IDC_VENCRYPT_KEYBITS)) {
+			SendMessage(hBits, CB_RESETCONTENT, 0, 0);
+			int sel = 1;
+			for (int i = 0; i < (int)(sizeof(kSelfSignedKeyBits) / sizeof(kSelfSignedKeyBits[0])); i++) {
+				char buf[8];
+				sprintf_s(buf, "%u", kSelfSignedKeyBits[i]);
+				SendMessageA(hBits, CB_ADDSTRING, 0, (LPARAM)buf);
+				if (kSelfSignedKeyBits[i] == settings->getTLSCertKeyBits())
+					sel = i;
+			}
+			SendMessage(hBits, CB_SETCURSEL, sel, 0);
+		}
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
@@ -2602,6 +2628,11 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 		char thumb[64]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, thumb, sizeof(thumb));
 		settings->setVeNCryptTLSCertThumbprint(thumb);
+		if (HWND hBits = GetDlgItem(hwnd, IDC_VENCRYPT_KEYBITS)) {
+			const LRESULT sel = SendMessage(hBits, CB_GETCURSEL, 0, 0);
+			if (sel >= 0 && sel < (LRESULT)(sizeof(kSelfSignedKeyBits) / sizeof(kSelfSignedKeyBits[0])))
+				settings->setTLSCertKeyBits(kSelfSignedKeyBits[sel]);
+		}
 		char dllPath[MAX_PATH]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, dllPath, sizeof(dllPath));
 		settings->setVeNCryptTokenDLLPath(dllPath);
