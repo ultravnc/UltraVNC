@@ -732,7 +732,7 @@ void ClientConnection::AuthVeNCrypt()
 		ReadExact((char *)&temp, 4);
 		{
 			temp = Swap32IfLE(temp);
-			// Prefer SASL subtypes (264 > 263 > others) so an updated viewer
+			// Prefer SASL subtypes (263 > 264 > others) so an updated viewer
 			// uses SCRAM(-PLUS) when the server offers it; servers that don't
 			// list SASL keep the previous first-supported-wins behaviour.
 			switch (temp)

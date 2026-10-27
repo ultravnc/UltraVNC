@@ -176,7 +176,7 @@ TV_CAP_MANAGEMENT_UI  0x02   the WinVNC "Manage users..." button is shown
                              and calls tv_show_management_ui()
 TV_CAP_SASL           0x04   DLL exports sasl_lookup() returning a stored
                              SCRAM-SHA-256 verifier; enables subtypes 263/264
-                             (TLS-SASL/X509-SASL) with SCRAM-SHA-256 and
+                             (X509-SASL/TLS-SASL) with SCRAM-SHA-256 and
                              channel-bound SCRAM-SHA-256-PLUS
 ```
 
