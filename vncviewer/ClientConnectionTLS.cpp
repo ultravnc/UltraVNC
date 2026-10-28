@@ -732,9 +732,11 @@ void ClientConnection::AuthVeNCrypt()
 		ReadExact((char *)&temp, 4);
 		{
 			temp = Swap32IfLE(temp);
-			// Prefer SASL subtypes (263 > 264 > others) so an updated viewer
+			// Prefer SASL subtypes (X509SASL > others) so an updated viewer
 			// uses SCRAM(-PLUS) when the server offers it; servers that don't
 			// list SASL keep the previous first-supported-wins behaviour.
+			// Anonymous TLS* subtypes (257-259, 264, 266) are not supported:
+			// Schannel cannot do anonymous TLS.
 			switch (temp)
 			{
 			case secTypeX509MsLogonIII:
@@ -744,16 +746,12 @@ void ClientConnection::AuthVeNCrypt()
 				if (subType != secTypeX509MsLogonIII)
 					subType = temp;   // strongest standard subtype: SASL over X509 TLS
 				break;
-			case secTypeTLSSASL:
-				if (subType != secTypeX509MsLogonIII && subType != secTypeX509SASL)
-					subType = temp;
-				break;
-			case rfbVncAuth:
-			case secTypePlain:
 			case secTypeX509None:
 			case secTypeX509Vnc:
 			case secTypeX509Plain:
 			case secTypeTokenTLS:
+			case rfbVncAuth:
+			case secTypePlain:
 				if (subType < 0)
 					subType = temp;
 				break;
@@ -872,13 +870,9 @@ void ClientConnection::AuthVeNCrypt()
 		// Human-readable encryption summary for the status window, e.g.
 		// "VeNCrypt X509-SASL — TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384".
 		const char* subName =
-			subType == secTypeTLSNone   ? "TLS-None"   :
-			subType == secTypeTLSVnc    ? "TLS-Vnc"    :
-			subType == secTypeTLSPlain  ? "TLS-Plain"  :
 			subType == secTypeX509None  ? "X509-None"  :
 			subType == secTypeX509Vnc   ? "X509-Vnc"   :
 			subType == secTypeX509Plain ? "X509-Plain" :
-			subType == secTypeTLSSASL   ? "TLS-SASL"   :
 			subType == secTypeX509SASL  ? "X509-SASL"  :
 			subType == secTypeTokenTLS  ? "TokenTLS"   :
 			subType == secTypeX509MsLogonIII ? "X509-MSLogonIII" : "?";
@@ -893,7 +887,6 @@ void ClientConnection::AuthVeNCrypt()
 	case secTypeX509MsLogonIII:
 		AuthMsLogonIII();
 		break;
-	case secTypeTLSSASL:
 	case secTypeX509SASL:
 		AuthSasl(endpointHash.empty() ? NULL : endpointHash.data(), endpointHash.size());
 		if (m_saslMech[0])
@@ -907,17 +900,14 @@ void ClientConnection::AuthVeNCrypt()
 			strncat_s(m_veNCryptDesc, _countof(m_veNCryptDesc), tail, _TRUNCATE);
 		}
 		break;
-	case secTypeTLSNone:
 	case secTypeX509None:
 		// do nothing
 		break;
 	case rfbVncAuth:
-	case secTypeTLSVnc:
 	case secTypeX509Vnc:
 		AuthVnc();
 		break;
 	case secTypePlain:
-	case secTypeTLSPlain:
 	case secTypeX509Plain:
 		{
 			char _tlsUser[256]={0}, _tlsPasswd[256]={0};
