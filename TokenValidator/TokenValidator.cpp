@@ -13,7 +13,7 @@
 //   1. TOTP (RFC 6238) codes from authenticator apps such as Microsoft
 //      Authenticator, Google Authenticator, etc.
 //   2. Server-issued 64-character session tokens for reconnects.
-//   3. SCRAM-SHA-256 verifiers for SASL auth (VeNCrypt subtypes 263/264).
+//   3. SCRAM-SHA-256 verifiers for SASL auth (VeNCrypt subtype 263).
 //
 // Exports:
 //   validate_token(user, token)
@@ -792,7 +792,7 @@ extern "C" __declspec(dllexport) int __cdecl issue_session_token(const char* use
     return 1;
 }
 
-// Return the stored SCRAM-SHA-256 verifier for SASL subtypes 263/264.
+// Return the stored SCRAM-SHA-256 verifier for SASL subtype 263.
 // The verifier string is key material: a stolen verifier lets an attacker
 // complete the server side but not recover the password, matching the
 // security model of PostgreSQL/pg_authid.

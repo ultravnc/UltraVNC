@@ -69,24 +69,26 @@ Server 2022 and later). On older systems the connection falls back to TLS 1.2.
 
 | Value | Name              | Inner authentication                          |
 |-------|-------------------|-----------------------------------------------|
-| 257   | secTypeTLSNone    | none — result OK immediately                  |
 | 261   | secTypeX509Vnc    | classic VNC DES challenge/response            |
-| 259   | secTypeTLSPlain   | user + pass message (5), validated by DLL     |
 | 262   | secTypeX509Plain  | user + pass message (5), validated by DLL     |
+| 263   | secTypeX509SASL   | SASL SCRAM-SHA-256(-PLUS), verifier from DLL  |
 | 300   | secTypeTokenTLS   | private versioned UltraVNC token protocol     |
+| 301   | secTypeX509MsLogonIII | private MS-Logon III inside TLS           |
 
 Subtype 300 is an UltraVNC private extension, not an assigned VeNCrypt subtype.
 It is identified by an encrypted `UVNC` marker and protocol version. Primary
 and reconnect credentials are methods inside this single subtype.
 
-The `TLS*`/`X509*` pairs behave identically in this implementation — the
-certificate is always presented and the client is expected to verify it (the
+The anonymous-TLS subtypes (257 TLSNone, 258 TLSVnc, 259 TLSPlain, 264
+TLSSASL) are not offered. Standard clients implement them with anonymous
+Diffie-Hellman cipher suites, which Schannel does not support. The server
+always presents its certificate and the client is expected to verify it (the
 UltraVNC viewer shows a warning dialog with certificate details and thumbprint
 persistence on verification failure).
 
 ## 5. Authentication request
 
-### Standard subtypes 259 and 262
+### Standard subtype 262
 
 These retain the standard VeNCrypt Plain layout:
 
@@ -114,7 +116,7 @@ Unknown major versions, methods or flag bits are rejected. A server may accept
 a lower-or-equal minor version within major version 1. Token semantics remain
 the validator DLL's responsibility.
 
-For standard Plain subtypes (259/262), credentials may be 0..1024 bytes so
+For the standard Plain subtype (262), credentials may be 0..1024 bytes so
 generic clients reach `validate_token`; the DLL decides validity.
 
 ## 6. SecurityResult and session token
@@ -175,8 +177,8 @@ TV_CAP_SESSION_TOKEN  0x01   DLL can issue and accept reconnect session tokens;
 TV_CAP_MANAGEMENT_UI  0x02   the WinVNC "Manage users..." button is shown
                              and calls tv_show_management_ui()
 TV_CAP_SASL           0x04   DLL exports sasl_lookup() returning a stored
-                             SCRAM-SHA-256 verifier; enables subtypes 263/264
-                             (X509-SASL/TLS-SASL) with SCRAM-SHA-256 and
+                             SCRAM-SHA-256 verifier; enables subtype 263
+                             (X509-SASL) with SCRAM-SHA-256 and
                              channel-bound SCRAM-SHA-256-PLUS
 ```
 
@@ -186,7 +188,7 @@ subtype-300 token auth (no session tokens, no SASL, no UI).
 ## 8. Interoperability guide
 
 * **Fastest path for a third-party client:** speak standard VeNCrypt and pick
-  subtype 259 (TLSPlain) or 262 (X509Plain). Read the spec-defined `0x01` Ack
+  subtype 262 (X509Plain). Read the spec-defined `0x01` Ack
   after sending the subtype (section 3), run TLS, then send the
   standard `userLen/passLen/user/pass` message with the token in the `pass`
   field. Everything else is textbook RFB.

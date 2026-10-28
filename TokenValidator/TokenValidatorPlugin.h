@@ -62,7 +62,7 @@ typedef int (__cdecl *TV_ISSUE_SESSION_TOKEN)(const char* user, char* outBuf, si
 // Return the stored SCRAM-SHA-256 verifier for the given user as a
 // null-terminated PostgreSQL-style string:
 //   "<iterations>:<saltB64>:<storedKeyB64>:<serverKeyB64>"
-// Used by WinVNC to run the SASL server exchange (VeNCrypt 263/264) without
+// Used by WinVNC to run the SASL server exchange (VeNCrypt 263) without
 // ever seeing the user's plaintext password. Returns 1 on success, 0 when
 // the user has no SCRAM credential.
 typedef int (__cdecl *TV_SASL_LOOKUP)(const char* user, char* outBuf, size_t outBufSize);
@@ -73,7 +73,7 @@ typedef int (__cdecl *TV_SASL_LOOKUP)(const char* user, char* outBuf, size_t out
 // Optional exports:
 //   tv_get_capabilities      - reports TV_CAP_* feature flags.
 //   issue_session_token      - needed for subtype-300 session-token reconnect.
-//   sasl_lookup              - needed for subtype-263/264 SASL (SCRAM) auth.
+//   sasl_lookup              - needed for subtype-263 SASL (SCRAM) auth.
 //   tv_has_management_ui     - advertises that tv_show_management_ui exists.
 //   tv_show_management_ui    - opens the validator-specific management dialog.
 //   tv_get_last_error        - optional diagnostic message buffer.
