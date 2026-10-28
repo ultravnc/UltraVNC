@@ -3517,7 +3517,7 @@ void ClientConnection::AuthMsLogonII()
 {
 	vnclog.Print(0, _T("SECURITY WARNING: MS-Logon II uses weak 31-bit DH - credentials vulnerable to eavesdropping\n"));
 	char gen[8], mod[8], pub[8], resp[8];
-	char user[256], passwd[64];
+	char user[256] = {0}, passwd[64] = {0};
 	unsigned char key[8];
 
 //act: clearPasswd must NOT be cleared, because of use of user command line
@@ -3746,7 +3746,7 @@ void ClientConnection::AuthMsLogonIII()
 	unsigned char shared_secret[crypto_scalarmult_BYTES];
 	
 	// Credentials buffers
-	char user[256], passwd[64];
+	char user[256] = {0}, passwd[64] = {0};
 	
 	// Generate X25519 keypair
 	if (crypto_box_keypair(client_pk, client_sk) != 0) {
