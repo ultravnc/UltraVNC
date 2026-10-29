@@ -75,6 +75,9 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 {
 	unsigned char *newbuf;
 
+	if (bufsize < 0 || bufsize > INT_MAX - 256)
+		throw ErrorException(L"Invalid zlib buffer size requested.");
+
 	if (m_zlibbufsize >= bufsize + 256) return;
 
 	omni_mutex_lock l(m_zlibBufferMutex);
@@ -100,7 +103,7 @@ void ClientConnection::CheckZlibBufferSize(int bufsize)
 void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN *prgn, bool zstd)
 {
 	UINT nNbCacheRects = pfburh->r.x;
-	UINT numRawBytes = pfburh->r.y+pfburh->r.w*65535;
+	UINT numRawBytes = (UINT)pfburh->r.y + (UINT)pfburh->r.w * 65535;
 	UINT numCompBytes;
 	rfbZlibHeader hdr;
 	// Read in the rfbZlibHeader
@@ -114,12 +117,16 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 	// Verify buffer space for cache rects list
 	CheckZipBufferSize(numRawBytes+500);
 
-	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK)
+	UINT numAvailOut = numRawBytes;
+	if (ultraVncZlib->decompress(numCompBytes, numAvailOut, (unsigned char *)m_netbuf, m_zipbuf, zstd) != Z_OK)
 		return;
+	UINT numDecompBytes = numRawBytes - numAvailOut;
 
 	BYTE* pzipbuf = m_zipbuf;
 	for (UINT ii = 0 ; ii < nNbCacheRects; ii++)
 	{
+		if (numDecompBytes < sz_rfbFramebufferUpdateRectHeader)
+			return;
 		rfbFramebufferUpdateRectHeader surh;
 		memcpy((char *) &surh,pzipbuf, sz_rfbFramebufferUpdateRectHeader);
 		surh.r.x = Swap16IfLE(surh.r.x);
@@ -128,6 +135,10 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		surh.r.h = Swap16IfLE(surh.r.h);
 		surh.encoding = Swap32IfLE(surh.encoding);
 		pzipbuf += sz_rfbFramebufferUpdateRectHeader;
+		numDecompBytes -= sz_rfbFramebufferUpdateRectHeader;
+
+		if (!Check_Rectangle_borders(surh.r.x, surh.r.y, surh.r.w, surh.r.h))
+			return;
 
 		RECT rect;
 		rect.left = surh.r.x;
@@ -139,6 +150,8 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		SaveArea(rect);
 		if ( surh.encoding==rfbEncodingRaw) {
 			UINT numpixels = surh.r.w * surh.r.h;
+			if ((unsigned __int64)numpixels * (m_myFormat.bitsPerPixel / 8) > numDecompBytes)
+				return;
 			omni_mutex_lock l(m_bitmapdcMutex);						  
 
 			// This big switch is untidy but fast
@@ -157,6 +170,7 @@ void ClientConnection::ReadQueueZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 					vnclog.Print(0, _T("Invalid number of bits per pixel: %d\n"), m_myFormat.bitsPerPixel);
 			}
 			pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
+			numDecompBytes -= numpixels*m_myFormat.bitsPerPixel/8;
 			if (!m_opts->m_Directx)InvalidateRegion(&rect,prgn);
 		}
 	}

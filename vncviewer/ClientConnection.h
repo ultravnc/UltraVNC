@@ -257,7 +257,8 @@ private:
 	void AuthSessionSelect(); // adzm 2010-10
 	void AuthMsLogonI();
 	void AuthMsLogonII();
-	void AuthMsLogonIII();  // X25519 + AES-256-GCM (secure replacement for MS-Logon II)
+	void AuthMsLogonIII();  // X25519 key exchange, credentials still DES-CBC
+	void AuthMsLogonIV();   // X25519 + XChaCha20-Poly1305 AEAD (secure replacement for MS-Logon II/III)
 	void AuthSecureVNCPlugin();
 	void AuthSecureVNCPlugin_old();
 	////////////////////////////////////////////////
@@ -429,12 +430,12 @@ private:
 	void HandleZlibHexSubencodingStream8(int x, int y, int w, int h, int subencoding);
 	void HandleZlibHexSubencodingStream16(int x, int y, int w, int h, int subencoding);
 	void HandleZlibHexSubencodingStream32(int x, int y, int w, int h, int subencoding);
-	void HandleZlibHexSubencodingBuf8(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
-	void HandleZlibHexSubencodingBuf16(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
-	void HandleZlibHexSubencodingBuf32(int x, int y, int w, int h, int subencoding, unsigned char * buffer);
+	void HandleZlibHexSubencodingBuf8(int x, int y, int w, int h, int subencoding, unsigned char * buffer, unsigned int bufLen);
+	void HandleZlibHexSubencodingBuf16(int x, int y, int w, int h, int subencoding, unsigned char * buffer, unsigned int bufLen);
+	void HandleZlibHexSubencodingBuf32(int x, int y, int w, int h, int subencoding, unsigned char * buffer, unsigned int bufLen);
 	void ReadZlibHexRect(rfbFramebufferUpdateRectHeader *pfburh, bool zstd);
 
-	bool zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd);
+	bool zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd, unsigned int *pProduced = NULL);
 
 	// ClientConnectionClipboard.cpp
 	void ProcessLocalClipboardChange();

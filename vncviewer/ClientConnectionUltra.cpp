@@ -105,6 +105,10 @@ void ClientConnection::ReadUltraZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 		 if ( surh.encoding==rfbEncodingRaw)
 			{
 				UINT numpixels = surh.r.w * surh.r.h;							  
+				m_zlibbuf_size += numpixels * m_myFormat.bitsPerPixel / 8;
+				// Security Check
+				if (m_zlibbuf_size > new_len)
+					{assert(true);return;}
 				if (m_DIBbits) ConvertAll(surh.r.w,surh.r.h,surh.r.x, surh.r.y,m_myFormat.bitsPerPixel/8,(BYTE *)pzipbuf,(BYTE *)m_DIBbits,m_si.framebufferWidth,m_si.framebufferHeight);
 				pzipbuf +=numpixels*m_myFormat.bitsPerPixel/8;
 				if (!m_opts->m_Directx)InvalidateRegion(&rect,prgn);

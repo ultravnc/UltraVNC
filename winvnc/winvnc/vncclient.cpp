@@ -1356,8 +1356,9 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 
 		if (!m_auth && m_ms_logon)
 		{
-			// Always advertise both: new viewers pick III, old viewers pick II
+			// Always advertise: newest viewers pick IV, then III, old viewers pick II
 			// When RequireMSLogonIII is set, we accept II but send error message
+			auth_types.push_back(rfbUltraVNC_MsLogonIVAuth);
 			auth_types.push_back(rfbUltraVNC_MsLogonIIIAuth);
 			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);
 			if (settings->getRequireMSLogonIII()) {
@@ -1431,6 +1432,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		auth_success = 0;
 		version_warning = 1;
 		break;
+	case rfbUltraVNC_MsLogonIVAuth:
+		auth_success = AuthMsLogonIV(auth_message);
+		vnclog.Print(LL_LOGSCREEN, "MsLogonIV success = %d", auth_success);
+		if (auth_success) {
+			auth_is_mslogon = TRUE;
+		}
+		break;
 	case rfbUltraVNC_MsLogonIIIAuth:
 		auth_success = AuthMsLogonIII(auth_message);
 		vnclog.Print(LL_LOGSCREEN, "MsLogonIII success = %d", auth_success);
@@ -1494,6 +1502,11 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 			// MS-Logon III successful - auth complete
 			auth_result = rfbVncAuthOK;
 			vnclog.Print(LL_LOGSCREEN, "MS-Logon III auth completed successfully\n");
+		}
+		else if (auth_accepted == rfbUltraVNC_MsLogonIVAuth) {
+			// MS-Logon IV successful - auth complete
+			auth_result = rfbVncAuthOK;
+			vnclog.Print(LL_LOGSCREEN, "MS-Logon IV auth completed successfully\n");
 		}
 		else if ((settings->getScPrompt() || settings->getScExit()) && !bSCPromptActive) {
 			auth_result = rfbVncAuthContinue;
@@ -1927,8 +1940,9 @@ vncClientThread::AuthMsLogon(std::string& auth_message)
 	}
 }
 
-// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
-// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+// MS-Logon III: X25519 key exchange, but credentials are still DES-CBC
+// (vncDecryptBytes) under the first 8 bytes of the derived key.
+// Prefer MS-Logon IV (XChaCha20-Poly1305 AEAD) when the viewer supports it.
 BOOL
 vncClientThread::AuthMsLogonIII(std::string& auth_message)
 {
@@ -1963,7 +1977,7 @@ vncClientThread::AuthMsLogonIII(std::string& auth_message)
 		return FALSE;
 	}
 	
-	// Derive AES-256 key from shared secret
+	// Derive key material from shared secret (only first 8 bytes are used for DES)
 	unsigned char aes_key[32];
 	crypto_hash_sha256(aes_key, shared_secret, sizeof(shared_secret));
 	
@@ -1978,14 +1992,13 @@ vncClientThread::AuthMsLogonIII(std::string& auth_message)
 	// Restore timeout
 	m_socket->SetTimeout(30000);
 	
-	// Decrypt using first 8 bytes of derived key (compatibility with existing encryption)
+	// Decrypt with DES-CBC (legacy wire format; key truncated to 8 bytes).
+	// MS-Logon IV replaces this with XChaCha20-Poly1305 AEAD.
 	unsigned char key[8];
 	memcpy(key, aes_key, 8);
 	vncDecryptBytes((unsigned char*)user, sizeof(user), key); user[255] = '\0';
 	vncDecryptBytes((unsigned char*)passwd, sizeof(passwd), key); passwd[63] = '\0';
-	
-	vnclog.Print(LL_INTINFO, "MS-Logon III: user=%s\n", user);
-	
+
 	// Verify credentials
 	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientNameAddress());
 	vnclog.Print(LL_INTINFO, "CheckUserGroupPasswordUni result=%i\n", result);
@@ -2000,6 +2013,107 @@ vncClientThread::AuthMsLogonIII(std::string& auth_message)
 	sodium_memzero(aes_key, sizeof(aes_key));
 	sodium_memzero(key, sizeof(key));
 	
+	if (result) {
+		m_client->m_client_domain_username = _strdup(user);
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+// MS-Logon IV: X25519 key exchange + XChaCha20-Poly1305 AEAD on credentials.
+// Wire format: server_pk(32) -> client_pk(32) -> user_ct(256+16) -> passwd_ct(64+16).
+// Key and per-message nonces are derived from the shared secret (same derivation
+// as the viewer), so nothing extra travels on the wire beyond ciphertexts + tags.
+BOOL
+vncClientThread::AuthMsLogonIV(std::string& auth_message)
+{
+	// X25519 key exchange
+	unsigned char server_pk[crypto_scalarmult_BYTES];
+	unsigned char server_sk[crypto_scalarmult_BYTES];
+	unsigned char client_pk[crypto_scalarmult_BYTES];
+	unsigned char shared_secret[crypto_scalarmult_BYTES];
+
+	char user[256], passwd[64];
+
+	// Generate X25519 keypair
+	if (crypto_box_keypair(server_pk, server_sk) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "Failed to generate X25519 keypair\n");
+		return FALSE;
+	}
+
+	// Send server public key
+	if (!m_socket->SendExactQueue((char*)server_pk, sizeof(server_pk))) return FALSE;
+	if (!m_socket->ClearQueue()) return FALSE;
+
+	// Give the user time to type credentials
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
+
+	// Read client public key
+	if (!m_socket->ReadExact((char*)client_pk, sizeof(client_pk))) return FALSE;
+
+	// Compute shared secret
+	if (crypto_scalarmult(shared_secret, server_sk, client_pk) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "X25519 key exchange failed\n");
+		return FALSE;
+	}
+
+	// Derive AEAD key and per-message nonces from the shared secret
+	unsigned char enc_key[crypto_aead_xchacha20poly1305_ietf_KEYBYTES];
+	unsigned char nonce_user[crypto_aead_xchacha20poly1305_ietf_NPUBBYTES];
+	unsigned char nonce_pass[crypto_aead_xchacha20poly1305_ietf_NPUBBYTES];
+	crypto_generichash(enc_key, sizeof(enc_key),
+		(const unsigned char*)"uvnc-mslogon4-key", 17, shared_secret, sizeof(shared_secret));
+	crypto_generichash(nonce_user, sizeof(nonce_user),
+		(const unsigned char*)"uvnc-mslogon4-user", 18, shared_secret, sizeof(shared_secret));
+	crypto_generichash(nonce_pass, sizeof(nonce_pass),
+		(const unsigned char*)"uvnc-mslogon4-passwd", 20, shared_secret, sizeof(shared_secret));
+
+	// Zero out secrets
+	sodium_memzero(shared_secret, sizeof(shared_secret));
+	sodium_memzero(server_sk, sizeof(server_sk));
+
+	// Read encrypted credentials (plaintext size + 16-byte Poly1305 tag)
+	unsigned char user_ct[256 + crypto_aead_xchacha20poly1305_ietf_ABYTES];
+	unsigned char passwd_ct[64 + crypto_aead_xchacha20poly1305_ietf_ABYTES];
+	if (!m_socket->ReadExact((char*)user_ct, sizeof(user_ct))) return FALSE;
+	if (!m_socket->ReadExact((char*)passwd_ct, sizeof(passwd_ct))) return FALSE;
+
+	// Restore timeout
+	m_socket->SetTimeout(30000);
+
+	// Decrypt and authenticate credentials
+	if (crypto_aead_xchacha20poly1305_ietf_decrypt((unsigned char*)user, NULL, NULL,
+		user_ct, sizeof(user_ct), NULL, 0, nonce_user, enc_key) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "MS-Logon IV: credential authentication failed (user)\n");
+		sodium_memzero(enc_key, sizeof(enc_key));
+		return FALSE;
+	}
+	if (crypto_aead_xchacha20poly1305_ietf_decrypt((unsigned char*)passwd, NULL, NULL,
+		passwd_ct, sizeof(passwd_ct), NULL, 0, nonce_pass, enc_key) != 0) {
+		vnclog.Print(LL_LOGSCREEN, "MS-Logon IV: credential authentication failed (passwd)\n");
+		sodium_memzero(enc_key, sizeof(enc_key));
+		return FALSE;
+	}
+	user[255] = '\0';
+	passwd[63] = '\0';
+
+	// Verify credentials
+	int result = CheckUserGroupPasswordUni(user, passwd, m_client->GetClientNameAddress());
+	vnclog.Print(LL_INTINFO, "CheckUserGroupPasswordUni result=%i\n", result);
+
+	if (result == 2) { // ViewOnly?
+		m_client->EnableKeyboard(false);
+		m_client->EnablePointer(false);
+		m_client->EnableGii(false);
+	}
+
+	// Cleanup
+	sodium_memzero(enc_key, sizeof(enc_key));
+	sodium_memzero(passwd, sizeof(passwd));
+
 	if (result) {
 		m_client->m_client_domain_username = _strdup(user);
 		return TRUE;
@@ -2045,7 +2159,7 @@ vncClientThread::AuthMsLogonReject(std::string& auth_message)
 	int64ToBytes(dh.createEncryptionKey(bytesToInt64(resp)), (char*)key);
 
 	// Set error message for old viewer
-	auth_message = "This server requires MS-Logon III (secure authentication). "
+	auth_message = "This server requires MS-Logon III or newer (secure authentication). "
 		"Your viewer is too old and only supports the legacy MS-Logon II. "
 		"Please upgrade your UltraVNC viewer to version 1.8.2.3 or later.";
 	

@@ -2904,7 +2904,7 @@ void ClientConnection::NegotiateProxy()
 	_tcscat_s(tmphost,_T(":"));
 	_tcscat_s(tmphost, MAX_HOST_NAME_LEN, _itow(m_port,tmphost2, 10));
 	}
-	{ char _tmpA[MAX_HOST_NAME_LEN]; WideCharToMultiByte(CP_UTF8,0,tmphost,-1,_tmpA,MAX_HOST_NAME_LEN,NULL,NULL); WriteExactProxy(_tmpA,MAX_HOST_NAME_LEN); }
+	{ char _tmpA[MAX_HOST_NAME_LEN] = {0}; WideCharToMultiByte(CP_UTF8,0,tmphost,-1,_tmpA,MAX_HOST_NAME_LEN,NULL,NULL); WriteExactProxy(_tmpA,MAX_HOST_NAME_LEN); }
 
 	vnclog.Print(0, _T("Connected to RFB server, using protocol version %d.%d\n"),
 		rfbProtocolMajorVersion, m_minorVersion);
@@ -2962,6 +2962,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbUltraVNC_SecureVNCPluginAuth_new:
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
 				case rfbUltraVNC_SessionSelect:
+				case rfbUltraVNC_MsLogonIVAuth:
 				case rfbUltraVNC_MsLogonIIIAuth:
 				case rfbUltraVNC_MsLogonIIAuth:
 				case rfbVeNCypt:
@@ -2984,6 +2985,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
 				auth_priority.push_back(rfbClientInitExtraMsgSupport);
 				auth_priority.push_back(rfbUltraVNC_SessionSelect);
+				auth_priority.push_back(rfbUltraVNC_MsLogonIVAuth);  // Prefer AEAD version
 				auth_priority.push_back(rfbUltraVNC_MsLogonIIIAuth);  // Prefer secure X25519 version
 			auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);  // Fallback to legacy 31-bit DH
 				auth_priority.push_back(rfbVeNCypt);
@@ -3122,6 +3124,14 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			vnclog.Print(0, _T("         Use RSA-AES plugin for full session encryption on untrusted networks\n"));
 		}
 		AuthMsLogonIII();
+		break;
+	case rfbUltraVNC_MsLogonIVAuth:
+		vnclog.Print(0, _T("Using secure MS-Logon IV (X25519 + XChaCha20-Poly1305)\n"));
+		if (!m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("WARNING: MS-Logon IV secures authentication, but VNC session data is UNENCRYPTED\n"));
+			vnclog.Print(0, _T("         Use RSA-AES plugin for full session encryption on untrusted networks\n"));
+		}
+		AuthMsLogonIV();
 		break;
 	case rfbUltraVNC_SecureVNCPluginAuth:
 		if (bSecureVNCPluginActive) {
@@ -3572,8 +3582,8 @@ void ClientConnection::AuthMsLogonII()
 			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 			// adzm 2010-10 - RFB3.8 - the 'MS-Logon' param woudl always be true here
 			if (ad.DoDialog(dtUserPass, m_host, m_port)) {
-				strncpy_s(passwd, 256, ad.m_passwd, 63); passwd[63]='\0';
-				strncpy_s(user, 256, ad.m_user, 254);
+				strncpy_s(passwd, _countof(passwd), ad.m_passwd, 63); passwd[63]='\0';
+				strncpy_s(user, _countof(user), ad.m_user, 254);
 				vncEncryptPasswdMs(m_encPasswdMs, passwd);
 				strcpy_s(m_ms_user, user);
 
@@ -3735,8 +3745,9 @@ void ClientConnection::AuthMsLogonI()
 	}
 }
 
-// MS-Logon III: X25519 + AES-256-GCM (replaces weak 31-bit DH from MS-Logon II)
-// This provides 128-bit security vs ~31-bit in the legacy implementation (FINDING-002)
+// MS-Logon III: X25519 key exchange, but credentials are still encrypted with
+// DES-CBC (vncEncryptBytes2) using the first 8 bytes of the derived key.
+// Prefer MS-Logon IV (XChaCha20-Poly1305 AEAD) when the server offers it.
 void ClientConnection::AuthMsLogonIII()
 {
 	// X25519 key exchange
@@ -3823,8 +3834,8 @@ void ClientConnection::AuthMsLogonIII()
 		}
 	}
 	
-	// Encrypt credentials using AES-256-CFB (compatible with both sides)
-	// For production, AES-256-GCM would be preferred for authentication
+	// Encrypt credentials with DES-CBC (legacy wire format; key truncated to 8 bytes).
+	// MS-Logon IV replaces this with XChaCha20-Poly1305 AEAD.
 	unsigned char key[8];
 	memcpy(key, aes_key, 8);  // Use first 8 bytes for compatibility with existing encryption
 	vncEncryptBytes2((unsigned char*)user, sizeof(user), key);
@@ -3836,6 +3847,120 @@ void ClientConnection::AuthMsLogonIII()
 	// Clean up
 	sodium_memzero(aes_key, sizeof(aes_key));
 	sodium_memzero(key, sizeof(key));
+}
+
+// MS-Logon IV: X25519 key exchange + XChaCha20-Poly1305 AEAD on credentials.
+// Wire format: server_pk(32) -> client_pk(32) -> user_ct(256+16) -> passwd_ct(64+16).
+// Key and per-message nonces are derived from the shared secret, so nothing
+// extra travels on the wire beyond the ciphertexts and their tags.
+void ClientConnection::AuthMsLogonIV()
+{
+	// X25519 key exchange
+	unsigned char client_pk[crypto_scalarmult_BYTES];
+	unsigned char client_sk[crypto_scalarmult_BYTES];
+	unsigned char server_pk[crypto_scalarmult_BYTES];
+	unsigned char shared_secret[crypto_scalarmult_BYTES];
+
+	// Credentials buffers
+	char user[256] = {0}, passwd[64] = {0};
+
+	// Generate X25519 keypair
+	if (crypto_box_keypair(client_pk, client_sk) != 0) {
+		throw ErrorException(L"Failed to generate X25519 keypair");
+	}
+
+	// Read server public key
+	ReadExact((char*)server_pk, sizeof(server_pk));
+
+	// Compute shared secret
+	if (crypto_scalarmult(shared_secret, client_sk, server_pk) != 0) {
+		throw ErrorException(L"X25519 key exchange failed");
+	}
+
+	// Send client public key
+	WriteExact((char*)client_pk, sizeof(client_pk));
+
+	// Derive AEAD key and per-message nonces from the shared secret
+	unsigned char enc_key[crypto_aead_xchacha20poly1305_ietf_KEYBYTES];
+	unsigned char nonce_user[crypto_aead_xchacha20poly1305_ietf_NPUBBYTES];
+	unsigned char nonce_pass[crypto_aead_xchacha20poly1305_ietf_NPUBBYTES];
+	crypto_generichash(enc_key, sizeof(enc_key),
+		(const unsigned char*)"uvnc-mslogon4-key", 17, shared_secret, sizeof(shared_secret));
+	crypto_generichash(nonce_user, sizeof(nonce_user),
+		(const unsigned char*)"uvnc-mslogon4-user", 18, shared_secret, sizeof(shared_secret));
+	crypto_generichash(nonce_pass, sizeof(nonce_pass),
+		(const unsigned char*)"uvnc-mslogon4-passwd", 20, shared_secret, sizeof(shared_secret));
+
+	// Zero out shared secret
+	sodium_memzero(shared_secret, sizeof(shared_secret));
+	sodium_memzero(client_sk, sizeof(client_sk));
+
+	// Get credentials (same flow as MS-Logon II/III)
+	if ((strlen(m_cmdlnUser) > 0) && (strlen(m_pApp->m_options.m_clearPassword) > 0) && !m_pApp->m_options.m_NoMoreCommandLineUserPassword)
+	{
+		vnclog.Print(0, _T("Command line MS-Logon IV.\n"));
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), m_pApp->m_options.m_clearPassword, _TRUNCATE);
+		strncpy_s(passwd, _countof(passwd), m_clearPasswd, _TRUNCATE);
+		strncpy_s(user, _countof(user), m_cmdlnUser, _TRUNCATE);
+		vncEncryptPasswdMs(m_encPasswdMs, passwd);
+		strcpy_s(m_ms_user, user);
+	}
+	else if (strlen((const char*)m_encPasswdMs) > 0)
+	{
+		char* pw = vncDecryptPasswdMs(m_encPasswdMs);
+		strcpy_s(passwd, pw);
+		free(pw);
+		strcpy_s(user, m_ms_user);
+	}
+	else
+	{
+		// Try Windows Credential Manager first
+		char savedDomain[256] = {0};
+		m_usedSavedVncPassword = CredentialManager::ReadMsLogonPassword(m_host, m_port, savedDomain, 256,
+			user, sizeof(user), passwd, sizeof(passwd));
+		if (m_usedSavedVncPassword)
+		{
+			vnclog.Print(0, _T("Using saved MS-Logon IV credentials from Credential Manager for %s:%d\n"), m_host, m_port);
+			vncEncryptPasswdMs(m_encPasswdMs, passwd);
+			strcpy_s(m_ms_user, user);
+		}
+		else
+		{
+			AuthDialog ad;
+			ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+			if (ad.DoDialog(dtUserPass, m_host, m_port)) {
+				strncpy_s(passwd, _countof(passwd), ad.m_passwd, 63); passwd[63] = '\0';
+				strncpy_s(user, _countof(user), ad.m_user, 254);
+				vncEncryptPasswdMs(m_encPasswdMs, passwd);
+				strcpy_s(m_ms_user, user);
+
+				if (ad.m_savePassword)
+				{
+					CredentialManager::WriteMsLogonPassword(m_host, m_port, "", user, passwd);
+					vnclog.Print(0, _T("MS-Logon IV credentials saved to Credential Manager for %s:%d\n"), m_host, m_port);
+				}
+			}
+			else {
+				QuietException_helper(sz_L54);
+			}
+		}
+	}
+
+	// Encrypt credentials with XChaCha20-Poly1305 AEAD (ciphertext + 16-byte tag)
+	unsigned char user_ct[256 + crypto_aead_xchacha20poly1305_ietf_ABYTES];
+	unsigned char passwd_ct[64 + crypto_aead_xchacha20poly1305_ietf_ABYTES];
+	crypto_aead_xchacha20poly1305_ietf_encrypt(user_ct, NULL,
+		(const unsigned char*)user, sizeof(user), NULL, 0, NULL, nonce_user, enc_key);
+	crypto_aead_xchacha20poly1305_ietf_encrypt(passwd_ct, NULL,
+		(const unsigned char*)passwd, sizeof(passwd), NULL, 0, NULL, nonce_pass, enc_key);
+
+	WriteExactQueue((char*)user_ct, sizeof(user_ct));
+	WriteExact((char*)passwd_ct, sizeof(passwd_ct));
+
+	// Clean up
+	sodium_memzero(enc_key, sizeof(enc_key));
+	sodium_memzero(user, sizeof(user));
+	sodium_memzero(passwd, sizeof(passwd));
 }
 
 void ClientConnection::AuthVnc()
@@ -10951,11 +11076,8 @@ void ClientConnection::Scrollbar_RecalculateSize(HWND hwnd)
 
 bool ClientConnection::incorrectParameters(CARD16 width, CARD16 height, CARD16 xx, CARD16 yy, int framebufferWidth, int framebufferHeight)
 {
-	return (width > framebufferWidth ||
-		xx > framebufferWidth ||
-		height > framebufferHeight ||
-		yy > framebufferHeight ||
-		((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight));
+	return ((int)xx + (int)width > framebufferWidth ||
+		(int)yy + (int)height > framebufferHeight);
 }
 
 void ClientConnection::checkParemeters()

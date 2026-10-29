@@ -84,6 +84,11 @@ void ClientConnection::ReadTightRect(rfbFramebufferUpdateRectHeader *pfburh, boo
     return;
   }
 
+  if (pfburh->r.w > sizeof(m_tightPrevRow) / (3 * sizeof(CARD16))) {
+      vnclog.Print(0, _T("Tight encoding: rectangle width %d exceeds filter limit\n"), pfburh->r.w);
+      throw WarningException(L"Invalid Tight rectangle received from server.");
+  }
+
   /*
    * Here primary compression mode handling begins.
    * Data was processed with optional filter + Zlib compression.

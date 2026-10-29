@@ -19,14 +19,17 @@
 
 #include "lzo/minilzo.h"
 
-bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd)
+bool ClientConnection::zlibDecompress(unsigned char *from_buf, unsigned char *to_buf, unsigned int count, unsigned int size, UltraVncZ * ultravncZ, bool zstd, unsigned int *pProduced)
 {
 	int inflateResult;
-	inflateResult = ultravncZ->decompress(count, size, from_buf, to_buf, zstd);
+	unsigned int avail_out = size;
+	inflateResult = ultravncZ->decompress(count, avail_out, from_buf, to_buf, zstd);
 	if ( inflateResult < 0 ) {
 		vnclog.Print(0, _T("zlib inflate error: %d\n"), inflateResult);
 		return false;
 	}
+	if (pProduced)
+		*pProduced = size - avail_out;
 
 	return true;
 }
@@ -96,8 +99,9 @@ void ClientConnection::HandleZlibHexEncoding##bpp(int rx, int ry, int rw, int rh
                 nCompData = Swap16IfLE(nCompData);								\
 				CheckBufferSize(nCompData);										\
                 ReadExact(m_netbuf, nCompData);									\
-		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)+20), ultraVncZEncoded, zstd)) {  \
-                    HandleZlibHexSubencodingBuf##bpp(x, y, w, h, subencoding, m_zlibbuf);							\
+				unsigned int nDecompBytes = 0;									\
+		        if (zlibDecompress((unsigned char *)m_netbuf, m_zlibbuf, nCompData, ((w*h+2)*(bpp/8)+20), ultraVncZEncoded, zstd, &nDecompBytes)) {  \
+                    HandleZlibHexSubencodingBuf##bpp(x, y, w, h, subencoding, m_zlibbuf, nDecompBytes);			\
 				}																\
                 continue;														\
             }																	\
@@ -139,6 +143,9 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 																				\
 	if (subencoding & rfbHextileSubrectsColoured) {								\
 																				\
+		if (getBufferSize() < (UINT)(nSubrects * (2 + (bpp / 8))))				\
+			CheckBufferSize(nSubrects * (2 + (bpp / 8)));						\
+		ptr = (CARD8 *)m_netbuf;												\
 		ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8)));						\
 																				\
 		for (i = 0; i < (int)nSubrects; i++) {								\
@@ -152,6 +159,9 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 		}																		\
 																				\
 	} else {																	\
+		if (getBufferSize() < (UINT)(nSubrects * 2))							\
+			CheckBufferSize(nSubrects * 2);										\
+		ptr = (CARD8 *)m_netbuf;												\
 		ReadExact(m_netbuf, nSubrects * 2);										\
 																				\
 		for (i = 0; i < (int)nSubrects; i++) {								\
@@ -165,16 +175,18 @@ void ClientConnection::HandleZlibHexSubencodingStream##bpp(int x, int y, int w, 
 }																				\
 																				\
 																				\
-void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int h, int subencoding, unsigned char *buffer)		\
+void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int h, int subencoding, unsigned char *buffer, unsigned int bufLen)		\
 {																				\
 	CARD##bpp bg, fg;															\
 	int i;																			\
 	CARD8 *ptr;																	\
 	int sx, sy, sw, sh;															\
 	CARD8 nSubrects;															\
-	int bufIndex = 0;															\
+	unsigned int bufIndex = 0;													\
 																				\
 	if (subencoding & rfbHextileBackgroundSpecified) {							\
+		if (bufLen - bufIndex < (unsigned int)(bpp/8))							\
+			return;																\
 		bg = *((CARD##bpp *)(buffer + bufIndex));								\
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&bg, (bpp/8)); */									\
@@ -183,6 +195,8 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 	FillSolidRect_ultra(x,y,w,h, m_myFormat.bitsPerPixel,(BYTE*)pbgcolor);\
 																				\
 	if (subencoding & rfbHextileForegroundSpecified)  {							\
+		if (bufLen - bufIndex < (unsigned int)(bpp/8))							\
+			return;																\
 		fg = *((CARD##bpp *)(buffer + bufIndex));								\
 		bufIndex += (bpp/8);													\
 		/* ReadExact((char *)&fg, (bpp/8)); */									\
@@ -193,6 +207,8 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 		return;																	\
 	}																			\
 																				\
+	if (bufLen - bufIndex < 1u)													\
+		return;																	\
 	nSubrects = *((CARD8 *)(buffer + bufIndex));									\
 	bufIndex += 1;																\
 	/* ReadExact( (char *)&nSubrects, 1); */									\
@@ -202,6 +218,8 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 	if (subencoding & rfbHextileSubrectsColoured) {								\
 																				\
 		/* ReadExact( m_netbuf, nSubrects * (2 + (bpp / 8))); */				\
+		if (bufLen - bufIndex < (unsigned int)nSubrects * (2 + (bpp / 8)))		\
+			return;																\
 																				\
 		for (i = 0; i < (int)nSubrects; i++) {								\
 			memcpy(pfgcolor,ptr,bpp/8);											\
@@ -215,6 +233,8 @@ void ClientConnection::HandleZlibHexSubencodingBuf##bpp(int x, int y, int w, int
 																				\
 	} else {																	\
 		/* ReadExact(m_netbuf, nSubrects * 2); */								\
+		if (bufLen - bufIndex < (unsigned int)nSubrects * 2)					\
+			return;																\
 																				\
 		for (i = 0; i < (int)nSubrects; i++) {								\
 			sx = *ptr >> 4;														\

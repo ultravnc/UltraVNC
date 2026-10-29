@@ -667,7 +667,8 @@ public:
 	BOOL AuthSecureVNCPlugin(std::string& auth_message); // must SetHandshakeComplete after sending auth result!
 	BOOL AuthSecureVNCPlugin_old(std::string& auth_message);
 	BOOL AuthMsLogon(std::string& auth_message);
-	BOOL AuthMsLogonIII(std::string& auth_message);  // X25519 + AES-256-GCM
+	BOOL AuthMsLogonIII(std::string& auth_message);  // X25519 key exchange, DES-CBC credentials
+	BOOL AuthMsLogonIV(std::string& auth_message);   // X25519 + XChaCha20-Poly1305 AEAD credentials
 	BOOL AuthMsLogonReject(std::string& auth_message);  // Reject old viewers with upgrade message
 	BOOL AuthVnc(std::string& auth_message);
 	BOOL AuthSCPrompt(std::string& auth_message); // adzm 2010-10

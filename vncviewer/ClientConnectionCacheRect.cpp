@@ -41,6 +41,7 @@ void ClientConnection::SaveArea(RECT &r)
 	int y = r.top;
 	int w = r.right - r.left;
 	int h = r.bottom - r.top;
+	if (!Check_Rectangle_borders(x, y, w, h)) return;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 	if (m_DIBbitsCache && m_DIBbits) 
@@ -53,7 +54,7 @@ void ClientConnection::RestoreArea(RECT &r)
 	int y = r.top;
 	int w = r.right - r.left;
 	int h = r.bottom - r.top;
-
+	if (!Check_Rectangle_borders(x, y, w, h)) return;
 
 	omni_mutex_lock l(m_bitmapdcMutex);
 
