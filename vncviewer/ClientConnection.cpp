@@ -534,6 +534,9 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	// sf@2002 - File Transfer on server
 	m_fServerKnowsFileTransfer = false;
 
+	// Xen VNC Proxy (xvp) VM power-control support
+	m_fServerSupportsXvp = false;
+
 	// Auto Mode
 	m_nConfig = 0;
 
@@ -1648,6 +1651,15 @@ void ClientConnection::CreateDisplay()
 		// Top level of the window menu, so the Ctrl+Alt+Shift+V accelerator
 		// arrives as WM_SYSCOMMAND like the other window-menu commands.
 		AppendMenu(hsysmenu, MF_STRING, ID_CONN_TYPECLIPBOARD, _T("Type Clipboard as Keystrokes	Ctrl+Alt+Shift+V"));
+
+		// Xen VNC Proxy (xvp) VM power control
+		m_hPopupMenuXvp = CreatePopupMenu();
+		{
+			AppendMenu(m_hPopupMenuXvp, MF_STRING, ID_XVP_SHUTDOWN,	_T("Shutdown VM"));
+			AppendMenu(m_hPopupMenuXvp, MF_STRING, ID_XVP_REBOOT,		_T("Reboot VM"));
+			AppendMenu(m_hPopupMenuXvp, MF_STRING, ID_XVP_RESET,		_T("Reset VM"));
+		}
+		AppendMenu(hsysmenu, MF_POPUP, (UINT_PTR)m_hPopupMenuXvp, _T("VM Power (xvp)"));
 
 		// group connection options together
 		AppendMenu(hsysmenu, MF_SEPARATOR, NULL, NULL);
@@ -3057,6 +3069,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbRSAAES);
 				auth_priority.push_back(rfbRSAAESne_256);
 				auth_priority.push_back(rfbRSAAESne);
+				auth_priority.push_back(rfbXvpAuth);
 				auth_priority.push_back(rfbVncAuth);
 				auth_priority.push_back(rfbNoAuth);
 
@@ -3231,6 +3244,13 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		break;
 	case rfbVeNCypt:
 		AuthVeNCrypt();
+		break;
+	case rfbXvpAuth:
+		vnclog.Print(0, _T("Using xvp authentication (Xen VNC Proxy)\n"));
+		if (!m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("WARNING: xvp authentication is unencrypted - session data is plaintext\n"));
+		}
+		AuthXvp();
 		break;
 	default:
 		vnclog.Print(0, _T("Unknown authentication scheme: %d\n"), (int)authScheme);
@@ -4133,6 +4153,71 @@ void ClientConnection::AuthVnc()
 	WriteExact((char *) challenge, CHALLENGESIZE);
 }
 
+void ClientConnection::AuthXvp()
+{
+	// xvp (Xen VNC Proxy, security type 22): the client sends the username
+	// and target VM name, then standard VNC authentication follows.
+	// Username convention: "user" or "user@target" (target may be empty
+	// for proxies that listen on a per-VM port).
+	char user[256] = "";
+	char target[256] = "";
+
+	AuthDialog ad;
+	ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+	if (ad.DoDialog(dtUserPass, m_host, m_port))
+	{
+		strncpy_s(user, sizeof(user), ad.m_user, _TRUNCATE);
+		char *sep = strchr(user, '@');
+		if (sep) {
+			*sep = '\0';
+			strncpy_s(target, sizeof(target), sep + 1, _TRUNCATE);
+		}
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), ad.m_passwd, _TRUNCATE);
+		if (strlen(ad.m_passwd) == 0)
+		{
+			vnclog.Print(0, _T("Password had zero length\n"));
+			throw WarningException(sz_L53);
+		}
+	}
+	else
+	{
+		QuietException_helper(sz_L54);
+	}
+
+	int ulen = (int)strlen(user);
+	int tlen = (int)strlen(target);
+	if (ulen > 255) ulen = 255;
+	if (tlen > 255) tlen = 255;
+
+	CARD8 credlen[2];
+	credlen[0] = (CARD8)ulen;
+	credlen[1] = (CARD8)tlen;
+	WriteExact((char *)credlen, sizeof(credlen));
+	if (ulen) WriteExact(user, ulen);
+	if (tlen) WriteExact(target, tlen);
+
+	vnclog.Print(0, _T("xvp: sent credentials for user '%hs'%hs%hs\n"),
+		user, tlen ? " target '" : "", tlen ? target : "");
+
+	// Continue as standard VNC authentication (DES challenge)
+	AuthVnc();
+}
+
+void ClientConnection::SendXvpMsg(CARD8 code)
+{
+	if (!m_fServerSupportsXvp) {
+		vnclog.Print(0, _T("xvp: server does not support the xvp extension\n"));
+		return;
+	}
+	rfbXvpMsg xvp;
+	xvp.type = rfbXvp;
+	xvp.pad = 0;
+	xvp.version = 1;
+	xvp.code = code;
+	WriteExactQueue((char *)&xvp, sz_rfbXvpMsg, rfbXvp);
+	FlushWriteQueue(true, 5);
+}
+
 void ClientConnection::AuthSCPrompt()
 {
 	if (m_minorVersion < 7) {
@@ -4832,6 +4917,7 @@ void ClientConnection::SetFormatAndEncodings()
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingUnicodeTextChat);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingHighResolutionWheel);
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingChatFileTransfer);
+	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingXvp);
 
 	// adzm - 2010-07 - Extended clipboard
 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingExtendedClipboard);
@@ -6169,6 +6255,24 @@ void* ClientConnection::run_undetached(void* arg) {
 				case rfbTextChat:
 					m_pTextChat->ProcessTextChatMsg();
 					break;
+
+				// Xen VNC Proxy (xvp) - XVP_INIT / XVP_FAIL
+				case rfbXvp:
+				{
+					rfbXvpMsg xvp;
+					ReadExact(((char *)&xvp) + m_nTO, sz_rfbXvpMsg - m_nTO);
+					if (xvp.code == rfbXvpInit) {
+						m_fServerSupportsXvp = TRUE;
+						vnclog.Print(0, _T("xvp: server supports VM power control (version %d)\n"), xvp.version);
+					}
+					else if (xvp.code == rfbXvpFail) {
+						vnclog.Print(0, _T("xvp: server refused the requested VM operation\n"));
+					}
+					else {
+						vnclog.Print(3, _T("xvp: unknown message code %d\n"), xvp.code);
+					}
+				}
+				break;
 
 				// Modif sf@2002 - Server Scaling
 				// Server Scaled screen buffer size has changed, so we resize
@@ -9148,6 +9252,31 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 						//adzm 2010-09
 						_this->FlushWriteQueue(true, 5);
 						return 0;
+
+					// Xen VNC Proxy (xvp) VM power commands
+					case ID_XVP_SHUTDOWN:
+					case ID_XVP_REBOOT:
+					case ID_XVP_RESET:
+					{
+						if (!_this->m_fServerSupportsXvp) {
+							MessageBox(hwnd, _T("The server does not support the xvp VM power extension."),
+								_T("UltraVNC Viewer"), MB_ICONINFORMATION);
+							return 0;
+						}
+						const wchar_t *action =
+							(LOWORD(wParam) == ID_XVP_SHUTDOWN) ? L"shut down" :
+							(LOWORD(wParam) == ID_XVP_REBOOT) ? L"reboot" : L"reset";
+						wchar_t msg[256];
+						_snwprintf_s(msg, _countof(msg), _TRUNCATE,
+							L"Do you want to %s the remote virtual machine?", action);
+						if (MessageBoxW(hwnd, msg, _T("UltraVNC Viewer - VM Power"),
+								MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES) {
+							_this->SendXvpMsg((CARD8)(
+								(LOWORD(wParam) == ID_XVP_SHUTDOWN) ? rfbXvpShutdown :
+								(LOWORD(wParam) == ID_XVP_REBOOT) ? rfbXvpReboot : rfbXvpReset));
+						}
+						return 0;
+					}
 
 					case ID_CLOSEDAEMON:
 						if (MessageBox(hwnd, sz_L75,
