@@ -81,6 +81,7 @@
     <ClCompile Include="vncntlm.cpp" />
     <ClCompile Include="vncOSVersion.cpp" />
     <ClCompile Include="SchannelTLS.cpp" />
+    <ClCompile Include="RSAAESAuth.cpp" />
     <ClCompile Include="VeNCryptAuth.cpp" />
     <ClCompile Include="vncserver.cpp" />
     <ClCompile Include="vncsetauth.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="vncencodezrle.h" />
     <ClInclude Include="vnchttpconnect.h" />
     <ClInclude Include="SchannelTLS.h" />
+    <ClInclude Include="RSAAESAuth.h" />
     <ClInclude Include="VeNCryptAuth.h" />
     <ClInclude Include="vncinsthandler.h" />
     <ClInclude Include="vnckeymap.h" />

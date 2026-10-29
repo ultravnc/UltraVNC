@@ -76,6 +76,10 @@ public:
     // True after a successful ServerHandshake().
     bool IsReady() const { return m_ready; }
 
+    // The loaded certificate context (borrowed pointer, owned by this object).
+    // Used by the RA2 security types which reuse the same RSA key pair.
+    PCCERT_CONTEXT GetCertContext() const { return m_certCtx; }
+
 private:
     // Raw socket send/recv helpers (bypass VSocket HTTP wrappers)
     bool RawSend(VSocket* sock, const BYTE* data, DWORD len);

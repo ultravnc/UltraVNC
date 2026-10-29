@@ -55,6 +55,7 @@
 #include "rfb/dh.h"
 #include "rfb/HighResolutionWheel.h"
 #include "vncauth.h"
+#include "RSAAESAuth.h"
 
 #include <sodium.h> // For X25519 key exchange (MS-Logon III)
 
@@ -1419,6 +1420,18 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	if (settings->getEnableVeNCryptTLS() && !bVeNCryptOnly)
 		auth_types.push_back(rfbVeNCypt);
 
+	// RA2/RA2ne (RealVNC RSA-AES types 5/6/129/130) reuse the VeNCrypt
+	// certificate RSA key and are offered alongside the other auth types
+	// when enabled. 256-bit variants first; viewers pick by preference.
+	if (settings->getEnableRA2())
+		auth_types.push_back(rfbRSAAES_256);
+	if (settings->getEnableRA2ne())
+		auth_types.push_back(rfbRSAAESne_256);
+	if (settings->getEnableRA2())
+		auth_types.push_back(rfbRSAAES);
+	if (settings->getEnableRA2ne())
+		auth_types.push_back(rfbRSAAESne);
+
 	// adzm 2010-09 - Send the auths
 	{
 		CARD8 authCount = (CARD8)auth_types.size();
@@ -1514,6 +1527,13 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
 		vnclog.Print(LL_LOGSCREEN, "Vnc password success = %d", auth_success);
+		break;
+	case rfbRSAAES:
+	case rfbRSAAES_256:
+	case rfbRSAAESne:
+	case rfbRSAAESne_256:
+		auth_success = AuthRSAAES(auth_accepted, auth_message);
+		vnclog.Print(LL_LOGSCREEN, "RSA-AES auth success = %d", auth_success);
 		break;
 	case rfbNoAuth:
 		auth_success = TRUE;
@@ -2419,6 +2439,78 @@ BOOL vncClientThread::AuthVeNCrypt(std::string& auth_message)
 
 	m_veNCryptAuth = std::move(auth);
 	return ok;
+}
+
+void vncClientThread::ReleaseRA2()
+{
+	m_ra2Auth.reset();
+}
+
+// RA2 / RA2ne (RealVNC RSA-AES security types 5/6/129/130).
+// The RA2 handshake runs the RSA key exchange, key hash verification and
+// credential read; for RA2 the EAX callbacks stay installed on the socket
+// for the rest of the session, for RA2ne they are removed inside
+// Authenticate() after the credentials.
+BOOL
+vncClientThread::AuthRSAAES(CARD8 authType, std::string& auth_message)
+{
+	const bool allEncrypted = (authType == rfbRSAAES || authType == rfbRSAAES_256);
+	const DWORD keySize = (authType == rfbRSAAES_256 || authType == rfbRSAAESne_256) ? 256 : 128;
+	const bool requireUser = (m_ms_logon != FALSE);
+
+	auto auth = std::make_unique<RSAAESAuth>(m_socket);
+
+	// Give the user time to type credentials
+	m_socket->SetTimeout(120000);
+	m_client->authAttempted = true;
+
+	std::string user, pass;
+	BOOL ok = auth->Authenticate(keySize, allEncrypted, requireUser, user, pass, auth_message);
+
+	m_socket->SetTimeout(30000);
+
+	if (!ok)
+		return FALSE;
+
+	if (requireUser)
+	{
+		int result = CheckUserGroupPasswordUni((char*)user.c_str(), (char*)pass.c_str(),
+			m_client->GetClientNameAddress());
+		vnclog.Print(LL_INTINFO, "RA2 CheckUserGroupPasswordUni result=%i\n", result);
+		if (result == 2) { // ViewOnly?
+			m_client->EnableKeyboard(false);
+			m_client->EnablePointer(false);
+			m_client->EnableGii(false);
+		}
+		if (result)
+		{
+			m_client->m_client_domain_username = _strdup(user.c_str());
+			m_ra2Auth = std::move(auth);
+			return TRUE;
+		}
+		auth_message = "Authentication failed";
+		return FALSE;
+	}
+
+	// Password-only subtype: compare against the VNC password (and the
+	// view-only password, which grants a restricted session).
+	vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+	if (strlen(plain) > 0 && pass == (const char*)plain)
+	{
+		m_ra2Auth = std::move(auth);
+		return TRUE;
+	}
+	vncPasswd::ToText plain2(settings->getPasswdViewOnly(), settings->getSecure());
+	if (strlen(plain2) > 0 && pass == (const char*)plain2)
+	{
+		m_client->EnableKeyboard(false);
+		m_client->EnablePointer(false);
+		m_client->EnableGii(false);
+		m_ra2Auth = std::move(auth);
+		return TRUE;
+	}
+	auth_message = "Authentication failed";
+	return FALSE;
 }
 
 void
@@ -5765,7 +5857,10 @@ vncClient::Kill(bool deleted)
 	if (m_pTextChat)
 		m_pTextChat->KillDialog();
 	if (m_thread_ClientThread)
+	{
 		((vncClientThread*)m_thread_ClientThread)->ReleaseVeNCrypt();
+		((vncClientThread*)m_thread_ClientThread)->ReleaseRA2();
+	}
 	if (m_socket != NULL)
 		m_socket->Close();
 	if (deleted && m_thread_ClientThread)

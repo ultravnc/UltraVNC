@@ -61,6 +61,8 @@ typedef std::list<vncClientId> vncClientList;
 #include "MouseSimulator.h"
 #include "VeNCryptAuth.h"
 
+class RSAAESAuth;
+
 // The vncClient class itself
 typedef UINT (WINAPI *pSendinput)(UINT,LPINPUT,INT);
 #define SPI_GETMOUSESPEED         0x0070
@@ -676,6 +678,7 @@ public:
 	BOOL AuthSCPrompt(std::string& auth_message); // adzm 2010-10
 	BOOL AuthSessionSelect(std::string& auth_message); // adzm 2010-10
 	BOOL AuthVeNCrypt(std::string& auth_message); // Native TLS + token auth
+	BOOL AuthRSAAES(CARD8 authType, std::string& auth_message); // RA2/RA2ne RSA-AES
 
 	BOOL FilterClients_Blacklist();
 #ifndef SC_20
@@ -690,6 +693,7 @@ public:
 	virtual bool InitSocket();
 	virtual bool TryReconnect();
 	void ReleaseVeNCrypt() { m_veNCryptAuth.reset(); }
+	void ReleaseRA2();
 
 	// The main thread function
 	virtual void run(void *arg);
@@ -714,6 +718,7 @@ protected:
 	int m_major;
 	int m_minor;
 	std::unique_ptr<VeNCryptAuth> m_veNCryptAuth; // owns native TLS session for this client
+	std::unique_ptr<RSAAESAuth> m_ra2Auth; // owns RA2 EAX session for this client
 #ifdef _Gii
 #ifdef _USE_DLL
 	PInitializeTouchInjection DLL_InitializeTouchInjection;

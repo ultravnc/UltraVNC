@@ -430,6 +430,19 @@ namespace
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), veNCryptEnabled && !msLogon);
 	}
 
+	// The certificate thumbprint/select/generate controls feed both VeNCrypt
+	// TLS and the RA2 security types (same RSA key), so they stay enabled
+	// when either is checked.
+	void UpdateCertControlAvailability(HWND hwnd, BOOL veNCryptEnabled)
+	{
+		const BOOL ra2 = (SendDlgItemMessage(hwnd, IDC_ENABLE_RA2, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			|| (SendDlgItemMessage(hwnd, IDC_ENABLE_RA2NE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		const BOOL enable = veNCryptEnabled || ra2;
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), enable);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), enable);
+		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), enable);
+	}
+
 	void UpdateVncPasswordAvailability(HWND hSecurityTab, HWND hTlsTab)
 	{
 		if (!hSecurityTab || !hTlsTab)
@@ -1469,6 +1482,8 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), BM_SETCHECK, settings->getVeNCryptAllowPlainAuth(), 0);
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), BM_SETCHECK, settings->getVeNCryptRequireChannelBinding(), 0);
 		SendMessage(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_LEGACY), BM_SETCHECK, settings->getVeNCryptAllowLegacyAuth(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_ENABLE_RA2), BM_SETCHECK, settings->getEnableRA2(), 0);
+		SendMessage(GetDlgItem(hwnd, IDC_ENABLE_RA2NE), BM_SETCHECK, settings->getEnableRA2ne(), 0);
 		SetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, settings->getVeNCryptTLSCertThumbprint());
 		SetDlgItemText(hwnd, IDC_VENCRYPT_DLLPATH, settings->getVeNCryptTokenDLLPath());
 		if (HWND hBits = GetDlgItem(hwnd, IDC_VENCRYPT_KEYBITS)) {
@@ -1484,9 +1499,7 @@ bool PropertiesDialog::DlgInitDialog(HWND hwnd)
 			SendMessage(hBits, CB_SETCURSEL, sel, 0);
 		}
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
+		UpdateCertControlAvailability(hwnd, bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
@@ -1934,9 +1947,7 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 	{
 		BOOL bVeNCrypt = (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_ALLOW_PLAIN), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_THUMBPRINT), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_SELECT), bVeNCrypt);
-		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_CERT_GEN), bVeNCrypt);
+		UpdateCertControlAvailability(hwnd, bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLLPATH), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_DLL_BROWSE), bVeNCrypt);
 		EnableWindow(GetDlgItem(hwnd, IDC_VENCRYPT_REQUIRE_PLUS), bVeNCrypt);
@@ -1948,6 +1959,12 @@ bool PropertiesDialog::onCommand( int command, HWND hwnd, int subcommand)
 		UpdateManageUsersButton(hwnd);
 	}
 	return TRUE;
+
+	case IDC_ENABLE_RA2:
+	case IDC_ENABLE_RA2NE:
+		UpdateCertControlAvailability(hwnd,
+			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ENABLE, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		return TRUE;
 
 	case IDC_VENCRYPT_ALLOW_PLAIN:
 		if (SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_PLAIN, BM_GETCHECK, 0, 0) == BST_CHECKED)
@@ -2622,6 +2639,10 @@ void PropertiesDialog::onTabsAPPLY(HWND hwnd)
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_ALLOW_LEGACY, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		settings->setVeNCryptRequireChannelBinding(
 			SendDlgItemMessage(hwnd, IDC_VENCRYPT_REQUIRE_PLUS, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setEnableRA2(
+			SendDlgItemMessage(hwnd, IDC_ENABLE_RA2, BM_GETCHECK, 0, 0) == BST_CHECKED);
+		settings->setEnableRA2ne(
+			SendDlgItemMessage(hwnd, IDC_ENABLE_RA2NE, BM_GETCHECK, 0, 0) == BST_CHECKED);
 		char thumb[64]{};
 		GetDlgItemText(hwnd, IDC_VENCRYPT_THUMBPRINT, thumb, sizeof(thumb));
 		settings->setVeNCryptTLSCertThumbprint(thumb);
