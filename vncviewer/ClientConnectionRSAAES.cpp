@@ -15,6 +15,13 @@
 #include "Exception.h"
 #include "AuthDialog.h"
 #include <commctrl.h>
+#include <bcrypt.h>
+#include <vector>
+#include "../common/BcryptHelp.h"
+
+#ifndef BCRYPT_KDF_RAW_SECRET
+#define BCRYPT_KDF_RAW_SECRET L"TRUNCATE"
+#endif
 extern "C" {
 #include "../common/mnemonic.h"
 }
@@ -885,4 +892,160 @@ void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
 		delete m_pPluginInterface;
 		m_pPluginInterface = NULL;
 	}
+}
+
+// Apple Remote Desktop / macOS Screen Sharing authentication (security type 30).
+// Server sends DH parameters + its public key; the client replies with
+// AES-128-ECB(MD5(dh_shared_secret), 64B user || 64B pass) + its DH public key.
+void ClientConnection::AuthAppleDH()
+{
+	CARD16 gen, keySize;
+	ReadExact((char*)&gen, 2);
+	ReadExact((char*)&keySize, 2);
+	gen = Swap16IfLE(gen);
+	keySize = Swap16IfLE(keySize);
+	if (gen < 2 || keySize < 64 || keySize > 512) {
+		throw WarningException(L"AppleDH: invalid DH parameters from server");
+	}
+	std::vector<BYTE> modulus(keySize), serverPub(keySize);
+	ReadExact((char*)modulus.data(), keySize);
+	ReadExact((char*)serverPub.data(), keySize);
+
+	BCRYPT_ALG_HANDLE hAlg = NULL;
+	BCRYPT_KEY_HANDLE hKey = NULL, hPeer = NULL;
+	BCRYPT_SECRET_HANDLE hSecret = NULL;
+	BCRYPT_ALG_HANDLE hMd5Alg = NULL;
+	BCRYPT_HASH_HANDLE hHash = NULL;
+	std::vector<BYTE> secret(keySize);
+	ULONG secretLen = 0;
+
+	struct Cleanup {
+		BCRYPT_ALG_HANDLE *pAlg, *pMd5Alg;
+		BCRYPT_KEY_HANDLE *pKey, *pPeer;
+		BCRYPT_SECRET_HANDLE *pSecret;
+		BCRYPT_HASH_HANDLE *pHash;
+		~Cleanup() {
+			if (*pHash) BCryptDestroyHash(*pHash);
+			if (*pMd5Alg) BCryptCloseAlgorithmProvider(*pMd5Alg, 0);
+			if (*pSecret) BCryptDestroySecret(*pSecret);
+			if (*pPeer) BCryptDestroyKey(*pPeer);
+			if (*pKey) BCryptDestroyKey(*pKey);
+			if (*pAlg) BCryptCloseAlgorithmProvider(*pAlg, 0);
+		}
+	} cleanup{ &hAlg, &hMd5Alg, &hKey, &hPeer, &hSecret, &hHash };
+
+	// Generate a DH key pair constrained to the server's parameters
+	// (modulus + generator, keySize bytes each, big-endian)
+	{
+		std::vector<BYTE> blob(sizeof(BCRYPT_DH_PARAMETER_HEADER) + 2 * keySize, 0);
+		BCRYPT_DH_PARAMETER_HEADER *hdr = (BCRYPT_DH_PARAMETER_HEADER *)blob.data();
+		hdr->cbLength = (ULONG)blob.size();
+		hdr->dwMagic = BCRYPT_DH_PARAMETERS_MAGIC;
+		hdr->cbKeyLength = keySize;
+		memcpy(blob.data() + sizeof(BCRYPT_DH_PARAMETER_HEADER), modulus.data(), keySize);
+		BYTE *genField = blob.data() + sizeof(BCRYPT_DH_PARAMETER_HEADER) + keySize;
+		genField[keySize - 2] = (BYTE)(gen >> 8);
+		genField[keySize - 1] = (BYTE)(gen & 0xFF);
+
+		NTSTATUS st = BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_DH_ALGORITHM, NULL, 0);
+		if (st == 0) st = BCryptGenerateKeyPair(hAlg, &hKey, keySize * 8, 0);
+		if (st == 0) st = BCryptSetProperty(hKey, BCRYPT_DH_PARAMETERS,
+				blob.data(), (ULONG)blob.size(), 0);
+		if (st == 0) st = BCryptFinalizeKeyPair(hKey, 0);
+		if (st != 0) {
+			throw WarningException(L"AppleDH: DH key generation failed");
+		}
+	}
+
+	// Export our public key - last keySize bytes of the DH public blob
+	std::vector<BYTE> clientPub;
+	{
+		ULONG cb = 0;
+		if (BCryptExportKey(hKey, NULL, BCRYPT_DH_PUBLIC_BLOB, NULL, 0, &cb, 0) != 0) {
+			throw WarningException(L"AppleDH: DH public key export failed");
+		}
+		std::vector<BYTE> blob(cb);
+		if (BCryptExportKey(hKey, NULL, BCRYPT_DH_PUBLIC_BLOB, blob.data(), cb, &cb, 0) != 0
+			|| cb < keySize) {
+			throw WarningException(L"AppleDH: DH public key export failed");
+		}
+		clientPub.assign(blob.data() + cb - keySize, blob.data() + cb);
+	}
+
+	// Import the server's public key and derive the shared secret
+	{
+		std::vector<BYTE> blob(sizeof(BCRYPT_DH_KEY_BLOB) + 3 * keySize, 0);
+		BCRYPT_DH_KEY_BLOB *hdr = (BCRYPT_DH_KEY_BLOB *)blob.data();
+		hdr->dwMagic = BCRYPT_DH_PUBLIC_MAGIC;
+		hdr->cbKey = keySize;
+		BYTE *p = blob.data() + sizeof(BCRYPT_DH_KEY_BLOB);
+		memcpy(p, modulus.data(), keySize);
+		p[keySize * 2 - 2] = (BYTE)(gen >> 8);
+		p[keySize * 2 - 1] = (BYTE)(gen & 0xFF);
+		memcpy(p + 2 * keySize, serverPub.data(), keySize);
+
+		if (BCryptImportKeyPair(hAlg, NULL, BCRYPT_DH_PUBLIC_BLOB, &hPeer,
+				blob.data(), (ULONG)blob.size(), 0) != 0
+			|| BCryptSecretAgreement(hKey, hPeer, &hSecret, 0) != 0
+			|| BCryptDeriveKey(hSecret, BCRYPT_KDF_RAW_SECRET, NULL,
+				secret.data(), keySize, &secretLen, 0) != 0
+			|| secretLen == 0 || secretLen > keySize) {
+			throw WarningException(L"AppleDH: DH key agreement failed");
+		}
+		// CNG returns the raw DH secret little-endian with the high bytes
+		// truncated; convert to a keySize-byte big-endian value.
+		std::vector<BYTE> secretBE(keySize, 0);
+		for (ULONG i = 0; i < secretLen; i++)
+			secretBE[keySize - 1 - i] = secret[i];
+		SecureZeroMemory(secret.data(), secret.size());
+		secret = secretBE;
+		secretLen = keySize;
+	}
+
+	// AES-128 key = MD5(shared secret)
+	BYTE aesKey[16];
+	if (BCryptOpenAlgorithmProvider(&hMd5Alg, BCRYPT_MD5_ALGORITHM, NULL, 0) != 0
+		|| BCryptCreateHash(hMd5Alg, &hHash, NULL, 0, NULL, 0, 0) != 0
+		|| BCryptHashData(hHash, secret.data(), secretLen, 0) != 0
+		|| BCryptFinishHash(hHash, aesKey, sizeof(aesKey), 0) != 0) {
+		SecureZeroMemory(secret.data(), secret.size());
+		throw WarningException(L"AppleDH: MD5 key derivation failed");
+	}
+	SecureZeroMemory(secret.data(), secret.size());
+
+	// Credentials: 64B user + 64B pass, null-terminated, random padding
+	char user[256] = "", passwd[256] = "";
+	strncpy_s(user, sizeof(user), m_cmdlnUser, _TRUNCATE);
+	strncpy_s(passwd, sizeof(passwd), m_clearPasswd, _TRUNCATE);
+	if (user[0] == '\0' || passwd[0] == '\0') {
+		AuthDialog ad;
+		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
+		if (!ad.DoDialog(dtUserPass, m_host, m_port)) {
+			throw WarningException(L"Authentication cancelled");
+		}
+		strncpy_s(user, sizeof(user), ad.m_user, _TRUNCATE);
+		strncpy_s(passwd, sizeof(passwd), ad.m_passwd, _TRUNCATE);
+		strncpy_s(m_clearPasswd, _countof(m_clearPasswd), ad.m_passwd, _TRUNCATE);
+	}
+
+	BYTE cred[128];
+	BcryptHelp::Random(cred, sizeof(cred));
+	strncpy_s((char *)cred, 64, user, _TRUNCATE);
+	strncpy_s((char *)cred + 64, 64, passwd, _TRUNCATE);
+	SecureZeroMemory(passwd, sizeof(passwd));
+
+	AESCipher aes;
+	if (!aes.Init(128, aesKey) || !aes.Encrypt(cred, sizeof(cred))) {
+		SecureZeroMemory(cred, sizeof(cred));
+		SecureZeroMemory(aesKey, sizeof(aesKey));
+		throw WarningException(L"AppleDH: credential encryption failed");
+	}
+	SecureZeroMemory(aesKey, sizeof(aesKey));
+
+	WriteExact((char *)cred, sizeof(cred));
+	SecureZeroMemory(cred, sizeof(cred));
+	WriteExact((char *)clientPub.data(), keySize);
+
+	vnclog.Print(0, _T("AppleDH: sent encrypted credentials for user '%hs' (%d-bit DH)\n"),
+		user, keySize * 8);
 }
