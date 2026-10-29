@@ -256,6 +256,8 @@ private:
 	// Requires TLS to be active and the TLS plugin already installed.
 	void AuthSasl(uint8_t* cbData, size_t cbDataLen);
 	void AuthVnc();
+	void AuthXvp();
+	void SendXvpMsg(CARD8 code);
 	void AuthSCPrompt(); // adzm 2010-10
 	void AuthSessionSelect(); // adzm 2010-10
 	void AuthMsLogonI();
@@ -695,6 +697,7 @@ private:
 	HMENU m_hPopupMenuClipboardFormats;
 	HMENU m_hPopupMenuDisplay;
 	HMENU m_hPopupMenuKeyboard;
+	HMENU m_hPopupMenuXvp;
 
 	// Window may be scrollable - these control the scroll position
 	int m_hScrollMax, m_vScrollMax;
@@ -749,6 +752,7 @@ private:
 
 	// sf@2002 - File Transfer on server
 	BOOL m_fServerKnowsFileTransfer;
+	BOOL m_fServerSupportsXvp;
 
 	// sf@2002 - Auto mode
 	int  m_nConfig;

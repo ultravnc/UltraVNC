@@ -377,6 +377,9 @@
 #define ID_BUTTON_TEXTCHAT              50022
 #define IDS_WARNING                     50022
 #define ID_CLEAR_SAVED_PASSWORD         50025
+#define ID_XVP_SHUTDOWN                 50026
+#define ID_XVP_REBOOT                   50027
+#define ID_XVP_RESET                    50028
 #define ID_CONN_TYPECLIPBOARD           50990
 #define ID_BUTTON_TYPECLIP              50991
 #define IDS_A1                          50023
@@ -717,7 +720,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        242
-#define _APS_NEXT_COMMAND_VALUE         50026
+#define _APS_NEXT_COMMAND_VALUE         50029
 #define _APS_NEXT_CONTROL_VALUE         2085
 #define _APS_NEXT_SYMED_VALUE           154
 #endif

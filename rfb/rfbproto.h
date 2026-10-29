@@ -281,6 +281,7 @@ typedef char rfbProtocolVersionMsg[13];	/* allow extra byte for null */
 #define rfbRSAAESne 6
 #define rfbRSAAES_256 129
 #define rfbRSAAESne_256 130
+#define rfbXvpAuth 22
 #define rfbUltraVNC 17
 // adzm 2010-09 - After rfbUltraVNC, auth repeats via rfbVncAuthContinue
 #define rfbVeNCypt 19
@@ -484,6 +485,14 @@ typedef struct {
 #define rfbMonitorInfo 252
 #define rfbSetMonitor 254
 
+/* Xen VNC Proxy (xvp) - bidirectional message type 250 */
+#define rfbXvp 250
+#define rfbXvpFail     0
+#define rfbXvpInit     1
+#define rfbXvpShutdown 2
+#define rfbXvpReboot   3
+#define rfbXvpReset    4
+
 
 
 /*****************************************************************************
@@ -529,6 +538,9 @@ typedef struct {
 #define rfbEncodingUltraZip					0xFFFF0009
 #define rfbEncodingQueueZstd				0xFFFF000A
 #define rfbEncodingQueueEnable				0xFFFF000B
+
+// Xen VNC Proxy (xvp) pseudo-encoding (-309)
+#define rfbEncodingXvp                      0xFFFFFECB
 
 // viewer requests server state updates
 #define rfbEncodingServerState              0xFFFF8000
@@ -1242,6 +1254,22 @@ typedef struct _rfbTextChatMsg {
 #define rfbTextChatOpen		0xFFFFFFFF 
 #define rfbTextChatClose	0xFFFFFFFE  
 #define rfbTextChatFinished 0xFFFFFFFD 
+
+/*-----------------------------------------------------------------------------
+ * Xen VNC Proxy (xvp) message - bidirectional, type 250
+ *
+ * Server -> client: code is rfbXvpFail or rfbXvpInit (declares support).
+ * Client -> server: code is rfbXvpShutdown, rfbXvpReboot or rfbXvpReset.
+ */
+
+typedef struct _rfbXvpMsg {
+    CARD8 type;			/* always rfbXvp */
+    CARD8 pad;
+    CARD8 version;		/* xvp extension version, currently 1 */
+    CARD8 code;			/* rfbXvp* message code */
+} rfbXvpMsg;
+
+#define sz_rfbXvpMsg 4
 
 
 /*-----------------------------------------------------------------------------
