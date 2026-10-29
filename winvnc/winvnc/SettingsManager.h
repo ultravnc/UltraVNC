@@ -91,6 +91,12 @@ public:
 	void setVeNCryptTokenDLLPath(const char* v)      { strncpy_s(m_pref_VeNCryptTokenDLLPath, v, MAX_PATH - 1); m_pref_VeNCryptTokenDLLPath[MAX_PATH - 1] = 0; };
 	const char* getVeNCryptSubtypes()          { return m_pref_VeNCryptSubtypes; };
 	void setVeNCryptSubtypes(const char* v)    { strncpy_s(m_pref_VeNCryptSubtypes, v, sizeof(m_pref_VeNCryptSubtypes) - 1); m_pref_VeNCryptSubtypes[sizeof(m_pref_VeNCryptSubtypes) - 1] = 0; };
+	// RA2 / RA2ne (RealVNC RSA-AES security types 5/6/129/130), reusing the
+	// VeNCrypt certificate RSA key as the server identity.
+	BOOL getEnableRA2()                        { return m_pref_EnableRA2; };
+	void setEnableRA2(BOOL v)                  { m_pref_EnableRA2 = v; };
+	BOOL getEnableRA2ne()                      { return m_pref_EnableRA2ne; };
+	void setEnableRA2ne(BOOL v)                { m_pref_EnableRA2ne = v; };
 	BOOL getEnableRemoteInputs() { return m_pref_EnableRemoteInputs; };
 	BOOL getDisableLocalInputs() { return m_pref_DisableLocalInputs; };
 	BOOL getEnableJapInput() { return m_pref_EnableJapInput; };
@@ -344,6 +350,8 @@ private:
 	char m_pref_VeNCryptTLSCertThumbprint[41];
 	char m_pref_VeNCryptTokenDLLPath[MAX_PATH];
 	char m_pref_VeNCryptSubtypes[256];
+	BOOL m_pref_EnableRA2;
+	BOOL m_pref_EnableRA2ne;
 
 	BOOL m_pref_AutoPortSelect;
 	LONG m_pref_PortNumber;

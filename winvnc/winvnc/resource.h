@@ -425,6 +425,8 @@
 #define IDD_SELECT_CERT                 1391
 #define IDC_SELECT_CERT_LIST            1392
 #define IDC_VENCRYPT_KEYBITS            1393
+#define IDC_ENABLE_RA2                  1394
+#define IDC_ENABLE_RA2NE                1395
 #define IDE_CUSTOM1                     4377
 #define ID_ABOUT                        32771
 #define ID_ADMIN_PROPERTIES             32772
