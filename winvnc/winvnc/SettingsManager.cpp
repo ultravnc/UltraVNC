@@ -168,6 +168,8 @@ void SettingsManager::setDefaults()
 	memset(m_pref_VeNCryptTokenDLLPath, 0, sizeof(m_pref_VeNCryptTokenDLLPath));
 	// Secure default: token and SASL only. Weaker methods are explicit opt-ins.
 	strcpy_s(m_pref_VeNCryptSubtypes, "301 300 263");
+	m_pref_EnableRA2 = FALSE;
+	m_pref_EnableRA2ne = FALSE;
 #else
 	m_pref_AutoPortSelect = false;
 	m_pref_EnableHTTPConnect = false;
@@ -398,6 +400,8 @@ void SettingsManager::load()
 	iniFile.ReadString("admin", "VeNCryptSubtypes", veNCryptSubtypes, sizeof(veNCryptSubtypes));
 	if (veNCryptSubtypes[0])
 		strcpy_s(m_pref_VeNCryptSubtypes, veNCryptSubtypes);
+	m_pref_EnableRA2 = iniFile.ReadInt("admin", "EnableRA2", m_pref_EnableRA2);
+	m_pref_EnableRA2ne = iniFile.ReadInt("admin", "EnableRA2ne", m_pref_EnableRA2ne);
 	m_pref_AutoPortSelect = iniFile.ReadInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	m_pref_PortNumber = iniFile.ReadInt("admin", "PortNumber", m_pref_PortNumber);
 	m_pref_HttpPortNumber = iniFile.ReadInt("admin", "HTTPPortNumber", DISPLAY_TO_HPORT(PORT_TO_DISPLAY(m_pref_PortNumber)));
@@ -519,6 +523,8 @@ void SettingsManager::save()
 	iniFile.WriteString("admin", "VeNCryptTLSCertThumbprint", m_pref_VeNCryptTLSCertThumbprint);
 	iniFile.WriteString("admin", "VeNCryptTokenDLLPath", m_pref_VeNCryptTokenDLLPath);
 	iniFile.WriteString("admin", "VeNCryptSubtypes", m_pref_VeNCryptSubtypes);
+	iniFile.WriteInt("admin", "EnableRA2", m_pref_EnableRA2);
+	iniFile.WriteInt("admin", "EnableRA2ne", m_pref_EnableRA2ne);
 	iniFile.WriteInt("admin", "AutoPortSelect", m_pref_AutoPortSelect);
 	if (!m_pref_AutoPortSelect) {
 		iniFile.WriteInt("admin", "PortNumber", m_pref_PortNumber);
