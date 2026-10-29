@@ -257,6 +257,7 @@ private:
 	void AuthSasl(uint8_t* cbData, size_t cbDataLen);
 	void AuthVnc();
 	void AuthXvp();
+	void AuthAppleDH();
 	void SendXvpMsg(CARD8 code);
 	void AuthSCPrompt(); // adzm 2010-10
 	void AuthSessionSelect(); // adzm 2010-10

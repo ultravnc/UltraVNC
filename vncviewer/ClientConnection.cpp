@@ -3042,6 +3042,8 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbRSAAES:
 				case rfbRSAAESne_256:
 				case rfbRSAAESne:
+				case rfbAppleDH:
+				case rfbXvpAuth:
 				case rfbVncAuth:
 				case rfbNoAuth:
 					auth_supported.push_back(authAllowed[i]);
@@ -3069,6 +3071,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				auth_priority.push_back(rfbRSAAES);
 				auth_priority.push_back(rfbRSAAESne_256);
 				auth_priority.push_back(rfbRSAAESne);
+				auth_priority.push_back(rfbAppleDH);
 				auth_priority.push_back(rfbXvpAuth);
 				auth_priority.push_back(rfbVncAuth);
 				auth_priority.push_back(rfbNoAuth);
@@ -3244,6 +3247,13 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 		break;
 	case rfbVeNCypt:
 		AuthVeNCrypt();
+		break;
+	case rfbAppleDH:
+		vnclog.Print(0, _T("Using AppleDH authentication (macOS Screen Sharing)\n"));
+		if (!m_pIntegratedPluginInterface) {
+			vnclog.Print(0, _T("WARNING: AppleDH protects credentials only - session data is UNENCRYPTED\n"));
+		}
+		AuthAppleDH();
 		break;
 	case rfbXvpAuth:
 		vnclog.Print(0, _T("Using xvp authentication (Xen VNC Proxy)\n"));
