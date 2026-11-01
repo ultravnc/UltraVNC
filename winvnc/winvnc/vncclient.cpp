@@ -1361,13 +1361,16 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 	// encryption takes priority over everything, for now at least.
 	// would be useful to have a host list to configure these settings.
 	// Include the SecureVNCPluginAuth type for those that support it but are not UltraVNC Viewers
-	// VeNCrypt is fail-closed by default. Legacy top-level authentication is
-	// advertised only when the administrator explicitly allows it.
-	const bool bVeNCryptOnly = settings->getEnableVeNCryptTLS() && !settings->getVeNCryptAllowLegacyAuth();
+	// Secure authentication is fail-closed by default. Legacy top-level
+	// authentication is advertised only when the administrator explicitly
+	// allows it, or when no secure type (VeNCrypt/RA2/RA2ne) is enabled at all.
+	const bool bSecureOnly = (settings->getEnableVeNCryptTLS() || settings->getEnableRA2() || settings->getEnableRA2ne())
+		&& !settings->getVeNCryptAllowLegacyAuth();
 
-	if (bVeNCryptOnly)
+	if (bSecureOnly)
 	{
-		auth_types.push_back(rfbVeNCypt);
+		if (settings->getEnableVeNCryptTLS())
+			auth_types.push_back(rfbVeNCypt);
 	}
 	else if (!bSecureVNCPluginActive && m_socket->IsUsePluginEnabled() && m_server->GetDSMPluginPointer()->IsEnabled() && m_socket->GetIntegratedPlugin() != NULL)
 	{
@@ -1417,7 +1420,7 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 
 	// VeNCrypt TLS is offered in addition to the normal auth types, so viewers
 	// that don't select it can still connect with mslogon/plain VNC auth.
-	if (settings->getEnableVeNCryptTLS() && !bVeNCryptOnly)
+	if (settings->getEnableVeNCryptTLS() && !bSecureOnly)
 		auth_types.push_back(rfbVeNCypt);
 
 	// RA2/RA2ne (RealVNC RSA-AES types 5/6/129/130) reuse the VeNCrypt
@@ -2429,6 +2432,41 @@ BOOL vncClientThread::AuthVeNCrypt(std::string& auth_message)
 	// PerformTLSHandshake has installed them.
 	auth->VncAuthCallback = [this](std::string& msg) { return AuthVnc(msg) != FALSE; };
 	auth->MsLogonIIIAuthCallback = [this](std::string& msg) { return AuthMsLogonIII(msg) != FALSE; };
+	// secTypeX509Plain carries user+password: validate via MS-Logon when
+	// enabled, otherwise against the VNC / view-only passwords (same as RA2).
+	auth->PlainAuthCallback = [this](const std::string& user, const std::string& pass, std::string& msg) {
+		if (m_ms_logon)
+		{
+			int result = CheckUserGroupPasswordUni((char*)user.c_str(), (char*)pass.c_str(),
+				m_client->GetClientNameAddress());
+			vnclog.Print(LL_INTINFO, "VeNCrypt Plain CheckUserGroupPasswordUni result=%i\n", result);
+			if (result == 2) { // view-only
+				m_client->EnableKeyboard(false);
+				m_client->EnablePointer(false);
+				m_client->EnableGii(false);
+			}
+			if (result)
+			{
+				m_client->m_client_domain_username = _strdup(user.c_str());
+				return true;
+			}
+			msg = "Authentication failed";
+			return false;
+		}
+		vncPasswd::ToText plain(settings->getPasswd(), settings->getSecure());
+		if (strlen(plain) > 0 && pass == (const char*)plain)
+			return true;
+		vncPasswd::ToText plain2(settings->getPasswdViewOnly(), settings->getSecure());
+		if (strlen(plain2) > 0 && pass == (const char*)plain2)
+		{
+			m_client->EnableKeyboard(false);
+			m_client->EnablePointer(false);
+			m_client->EnableGii(false);
+			return true;
+		}
+		msg = "Authentication failed";
+		return false;
+	};
 
 	// Give the user time to accept the certificate and type credentials
 	m_socket->SetTimeout(120000);

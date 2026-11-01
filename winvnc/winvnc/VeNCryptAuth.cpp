@@ -239,6 +239,19 @@ bool VeNCryptAuth::Authenticate(std::string& outFailureMessage)
     vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: credentials received, user='%s' userLen=%d tokenLen=%d\n"),
                  username.c_str(), (int)username.size(), (int)token.size());
 
+    // X509-Plain carries a user+password pair; when a password validator is
+    // installed it takes precedence over the token validator DLL.
+    if (m_chosenType == secTypeX509Plain && PlainAuthCallback)
+    {
+        if (!PlainAuthCallback(username, token, outFailureMessage))
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: plain auth failed: %s\n"), outFailureMessage.c_str());
+            return false;
+        }
+        vnclog.Print(LL_CLIENTS, VNCLOG("VeNCrypt: plain auth OK\n"));
+        return true;
+    }
+
     if (!ValidateToken(username.c_str(), token.c_str(), outFailureMessage))
     {
         vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: token validation failed: %s\n"), outFailureMessage.c_str());
