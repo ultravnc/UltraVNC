@@ -70,6 +70,12 @@ public:
     // Called after TLS is installed for the private X509-MSLogonIII subtype.
     std::function<bool(std::string&)> MsLogonIIIAuthCallback;
 
+    // secTypeX509Plain sends user+password in the clear inside the TLS
+    // channel. When set, the callback decides whether they are valid
+    // (e.g. MS-Logon or the VNC password). When unset, the credential
+    // falls back to the token validator DLL.
+    std::function<bool(const std::string& user, const std::string& pass, std::string&)> PlainAuthCallback;
+
 private:
     bool SendVeNCryptVersion();
     bool ReadClientVersion();
