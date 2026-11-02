@@ -4858,7 +4858,7 @@ vncClientThread::run(void* arg)
 					case rfbCDirCreate:
 					{
 						const UINT length = Swap32IfLE(msg.ft.length);
-						char szDir[MAX_PATH + 1];
+						char szDir[MAX_PATH * 3 + 1];
 						if (length > sizeof(szDir) - 1) break;
 
 						// Read in the Name of Dir to explore
