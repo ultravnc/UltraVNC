@@ -20,6 +20,7 @@
 
 
 #include "ClientConnection.h"
+#include "ViewerBounds.h"
 #include "SessionDialog.h"
 #include "AuthDialog.h"
 #include "CredentialManager.h"
@@ -4764,6 +4765,8 @@ void ClientConnection::SetFormatAndEncodings()
 void ClientConnection::Createdib()
 {
 	omni_mutex_lock l(m_bitmapdcMutex);
+	if (!ViewerBounds::framebuffer(m_si.framebufferWidth, m_si.framebufferHeight, m_myFormat.bitsPerPixel / 8))
+		throw ErrorException(L"Invalid framebuffer dimensions.");
 	TempDC hdc(m_hwndcn);
 	BitmapInfo bi;
 	UINT iUsage;
@@ -6577,6 +6580,8 @@ inline void ClientConnection::ReadScreenUpdate()
 					{
 						ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 						m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
+						if (m_nZRLEReadSize < 0 || m_nZRLEReadSize > 104857596)
+							throw ErrorException(L"Invalid compressed rectangle size.");
 
 						CheckZRLENetRectBufferSize((int)(m_nZRLEReadSize));
 						CheckBufferSize((int)(m_nZRLEReadSize)); // sf@2003
@@ -6588,6 +6593,8 @@ inline void ClientConnection::ReadScreenUpdate()
 					// Get the size of the rectangle data buffer
 					ReadExact((char*)&(m_nZRLEReadSize), sizeof(CARD32));
 					m_nZRLEReadSize = Swap32IfLE(m_nZRLEReadSize);
+					if (m_nZRLEReadSize < 0 || m_nZRLEReadSize > 104857596)
+						throw ErrorException(L"Invalid compressed rectangle size.");
 					int tempsize=m_nZRLEReadSize;
 					// Read the whole  rect buffer and put the result in m_netbuf
 					CheckZRLENetRectBufferSize((int)(m_nZRLEReadSize)+4);
@@ -6752,6 +6759,8 @@ inline void ClientConnection::ReadScreenUpdate()
 
 				if (!fis->GetReadFromMemoryBuffer())
 				{
+					if (nDataLength <= 0 || nDataLength > 104857596)
+						throw ErrorException(L"Invalid XZ rectangle size.");
 					m_nXZReadSize = nDataLength;
 					assert(m_nXZReadSize > 0);
 					CheckXZNetRectBufferSize((int)m_nXZReadSize);
@@ -7248,10 +7257,8 @@ void ClientConnection::ReadServerState(ULONG_PTR wheelGeneration)
 // Reads the number of bytes specified into the buffer given
 void ClientConnection::ReadExact(char *inbuf, int wanted)
 {
-	if (wanted < 0) {
-		assert(true);
-		return;
-	}
+	if (wanted < 0)
+		throw ErrorException(L"Invalid network read length.");
 
 	if (wanted == 0) {
 		return;
@@ -7270,6 +7277,9 @@ void ClientConnection::ReadExact(char *inbuf, int wanted)
 				// If we must read already restored data from memory
 				if (m_fReadFromNetRectBuf)
 				{
+					if (m_nReadSize < 0 || m_nNetRectBufOffset < 0 || wanted < 0 ||
+						!ViewerBounds::range(m_nNetRectBufOffset, wanted, m_nReadSize))
+						throw ErrorException(L"Buffered rectangle read exceeds payload.");
 					memcpy(inbuf, m_pNetRectBuf + m_nNetRectBufOffset, wanted);
 					m_nNetRectBufOffset += wanted;
 					if (m_nNetRectBufOffset == m_nReadSize)
@@ -7375,6 +7385,9 @@ void ClientConnection::ReadExactProtocolVersion(char *inbuf, int wanted, bool& f
 				// If we must read already restored data from memory
 				if (m_fReadFromNetRectBuf)
 				{
+					if (m_nReadSize < 0 || m_nNetRectBufOffset < 0 || wanted < 0 ||
+						!ViewerBounds::range(m_nNetRectBufOffset, wanted, m_nReadSize))
+						throw ErrorException(L"Buffered rectangle read exceeds payload.");
 					memcpy(inbuf, m_pNetRectBuf + m_nNetRectBufOffset, wanted);
 					m_nNetRectBufOffset += wanted;
 					if (m_nNetRectBufOffset == m_nReadSize)
@@ -7965,13 +7978,9 @@ void ClientConnection::ReadNewFBSize(rfbFramebufferUpdateRectHeader *pfburh)
 	ClearCache();
 	m_fScalingDone = false;
 
-	if (m_si.framebufferWidth > 20000 || m_si.framebufferHeight > 20000) { // a screensize > 20 000 is not possible with current OS
-		BOOL somebool;
-		bool yes = yesnoUVNCMessageBox(m_hInstResDLL, NULL, str50297, str50290, str50293, str50294, L"",somebool);
-		if (!yes)
-			exit(0);
-		m_si.framebufferWidth = 1024;
-		m_si.framebufferHeight = 800;
+	if (m_nServerScale <= 0 || !ViewerBounds::framebuffer(pfburh->r.w / m_nServerScale,
+		pfburh->r.h / m_nServerScale, m_myFormat.bitsPerPixel / 8)) { // a screensize > 20 000 is not possible with current OS
+		throw ErrorException(L"Invalid framebuffer resize dimensions.");
 	}
 
 	m_si.framebufferWidth = pfburh->r.w / m_nServerScale;
@@ -8092,6 +8101,8 @@ BYTE* ClientConnection::RestoreBufferStep2(BYTE* pRestoredDataBuffer, int nDataL
 //
 inline void ClientConnection::CheckNetRectBufferSize(int nBufSize)
 {
+	if (nBufSize < 0 || !ViewerBounds::payload(nBufSize))
+		throw ErrorException(L"Invalid rectangle buffer size.");
 	if (m_nNetRectBufSize > nBufSize) return;
 
 	omni_mutex_lock l(m_NetRectBufferMutex);
@@ -8113,6 +8124,8 @@ inline void ClientConnection::CheckNetRectBufferSize(int nBufSize)
 //
 inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 {
+	if (nBufSize < 0 || !ViewerBounds::payload(nBufSize))
+		throw ErrorException(L"Invalid rectangle buffer size.");
 	if (m_nZRLENetRectBufSize > nBufSize) return;
 
 	omni_mutex_lock l(m_ZRLENetRectBufferMutex);
@@ -8132,6 +8145,8 @@ inline void ClientConnection::CheckZRLENetRectBufferSize(int nBufSize)
 #ifdef _XZ
 inline void ClientConnection::CheckXZNetRectBufferSize(int nBufSize)
 {
+	if (nBufSize < 0 || !ViewerBounds::payload(nBufSize))
+		throw ErrorException(L"Invalid rectangle buffer size.");
 	if (m_nXZNetRectBufSize > nBufSize) return;
 
 	omni_mutex_lock l(m_XZNetRectBufferMutex);
@@ -10339,9 +10354,8 @@ void ClientConnection::ConvertAll(CARD16 width, CARD16 height, CARD16 xx, CARD16
 	sourcepos=(BYTE*)source;
 
     int y;
-    width*=bytes_per_pixel;
     for (y=0; y<height; y++) {
-        memcpy(destpos, sourcepos, width);
+        memcpy(destpos, sourcepos, bytesPerInputRow);
         sourcepos = (BYTE*)sourcepos + bytesPerInputRow;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
@@ -10355,8 +10369,8 @@ void ClientConnection:: ConvertAll_secure(CARD16 width, CARD16 height, CARD16 xx
 	int bytesPerInputRow = width * bytes_per_pixel;
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 	//security check input buffer
-	if ((bytes_per_pixel * height) > sourceSize)
-			goto error;
+	if (sourceSize < 0 || !ViewerBounds::pixels(width, height, bytes_per_pixel, sourceSize))
+		throw ErrorException(L"Rectangle pixel data is truncated.");
 	//8-bit pitch need to be taken in account
 	if (bytesPerOutputRow % 4)
 		bytesPerOutputRow += 4 - bytesPerOutputRow % 4;
@@ -10370,9 +10384,8 @@ void ClientConnection:: ConvertAll_secure(CARD16 width, CARD16 height, CARD16 xx
 	sourcepos=(BYTE*)source;
 
     int y;
-    width*=bytes_per_pixel;
     for (y=0; y<height; y++) {
-        memcpy(destpos, sourcepos, width);
+        memcpy(destpos, sourcepos, bytesPerInputRow);
         sourcepos = (BYTE*)sourcepos + bytesPerInputRow;
         destpos = (BYTE*)destpos + bytesPerOutputRow;
     }
@@ -10413,7 +10426,7 @@ ClientConnection:: Copyto0buffer(int width, int height, int xx, int yy,int bytes
 {
 	int bytesPerOutputRow = framebufferWidth * bytes_per_pixel;
 
-	if ( ((width + xx) * (height + yy)) > (framebufferWidth * framebufferHeight))
+	if (!ViewerBounds::rectangle(xx, yy, width, height, framebufferWidth, framebufferHeight))
 			goto error;
 
 	//8-bit pitch need to be taken in account
@@ -10643,13 +10656,7 @@ ClientConnection::SolidColor(int width, int height, int xx, int yy,int bytes_per
 bool
 ClientConnection:: Check_Rectangle_borders(int x,int y,int w,int h)
 {
-	if (x<0) return false;
-	if (y<0) return false;
-	if (x+w>m_si.framebufferWidth) return false;
-	if (y+h>m_si.framebufferHeight) return false;
-	if (x+w<x) return false;
-	if (y+h<y) return false;
-	return true;
+	return ViewerBounds::rectangle(x, y, w, h, m_si.framebufferWidth, m_si.framebufferHeight);
 }
 
 // adzm 2010-09

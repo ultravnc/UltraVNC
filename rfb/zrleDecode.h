@@ -144,6 +144,8 @@ top:
               }
               nbits -= bppp;
               U8 index = (byte >> nbits) & ((1 << bppp) - 1) & 127;
+              if (index >= palSize)
+                throw Exception("Invalid RLE palette index");
               *ptr++ = palette[index];
             }
           }
@@ -163,6 +165,8 @@ top:
             int b;
             do {
               b = zis->readU8();
+              if (b > end - ptr - len)
+                throw Exception("RLE run exceeds tile bounds");
               len += b;
             } while (b == 255);
 
@@ -184,6 +188,8 @@ top:
               int b;
               do {
                 b = zis->readU8();
+                if (b > end - ptr - len)
+                  throw Exception("RLE run exceeds tile bounds");
                 len += b;
               } while (b == 255);
 
@@ -192,6 +198,8 @@ top:
 
             index &= 127;
 
+            if (index >= palSize)
+              throw Exception("Invalid RLE palette index");
             PIXEL_T pix = palette[index];
 
             while (len-- > 0) *ptr++ = pix;

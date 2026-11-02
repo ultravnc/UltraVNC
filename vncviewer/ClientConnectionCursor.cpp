@@ -12,11 +12,15 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#include "ViewerBounds.h"
+#include "Exception.h"
 
 void ClientConnection::ReadCursorShape(rfbFramebufferUpdateRectHeader *pfburh) {
 
 	const int cursorWidth = pfburh->r.w;
 	const int cursorHeight = pfburh->r.h;
+	if (!ViewerBounds::pixels(cursorWidth, cursorHeight, sizeof(COLORREF), 104857600))
+		throw ErrorException(L"Cursor shape exceeds size limit.");
 	const int cursorPixels = cursorWidth * cursorHeight;
 	
 	vnclog.Print(6, _T("Receiving cursor shape update, cursor %dx%d\n"),
@@ -376,27 +380,8 @@ void ClientConnection::SoftCursorToScreen(RECT *screenArea, POINT *cursorOffset)
 	int w = rcWidth;
 	int h = rcHeight;
 
-	if (x < 0) {
-		cx = -x;
-		w -= cx;
-		x = 0;
-	} else if (x + w > m_si.framebufferWidth) {
-		w = m_si.framebufferWidth - x;
-	}
-	if (y < 0) {
-		cy = -y;
-		h -= cy;
-		y = 0;
-	} else if (y + h > m_si.framebufferHeight) {
-		h = m_si.framebufferHeight - y;
-	}
-
-	if (w < 0) {
-		cx = 0; x = 0; w = 0;
-	}
-	if (h < 0) {
-		cy = 0; y = 0; h = 0;
-	}
+	ViewerBounds::clipAxis(x, w, m_si.framebufferWidth, cx);
+	ViewerBounds::clipAxis(y, h, m_si.framebufferHeight, cy);
 
 	if (screenArea != NULL) {
 		SetRect(screenArea, x, y, x + w, y + h);

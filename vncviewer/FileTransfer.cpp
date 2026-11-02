@@ -34,6 +34,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "FileTransfer.h"
+#include "ViewerBounds.h"
 #include "Exception.h"
 #include "commctrl.h"
 #include "shlobj.h"
@@ -528,6 +529,8 @@ void FileTransfer::ProcessFileTransferMsg(void)
 	
 	rfbFileTransferMsg ft;
 	m_pCC->ReadExact(((char *) &ft) + m_pCC->m_nTO, sz_rfbFileTransferMsg - m_pCC->m_nTO);
+	if (!ViewerBounds::payload(Swap32IfLE(ft.length)))
+		throw ErrorException(L"File-transfer payload exceeds size limit.");
 
 	switch (ft.contentType)
 	{
@@ -2164,7 +2167,9 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, UINT nLen, bool fUnicodeEntry
 		if (nLen > sizeof(WIN32_FIND_DATAW)) return;
 		WIN32_FIND_DATAW fdW;
 		memset(&fdW, 0, sizeof(fdW));
-		m_pCC->ReadString((char *)&fdW, nLen);
+		m_pCC->ReadExact((char *)&fdW, nLen);
+		if (wmemchr(fdW.cFileName, L'\0', _countof(fdW.cFileName)) == NULL)
+			throw ErrorException(L"Unterminated directory filename.");
 		memset(&m_fd, 0, sizeof(WIN32_FIND_DATA));
 		m_fd.dwFileAttributes  = fdW.dwFileAttributes;
 		m_fd.ftCreationTime    = fdW.ftCreationTime;
@@ -2178,7 +2183,8 @@ void FileTransfer::ReceiveDirectoryItem(HWND hWnd, UINT nLen, bool fUnicodeEntry
 	}
 	else
 	{
-		if ((nLen + 1) > sizeof(m_szFileSpec)) return;
+		if (nLen >= sizeof(m_szFileSpec) || nLen > sizeof(m_fd))
+			throw ErrorException(L"Remote directory entry exceeds size limit.");
 		// Read the File/Directory full info
 		m_pCC->ReadString((char *)m_szFileSpec, nLen);
 		memset(&m_fd, '\0', sizeof(WIN32_FIND_DATA));
@@ -2261,7 +2267,8 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, UINT nLen)
 	TCHAR szType[32];
 	UINT nIndex = 0;
 
-	if ((nLen + 1) > sizeof(szDrivesList)) return;
+	if (nLen >= sizeof(szDrivesList))
+		throw ErrorException(L"Remote drive list exceeds size limit.");
 
 	m_pCC->ReadString(szDrivesList, nLen);
 
@@ -2272,9 +2279,11 @@ void FileTransfer::ListRemoteDrives(HWND hWnd, UINT nLen)
 	SetDlgItemTextW(hWnd, IDC_CURR_REMOTE, L"");
 
 	// Fill the tree with the remote drives
-	while (nIndex < nLen - 3)
+	while (ViewerBounds::range(nIndex, 4, nLen))
 	{
-		strcpy_s(szDriveA, 4, szDrivesList + nIndex);
+		if (szDrivesList[nIndex + 3] != '\0')
+			throw ErrorException(L"Invalid remote drive record.");
+		memcpy(szDriveA, szDrivesList + nIndex, sizeof(szDriveA));
 		MultiByteToWideChar(CP_ACP, 0, szDriveA, -1, szDrive, 4);
 		nIndex += 4;
 
@@ -2694,6 +2703,8 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	ft.size = Swap32IfLE(0);
 	ft.length = Swap32IfLE(0);
 
+	if (!ViewerBounds::payload(nLen))
+		throw ErrorException(L"Invalid remote filename length.");
 	char *szRemoteFileName = new char [nLen+1];
 	if (szRemoteFileName == NULL) return false;
 	memset(szRemoteFileName, 0, nLen+1);
@@ -3861,6 +3872,12 @@ int FileTransfer::ZipPossibleDirectory(LPSTR szSrcFileName)
 bool FileTransfer::ReceiveDestinationFileChecksums(int nSize, UINT nLen)
 {
 //	vnclog.Print(0, _T("ReceiveDestinationFileChecksums\n"));
+	if (!ViewerBounds::payload(nLen) || nLen % 4 != 0)
+		throw ErrorException(L"Invalid checksum payload length.");
+	delete [] m_lpCSBuffer;
+	m_lpCSBuffer = NULL;
+	m_nCSBufferSize = 0;
+	m_nCSOffset = 0;
 	m_lpCSBuffer = new char [nLen+1]; //nSize
 	if (m_lpCSBuffer == NULL) 
 	{
@@ -3895,6 +3912,8 @@ bool FileTransfer::SendFile(long lSize, UINT nLen)
 	 OutputDebugStringW(debugMsg);}
 #endif
 
+	if (!ViewerBounds::payload(nLen))
+		throw ErrorException(L"Invalid remote filename length.");
 	char *szRemoteFileName = new char [nLen+1];
 	if (szRemoteFileName == NULL) return false;
 	memset(szRemoteFileName, 0, nLen+1);
@@ -4062,7 +4081,7 @@ bool FileTransfer::SendFileChunk()
 		// if Checksums are available for this file
 		if (m_lpCSBuffer != NULL)
 		{
-			if (m_nCSOffset < m_nCSBufferSize)
+			if (ViewerBounds::range(m_nCSOffset, 4, m_nCSBufferSize))
 			{
 				memcpy(&nCS, &m_lpCSBuffer[m_nCSOffset], 4);
 				if (nCS != 0)
@@ -4448,6 +4467,8 @@ void FileTransfer::RenameRemoteFileOrDirectory(LPSTR szCurrentName, LPSTR szNewN
 //
 bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, UINT nLen)
 {
+	if (!ViewerBounds::payload(nLen))
+		throw ErrorException(L"Invalid remote filename length.");
 	char *szRemoteName = new char [nLen+1];
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
@@ -4480,6 +4501,8 @@ bool FileTransfer::CreateRemoteDirectoryFeedback(long lSize, UINT nLen)
 //
 bool FileTransfer::DeleteRemoteFileFeedback(long lSize, UINT nLen)
 {
+	if (!ViewerBounds::payload(nLen))
+		throw ErrorException(L"Invalid remote filename length.");
 	char *szRemoteName = new char [nLen+1];
 	if (szRemoteName == NULL) return false;
 	memset(szRemoteName, 0, nLen+1);
@@ -4521,6 +4544,8 @@ bool FileTransfer::RenameRemoteFileOrDirectoryFeedback(long lSize, UINT nLen)
 {
 	if (nLen <= 0) return false;
 
+	if (!ViewerBounds::payload(nLen))
+		throw ErrorException(L"Invalid remote filename length.");
 	char *szContent = new char [nLen+1];
 	if (szContent == NULL) return false;
 	memset(szContent, 0, nLen+1);

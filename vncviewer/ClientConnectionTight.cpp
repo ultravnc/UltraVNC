@@ -13,6 +13,8 @@
 #include "vncviewer.h"
 #include "ClientConnection.h"
 #include "Exception.h"
+#include "ViewerJpegSource.h"
+#include <memory>
 
 #define TIGHT_MIN_TO_COMPRESS 12
 #define TIGHT_BUFFER_SIZE (2048 * 200)
@@ -476,14 +478,12 @@ void ClientConnection::FilterPalette (int numRows)
 // JPEG decompression code.
 //
 
-static bool jpegError;
+
 //
 // A "Source manager" for the JPEG library.
 //
 
-static struct jpeg_source_mgr jpegSrcManager;
-static JOCTET *jpegBufferPtr;
-static size_t jpegBufferLen;
+
 
 static void JpegInitSource(j_decompress_ptr cinfo);
 static boolean JpegFillInputBuffer(j_decompress_ptr cinfo);
@@ -493,31 +493,19 @@ static void JpegTermSource(j_decompress_ptr cinfo);
 static void
 JpegInitSource(j_decompress_ptr cinfo)
 {
-	jpegError = false;
+	ViewerJpeg::initSource(cinfo);
 }
 
 static boolean
 JpegFillInputBuffer(j_decompress_ptr cinfo)
 {
-	jpegError = true;
-	jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-	jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-
-	return TRUE;
+	return ViewerJpeg::fillInputBuffer(cinfo);
 }
 
 static void
 JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes)
 {
-	if (num_bytes < 0 || (size_t)num_bytes > jpegSrcManager.bytes_in_buffer) {
-		jpegError = true;
-		jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-		jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-	}
-	else {
-		jpegSrcManager.next_input_byte += (size_t)num_bytes;
-		jpegSrcManager.bytes_in_buffer -= (size_t)num_bytes;
-	}
+	ViewerJpeg::skipInputData(cinfo, num_bytes);
 }
 
 static void
@@ -555,8 +543,15 @@ void JpegErrorHeader(j_common_ptr cinfo) {
 }
 void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
 {
-  struct jpeg_decompress_struct cinfo;
+  struct jpeg_decompress_struct cinfo = {};
+  auto destroy = [](jpeg_decompress_struct* p) { if (p->mem) jpeg_destroy_decompress(p); };
+  std::unique_ptr<jpeg_decompress_struct, decltype(destroy)> cleanup(&cinfo, destroy);
   struct jpeg_error_mgr jerr;
+  jpeg_source_mgr sourceManager = {};
+  bool jpegError = false;
+  JOCTET* jpegBufferPtr = NULL;
+  size_t jpegBufferLen = 0;
+  cinfo.client_data = &jpegError;
 
   int compressedLen = (int)ReadCompactLen();
   if (compressedLen <= 0) {
@@ -578,21 +573,20 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
       jpegBufferPtr = (JOCTET*)m_netbuf;
       jpegBufferLen = (size_t)compressedLen;
 
-      m_jpegSrcManager.init_source = JpegInitSource;
-      m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
-      m_jpegSrcManager.skip_input_data = JpegSkipInputData;
-      m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
-      m_jpegSrcManager.term_source = JpegTermSource;
-      m_jpegSrcManager.next_input_byte = jpegBufferPtr;
-      m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+      sourceManager.init_source = JpegInitSource;
+      sourceManager.fill_input_buffer = JpegFillInputBuffer;
+      sourceManager.skip_input_data = JpegSkipInputData;
+      sourceManager.resync_to_restart = jpeg_resync_to_restart;
+      sourceManager.term_source = JpegTermSource;
+      sourceManager.next_input_byte = jpegBufferPtr;
+      sourceManager.bytes_in_buffer = jpegBufferLen;
 
-      cinfo.src = &m_jpegSrcManager;
+      cinfo.src = &sourceManager;
 
       jpeg_read_header(&cinfo, TRUE);
   }
   catch (QuietException& e) {
       e.Report();
-      jpeg_destroy_decompress(&cinfo);
       return;
   }
 
@@ -602,13 +596,11 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   if ((int)cinfo.output_width != w || (int)cinfo.output_height != h ||
       cinfo.output_components != 3) {
     vnclog.Print(0, _T("Tight Encoding: Wrong JPEG data received.\n"));
-    jpeg_destroy_decompress(&cinfo);
     return;
   }
 
   if (w < 1 || h < 1 || w > 65535) {
     vnclog.Print(0, _T("Tight JPEG: invalid rectangle dimensions %dx%d\n"), w, h);
-    jpeg_destroy_decompress(&cinfo);
     return;
   }
 
@@ -637,7 +629,6 @@ void ClientConnection::DecompressJpegRect(int x, int y, int w, int h)
   if (!jpegError)
     jpeg_finish_decompress(&cinfo);
 
-  jpeg_destroy_decompress(&cinfo);
 }
 
 

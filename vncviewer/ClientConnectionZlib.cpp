@@ -45,8 +45,8 @@ void ClientConnection::ReadZlibRect(rfbFramebufferUpdateRectHeader *pfburh, bool
 
 	// Verify enough buffer space for screen update.
 	CheckZlibBufferSize(numRawBytes);
-	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK)
-		return;
+	if (ultraVncZlib->decompress(numCompBytes, numRawBytes, (unsigned char *)m_netbuf, m_zlibbuf, zstd) != Z_OK || numRawBytes != 0)
+		throw ErrorException(L"Invalid compressed rectangle data.");
 
 	// No other threads can use bitmap DC
 	omni_mutex_lock l(m_bitmapdcMutex);	

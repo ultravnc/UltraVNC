@@ -15,18 +15,19 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#include "ViewerBounds.h"
 #ifdef _VCPKG
 #include <jpeglib.h>
 #else
 #include "libjpeg-turbo-win/jpeglib.h"
 #endif
 #include "Exception.h"
+#include "ViewerJpegSource.h"
+#include <memory>
+#include <vector>
 
 
-static struct jpeg_source_mgr jpegSrcManager;
-static JOCTET *jpegBufferPtr;
-static size_t jpegBufferLen;
-static bool jpegError;
+
 static void JpegInitSource(j_decompress_ptr cinfo);
 static boolean JpegFillInputBuffer(j_decompress_ptr cinfo);
 static void JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes);
@@ -35,30 +36,19 @@ static void JpegTermSource(j_decompress_ptr cinfo);
 static void
 JpegInitSource(j_decompress_ptr cinfo)
 {
-  jpegError = false;
+  ViewerJpeg::initSource(cinfo);
 }
 
 static boolean
 JpegFillInputBuffer(j_decompress_ptr cinfo)
 {
-  jpegError = true;
-  jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-  jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-
-  return TRUE;
+  return ViewerJpeg::fillInputBuffer(cinfo);
 }
 
 static void
 JpegSkipInputData(j_decompress_ptr cinfo, long num_bytes)
 {
-  if (num_bytes < 0 || (size_t)num_bytes > jpegSrcManager.bytes_in_buffer) {
-    jpegError = true;
-    jpegSrcManager.bytes_in_buffer = jpegBufferLen;
-    jpegSrcManager.next_input_byte = (JOCTET *)jpegBufferPtr;
-  } else {
-    jpegSrcManager.next_input_byte += (size_t) num_bytes;
-    jpegSrcManager.bytes_in_buffer -= (size_t) num_bytes;
-  }
+  ViewerJpeg::skipInputData(cinfo, num_bytes);
 }
 
 static void
@@ -87,11 +77,22 @@ JpegSetSrcManager(j_decompress_ptr cinfo, char *compressedData, int compressedLe
 void 
 	ClientConnection::DecompressJpegRect(BYTE *src, int srclen, BYTE *dst, int dst_size,int w, int h,rfbPixelFormat m_remoteformat)
 {
-  struct jpeg_decompress_struct cinfo;
+  if (srclen <= 0 || dst_size < 0 || w <= 0 || h <= 0 ||
+      !ViewerBounds::pixels(w, h, m_remoteformat.bitsPerPixel / 8, dst_size))
+      throw ErrorException(L"Invalid JPEG buffer dimensions.");
+  struct jpeg_decompress_struct cinfo = {};
+  auto destroy = [](jpeg_decompress_struct* p) { if (p->mem) jpeg_destroy_decompress(p); };
+  std::unique_ptr<jpeg_decompress_struct, decltype(destroy)> cleanup(&cinfo, destroy);
   struct jpeg_error_mgr jerr;
+  jpeg_source_mgr sourceManager = {};
+  bool jpegError = false;
+  JOCTET* jpegBufferPtr = (JOCTET*)src;
+  size_t jpegBufferLen = srclen;
+  cinfo.client_data = &jpegError;
   int pixelsize;
   BYTE *dstBuf=NULL;
   bool dstBufIsTemp = false;
+  std::vector<BYTE> temporary;
 
  // Set up JPEG decompression
   cinfo.err = jpeg_std_error(&jerr);
@@ -104,24 +105,22 @@ void
       jpegBufferPtr = (JOCTET*)src;
       jpegBufferLen = (size_t)srclen;
 
-      m_jpegSrcManager.init_source = JpegInitSource;
-      m_jpegSrcManager.fill_input_buffer = JpegFillInputBuffer;
-      m_jpegSrcManager.skip_input_data = JpegSkipInputData;
-      m_jpegSrcManager.resync_to_restart = jpeg_resync_to_restart;
-      m_jpegSrcManager.term_source = JpegTermSource;
-      m_jpegSrcManager.next_input_byte = jpegBufferPtr;
-      m_jpegSrcManager.bytes_in_buffer = jpegBufferLen;
+      sourceManager.init_source = JpegInitSource;
+      sourceManager.fill_input_buffer = JpegFillInputBuffer;
+      sourceManager.skip_input_data = JpegSkipInputData;
+      sourceManager.resync_to_restart = jpeg_resync_to_restart;
+      sourceManager.term_source = JpegTermSource;
+      sourceManager.next_input_byte = jpegBufferPtr;
+      sourceManager.bytes_in_buffer = jpegBufferLen;
 
-      cinfo.src = &m_jpegSrcManager;
+      cinfo.src = &sourceManager;
 
       jpeg_read_header(&cinfo, TRUE);
       cinfo.out_color_space = JCS_RGB;
       pixelsize = 3;
   }
-  catch (QuietException& e) {
-      e.Report();
-      jpeg_destroy_decompress(&cinfo);
-      return;
+  catch (QuietException&) {
+      throw;
   }
 
 #ifdef JCS_EXTENSIONS
@@ -157,19 +156,21 @@ void
 #endif
 
   if (cinfo.out_color_space == JCS_RGB) {
-    dstBuf = new BYTE[w * h * pixelsize];
+    if (!ViewerBounds::pixels(w, h, pixelsize, 104857600))
+      throw ErrorException(L"JPEG temporary buffer exceeds size limit.");
+    temporary.resize(static_cast<size_t>(w) * h * pixelsize);
+    dstBuf = temporary.data();
     dstBufIsTemp = true;
   }
 
-  JSAMPROW *rowPointer = new JSAMPROW[h];
+  std::vector<JSAMPROW> rowPointer(h);
   for (int dy = 0; dy < h; dy++)
     rowPointer[dy] = (JSAMPROW)(&dstBuf[dy * w * pixelsize]);
 
   jpeg_start_decompress(&cinfo);
   if (cinfo.output_width != (unsigned)w || cinfo.output_height != (unsigned)h ||
       cinfo.output_components != pixelsize) {
-      jpeg_destroy_decompress(&cinfo);
-      return;
+      throw ErrorException(L"JPEG dimensions do not match update rectangle.");
   }
 
   while (cinfo.output_scanline < cinfo.output_height) {
@@ -180,14 +181,21 @@ void
     }
   }
 
-  delete [] rowPointer;
-
-  if (!jpegError) {
-    jpeg_finish_decompress(&cinfo);
+  if (jpegError)
+    throw ErrorException(L"Truncated JPEG rectangle.");
+  jpeg_finish_decompress(&cinfo);
+  if (dstBufIsTemp) {
+    const int bytesPerPixel = m_remoteformat.bitsPerPixel / 8;
+    if (m_remoteformat.redMax == 0 || m_remoteformat.greenMax == 0 || m_remoteformat.blueMax == 0 ||
+        m_remoteformat.redShift >= 32 || m_remoteformat.greenShift >= 32 || m_remoteformat.blueShift >= 32)
+      throw ErrorException(L"Invalid JPEG pixel format.");
+    for (size_t i = 0; i < static_cast<size_t>(w) * h; ++i) {
+      CARD32 pixel = ((static_cast<CARD32>(dstBuf[i * 3]) * m_remoteformat.redMax / 255) << m_remoteformat.redShift) |
+        ((static_cast<CARD32>(dstBuf[i * 3 + 1]) * m_remoteformat.greenMax / 255) << m_remoteformat.greenShift) |
+        ((static_cast<CARD32>(dstBuf[i * 3 + 2]) * m_remoteformat.blueMax / 255) << m_remoteformat.blueShift);
+      memcpy(dst + i * bytesPerPixel, &pixel, bytesPerPixel);
+    }
   }
-
-  jpeg_destroy_decompress(&cinfo);
-  if (dstBufIsTemp) delete [] dstBuf;
   return ;
 }
 

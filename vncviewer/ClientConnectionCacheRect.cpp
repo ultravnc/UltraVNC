@@ -17,6 +17,7 @@
 #include "stdhdrs.h"
 #include "vncviewer.h"
 #include "ClientConnection.h"
+#include "Exception.h"
 
 
 void ClientConnection::ReadCacheRect(rfbFramebufferUpdateRectHeader *pfburh)
@@ -104,10 +105,8 @@ void ClientConnection::ReadCacheZip(rfbFramebufferUpdateRectHeader *pfburh,HRGN 
 						  (unsigned char*)m_netbuf,	// Src
 						  numCompBytes	// Src len
 						 );							    
-	if (nRet != 0)
-	{
-		return;		
-	}
+	if (nRet != 0 || numRawBytes < nNbCacheRects * sz_rfbRectangle)
+		throw ErrorException(L"Invalid compressed cache rectangle list.");
 
 	// Read all the cache rects
 	rfbRectangle theRect;
