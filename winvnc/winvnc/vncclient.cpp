@@ -2874,6 +2874,14 @@ vncClientThread::run(void* arg)
 			m_client->NotifyPluginStreamingSupport();
 			need_notify_streaming_DSM = false;
 		}
+		// Resume an ongoing file upload (server -> viewer) that yielded to incoming messages
+		if (m_client->m_fFileUploadRunning)
+		{
+			m_client->cl_connected = m_client->SendFileChunk();
+			if (!m_client->cl_connected)
+				break;
+		}
+
 		// sf@2002 - v1.1.2
 		int nTO = 1; // Type offset
 		// If DSM Plugin, we must read all the transformed incoming rfb messages (type included)
@@ -4618,7 +4626,7 @@ vncClientThread::run(void* arg)
 					{
 						m_client->m_fFileUploadError = true;
 						m_client->m_fUserAbortedFileTransfer = true;
-						// m_client->FinishFileSending();
+						m_client->FinishFileSending();
 					}
 					else // Old method for File Transfer handshake perimssion (<= RC18)
 					{
@@ -7070,6 +7078,11 @@ bool vncClient::SendFileChunk()
 		if (needYield) {
 			Sleep(1);  // Minimal yield to allow TCP buffers to drain and screen updates
 		}
+
+		// Let the client thread process pending viewer messages (e.g. rfbAbortFileTransfer);
+		// it resumes sending once they are handled.
+		if (connected && m_fFileUploadRunning && m_socket->ReadSelect(0))
+			break;
 
 		/*if (connected)
 		{
