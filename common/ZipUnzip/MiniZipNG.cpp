@@ -7,6 +7,7 @@
 // SPDX-FileCopyrightText: Copyright (C) 2025 UltraVNC Team Members. All Rights Reserved.
 
 #include "MiniZipNG.h"
+#include "../win32_helpers.h"
 #include <minizip-ng/mz.h>
 #include <minizip-ng/mz_zip.h>
 #include <minizip-ng/mz_strm.h>
@@ -333,7 +334,22 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
     {
         wcscpy_s(szLongPathW, MAX_PATH * 4, szExtractPath);
     }
-    
+
+    // Canonical extraction root without the \\?\ prefix. Every entry is
+    // checked against it after GetFullPathNameW resolution.
+    WCHAR szRootFullW[MAX_PATH * 4];
+    DWORD nRootLen = GetFullPathNameW(szExtractPath, MAX_PATH * 4, szRootFullW, NULL);
+    size_t nRootFullLen = (nRootLen > 0 && nRootLen < MAX_PATH * 4) ? wcslen(szRootFullW) : 0;
+    while (nRootFullLen > 0 && szRootFullW[nRootFullLen - 1] == L'\\')
+        szRootFullW[--nRootFullLen] = L'\0';
+    if (nRootFullLen == 0)
+    {
+        MZ_DEBUG(L"[MiniZipNG] Failed to resolve extract root\n");
+        mz_zip_reader_close(zip_reader);
+        mz_zip_reader_delete(&zip_reader);
+        return false;
+    }
+
     // Go to first entry
     err = mz_zip_reader_goto_first_entry(zip_reader);
     
@@ -371,7 +387,35 @@ bool CMiniZipNG::UnZipDirectory(LPCWSTR szExtractPath, LPCWSTR szZipPath)
         // Replace forward slashes with backslashes for Windows
         for (WCHAR* p = szEntryNameW; *p; p++)
             if (*p == L'/') *p = L'\\';
-        
+
+        // Skip entries whose names could escape the extraction root
+        // (absolute paths, drive specifiers, "." or ".." components)
+        if (!helper::IsSafeRelativePathW(szEntryNameW))
+        {
+            MZ_DEBUG(L"[MiniZipNG] Skipping unsafe entry name\n");
+            num_errors++;
+            err = mz_zip_reader_goto_next_entry(zip_reader);
+            continue;
+        }
+
+        // Verify the resolved entry path stays inside the extraction root
+        {
+            WCHAR szJoinW[MAX_PATH * 4];
+            WCHAR szResolvedW[MAX_PATH * 4];
+            _snwprintf_s(szJoinW, MAX_PATH * 4, _TRUNCATE, L"%s\\%s", szRootFullW, szEntryNameW);
+            DWORD nRes = GetFullPathNameW(szJoinW, MAX_PATH * 4, szResolvedW, NULL);
+            if (nRes == 0 || nRes >= MAX_PATH * 4 ||
+                wcslen(szResolvedW) <= nRootFullLen ||
+                _wcsnicmp(szResolvedW, szRootFullW, nRootFullLen) != 0 ||
+                szResolvedW[nRootFullLen] != L'\\')
+            {
+                MZ_DEBUG(L"[MiniZipNG] Skipping entry outside extraction root\n");
+                num_errors++;
+                err = mz_zip_reader_goto_next_entry(zip_reader);
+                continue;
+            }
+        }
+
         WCHAR szFullPathW[MAX_PATH * 4];
         _snwprintf_s(szFullPathW, MAX_PATH * 4, _TRUNCATE, L"%s\\%s", szLongPathW, szEntryNameW);
         

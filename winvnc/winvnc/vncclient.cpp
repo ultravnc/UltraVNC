@@ -7438,6 +7438,23 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 			vnclog.Print(0, _T("  Decoded dirname: %s\n"), szFinalDirNameW);
 		}
 
+		// Security: the final folder name comes from the client. It must be a
+		// single plain folder name - reject "..", path separators, drive
+		// specifiers and trailing dots/spaces before extracting anything.
+		UINT cpName = m_fClientSupportsUnicode ? CP_UTF8 : CP_ACP;
+		WCHAR szDirNameW2[MAX_PATH * 4];
+		MultiByteToWideChar(cpName, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
+		const WCHAR* szEffectiveNameW = (wcslen(szFinalDirNameW) > 0) ? szFinalDirNameW : szDirNameW2;
+		if (!helper::IsSafeFileNameW(szEffectiveNameW))
+		{
+			vnclog.Print(0, _T("  REJECTED unsafe dir name: %s\n"), szEffectiveNameW);
+			m_fFileDownloadError = true;
+			WCHAR szZipDelW[MAX_PATH * 4];
+			MakeLongPath(szFileName, szZipDelW, MAX_PATH * 4);
+			DeleteFileW(szZipDelW);
+			return true;
+		}
+
 		// Use a short ASCII temp name for extraction, then rename to Unicode
 		char szExtractName[64];
 		sprintf_s(szExtractName, "UVNCTMP%08X", GetTickCount());
@@ -7487,16 +7504,24 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 				wcscpy_s(szParentW, szFileNameW);
 				WCHAR* pp2 = wcsrchr(szParentW, L'\\');
 				if (pp2) *(pp2 + 1) = L'\0';
-				if (wcslen(szFinalDirNameW) > 0)
-					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szFinalDirNameW);
-				else
+				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szEffectiveNameW);
+
+				// Security: the resolved destination must be a direct child
+				// of the destination folder.
+				BOOL bMoved = FALSE;
+				if (helper::IsDirectChildPathW(szParentW, szFinalPathW))
 				{
-					WCHAR szDirNameW2[MAX_PATH * 4];
-					MultiByteToWideChar(cp, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
-					_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentW, szDirNameW2);
+					bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+					if (!bMoved)
+					{
+						// Destination folder already exists: merge extracted content into it
+						DWORD dwDstAttr = GetFileAttributesW(szFinalPathW);
+						if (dwDstAttr != INVALID_FILE_ATTRIBUTES && (dwDstAttr & FILE_ATTRIBUTE_DIRECTORY))
+							bMoved = helper::MoveDirContentsInto(szExtractPathW, szFinalPathW) ? TRUE : FALSE;
+					}
 				}
-				
-				BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+				if (!bMoved)
+					m_fFileDownloadError = true;
 			}
 		}
 		else

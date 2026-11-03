@@ -2670,19 +2670,6 @@ void FileTransfer::RequestRemoteFile(LPSTR szRemoteFileName)
 	return;
 }
 
-bool endsWith(const char* str, const char* ending) {
-	if (str == nullptr || ending == nullptr)
-		return false;
-
-	size_t strLength = strlen(str);
-	size_t endingLength = strlen(ending);
-
-	if (endingLength > strLength)
-		return false;
-
-	return (strcmp(str + strLength - endingLength, ending) == 0);
-}
-
 //
 // Receive a file
 //
@@ -2766,8 +2753,15 @@ bool FileTransfer::ReceiveFile(unsigned long lSize, UINT nLen)
 	unsigned long dwFreeKBytes=0;
 	//security requested filename must be the received filename
 	if (strcmp(szRemoteFileName, szRemoteFileNameRequested) != NULL) {
-		if (!endsWith(szRemoteFileName, ".zip"))
+		// Only a "[ name ]" directory request may be answered with a
+		// differently-named reply: the !UVNCDIR-...zip built for that
+		// directory. Anything else is rejected.
+		if (!IsExpectedDirZipReply(szRemoteFileName, szRemoteFileNameRequested, m_fServerSupportsUnicode, UsingOldProtocol()))
+		{
+			delete [] szRemoteFileName;
+			m_fFileDownloadError = true;
 			return false;
+		}
 	}
 
 	// Check free space using Unicode API on the destination drive root
@@ -3291,6 +3285,25 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 #endif
 		}
 
+		// Security: the final folder name comes from the server. It must be a
+		// single plain folder name - reject "..", path separators, drive
+		// specifiers and trailing dots/spaces before extracting anything.
+		WCHAR szDirNameW2[MAX_PATH * 4];
+		MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
+		const WCHAR* szEffectiveNameW = (wcslen(szFinalDirNameW) > 0) ? szFinalDirNameW : szDirNameW2;
+		if (!IsSafeFileNameW(szEffectiveNameW))
+		{
+#if DEBUG_FT
+			OutputDebugStringW(L"  REJECTED unsafe dir name: "); OutputDebugStringW(szEffectiveNameW); OutputDebugStringW(L"\n");
+#endif
+			DeleteFileW(szFileName);
+			m_fFileDownloadError = true;
+			wchar_t szStatusErr[512];
+			_snwprintf_s(szStatusErr, 512, _TRUNCATE, L" %s < %s >", sz_H12, szEffectiveNameW);
+			SetStatus(szStatusErr);
+			return true;
+		}
+
 		// Extract to ASCII temp name, then rename to Unicode
 		char szExtractName[64];
 		sprintf_s(szExtractName, "UVNCTMP%08X", GetTickCount());
@@ -3380,20 +3393,36 @@ bool FileTransfer::UnzipPossibleDirectory(LPCWSTR szFileName)
 			MultiByteToWideChar(CP_ACP, 0, szExtractName, -1, szExtractNameW, 64);
 			_snwprintf_s(szExtractPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szExtractNameW);
 
-			if (wcslen(szFinalDirNameW) > 0)
-				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szFinalDirNameW);
-			else
-			{
-				WCHAR szDirNameW2[MAX_PATH * 4];
-				MultiByteToWideChar(CP_ACP, 0, szDirName, -1, szDirNameW2, MAX_PATH * 4);
-				_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szDirNameW2);
-			}
+			_snwprintf_s(szFinalPathW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szParentPathW, szEffectiveNameW);
 #if DEBUG_FT
 			OutputDebugStringW(L"  Renaming:\n    From: "); OutputDebugStringW(szExtractPathW);
 			OutputDebugStringW(L"\n    To: "); OutputDebugStringW(szFinalPathW); OutputDebugStringW(L"\n");
 #endif
-			
-			BOOL bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+
+			// Security: the resolved destination must be a direct child of
+			// the download folder.
+			BOOL bMoved = FALSE;
+			if (IsDirectChildPathW(szParentPathW, szFinalPathW))
+			{
+				bMoved = MoveFileW(szExtractPathW, szFinalPathW);
+				if (!bMoved)
+				{
+					// Destination folder already exists: merge extracted content into it
+					DWORD dwDstAttr = GetFileAttributesW(szFinalPathW);
+					if (dwDstAttr != INVALID_FILE_ATTRIBUTES && (dwDstAttr & FILE_ATTRIBUTE_DIRECTORY))
+						bMoved = MoveDirContentsInto(szExtractPathW, szFinalPathW);
+				}
+			}
+			else
+			{
+				m_fFileDownloadError = true;
+			}
+			if (!bMoved)
+			{
+				wchar_t szStatusW7[MAX_PATH * 4 + 64];
+				_snwprintf_s(szStatusW7, MAX_PATH * 4 + 64, _TRUNCATE, L" %s < %s >", sz_H12, szFinalPathW);
+				SetStatus(szStatusW7);
+			}
 #if DEBUG_FT
 		if (!bMoved)
 		{
