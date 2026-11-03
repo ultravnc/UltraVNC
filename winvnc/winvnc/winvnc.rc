@@ -79,7 +79,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,215,56,54,16
     CONTROL         IDB_LOGO64,IDC_VNCLOGO,"Static",SS_BITMAP | SS_CENTERIMAGE,7,1,39,39
     LTEXT           "UltraVNC Server 1.4.4.0-dev",IDC_VERSION,49,5,145,11
-    LTEXT           "Copyright © 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
+    LTEXT           "Copyright ï¿½ 2002-2024 UltraVNC Team Members",IDC_NAME,49,27,222,12
     LTEXT           "Website:",IDC_WWW2,15,65,31,9
     LTEXT           "Built",IDC_BUILDTEXT,49,16,20,10
     LTEXT           "BuildTime",IDC_BUILDTIME,72,16,92,10
@@ -480,19 +480,20 @@ FONT 11, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     GROUPBOX        "VeNCrypt TLS (native encrypted VNC)",IDC_STATIC_VeNCrypt,6,3,349,125
     CONTROL         "Enable VeNCrypt TLS",IDC_VENCRYPT_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,13,141,10
-    CONTROL         "RA2 encrypted session (5/129)",IDC_ENABLE_RA2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,170,13,125,10
+    CONTROL         "RA2 encrypted session (5/129)",IDC_ENABLE_RA2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,9,125,10
+    CONTROL         "RA2ne handshake only (6/130)",IDC_ENABLE_RA2NE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,21,130,10
     CONTROL         "Allow X509-Plain password method",IDC_VENCRYPT_ALLOW_PLAIN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,99,143,10
-    LTEXT           "Certificate thumbprint:",IDC_STATIC_THUMB,13,31,80,8
-    EDITTEXT        IDC_VENCRYPT_THUMBPRINT,95,29,137,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Select...",IDC_VENCRYPT_CERT_SELECT,239,29,40,12
-    PUSHBUTTON      "New self-signed",IDC_VENCRYPT_CERT_GEN,288,29,56,12
-    LTEXT           "Token validator DLL:",IDC_STATIC_TOKEN,15,47,80,10
-    EDITTEXT        IDC_VENCRYPT_DLLPATH,95,45,137,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_VENCRYPT_DLL_BROWSE,239,45,40,12
-    PUSHBUTTON      "Manage users...",IDC_VENCRYPT_MANAGE,288,45,55,12
-    GROUPBOX        "",IDC_STATIC,10,60,345,66
-    LTEXT           "Allowed VeNCrypt + RA2 types",IDC_STATIC_SUBTYPES,16,60,160,8
+    LTEXT           "Certificate thumbprint:",IDC_STATIC_THUMB,13,37,80,8
+    EDITTEXT        IDC_VENCRYPT_THUMBPRINT,95,35,137,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Select...",IDC_VENCRYPT_CERT_SELECT,239,35,40,12
+    PUSHBUTTON      "New self-signed",IDC_VENCRYPT_CERT_GEN,288,35,56,12
+    LTEXT           "Token validator DLL:",IDC_STATIC_TOKEN,15,53,80,10
+    EDITTEXT        IDC_VENCRYPT_DLLPATH,95,51,137,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_VENCRYPT_DLL_BROWSE,239,51,40,12
+    PUSHBUTTON      "Manage users...",IDC_VENCRYPT_MANAGE,288,51,55,12
+    GROUPBOX        "",IDC_STATIC,10,66,345,60
+    LTEXT           "Allowed VeNCrypt subtypes",IDC_STATIC_SUBTYPES,16,66,160,8
     CONTROL         "X509-Vnc (261)",IDC_VENCRYPT_SUBTYPE_261,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,75,82,10
     CONTROL         "X509-Plain (262)",IDC_VENCRYPT_SUBTYPE_262,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,82,10
     CONTROL         "X509-SASL (263)",IDC_VENCRYPT_SUBTYPE_263,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,99,82,10
@@ -502,7 +503,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,87,145,10
     CONTROL         "TokenTLS (300)",IDC_VENCRYPT_SUBTYPE_300,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,101,75,82,10
     CONTROL         "X509-MSLogonIII (301)",IDC_VENCRYPT_SUBTYPE_301,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,101,87,90,10
-    CONTROL         "RA2ne handshake only (6/130)",IDC_ENABLE_RA2NE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,113,130,10
     LTEXT           "Self-signed key bits:",IDC_STATIC,197,113,75,8
     COMBOBOX        IDC_VENCRYPT_KEYBITS,282,111,62,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Web client (noVNC) HTTPS / TLS",IDC_NOVNC,6,131,349,50
@@ -518,7 +518,7 @@ BEGIN
 END
 
 IDD_SELECT_CERT DIALOGEX 0, 0, 280, 160
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_MODALFRAME
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select certificate"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -925,23 +925,6 @@ IDR_WEBVIEWER_VENDOR_PAKO_LIB_ZLIB_ZSTREAM_JS JS                      "../../3rd
 IDR_WEBVIEWER_INDEX_HTML HTML                    "res/webviewer_index.html"
 
 
-#ifndef APSTUDIO_INVOKED
-	#if defined(SC_20)
-	/////////////////////////////////////////////////////////////////////////////
-	//
-	// DLL
-	//
-
-	IDR_DLL1                DLL                     "res/ddengine.dll"
-
-
-	/////////////////////////////////////////////////////////////////////////////
-	//
-	// ENCRYPTIONDLL
-	//
-	IDR_ENCRYPTIONDLL1      ENCRYPTIONDLL           "res/SecureVNCPlugin.dsm"
-	#endif
-#endif
 /////////////////////////////////////////////////////////////////////////////
 //
 // AFX_DIALOG_LAYOUT
