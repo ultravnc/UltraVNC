@@ -109,7 +109,17 @@ void ZstdInStream::decompress()
 	if (ZSTD_isError(result))
 		throw Exception(ZSTD_getErrorName(result));
 
-	bytesIn -= (int)(((U8*)inBuffer->src + inBuffer->pos) - (U8*)underlying->getptr());
+	size_t consumed = (size_t)(((U8*)inBuffer->src + inBuffer->pos) - (U8*)underlying->getptr());
+	size_t produced = outBuffer->pos;
+
+	// If a call neither consumes input nor produces output, the loop in
+	// overrun() would spin forever once the compressed byte budget is used
+	// up. Treat that as a truncated/corrupt stream, like the zlib and xz
+	// in-streams do.
+	if (consumed == 0 && produced == 0)
+		throw Exception("ZstdInStream: no decompression progress (truncated input?)");
+
+	bytesIn -= (int)consumed;
 	end = ((U8*)outBuffer->dst + outBuffer->pos);
 	underlying->setptr((U8*)inBuffer->src + inBuffer->pos);
 }

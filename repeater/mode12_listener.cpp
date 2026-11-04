@@ -65,23 +65,32 @@ open_connection( const char *host, u_short port )
 			int myport=0;
 			if (ParseDisplay(temp1[i], sizeof(temp1[i]), myhost, 255, &myport))
 			{
-				char *testchar=NULL;
-				testchar=strstr(remote_host,myhost);
-				int a=int(testchar-remote_host);
-				if (port==myport && testchar!=NULL && a==0)
-				found=TRUE;
+				struct sockaddr_in rule_addr;
+				// Compare the resolved 32-bit addresses exactly: a string
+				// prefix match would also allow e.g. 10.0.0.150 when only
+				// 10.0.0.1 was listed.
+				if (local_resolve(myhost, &rule_addr, NULL) == 0 &&
+					rule_addr.sin_addr.s_addr == saddr.sin_addr.s_addr &&
+					port == myport)
+					found=TRUE;
 			}
-
-			//if (strstr(temp1[i],remote_host) != NULL)
-			//found=TRUE;
 		}
 	}
 	if (saved_refuse)
 	{
 		for (i=0;i<rule2;i++)
 		{
-		if (strstr(temp2[i],inet_ntoa(saddr.sin_addr)) != NULL)
-		found=FALSE;
+			TCHAR myhost[256]="";
+			int myport=0;
+			if (ParseDisplay(temp2[i], sizeof(temp2[i]), myhost, 255, &myport))
+			{
+				struct sockaddr_in rule_addr;
+				// Exact IP match (port-insensitive, as before): a refused
+				// host is refused regardless of the requested port.
+				if (local_resolve(myhost, &rule_addr, NULL) == 0 &&
+					rule_addr.sin_addr.s_addr == saddr.sin_addr.s_addr)
+					found=FALSE;
+			}
 		}
 	}
 	if (!found) return SOCKET_ERROR;

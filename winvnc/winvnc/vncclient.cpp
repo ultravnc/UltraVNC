@@ -124,12 +124,12 @@ std::string get_real_filename(std::string name)
 
 // Canonicalize a file-transfer destination path and pin it to the configured root.
 // Returns true if the path is acceptable; on success outCanonical holds the canonical UTF-8 path.
-static bool ValidateFileTransferPath(const char* szUtf8Path, const char* szUtf8Root, std::string& outCanonical)
+static bool ValidateFileTransferPath(const char* szPath, const char* szUtf8Root, std::string& outCanonical, UINT cp = CP_UTF8)
 {
 	outCanonical.clear();
 
 	WCHAR szPathW[MAX_PATH * 4];
-	int nPath = MultiByteToWideChar(CP_UTF8, 0, szUtf8Path, -1, szPathW, _countof(szPathW));
+	int nPath = MultiByteToWideChar(cp, 0, szPath, -1, szPathW, _countof(szPathW));
 	if (nPath <= 0)
 		return false;
 
@@ -1356,14 +1356,12 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 
 		if (!m_auth && m_ms_logon)
 		{
-			// Always advertise: newest viewers pick IV, then III, old viewers pick II
-			// When RequireMSLogonIII is set, we accept II but send error message
+			// Advertise only MS-Logon IV and III. MS-Logon II (31-bit DH with a
+			// time-seeded rand()) is retired: old viewers that still select it
+			// are handled by the reject path below so they get a proper
+			// upgrade message instead of a silent disconnect.
 			auth_types.push_back(rfbUltraVNC_MsLogonIVAuth);
 			auth_types.push_back(rfbUltraVNC_MsLogonIIIAuth);
-			auth_types.push_back(rfbUltraVNC_MsLogonIIAuth);
-			if (settings->getRequireMSLogonIII()) {
-				vnclog.Print(LL_LOGSCREEN, "Server: Enforcing MS-Logon III (advertising II for proper error message)\n");
-			}
 		}
 		else
 		{
@@ -1399,11 +1397,14 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		return FALSE;
 
 	// obviously needs to be one that we suggested in the first place
-	// BUT: if RequireMSLogonIII is set and viewer sends MS-Logon II (0x71), accept it
-	// so we can send a proper error message instead of just closing the connection
+	// BUT: MS-Logon II (0x71) is no longer advertised. If an old viewer still
+	// selects it, accept the selection so we can send a proper error message
+	// instead of just closing the connection.
+	vnclog.Print(LL_INTINFO, "Client selected auth type: %d\n", (int)auth_accepted);
+
 	bool auth_type_valid = std::find(auth_types.begin(), auth_types.end(), auth_accepted) != auth_types.end();
-	bool is_mslogonii_fallback = (settings->getRequireMSLogonIII() && m_ms_logon && auth_accepted == rfbUltraVNC_MsLogonIIAuth);
-	
+	bool is_mslogonii_fallback = (m_ms_logon && auth_accepted == rfbUltraVNC_MsLogonIIAuth);
+
 	if (!auth_type_valid && !is_mslogonii_fallback) {
 		return FALSE;
 	}
@@ -1448,17 +1449,16 @@ BOOL vncClientThread::AuthenticateClient(std::vector<CARD8>& current_auth, bool 
 		break;
 	case rfbUltraVNC_MsLogonIIAuth:
 		if (is_mslogonii_fallback) {
-			// Old viewer tried MS-Logon II but server requires MS-Logon III
-			// Do normal MS-Logon II handshake but reject with upgrade message
+			// Old viewer tried MS-Logon II, which is retired (broken 31-bit
+			// DH). Do the handshake so the protocol stays in sync, then
+			// reject with an upgrade message.
 			auth_success = AuthMsLogonReject(auth_message);
-			vnclog.Print(LL_LOGSCREEN, "MsLogonII rejected (fallback for old viewer) = %d", auth_success);
+			vnclog.Print(LL_LOGSCREEN, "MsLogonII rejected (legacy auth retired) = %d", auth_success);
 			break;
 		}
-		auth_success = AuthMsLogon(auth_message);
-		vnclog.Print(LL_LOGSCREEN, "MsLogonII success = %d", auth_success);
-		if (auth_success) {
-			auth_is_mslogon = TRUE;
-		}
+		// MS-Logon II selected without MS-Logon enabled: reject.
+		auth_success = FALSE;
+		auth_message = "MS-Logon II is not supported by this server. Please upgrade your viewer.";
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
@@ -1645,10 +1645,12 @@ BOOL vncClientThread::AuthenticateLegacyClient(bool isconnected)
 		}
 		break;
 	case rfbLegacy_MsLogon:
-		auth_success = AuthMsLogon(auth_message);
-		if (auth_success) {
-			auth_is_mslogon = TRUE;
-		}
+		// Legacy viewers can only do MS-Logon II, whose 31-bit DH is broken.
+		// Complete the handshake so the protocol stays in sync, then reject
+		// with an upgrade message. (The SecureVNCPlugin path above still runs
+		// AuthMsLogon inside the plugin's encrypted channel, where the weak
+		// DH exchange is not exposed.)
+		auth_success = AuthMsLogonReject(auth_message);
 		break;
 	case rfbVncAuth:
 		auth_success = AuthVnc(auth_message);
@@ -3985,6 +3987,10 @@ vncClientThread::run(void* arg)
 				// Allocate storage for the text
 				// adzm - 2010-07 - Extended clipboard
 				int length = Swap32IfLE(msg.cct.length);
+				// View-only clients may not write to the server clipboard.
+				// The message body is still read and discarded below so the
+				// protocol stays in sync.
+				const bool fViewOnly = (!m_client->m_keyboardenabled || !m_client->m_pointerenabled);
 				if (length > 104857600) // 100 MBytes max
 					break;
 				if (length < 0 && m_client->m_clipboard.settings.m_bSupportsEx) {
@@ -4023,7 +4029,8 @@ vncClientThread::run(void* arg)
 						}
 						break;
 					case clipProvide:
-						m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
+						if (!fViewOnly)
+							m_server->UpdateLocalClipTextEx(extendedClipboardDataMessage, m_client);
 						break;
 					case clipRequest:
 					case clipPeek:
@@ -4038,7 +4045,7 @@ vncClientThread::run(void* arg)
 					break;
 					case clipNotify:	// request formats permitted by local automatic-transfer policy
 						{
-							if (m_client->m_fFileSessionOpen || m_server->IsThereFileTransBusy())
+							if (fViewOnly || m_client->m_fFileSessionOpen || m_server->IsThereFileTransBusy())
 								break;
 							omni_mutex_lock l(m_client->GetUpdateLock(), 82);
 							m_client->m_clipboard.m_notifiedRemoteFormats = extendedClipboardDataMessage.GetFlags() & clipFormatMask;
@@ -4101,7 +4108,8 @@ vncClientThread::run(void* arg)
 							delete[] wideStr;
 						}
 						// Get the server to update the local clipboard
-						m_server->UpdateLocalClipText(winStr);
+						if (!fViewOnly)
+							m_server->UpdateLocalClipText(winStr);
 
 						// Free the transformed clip text
 						delete[] winStr;
@@ -4237,10 +4245,12 @@ vncClientThread::run(void* arg)
 				// Only the first Viewer can set the resolution
 				// unless it's extended mode with a single monitor
 				// This way each viewer can add his own extended display
+				// View-only clients may not change the host's display layout
+				const bool fViewOnlySize = (!m_client->m_keyboardenabled || !m_client->m_pointerenabled);
 				m_client->m_singleExtendMode = (flag == dmExtendOnly);
-				if (m_server->virtualDisplay && !m_server->AreThereMultipleViewers())
+				if (!fViewOnlySize && m_server->virtualDisplay && !m_server->AreThereMultipleViewers())
 					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
-				else if (m_server->virtualDisplay && m_server->AreThereMultipleViewers() && m_client->m_singleExtendMode)
+				else if (!fViewOnlySize && m_server->virtualDisplay && m_server->AreThereMultipleViewers() && m_client->m_singleExtendMode)
 					m_server->virtualDisplay->attachDisplay(flag, resolutionMap, m_client->m_singleExtendMode, m_client->m_id, m_client->displayname);
 				if (strlen(m_client->displayname) == 0)
 					m_client->m_singleExtendMode = false;
@@ -4549,6 +4559,17 @@ vncClientThread::run(void* arg)
 					// sf@2004 - Delta Transfer
 					// Destination file already exists - the viewer sends the checksums
 				case rfbFileChecksums:
+					// Only accept checksums while a matching upload is pending.
+					// Without this, any authenticated client (even view-only,
+					// even with file transfer disabled) can make the server
+					// allocate and leak up to 100MB per message.
+					if (!settings->getEnableFileTransfer() || !fUserOk ||
+						!m_client->m_fFileDownloadRunning ||
+						m_client->m_hDestFile == NULL || m_client->m_hDestFile == INVALID_HANDLE_VALUE)
+					{
+						m_client->cl_connected = FALSE;
+						break;
+					}
 					m_socket->SetSendTimeout(settings->getftTimeout() * 1000);
 					m_client->cl_connected = m_client->ReceiveDestinationFileChecksums(Swap32IfLE(msg.ft.size), Swap32IfLE(msg.ft.length));
 					break;
@@ -4817,6 +4838,27 @@ vncClientThread::run(void* arg)
 							if (m_client->m_hPToken) RevertToSelf();
 						}
 
+						// Enforce the configured file-transfer root on directory listings:
+						// either the client-supplied path or the resolved special folder.
+						if (!fShortError)
+						{
+							std::string canonDir;
+							bool fValid;
+							if (nFolder == -1)
+								fValid = ValidateFileTransferPath(szDir, settings->getFileTransferRoot(), canonDir,
+																  fClientWantsUnicode ? CP_UTF8 : CP_ACP);
+							else if (fSpecialFolderResolvedW)
+							{
+								char szResolvedA[MAX_PATH * 4];
+								fValid = WideCharToMultiByte(CP_UTF8, 0, szDirW, -1, szResolvedA, sizeof(szResolvedA), NULL, NULL) > 0 &&
+										 ValidateFileTransferPath(szResolvedA, settings->getFileTransferRoot(), canonDir);
+							}
+							else
+								fValid = ValidateFileTransferPath(szDir, settings->getFileTransferRoot(), canonDir, CP_ACP);
+							if (!fValid)
+								fShortError = true;
+						}
+
 						strcat_s(szDir, "*");
 						if (fSpecialFolderResolvedW)
 							wcscat_s(szDirW, L"*");
@@ -5025,9 +5067,15 @@ vncClientThread::run(void* arg)
 						if (!settings->getEnableFileTransfer() || !fUserOk) break;
 						// Create the Dir
 						// Convert UTF-8 to Unicode for Chinese character support
+						// Enforce the configured file-transfer root on mkdir
 						WCHAR szDirW[MAX_PATH * 4];
-						MultiByteToWideChar(CP_UTF8, 0, szDir, -1, szDirW, MAX_PATH * 4);
-						BOOL fRet = CreateDirectoryW(szDirW, NULL);
+						BOOL fRet = FALSE;
+						std::string canonDirCreate;
+						if (ValidateFileTransferPath(szDir, settings->getFileTransferRoot(), canonDirCreate))
+						{
+							MultiByteToWideChar(CP_UTF8, 0, canonDirCreate.c_str(), -1, szDirW, MAX_PATH * 4);
+							fRet = CreateDirectoryW(szDirW, NULL);
+						}
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -5072,9 +5120,15 @@ vncClientThread::run(void* arg)
 
 						length = (UINT)(newname.length() + 1);
 						// Convert UTF-8 to Unicode for Chinese character support
+						// Enforce the configured file-transfer root on delete
 						WCHAR szFileW[MAX_PATH * 4];
-						MultiByteToWideChar(CP_UTF8, 0, szFile, -1, szFileW, MAX_PATH * 4);
-						BOOL fRet = DeleteFileOrDirectory(szFileW);
+						BOOL fRet = FALSE;
+						std::string canonFileDel;
+						if (ValidateFileTransferPath(szFile, settings->getFileTransferRoot(), canonFileDel))
+						{
+							MultiByteToWideChar(CP_UTF8, 0, canonFileDel.c_str(), -1, szFileW, MAX_PATH * 4);
+							fRet = DeleteFileOrDirectory(szFileW);
+						}
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -5119,11 +5173,18 @@ vncClientThread::run(void* arg)
 						*p = '*';
 
 						// Rename - use \\?\ prefix for long path support
+						// Enforce the configured file-transfer root on both names
 						WCHAR szCurrentNameW[MAX_PATH * 4];
 						WCHAR szNewNameW[MAX_PATH * 4];
-						MakeLongPath(szCurrentName, szCurrentNameW, MAX_PATH * 4);
-						MakeLongPath(szNewName, szNewNameW, MAX_PATH * 4);
-						BOOL fRet = MoveFileExW(szCurrentNameW, szNewNameW, MOVEFILE_REPLACE_EXISTING);
+						BOOL fRet = FALSE;
+						std::string canonCurName, canonNewName;
+						if (ValidateFileTransferPath(szCurrentName, settings->getFileTransferRoot(), canonCurName) &&
+							ValidateFileTransferPath(szNewName, settings->getFileTransferRoot(), canonNewName))
+						{
+							MakeLongPath(canonCurName.c_str(), szCurrentNameW, MAX_PATH * 4);
+							MakeLongPath(canonNewName.c_str(), szNewNameW, MAX_PATH * 4);
+							fRet = MoveFileExW(szCurrentNameW, szNewNameW, MOVEFILE_REPLACE_EXISTING);
+						}
 
 						rfbFileTransferMsg ft{};
 						ft.type = rfbFileTransfer;
@@ -6746,6 +6807,19 @@ bool vncClient::ReceiveDestinationFileChecksums(int nSize, int nLen)
 	if (nLen < 0 || nLen > 104857600) // 100 MBytes max
 		return false;
 
+	// The client checksums cover the file it is uploading; a longer payload
+	// than that file can ever need is a protocol error.
+	if (nLen > 4 * (int)(m_dwFileSize / sz_rfbBlockSize) + 1024)
+		return false;
+
+	// Free any buffer from an earlier message before replacing it.
+	if (m_lpCSBuffer)
+	{
+		delete[] m_lpCSBuffer;
+		m_lpCSBuffer = NULL;
+		m_nCSBufferSize = 0;
+	}
+
 	m_lpCSBuffer = new char[nLen + 1];
 	if (m_lpCSBuffer == NULL)
 	{
@@ -7218,6 +7292,17 @@ int vncClient::ZipPossibleDirectory(LPSTR szSrcFileName)
 		if (nDirLen >= 2) szDirNameW[nDirLen - 2] = L'\0'; // strip " ]"
 		*pw1 = L'\0'; // szPathW = "C:\parent\"
 
+		// The bracketed name is a single directory name, not a path: reject
+		// "..", separators and drive specifiers so "C:\Shared\[ .. ]" cannot
+		// escape the file-transfer root.
+		size_t nDirNameLen = wcslen(szDirNameW);
+		bool fBadDirName = (nDirNameLen == 0) ||
+			wcscmp(szDirNameW, L".") == 0 || wcscmp(szDirNameW, L"..") == 0 ||
+			szDirNameW[nDirNameLen - 1] == L'.' || szDirNameW[nDirNameLen - 1] == L' ' ||
+			wcspbrk(szDirNameW, L"\\/:*?\"<>|") != NULL;
+		if (fBadDirName)
+			return -1;
+
 		// Full source dir path and short path for ANSI zip library
 		WCHAR szSrcDirW[MAX_PATH * 4];
 		_snwprintf_s(szSrcDirW, MAX_PATH * 4, _TRUNCATE, L"%s%s", szPathW, szDirNameW);
@@ -7650,6 +7735,7 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 {
 	if (ThreadHandleCompressFolder != NULL)
 		return 0;
+	bool fRejected = false;
 	{
 		omni_mutex_lock ll(GetUpdateLock(), 90);
 		m_fCompressionEnabled = (Swap32IfLE(msg.ft.size) == 1);
@@ -7662,7 +7748,17 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 			return 0;
 		if (!settings->getEnableFileTransfer() || !fUserOk)
 			return 0;
+		// Enforce the configured file-transfer root on downloads as well.
+		// Directory requests arrive as <path>\[ <name> ]; canonicalizing the
+		// full request still pins the target inside the root.
+		std::string canonicalPath;
+		if (ValidateFileTransferPath(m_szSrcFileName, settings->getFileTransferRoot(), canonicalPath))
+			strcpy_s(m_szSrcFileName, canonicalPath.c_str());
+		else
+			fRejected = true;
 	}
+	if (fRejected)
+		return filetransferrequestPart2(-1);
 	DWORD dwTId;
 	ThreadHandleCompressFolder = CreateThread(NULL, 0, CompressFolder, this, 0, &dwTId);
 	return 1;

@@ -483,67 +483,63 @@ bool CDSMPlugin::LoadPlugin(char* szPlugin, bool fAllowMulti)
 	else // Use the original plugin dll
 	{
 		ZeroMemory(m_szDllName, 260);
+
+		// The plugin must be a plain file name next to the executable.
+		// Loading a bare name would walk the default DLL search order
+		// (application dir, system dirs, CWD, PATH): a missing plugin could
+		// then be hijacked from a writable PATH directory.
+		if (szPlugin == NULL || szPlugin[0] == '\0' ||
+			strpbrk(szPlugin, "\\/:") != NULL)
+			return false;
+
 #ifdef UNICODE
-		wchar_t szPluginW[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, szPlugin, -1, szPluginW, MAX_PATH);
-		m_hPDll = LoadLibraryW(szPluginW);
-#else
-		m_hPDll = LoadLibraryA(szPlugin);
-#endif // UNICODE
-		//Try current PATH
-		if (m_hPDll==NULL)
-		{
-#ifdef UNICODE
-			wchar_t szCurrentDirW[MAX_PATH] = L"";
-			wchar_t szCurrentDir_szPluginW[MAX_PATH] = L"";
-			if (GetModuleFileNameW(NULL, szCurrentDirW, MAX_PATH))
-				{
-					wchar_t* p = wcsrchr(szCurrentDirW, L'\\');
-					*p = L'\0';
-				}
-			wcscpy_s(szCurrentDir_szPluginW, MAX_PATH, szCurrentDirW);
-			wcscat_s(szCurrentDir_szPluginW, MAX_PATH, L"\\");
-			wchar_t szPluginW2[MAX_PATH];
-			MultiByteToWideChar(CP_ACP, 0, szPlugin, -1, szPluginW2, MAX_PATH);
-			wcscat_s(szCurrentDir_szPluginW, MAX_PATH, szPluginW2);
+		wchar_t szPluginPathW[MAX_PATH] = L"";
+		if (GetModuleFileNameW(NULL, szPluginPathW, MAX_PATH))
+			{
+				wchar_t* p = wcsrchr(szPluginPathW, L'\\');
+				if (p) *(p + 1) = L'\0';
+				else szPluginPathW[0] = L'\0';
+			}
+		wchar_t szPluginW2[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, szPlugin, -1, szPluginW2, MAX_PATH);
+		wcscat_s(szPluginPathW, MAX_PATH, szPluginW2);
 #ifdef _X64
-			char szCurrentDir_szPluginA[MAX_PATH];
-			wcstombs(szCurrentDir_szPluginA, szCurrentDir_szPluginW, MAX_PATH);
-			if (!IsDll64Bit(szCurrentDir_szPluginA)) {
+		char szPluginPathA[MAX_PATH];
+		wcstombs(szPluginPathA, szPluginPathW, MAX_PATH);
+		if (!IsDll64Bit(szPluginPathA)) {
 #ifdef _VIEWER
-				MessageBoxW(NULL, L"The encryption plugin has wrong arch (x86)", L"UltraVNC - Plugin", MB_ICONSTOP);
+			MessageBoxW(NULL, L"The encryption plugin has wrong arch (x86)", L"UltraVNC - Plugin", MB_ICONSTOP);
 #else
-				vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
+			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x86) \n"));
 #endif
-				return false;
-			}
-#else
-			char szCurrentDir_szPluginA2[MAX_PATH];
-			wcstombs(szCurrentDir_szPluginA2, szCurrentDir_szPluginW, MAX_PATH);
-			if (IsDll64Bit(szCurrentDir_szPluginA2)) {
-#ifdef _VIEWER
-				MessageBoxW(NULL, L"The encryption plugin has wrong arch (x64)", L"UltraVNC - Plugin", MB_ICONSTOP);
-#else
-			vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
-#endif
-				return false;
-			}
-#endif
-			m_hPDll = LoadLibraryW(szCurrentDir_szPluginW);
-#else
-			char szCurrentDirA[MAX_PATH] = "";
-			char szCurrentDir_szPluginA[MAX_PATH] = "";
-			if (GetModuleFileNameA(NULL, szCurrentDirA, MAX_PATH))
-				{
-					char* p = strrchr(szCurrentDirA, '\\');
-					*p = '\0';
-				}
-			strcpy_s(szCurrentDir_szPluginA, MAX_PATH, szCurrentDirA);
-			strcat_s(szCurrentDir_szPluginA, MAX_PATH, "\\");
-			strcat_s(szCurrentDir_szPluginA, MAX_PATH, szPlugin);
-			m_hPDll = LoadLibraryA(szCurrentDir_szPluginA);
-#endif // UNICODE
+			return false;
 		}
+#else
+		char szPluginPathA2[MAX_PATH];
+		wcstombs(szPluginPathA2, szPluginPathW, MAX_PATH);
+		if (IsDll64Bit(szPluginPathA2)) {
+#ifdef _VIEWER
+			MessageBoxW(NULL, L"The encryption plugin has wrong arch (x64)", L"UltraVNC - Plugin", MB_ICONSTOP);
+#else
+		vnclog.Print(0, VNCLOG("The encryption plugin has wrong arch (x64) \n"));
+#endif
+			return false;
+		}
+#endif
+		m_hPDll = LoadLibraryExW(szPluginPathW, NULL,
+			LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
+#else
+		char szPluginPathA[MAX_PATH] = "";
+		if (GetModuleFileNameA(NULL, szPluginPathA, MAX_PATH))
+			{
+				char* p = strrchr(szPluginPathA, '\\');
+				if (p) *(p + 1) = '\0';
+				else szPluginPathA[0] = '\0';
+			}
+		strcat_s(szPluginPathA, MAX_PATH, szPlugin);
+		m_hPDll = LoadLibraryExA(szPluginPathA, NULL,
+			LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32);
+#endif // UNICODE
 	}
 
 	if (m_hPDll == NULL) return false;

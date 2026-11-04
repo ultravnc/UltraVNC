@@ -320,7 +320,11 @@ DWORD WINAPI do_repeater(LPVOID lpParam)
     int f_remote;				/* read remote input more? */
     /** other variables **/
     int nfds, len;
-    fd_set *ifds, *ofds;
+	/* Windows fd_set is a count plus an array of SOCKET handles, not a
+	   bitmap: FD_ALLOC's (nfds+7)/8 sizing under-allocates and FD_SET
+	   overflows it.  Stack fd_sets are correctly sized and need no free. */
+    fd_set ifds_s, ofds_s;
+    fd_set *ifds = &ifds_s, *ofds = &ofds_s;
     struct timeval *tmo;
 //    struct timeval win32_tmo;
 	
@@ -400,8 +404,6 @@ DWORD WINAPI do_repeater(LPVOID lpParam)
 	
     /* repeater between stdin/out and socket  */
     nfds = ((local_in<remote)? remote: local_in) +1;
-    ifds = FD_ALLOC(nfds);
-    ofds = FD_ALLOC(nfds);
     f_local = 1;				/* yes, read from local */
     f_remote = 1;				/* yes, read from remote */
 	DWORD start=0;

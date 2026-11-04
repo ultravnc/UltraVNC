@@ -335,8 +335,16 @@ static BOOL WebSocketRecvFrame(VSocket* socket, char* payload, int maxPayload, i
 			if (!socket->ReadExactHTTP(mask, 4)) return FALSE;
 		}
 
-		// Guard against overflow
-		if ((int64_t)len > (int64_t)(maxPayload - totalLen)) return FALSE;
+		// Guard against overflow: compare as unsigned only. A 64-bit length
+		// with the top bit set is illegal per RFC 6455 and must not wrap to
+		// a negative value that passes a signed check.
+		if ((len >> 63) != 0) return FALSE;
+		uint64_t remaining = (totalLen < maxPayload) ? (uint64_t)(maxPayload - totalLen) : 0;
+		if (len > remaining) return FALSE;
+
+		// Control frames (close/ping/pong) must be <= 125 bytes and may not
+		// be fragmented (RFC 6455 5.5).
+		if (opcode >= 0x08 && (!fin || len > 125)) return FALSE;
 
 		if (len > 0) {
 			if (!socket->ReadExactHTTP(payload + totalLen, (VCard)len)) return FALSE;

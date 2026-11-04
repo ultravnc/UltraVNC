@@ -289,6 +289,13 @@ void TextChat::ProcessTextChatMsg(int nTO)
 	else
 	{
 		// Read the incoming text
+		// Any other negative length is a protocol error: it would reach
+		// new char[len] below as a huge size and crash the server.
+		if (len < 0)
+		{
+			m_pCC->cl_connected = FALSE;
+			return;
+		}
 		if (len > TEXTMAXSIZE) return; // Todo: Improve this...
 		if (len == 0)
 		{
@@ -298,7 +305,12 @@ void TextChat::ProcessTextChatMsg(int nTO)
 		else
 		{
 			char* raw = new char[len];
-			m_pCC->m_socket->ReadExact(raw, len);
+			if (!m_pCC->m_socket->ReadExact(raw, len))
+			{
+				delete[] raw;
+				m_pCC->cl_connected = FALSE;
+				return;
+			}
 
 			memset(m_szRemoteText, 0, TEXTMAXSIZE);
 			UINT assumed = m_pCC->m_supportsUnicodeTextChat ? CP_UTF8 : CP_ACP;

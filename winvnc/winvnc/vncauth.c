@@ -21,6 +21,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <process.h>
+#include <windows.h>
+#include <wincrypt.h>
+#include <bcrypt.h>
 #include "vncauth.h"
 #include "../common/d3des.h"
 
@@ -96,28 +99,38 @@ vncDecryptPasswd(char *inouttext, int secure)
 /*
  *   Generate a set of random bytes for use in challenge-response authentication.
  */
-void
-vncRandomBytes(unsigned char *where) {
-  int i;
-  static unsigned int seed;
-  seed += (unsigned int) time(0) + _getpid() + _getpid() * 987654;
-
-  srand(seed);
-  for (i=0; i < CHALLENGESIZE; i++) {
-    where[i] = (unsigned char)(rand() & 255);    
+/*
+ *   Fill a buffer with cryptographically secure random bytes for use in
+ *   challenge-response authentication. Falls back to the legacy provider
+ *   if the system-preferred CNG RNG is unavailable.
+ */
+static int
+vncSecureRandomBytes(unsigned char *where, unsigned long len) {
+  if (BCryptGenRandom(NULL, where, len,
+                      BCRYPT_USE_SYSTEM_PREFERRED_RNG) == 0)
+    return 1;
+  {
+    HCRYPTPROV hProv;
+    int ok = 0;
+    if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL,
+                            CRYPT_VERIFYCONTEXT)) {
+      ok = CryptGenRandom(hProv, len, where) ? 1 : 0;
+      CryptReleaseContext(hProv, 0);
+    }
+    return ok;
   }
 }
 
 void
-vncRandomBytesMs(unsigned char *where) {
-  int i;
-  static unsigned int seed;
-  seed += (unsigned int) time(0) + _getpid() + _getpid() * 987654;
+vncRandomBytes(unsigned char *where) {
+  if (!vncSecureRandomBytes(where, CHALLENGESIZE))
+    memset(where, 0, CHALLENGESIZE);
+}
 
-  srand(seed);
-  for (i=0; i < CHALLENGESIZEMS; i++) {
-    where[i] = (unsigned char)(rand() & 255);    
-  }
+void
+vncRandomBytesMs(unsigned char *where) {
+  if (!vncSecureRandomBytes(where, CHALLENGESIZEMS))
+    memset(where, 0, CHALLENGESIZEMS);
 }
 
 /*

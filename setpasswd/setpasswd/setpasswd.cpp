@@ -15,6 +15,8 @@
 #include "stdafx.h"
 #include "inifile.h"
 #include <time.h>
+#include <bcrypt.h>
+#pragma comment(lib, "bcrypt.lib")
 
 unsigned char fixedkey[8] = {23,82,107,6,35,78,88,7};
 static unsigned long KnL[32] = { 0L };
@@ -398,8 +400,23 @@ void gen_random(char *s, const int len) {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
 
+    // Passwords must not come from rand() seeded with time(NULL): an
+    // attacker who knows roughly when the install ran can replay the whole
+    // sequence. Use the OS CSPRNG with rejection sampling to avoid modulo
+    // bias (62 does not divide 256; discard bytes >= 4*62 = 248).
+    const unsigned int nAlpha = (unsigned int)(sizeof(alphanum) - 1);
+    const unsigned int limit = (256 / nAlpha) * nAlpha; // 248
+
     for (int i = 0; i < len; ++i) {
-        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+        unsigned char b = 0;
+        do {
+            if (BCryptGenRandom(NULL, &b, 1, BCRYPT_USE_SYSTEM_PREFERRED_RNG) != 0) {
+                // CSPRNG unavailable: better to fail than emit a guessable password.
+                fprintf(stderr, "setpasswd: secure random source unavailable\n");
+                exit(1);
+            }
+        } while (b >= limit);
+        s[i] = alphanum[b % nAlpha];
     }
 
     s[len] = 0;
@@ -431,7 +448,6 @@ static void do_random(IniFile &myIniFile)
 int main(int argc, char* argv[])
 {
 	char epasswd[MAXPWLEN+1];
-	srand ( (UINT)time(NULL) );
 	IniFile myIniFile;
 	memset(passwd,0,8);
 	memset(passwd2,0,8);
