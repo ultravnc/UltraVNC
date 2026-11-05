@@ -223,9 +223,9 @@ BOOL CALLBACK SessDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		_this->InitLanguage(hwnd);
 		HWND hExitCheck = GetDlgItem(hwnd, IDC_EXIT_CHECK); //PGM @ Advantig
 		SendMessage(hExitCheck, BM_SETCHECK, l_this->fExitCheck, 0); //PGM @ Advantig
-
+		_this->m_bInitShrink = true;
 		_this->ExpandBox(hwnd, !_this->m_bExpanded);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
+		//SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)_this->hBmpExpand);
 		//SetWindowText(GetDlgItem(hwnd, IDC_BUTTON_EXPAND), "Show Options");
 		return TRUE;
 	}
@@ -436,41 +436,40 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 	extern TCHAR sz_HideOptions[64];
 
 	RECT rcWnd, rcDefaultBox, rcChild, rcIntersection;
-	HWND wndChild = NULL;
-	HWND wndDefaultBox = NULL;
+	HWND hwndChild = GetTopWindow(hDlg);
+	HWND hwndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
+	if (hwndDefaultBox == NULL) return;
 
-	// get the window of the button
-	HWND  pCtrl = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
-	if (pCtrl == NULL) return;
+	HWND hwndBtnOptions = GetDlgItem(hDlg, IDC_SHOWOPTIONS);
+	if (hwndBtnOptions == NULL) return;
 
-	wndDefaultBox = GetDlgItem(hDlg, IDC_DEFAULTBOX);
-	if (wndDefaultBox == NULL) return;
+	HWND hwndBtnExpand = GetDlgItem(hDlg, IDC_BUTTON_EXPAND);
+	if (hwndBtnExpand == NULL) return;
 
 	// Change button image and text label
 	if (!fExpand) {
-		SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
-		SetWindowText(pCtrl, sz_ShowOptions);
+		SendMessage(hwndBtnExpand, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpExpand);
+		SetWindowText(hwndBtnOptions, sz_ShowOptions);
 	}
 	else {
-		SendMessage(GetDlgItem(hDlg, IDC_BUTTON_EXPAND), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
-		SetWindowText(pCtrl, sz_HideOptions);
+		SendMessage(hwndBtnExpand, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmpCollaps);
+		SetWindowText(hwndBtnOptions, sz_HideOptions);
 	}
 
 	// retrieve coordinates for the default child window
-	GetWindowRect(wndDefaultBox, &rcDefaultBox);
+	GetWindowRect(hwndDefaultBox, &rcDefaultBox);
 	//rcDefaultBox.left += 2;
 	rcDefaultBox.right += 6;
-	// enable/disable all of the child window outside of the default box.
-	wndChild = GetTopWindow(hDlg);
 
-	for (; wndChild != NULL; wndChild = GetWindow(wndChild, GW_HWNDNEXT))
+	// enable/disable all of the child window outside of the default box.
+	for (; hwndChild != NULL; hwndChild = GetWindow(hwndChild, GW_HWNDNEXT))
 	{
 		// get rectangle occupied by child window in screen coordinates.
-		GetWindowRect(wndChild, &rcChild);
+		GetWindowRect(hwndChild, &rcChild);
 
 		if (!IntersectRect(&rcIntersection, &rcChild, &rcDefaultBox))
 		{
-			EnableWindow(wndChild, fExpand);
+			EnableWindow(hwndChild, fExpand);
 		}
 	}
 
@@ -484,13 +483,29 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 		m_nExpandedHeight = rcWnd.bottom - rcWnd.top;
 
 		// we also hide the default box here so that it is not visible
-		ShowWindow(wndDefaultBox, SW_HIDE);
+		ShowWindow(hwndDefaultBox, SW_HIDE);
 
 		// shrink only the height; width stays unchanged
-		SetWindowPos(hDlg, NULL, 0, 0,
-			rcWnd.right - rcWnd.left,
-			rcDefaultBox.bottom - rcWnd.top,
-			SWP_NOZORDER | SWP_NOMOVE);
+		// Skip animation on first start
+		if (m_bInitShrink) {
+			SetWindowPos(hDlg, NULL, 0, 0,
+				rcWnd.right - rcWnd.left,
+				rcDefaultBox.bottom - rcWnd.top,
+				SWP_NOZORDER | SWP_NOMOVE);
+			m_bInitShrink = false;
+		}
+		else // Animate shrinking. Height - 1 to compensate rounding error
+		{		
+			for (float i = m_nExpandedHeight; i >= rcDefaultBox.bottom - rcWnd.top - 1;
+				i -= static_cast<float>(m_nExpandedHeight - (rcDefaultBox.bottom - rcWnd.top)) / 15)
+			{
+				SetWindowPos(hDlg, NULL, 0, 0,
+					rcWnd.right - rcWnd.left,
+					i,
+					SWP_NOZORDER | SWP_NOMOVE);
+				Sleep(1);
+			}
+		}
 
 		// record that the dialog is contracted.
 		m_bExpanded = FALSE;
@@ -501,16 +516,22 @@ void SessionDialog::ExpandBox(HWND hDlg, BOOL fExpand)
 
 		// Restore only the height; keep current width unchanged
 		GetWindowRect(hDlg, &rcWnd);
-		SetWindowPos(hDlg, NULL, 0, 0,
-			rcWnd.right - rcWnd.left,
-			m_nExpandedHeight,
-			SWP_NOMOVE | SWP_NOZORDER);
-
+		// Animate expanding. Height + 1 to compensate rounding error
+		for (float i = rcDefaultBox.bottom - rcWnd.top; i <= m_nExpandedHeight + 1; 
+			i += static_cast<float>(m_nExpandedHeight - (rcDefaultBox.bottom - rcWnd.top)) / 15)
+		{
+			SetWindowPos(hDlg, NULL, 0, 0,
+				rcWnd.right - rcWnd.left,
+				i,
+				SWP_NOMOVE | SWP_NOZORDER);
+			Sleep(1);
+		}
 		// make sure that the entire dialog box is visible on the user's screen.
 		SendMessage(hDlg, DM_REPOSITION, 0, 0);
 		m_bExpanded = TRUE;
 	}
 }
+
 
 void SessionDialog::InitPlugin(HWND hwnd)
 {
