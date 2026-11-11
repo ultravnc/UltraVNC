@@ -440,6 +440,102 @@ begin
   DonateImage.Parent := WizardForm;
 end;
 
+function RunHidden(const FileName, Params: String): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Result := Exec(FileName, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
+  if not Result then
+    Log('Command failed (' + IntToStr(ResultCode) + '): ' + FileName + ' ' + Params);
+end;
+
+// The SYSTEM service trusts {commonappdata}\UltraVNC\*.ini, so a folder or ini
+// planted there by a non-admin must not be reused. Exit code 0 only when the
+// folder and every ini in it are owned by SYSTEM, Administrators, TrustedInstaller
+// or the installing admin, are not reparse points, and no other account can
+// write to an ini.
+function IsSharedConfigDirTrusted(const Dir: String): Boolean;
+var
+  ScriptFile, Script: String;
+begin
+  ScriptFile := ExpandConstant('{tmp}\uvnc_check_config_acl.ps1');
+  Script :=
+    'param([string]$Dir)' + #13#10 +
+    '$ErrorActionPreference = "Stop"' + #13#10 +
+    '$sidType = [System.Security.Principal.SecurityIdentifier]' + #13#10 +
+    '$trusted = @("S-1-5-18", "S-1-5-32-544", "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464", [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value)' + #13#10 +
+    '# WriteData, AppendData, WriteEA, DeleteChild, Delete, WriteDAC, WriteOwner, GenericAll, GenericWrite' + #13#10 +
+    '$writeMask = 0x500D0056' + #13#10 +
+    'function Test-Owner([string]$Path) {' + #13#10 +
+    '  $item = Get-Item -LiteralPath $Path -Force' + #13#10 +
+    '  if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { return $false }' + #13#10 +
+    '  return ($trusted -contains (Get-Acl -LiteralPath $Path).GetOwner($sidType).Value)' + #13#10 +
+    '}' + #13#10 +
+    'function Test-NoForeignWrite([string]$Path) {' + #13#10 +
+    '  foreach ($ace in (Get-Acl -LiteralPath $Path).GetAccessRules($true, $true, $sidType)) {' + #13#10 +
+    '    if ($ace.AccessControlType -ne [System.Security.AccessControl.AccessControlType]::Allow) { continue }' + #13#10 +
+    '    if ($ace.PropagationFlags -band [System.Security.AccessControl.PropagationFlags]::InheritOnly) { continue }' + #13#10 +
+    '    if ($trusted -contains $ace.IdentityReference.Value) { continue }' + #13#10 +
+    '    if ([int64]$ace.FileSystemRights -band $writeMask) { return $false }' + #13#10 +
+    '  }' + #13#10 +
+    '  return $true' + #13#10 +
+    '}' + #13#10 +
+    'try {' + #13#10 +
+    '  if (-not (Test-Owner $Dir)) { exit 1 }' + #13#10 +
+    '  foreach ($ini in Get-ChildItem -LiteralPath $Dir -Filter *.ini -Force) {' + #13#10 +
+    '    if (-not (Test-Owner $ini.FullName) -or -not (Test-NoForeignWrite $ini.FullName)) { exit 1 }' + #13#10 +
+    '  }' + #13#10 +
+    '  exit 0' + #13#10 +
+    '} catch { exit 1 }' + #13#10;
+  Result := SaveStringToFile(ScriptFile, Script, False) and
+    RunHidden(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+      '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File ' + AddQuotes(ScriptFile) + ' -Dir ' + AddQuotes(Dir));
+end;
+
+// Moves an untrusted {commonappdata}\UltraVNC aside, then (re)creates it with a
+// protected ACL: SYSTEM and Administrators full control, Users read-only.
+// Returns an empty string on success, otherwise the error to show.
+function SecureSharedConfigDir: String;
+var
+  Dir, Quarantine, Icacls: String;
+begin
+  Result := '';
+  Dir := ExpandConstant('{commonappdata}\UltraVNC');
+  Icacls := ExpandConstant('{sys}\icacls.exe');
+
+  if (DirExists(Dir) or FileExists(Dir)) and not IsSharedConfigDirTrusted(Dir) then
+  begin
+    Quarantine := Dir + '.untrusted-' + GetDateTimeString('yyyymmddhhnnss', #0, #0);
+    if not RenameFile(Dir, Quarantine) then
+    begin
+      Result := Dir + ' was created or can be modified by a non-administrator account and could not be moved aside. Remove it and run Setup again.';
+      Log(Result);
+      Exit;
+    end;
+    Log('Untrusted ProgramData configuration moved to ' + Quarantine);
+  end;
+
+  if not DirExists(Dir) and not CreateDir(Dir) then
+  begin
+    Result := 'Failed to create ' + Dir;
+    Log(Result);
+    Exit;
+  end;
+
+  if not RunHidden(Icacls, AddQuotes(Dir) + ' /reset /T /C /L /Q') or
+     not RunHidden(Icacls, AddQuotes(Dir) + ' /inheritance:r /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F *S-1-5-32-545:(OI)(CI)RX /L /Q') or
+     not RunHidden(Icacls, AddQuotes(Dir) + ' /setowner *S-1-5-32-544 /T /C /L /Q') then
+  begin
+    Result := 'Failed to secure the permissions of ' + Dir;
+    Log(Result);
+  end;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  Result := SecureSharedConfigDir;
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   SourceFile, TargetDir, TargetFile: String;
@@ -498,6 +594,10 @@ begin
   DefaultConfigFile := ExpandConstant('{app}\ultravnc.ini');
   SharedConfigFile := ExpandConstant('{commonappdata}\UltraVNC\ultravnc.ini');
   
+  // An existing config is only kept once SecureSharedConfigDir has vetted it
+  if SecureSharedConfigDir <> '' then
+    Exit;
+
   // Check if ProgramData config already exists
   if FileExists(SharedConfigFile) then
   begin
@@ -546,6 +646,10 @@ begin
   SharedConfigFile := ExpandConstant('{commonappdata}\UltraVNC\ultravnc.ini');
   AppConfigFile := ExpandConstant('{app}\ultravnc.ini');
   
+  // An existing config is only kept once SecureSharedConfigDir has vetted it
+  if SecureSharedConfigDir <> '' then
+    Exit;
+
   // Check if ProgramData config already exists
   if FileExists(SharedConfigFile) then
   begin
