@@ -16,6 +16,8 @@
 #include "common/SaslWire.h"
 #include <wincrypt.h>
 #include <windows.h>
+#include <aclapi.h>
+#include <sddl.h>
 
 extern VNCLog vnclog;
 
@@ -63,6 +65,70 @@ namespace
                path[1] == ':' && (path[2] == '\\' || path[2] == '/');
     }
 
+    static bool IsTrustedSid(PSID sid)
+    {
+        static const char* const kTrustedInstallerSid =
+            "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464";
+        if (IsWellKnownSid(sid, WinLocalSystemSid) || IsWellKnownSid(sid, WinBuiltinAdministratorsSid))
+            return true;
+        PSID trustedInstaller = NULL;
+        bool trusted = false;
+        if (ConvertStringSidToSidA(kTrustedInstallerSid, &trustedInstaller))
+        {
+            trusted = EqualSid(sid, trustedInstaller) != FALSE;
+            LocalFree(trustedInstaller);
+        }
+        return trusted;
+    }
+
+    // True when 'path' is owned by SYSTEM, Administrators or TrustedInstaller
+    // and no other account is granted any of 'writeMask' on it.
+    static bool IsProtectedFromNonAdmins(const char* path, ACCESS_MASK writeMask)
+    {
+        PSID owner = NULL;
+        PACL dacl = NULL;
+        PSECURITY_DESCRIPTOR sd = NULL;
+        if (GetNamedSecurityInfoA(path, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+                                  &owner, NULL, &dacl, NULL, &sd) != ERROR_SUCCESS)
+            return false;
+        bool ok = owner && dacl && IsTrustedSid(owner);
+        for (DWORD i = 0; ok && i < dacl->AceCount; i++)
+        {
+            ACE_HEADER* header = NULL;
+            if (!GetAce(dacl, i, (LPVOID*)&header))
+            {
+                ok = false;
+                break;
+            }
+            if (header->AceType != ACCESS_ALLOWED_ACE_TYPE || (header->AceFlags & INHERIT_ONLY_ACE))
+                continue;
+            ACCESS_ALLOWED_ACE* ace = (ACCESS_ALLOWED_ACE*)header;
+            if ((ace->Mask & writeMask) && !IsTrustedSid((PSID)&ace->SidStart))
+                ok = false;
+        }
+        LocalFree(sd);
+        return ok;
+    }
+
+    // The validator DLL runs inside the (SYSTEM) server process, so neither the
+    // DLL nor the folder it and its dependencies are loaded from may be
+    // writable by a non-admin account.
+    static bool IsValidatorDllLocationTrusted(const char* fullPath)
+    {
+        const ACCESS_MASK fileWrite = FILE_WRITE_DATA | FILE_APPEND_DATA | FILE_WRITE_EA | DELETE |
+                                      WRITE_DAC | WRITE_OWNER | GENERIC_WRITE | GENERIC_ALL;
+        const ACCESS_MASK dirWrite = FILE_ADD_FILE | FILE_DELETE_CHILD | DELETE |
+                                     WRITE_DAC | WRITE_OWNER | GENERIC_WRITE | GENERIC_ALL;
+        char dir[MAX_PATH];
+        if (strcpy_s(dir, fullPath) != 0)
+            return false;
+        char* sep = strrchr(dir, '\\');
+        if (!sep)
+            return false;
+        *(sep == dir + 2 ? sep + 1 : sep) = '\0';
+        return IsProtectedFromNonAdmins(fullPath, fileWrite) && IsProtectedFromNonAdmins(dir, dirWrite);
+    }
+
     static HMODULE SafeLoadValidatorDll(const char* path)
     {
         if (!path || !path[0])
@@ -72,9 +138,18 @@ namespace
             vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: validator DLL path must be absolute (%s)\n"), path);
             return NULL;
         }
+        char fullPath[MAX_PATH];
+        DWORD len = GetFullPathNameA(path, MAX_PATH, fullPath, NULL);
+        if (len == 0 || len >= MAX_PATH)
+            return NULL;
+        if (!IsValidatorDllLocationTrusted(fullPath))
+        {
+            vnclog.Print(LL_CONNERR, VNCLOG("VeNCrypt: validator DLL or its folder is writable by non-admins, not loading (%s)\n"), fullPath);
+            return NULL;
+        }
         // Use LOAD_WITH_ALTERED_SEARCH_PATH so dependent DLLs are resolved from
         // the validator DLL's directory rather than the WinVNC search path.
-        return LoadLibraryExA(path, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+        return LoadLibraryExA(fullPath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     }
 
     HMODULE GetTokenValidatorDll()
