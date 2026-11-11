@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import socket, struct, ssl, time, hmac, hashlib, base64
+import os, socket, struct, ssl, time, hmac, hashlib, base64
 
-HOST = "127.0.0.1"
-PORT = 5900
-USER = b"debug"
-SECRET = "LT4O3H3N4SECUUXWJTXLCQIRX3SYRBBI"
+HOST = os.environ.get("UVNC_HOST", "127.0.0.1")
+PORT = int(os.environ.get("UVNC_PORT", "5900"))
+USER = os.environ.get("UVNC_TOTP_USER", "debug").encode()
+SECRET = os.environ["UVNC_TOTP_SECRET"]
 
 def totp_code():
     key = base64.b32decode(SECRET)
