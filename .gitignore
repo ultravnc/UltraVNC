@@ -234,3 +234,8 @@ TokenValidator/*.exe
 TokenValidator/*.totp.ini
 TokenValidator/*_totp.bmp
 TokenValidator/__pycache__/
+
+# udt_bridge_test runtime state (keys, DHT peer IPs)
+udt_bridge_test/config.json
+udt_bridge_test/dht_routing_*.json
+udt_bridge_test/peers.rats
