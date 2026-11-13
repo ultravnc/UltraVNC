@@ -62,6 +62,7 @@ private:
 	CRITICAL_SECTION CriticalSection_IN;
 	CRITICAL_SECTION CriticalSection_OUT;
 	SECURITY_ATTRIBUTES secAttr;
+	PSECURITY_DESCRIPTOR pSecDesc;
 	void create_sec_attribute();
 	char filemapping_IN[64];
 	char filemapping_OUT[64];
