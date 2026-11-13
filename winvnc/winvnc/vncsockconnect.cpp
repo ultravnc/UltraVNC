@@ -24,6 +24,7 @@
 
 
 VBool maybeHandleHTTPRequest(VSocket* sock,vncServer* svr);
+bool vncHTTPClaimBridgedPeer(VSocket* sock);
 
 // The function for the spawned thread to run
 class vncSockConnectThread : public omni_thread
@@ -71,7 +72,10 @@ void *vncSockConnectThread::run_undetached(void * arg)
 			break;
 		else
 		{
-			if(settings->getHttpPortNumber()== settings->getPortNumber())
+			// A WebSocket bridge connection from the HTTP server: report the browser's
+			// real address so it is filtered and authenticated as a remote client.
+			bool bridged = vncHTTPClaimBridgedPeer(new_socket);
+			if(!bridged && settings->getHttpPortNumber()== settings->getPortNumber())
 			{
 				if (maybeHandleHTTPRequest(new_socket,m_server)) {
  					// HTTP request has been handled and new_socket closed. The client will

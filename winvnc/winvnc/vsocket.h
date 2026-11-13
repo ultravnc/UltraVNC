@@ -191,6 +191,18 @@ public:
   bool GetPeerAddress6(char *address, int size);// IPv6
   bool GetPeerAddress(char *address, int size);// IPv64
 
+  // WebSocket bridge: bind to 127.0.0.1 on an ephemeral port before connecting,
+  // so the local port is known before the RFB listener can accept it.
+  VBool CreateBindLoopback4();
+  VBool ConnectLoopback4(const VCard port);
+  VCard GetSockPort();
+  VCard GetPeerPort();
+
+  // Real client address of a bridged (WebSocket) connection. When set,
+  // GetPeerName() reports it instead of the loopback peer of the bridge.
+  void SetForwardedPeerName(const char *name);
+  bool IsForwarded() const { return m_forwardedPeer[0] != 0; }
+
 
 
  
@@ -316,6 +328,8 @@ protected:
   unsigned int							G_SENDBUFFER;
 
   TLSCallbacks* m_tlsCallbacks = nullptr;
+
+  char m_forwardedPeer[64];
 };
 
 #endif // _ATT_VSOCKET_DEFINED

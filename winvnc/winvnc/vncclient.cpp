@@ -122,6 +122,24 @@ std::string get_real_filename(std::string name)
 	return name;
 }
 
+// Returns true if the supplied peer address is a loopback address.
+// Used to decide whether the opt-in AllowLoopbackWithoutDSM / AllowLoopbackWithoutAuth
+// shortcuts may be applied. Only the addresses actually returned by VSocket::GetPeerName
+// for IPv4/IPv6 loopback are recognised here.
+static bool IsLoopbackAddress(const char* addr)
+{
+	if (addr == NULL)
+		return false;
+	if (_stricmp(addr, "127.0.0.1") == 0)
+		return true;
+	if (_stricmp(addr, "::1") == 0)
+		return true;
+	// IPv4-mapped IPv6 loopback, e.g. when an IPv6-mode socket accepts an IPv4 peer.
+	if (_stricmp(addr, "::ffff:127.0.0.1") == 0)
+		return true;
+	return false;
+}
+
 // Canonicalize a file-transfer destination path and pin it to the configured root.
 // Returns true if the path is acceptable; on success outCanonical holds the canonical UTF-8 path.
 static bool ValidateFileTransferPath(const char* szPath, const char* szUtf8Root, std::string& outCanonical, UINT cp = CP_UTF8)
@@ -1090,7 +1108,7 @@ vncClientThread::CheckLoopBack()
 			if (remotename != NULL)
 				free(remotename);
 
-			if (!ok)
+			if (!ok && !m_socket->IsForwarded())
 			{
 				m_client->m_IsLoopback = true;
 			}
@@ -2461,6 +2479,16 @@ bool vncClientThread::InitSocket()
 		vnclog.Print(LL_INTINFO, VNCLOG("Invalid DSMPlugin Pointer\n"));
 		return false;
 	}
+
+	// Detect loopback early so DSM/auth relaxation decisions can be applied before
+	// any protocol handshaking. The peer address comes from the OS, so it cannot be
+	// spoofed by a remote client. Always recompute (not just set-to-true): the same
+	// vncClient/socket pair can be reused across a repeater/auto-reconnect cycle
+	// (see TryReconnect(), which calls InitSocket() again on a new outbound socket),
+	// so a stale loopback flag from a previous connection must not leak forward.
+	// A WebSocket-bridged connection arrives from 127.0.0.1 but is never treated as loopback.
+	const char* peerAddr = m_socket->GetPeerName(false);
+	m_client->m_IsLoopback = (!m_socket->IsForwarded() && peerAddr != NULL && IsLoopbackAddress(peerAddr));
 
 	// LOCK INITIAL SETUP
 	// All clients have the m_protocol_ready flag set to FALSE initially, to prevent
