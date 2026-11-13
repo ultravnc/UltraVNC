@@ -235,6 +235,7 @@ comm_serv::comm_serv()
 	data_OUT=NULL;
 	hMapFile_IN=NULL;
 	hMapFile_OUT=NULL;
+	pSecDesc=NULL;
 	InitializeCriticalSection(&CriticalSection_IN); 
 	InitializeCriticalSection(&CriticalSection_OUT); 
 	timeout_counter=0;
@@ -252,6 +253,7 @@ comm_serv::~comm_serv()
 	if (data_OUT)UnmapViewOfFile(data_OUT);
 	if (hMapFile_IN)CloseHandle(hMapFile_IN);
 	if (hMapFile_OUT)CloseHandle(hMapFile_OUT);
+	if (pSecDesc) LocalFree(pSecDesc);
 	DeleteCriticalSection(&CriticalSection_IN);
 	DeleteCriticalSection(&CriticalSection_OUT);
 }
@@ -260,27 +262,12 @@ comm_serv::~comm_serv()
 void 
 	comm_serv::create_sec_attribute()
 {
-		char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ];
+		// Only SYSTEM and elevated Administrators (winvnc and the uiAccess helper) may access the objects
 		secAttr.nLength = sizeof(secAttr);
 		secAttr.bInheritHandle = FALSE;
-		secAttr.lpSecurityDescriptor = &secDesc;
-		InitializeSecurityDescriptor(secAttr.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
-		SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE);
-
-		PSECURITY_DESCRIPTOR pSD;
-		BOOL retcode =ConvertStringSecurityDescriptorToSecurityDescriptor("S:(ML;;NW;;;LW)",SDDL_REVISION_1,&pSD,NULL);
-
-		if(retcode != 0){ 
-		PACL pSacl = NULL;
-		BOOL fSaclPresent = FALSE;
-		BOOL fSaclDefaulted = FALSE;
-		retcode =GetSecurityDescriptorSacl(
-			pSD,
-			&fSaclPresent,
-			&pSacl,
-			&fSaclDefaulted);
-		if (pSacl) retcode =SetSecurityDescriptorSacl(secAttr.lpSecurityDescriptor, TRUE, pSacl, FALSE); 
-		}
+		if (pSecDesc == NULL)
+			ConvertStringSecurityDescriptorToSecurityDescriptor("D:P(A;;GA;;;SY)(A;;GA;;;BA)",SDDL_REVISION_1,&pSecDesc,NULL);
+		secAttr.lpSecurityDescriptor = pSecDesc;
 }
 
 bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,bool master)
@@ -288,27 +275,8 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 	datasize_IN = IN_datasize_IN;
 	datasize_OUT = IN_datasize_OUT;
 
-	char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ];
-		secAttr.nLength = sizeof(secAttr);
-		secAttr.bInheritHandle = FALSE;
-		secAttr.lpSecurityDescriptor = &secDesc;
-		InitializeSecurityDescriptor(secAttr.lpSecurityDescriptor, SECURITY_DESCRIPTOR_REVISION);
-		SetSecurityDescriptorDacl(secAttr.lpSecurityDescriptor, TRUE, 0, FALSE);
-
-		PSECURITY_DESCRIPTOR pSD;
-		BOOL retcode =ConvertStringSecurityDescriptorToSecurityDescriptor("S:(ML;;NW;;;LW)",SDDL_REVISION_1,&pSD,NULL);
-
-		if(retcode != 0){ 
-		PACL pSacl = NULL;
-		BOOL fSaclPresent = FALSE;
-		BOOL fSaclDefaulted = FALSE;
-		retcode =GetSecurityDescriptorSacl(
-			pSD,
-			&fSaclPresent,
-			&pSacl,
-			&fSaclDefaulted);
-		if (pSacl) retcode =SetSecurityDescriptorSacl(secAttr.lpSecurityDescriptor, TRUE, pSacl, FALSE); 
-		}
+	create_sec_attribute();
+	if (secAttr.lpSecurityDescriptor == NULL) return false;
 
 	char savename[42];
 	strcpy_s(savename,42,name);
@@ -364,26 +332,26 @@ bool comm_serv::Init(char *name,int IN_datasize_IN,int IN_datasize_OUT,bool app,
 		if (datasize_IN!=0)
 		{
 		hMapFile_IN = CreateFileMapping(INVALID_HANDLE_VALUE,&secAttr,PAGE_READWRITE,0,datasize_IN,filemapping_IN);
-		if (hMapFile_IN == NULL) return false;
+		if (hMapFile_IN == NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 		data_IN=(char*)MapViewOfFile(hMapFile_IN,FILE_MAP_ALL_ACCESS,0,0,datasize_IN);           
 		if(data_IN==NULL) return false;
 		}
 		event_E_IN=CreateEvent(&secAttr, FALSE, FALSE, event_IN);
-		if(event_E_IN==NULL) return false;
+		if(event_E_IN==NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 		event_E_IN_DONE=CreateEvent(&secAttr, FALSE, FALSE, event_IN_DONE);
-		if(event_E_IN_DONE==NULL) return false;
+		if(event_E_IN_DONE==NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 
 		if (datasize_OUT!=0)
 		{
 		hMapFile_OUT = CreateFileMapping(INVALID_HANDLE_VALUE,&secAttr,PAGE_READWRITE,0,datasize_OUT,filemapping_OUT);
-		if (hMapFile_OUT == NULL) return false;
+		if (hMapFile_OUT == NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 		data_OUT=(char*)MapViewOfFile(hMapFile_OUT,FILE_MAP_ALL_ACCESS,0,0,datasize_OUT);           
 		if(data_OUT==NULL) return false;
 		}
 		event_E_OUT=CreateEvent(&secAttr, FALSE, FALSE, event_OUT);
-		if(event_E_OUT==NULL) return false;
+		if(event_E_OUT==NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 		event_E_OUT_DONE=CreateEvent(&secAttr, FALSE, FALSE, event_OUT_DONE);
-		if(event_E_OUT_DONE==NULL) return false;
+		if(event_E_OUT_DONE==NULL || GetLastError() == ERROR_ALREADY_EXISTS) return false;
 	}
 	else
 	{
