@@ -28,6 +28,7 @@
 #include "SettingsManager.h"
 #include "SchannelTLS.h"
 #include <vector>
+#include <string>
 
 //	[v1.0.2-jp1 fix]
 extern	HINSTANCE	hInstResDLL;
@@ -35,6 +36,14 @@ extern bool			fShutdownOrdered;
 
 // HTTP messages / message formats
 const char HTTP_MSG_OK[] = "HTTP/1.0 200 OK\r\n\r\n";
+
+const char HTTP_MSG_FORBIDDEN[] = "HTTP/1.0 403 Forbidden\r\n\r\n";
+
+// Limits for the per-connection HTTP worker threads
+static const int HTTP_MAX_WORKERS = 64;
+static const int HTTP_MAX_WORKERS_PER_HOST = 16;
+// Time allowed for a client to send the request line and headers
+static const DWORD HTTP_REQUEST_TIMEOUT_MS = 15000;
 
 const char HTTP_MSG_NOSOCKCONN [] =
 "<HTML>\n"
@@ -424,7 +433,7 @@ public:
 	virtual void *run_undetached(void * arg);
 	// Routines to handle HTTP requests
 	virtual void DoHTTP(VSocket *socket);
-	virtual char *ReadLine(VSocket *socket, char delimiter);
+	virtual char *ReadLine(VSocket *socket, char delimiter, DWORD startTick);
 
 
 	// Fields used internally
@@ -439,6 +448,171 @@ protected:
 	VSocket		*m_socket;
 };
 
+// WebSocket bridge peers: loopback source port of each bridge connection to the
+// RFB port, mapped to the real address of the browser that opened /ws. The RFB
+// accept loop claims the entry, so the session is filtered and authenticated as
+// that remote peer and never as a trusted loopback client.
+struct BridgedPeer {
+	VCard port;
+	std::string address;
+};
+static omni_mutex g_bridgedPeersMutex;
+static std::vector<BridgedPeer> g_bridgedPeers;
+
+static void RegisterBridgedPeer(VCard port, const char* address)
+{
+	omni_mutex_lock l(g_bridgedPeersMutex);
+	BridgedPeer peer;
+	peer.port = port;
+	peer.address = address;
+	g_bridgedPeers.push_back(peer);
+}
+
+static void UnregisterBridgedPeer(VCard port)
+{
+	omni_mutex_lock l(g_bridgedPeersMutex);
+	for (std::vector<BridgedPeer>::iterator it = g_bridgedPeers.begin(); it != g_bridgedPeers.end(); ++it) {
+		if (it->port == port) {
+			g_bridgedPeers.erase(it);
+			return;
+		}
+	}
+}
+
+// Called by the RFB accept loop for every new connection. Returns true (and sets
+// the socket's forwarded peer name) if it is a WebSocket bridge connection.
+bool vncHTTPClaimBridgedPeer(VSocket* sock)
+{
+	VCard port = sock->GetPeerPort();
+	if (port == 0)
+		return false;
+	const char* peer = sock->GetPeerName(false);
+	if (peer == NULL || (strcmp(peer, "127.0.0.1") != 0 && _stricmp(peer, "::ffff:127.0.0.1") != 0))
+		return false;
+
+	omni_mutex_lock l(g_bridgedPeersMutex);
+	for (std::vector<BridgedPeer>::iterator it = g_bridgedPeers.begin(); it != g_bridgedPeers.end(); ++it) {
+		if (it->port == port) {
+			sock->SetForwardedPeerName(it->address.c_str());
+			g_bridgedPeers.erase(it);
+			return true;
+		}
+	}
+	return false;
+}
+
+// Each accepted HTTP connection (including a long-lived /ws bridge) is served on
+// its own worker thread, so one slow or idle client cannot hold the listener.
+static omni_mutex g_httpWorkersMutex;
+static std::vector<std::string> g_httpWorkerPeers;
+
+static bool AcquireHTTPWorkerSlot(const std::string& peer)
+{
+	omni_mutex_lock l(g_httpWorkersMutex);
+	if ((int)g_httpWorkerPeers.size() >= HTTP_MAX_WORKERS)
+		return false;
+	int perHost = 0;
+	for (size_t i = 0; i < g_httpWorkerPeers.size(); i++)
+		if (g_httpWorkerPeers[i] == peer)
+			perHost++;
+	if (perHost >= HTTP_MAX_WORKERS_PER_HOST)
+		return false;
+	g_httpWorkerPeers.push_back(peer);
+	return true;
+}
+
+static void ReleaseHTTPWorkerSlot(const std::string& peer)
+{
+	omni_mutex_lock l(g_httpWorkersMutex);
+	for (std::vector<std::string>::iterator it = g_httpWorkerPeers.begin(); it != g_httpWorkerPeers.end(); ++it) {
+		if (*it == peer) {
+			g_httpWorkerPeers.erase(it);
+			return;
+		}
+	}
+}
+
+struct HTTPWorkerContext {
+	VSocket* socket;
+	vncServer* server;
+	SchannelTLS* tls;
+	std::string peer;
+};
+
+static unsigned __stdcall HTTPWorkerThread(void* arg)
+{
+	HTTPWorkerContext* ctx = (HTTPWorkerContext*)arg;
+	VSocket* sock = ctx->socket;
+	vncHTTPConnectThread http;
+	http.Inithttp(ctx->server);
+
+	if (ctx->tls)
+	{
+		SchannelTLS& tls = *ctx->tls;
+		if (tls.ServerHandshake(sock))
+		{
+			// Install TLS callbacks so all HTTP/WebSocket I/O is encrypted
+			VSocket::TLSCallbacks cb;
+			cb.send = [&tls, sock](const char* b, int l) -> bool {
+				return tls.Send(sock, b, l);
+			};
+			cb.recv = [&tls, sock](char* b, int l, int* got) -> bool {
+				return tls.Recv(sock, b, l, got);
+			};
+			sock->SetTLSCallbacks(&cb);
+
+			http.DoHTTP(sock);
+
+			sock->SetTLSCallbacks(nullptr);
+			tls.Shutdown(sock);
+		}
+		else
+		{
+			vnclog.Print(LL_CONNERR, VNCLOG("TLS: handshake failed, dropping connection\n"));
+		}
+		delete ctx->tls;
+	}
+	else
+	{
+		http.DoHTTP(sock);
+	}
+
+	// And close the client
+	sock->Shutdown();
+	sock->Close();
+	delete sock;
+	ReleaseHTTPWorkerSlot(ctx->peer);
+	delete ctx;
+	return 0;
+}
+
+// Takes ownership of socket and tls on success. On failure the caller still owns them.
+static bool StartHTTPWorker(VSocket* socket, vncServer* server, SchannelTLS* tls)
+{
+	HTTPWorkerContext* ctx = new HTTPWorkerContext;
+	ctx->socket = socket;
+	ctx->server = server;
+	ctx->tls = tls;
+	ctx->peer = socket->GetPeerName(false);
+
+	if (!AcquireHTTPWorkerSlot(ctx->peer))
+	{
+		vnclog.Print(LL_CONNERR, VNCLOG("HTTP: too many connections, dropping %s\n"), ctx->peer.c_str());
+		delete ctx;
+		return false;
+	}
+	HANDLE h = (HANDLE)_beginthreadex(NULL, 0, HTTPWorkerThread, ctx, 0, NULL);
+	if (!h)
+	{
+		vnclog.Print(LL_CONNERR, VNCLOG("HTTP: failed to create worker thread\n"));
+		ReleaseHTTPWorkerSlot(ctx->peer);
+		delete ctx;
+		return false;
+	}
+	CloseHandle(h);
+	return true;
+}
+
 
 // Added for HTTP-via-RFB. This function is called when a connection is
 // accepted on the RFB port. If the client sends an HTTP request we
@@ -448,14 +622,15 @@ VBool maybeHandleHTTPRequest(VSocket* sock,vncServer* svr)
 {
 	if (!sock->ReadSelect(2000)) return false;
 
-	// Client is sending data. Create a vncHTTPConnectThread to
-	// handle it.
-	vncHTTPConnectThread http;
-	http.Inithttp(svr);
-	http.DoHTTP(sock);
-	sock->Shutdown();
-	sock->Close();
-	delete sock;
+	// Client is sending data. Serve it on an HTTP worker thread so the
+	// RFB accept loop (which a /ws bridge connects back to) is not blocked.
+	sock->SetTimeout(15000); //ms
+	if (!StartHTTPWorker(sock, svr, NULL))
+	{
+		sock->Shutdown();
+		sock->Close();
+		delete sock;
+	}
 	return true;
 }
 
@@ -497,18 +672,20 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 		// Successful accept - perform the transaction
 		new_socket->SetTimeout(15000); //ms
 
+		SchannelTLS* tls = NULL;
+		bool certOk = true;
 		if (m_tlsEnabled)
 		{
-			// Perform TLS handshake before HTTP processing
-			SchannelTLS tls;
-			bool certOk = false;
+			// Load the certificate here; the TLS handshake runs on the worker thread
+			tls = new SchannelTLS;
+			certOk = false;
 			if (m_tlsCertThumbprint[0])
-				certOk = tls.LoadCertByThumbprint(m_tlsCertThumbprint);
+				certOk = tls->LoadCertByThumbprint(m_tlsCertThumbprint);
 			// Missing, expired or too-weak certificate: fall back to a fresh self-signed one.
 			if (!certOk)
 			{
 				char thumbprint[41];
-				certOk = tls.EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint, settings->getTLSCertKeyBits());
+				certOk = tls->EnsureSelfSignedCert("CN=UltraVNC-WebViewer", "UltraVNC-WebViewer", thumbprint, settings->getTLSCertKeyBits());
 				if (certOk)
 				{
 					settings->setTLSCertThumbprint(thumbprint);
@@ -516,33 +693,13 @@ void *vncHTTPConnectThread::run_undetached(void * arg)
 					strncpy_s(m_tlsCertThumbprint, thumbprint, 40);
 				}
 			}
-
-			if (certOk && tls.ServerHandshake(new_socket))
-			{
-				// Install TLS callbacks so all HTTP/WebSocket I/O is encrypted
-				VSocket::TLSCallbacks cb;
-				cb.send = [&tls, new_socket](const char* b, int l) -> bool {
-					return tls.Send(new_socket, b, l);
-				};
-				cb.recv = [&tls, new_socket](char* b, int l, int* got) -> bool {
-					return tls.Recv(new_socket, b, l, got);
-				};
-				new_socket->SetTLSCallbacks(&cb);
-
-				DoHTTP(new_socket);
-
-				new_socket->SetTLSCallbacks(nullptr);
-				tls.Shutdown(new_socket);
-			}
-			else
-			{
-				vnclog.Print(LL_CONNERR, VNCLOG("TLS: handshake failed, dropping connection\n"));
-			}
+			if (!certOk)
+				vnclog.Print(LL_CONNERR, VNCLOG("TLS: no certificate, dropping connection\n"));
 		}
-		else
-		{
-			DoHTTP(new_socket);
-		}
+
+		if (certOk && StartHTTPWorker(new_socket, m_server, tls))
+			continue;
+		delete tls;
 
 		// And close the client
 		new_socket->Shutdown();
@@ -612,10 +769,22 @@ static unsigned __stdcall WSRFBToClient(void* arg)
 static void BridgeWebSocketToRFB(VSocket* clientSocket, vncServer* server)
 {
 	// Connect a second socket to the local RFB listener so that the
-	// browser's WebSocket stream is forwarded to the VNC server.
+	// browser's WebSocket stream is forwarded to the VNC server. The bridge
+	// port is registered with the browser's address before connecting, so the
+	// RFB server never sees this connection as a loopback client.
+	char peer[64];
+	strncpy_s(peer, clientSocket->GetPeerName(false), _TRUNCATE);
 	VSocket* rfbSocket = new VSocket();
-	if (!rfbSocket->CreateConnect("127.0.0.1", settings->getPortNumber())) {
+	VCard bridgePort = 0;
+	if (!rfbSocket->CreateBindLoopback4() || (bridgePort = rfbSocket->GetSockPort()) == 0) {
+		vnclog.Print(LL_CONNERR, VNCLOG("failed to create WebSocket bridge socket\n"));
+		delete rfbSocket;
+		return;
+	}
+	RegisterBridgedPeer(bridgePort, peer);
+	if (!rfbSocket->ConnectLoopback4(settings->getPortNumber())) {
 		vnclog.Print(LL_CONNERR, VNCLOG("failed to connect WebSocket bridge to RFB port %d\n"), settings->getPortNumber());
+		UnregisterBridgedPeer(bridgePort);
 		delete rfbSocket;
 		return;
 	}
@@ -646,6 +815,7 @@ static void BridgeWebSocketToRFB(VSocket* clientSocket, vncServer* server)
 	if (h2) CloseHandle(h2);
 
 	DeleteCriticalSection(&ctx.sendLock);
+	UnregisterBridgedPeer(bridgePort);
 	rfbSocket->Close();
 	delete rfbSocket;
 }
@@ -657,9 +827,10 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 	char *line;
 
 	vnclog.Print(LL_CLIENTS, VNCLOG("DoHTTP started\n"));
+	const DWORD startTick = GetTickCount();
 
 	// Read in the HTTP request line
-	if ((line = ReadLine(socket, '\n')) == NULL)
+	if ((line = ReadLine(socket, '\n', startTick)) == NULL)
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("DoHTTP: ReadLine failed\n"));
 		return;
@@ -691,6 +862,11 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 			vnclog.Print(LL_CONNERR, VNCLOG("DoHTTP: header read failed\n"));
 			return;
 		}
+		if (GetTickCount() - startTick > HTTP_REQUEST_TIMEOUT_MS)
+		{
+			vnclog.Print(LL_CONNERR, VNCLOG("DoHTTP: request headers timed out\n"));
+			return;
+		}
 		if (headerPos < (int)sizeof(headers) - 1) {
 			headers[headerPos++] = c;
 		}
@@ -714,6 +890,14 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 	{
 		if (strcmp(filename, "/ws") == 0)
 		{
+			// The bridged RFB session is filtered on the real peer address too;
+			// refuse hosts rejected by AuthHosts or the blacklist before upgrading.
+			if (m_server->VerifyHost(socket->GetPeerName(false)) == vncServer::aqrReject)
+			{
+				vnclog.Print(LL_CONNERR, VNCLOG("WebSocket upgrade refused for %s\n"), socket->GetPeerName(false));
+				socket->SendExactHTTP(HTTP_MSG_FORBIDDEN, (const VCard)strlen(HTTP_MSG_FORBIDDEN));
+				return;
+			}
 			if (PerformWebSocketHandshake(socket, headers))
 			{
 				vnclog.Print(LL_CLIENTS, VNCLOG("WebSocket tunnel established\n"));
@@ -855,7 +1039,7 @@ void vncHTTPConnectThread::DoHTTP(VSocket *socket)
 		return;
 }
 
-char *vncHTTPConnectThread::ReadLine(VSocket *socket, char delimiter)
+char *vncHTTPConnectThread::ReadLine(VSocket *socket, char delimiter, DWORD startTick)
 
 {
 	int max=1024;
@@ -868,7 +1052,7 @@ char *vncHTTPConnectThread::ReadLine(VSocket *socket, char delimiter)
 	{
 		char c;
 
-		if (!socket->ReadExactHTTP(&c, 1))
+		if (!socket->ReadExactHTTP(&c, 1) || GetTickCount() - startTick > HTTP_REQUEST_TIMEOUT_MS)
 		{
 			delete [] buffer;
 			return NULL;

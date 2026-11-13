@@ -1116,7 +1116,7 @@ vncClientThread::CheckLoopBack()
 			if (remotename != NULL)
 				free(remotename);
 
-			if (!ok)
+			if (!ok && !m_socket->IsForwarded())
 			{
 				m_client->m_IsLoopback = true;
 			}
@@ -2700,8 +2700,9 @@ bool vncClientThread::InitSocket()
 	// vncClient/socket pair can be reused across a repeater/auto-reconnect cycle
 	// (see TryReconnect(), which calls InitSocket() again on a new outbound socket),
 	// so a stale loopback flag from a previous connection must not leak forward.
+	// A WebSocket-bridged connection arrives from 127.0.0.1 but is never treated as loopback.
 	const char* peerAddr = m_socket->GetPeerName(false);
-	m_client->m_IsLoopback = (peerAddr != NULL && IsLoopbackAddress(peerAddr));
+	m_client->m_IsLoopback = (!m_socket->IsForwarded() && peerAddr != NULL && IsLoopbackAddress(peerAddr));
 
 	// LOCK INITIAL SETUP
 	// All clients have the m_protocol_ready flag set to FALSE initially, to prevent
