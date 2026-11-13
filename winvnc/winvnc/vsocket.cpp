@@ -146,6 +146,7 @@ VSocket::VSocket()
 	m_fPluginStreamingIn = false;
 	m_fPluginStreamingOut = false;	
 	G_SENDBUFFER= settings->getSENDBUFFER_EX();
+	memset(m_forwardedPeer, 0, sizeof(m_forwardedPeer));
 }
 
 ////////////////////////////
@@ -902,6 +903,8 @@ VSocket::GetPeerNameIPV4(bool naam)
 VString
 VSocket::GetPeerName(bool naam)
 {
+	if (m_forwardedPeer[0])
+		return m_forwardedPeer;
 	if (settings->getIPV6())
 		return GetPeerNameIPV6(naam);
 	else
@@ -981,6 +984,92 @@ VSocket::GetSockName()
 		return GetSockNameIPV6();
 	else
 		return GetSockNameIPV4();
+}
+
+void
+VSocket::SetForwardedPeerName(const char *name)
+{
+	strncpy_s(m_forwardedPeer, name ? name : "", _TRUNCATE);
+}
+
+VBool
+VSocket::CreateBindLoopback4()
+{
+	if (sock != INVALID_SOCKET || sock4 != INVALID_SOCKET)
+		return VFalse;
+
+	SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (s == INVALID_SOCKET)
+		return VFalse;
+	const int one = 1;
+	setsockopt(s, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (char *)&one, sizeof(one));
+
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = 0;
+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) == SOCKET_ERROR)
+	{
+		closesocket(s);
+		return VFalse;
+	}
+	sock4 = s;
+	sock = s;
+	return VTrue;
+}
+
+VBool
+VSocket::ConnectLoopback4(const VCard port)
+{
+	if (sock4 == INVALID_SOCKET)
+		return VFalse;
+
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons((u_short)port);
+	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	if (connect(sock4, (struct sockaddr *)&addr, sizeof(addr)) == SOCKET_ERROR)
+		return VFalse;
+
+	SetDefaultSocketOptions4();
+	return VTrue;
+}
+
+static VCard SocketPort(SOCKET s, bool peer)
+{
+	if (s == INVALID_SOCKET)
+		return 0;
+
+	struct sockaddr_storage addr;
+	int addrsize = sizeof(addr);
+	memset(&addr, 0, sizeof(addr));
+	int r = peer ? getpeername(s, (struct sockaddr *)&addr, &addrsize)
+	             : getsockname(s, (struct sockaddr *)&addr, &addrsize);
+	if (r != 0)
+		return 0;
+	if (addr.ss_family == AF_INET)
+		return ntohs(((struct sockaddr_in *)&addr)->sin_port);
+	if (addr.ss_family == AF_INET6)
+		return ntohs(((struct sockaddr_in6 *)&addr)->sin6_port);
+	return 0;
+}
+
+VCard
+VSocket::GetSockPort()
+{
+	if (settings->getIPV6())
+		return SocketPort(sock4 != INVALID_SOCKET ? sock4 : sock6, false);
+	return SocketPort(sock, false);
+}
+
+VCard
+VSocket::GetPeerPort()
+{
+	if (settings->getIPV6())
+		return SocketPort(sock4 != INVALID_SOCKET ? sock4 : sock6, true);
+	return SocketPort(sock, true);
 }
 // 25 January 2008 jdp
 
