@@ -4473,10 +4473,14 @@ vncClientThread::run(void* arg)
 			{
 				map< pair<int, int>, pair<int, int> > resolutionMap;
 				DisplayMode flag = dmDisplay;
+				const int maxScreens = 16;
+				const int maxScreenDim = 16384;
+				bool validLayout = (msg.sdm.numberOfScreens <= maxScreens);
 				for (int i = 0; i < msg.sdm.numberOfScreens; i++) {
 					rfbExtDesktopScreen eds{};
 					if (!m_socket->ReadExact(((char*)&eds), sz_rfbExtDesktopScreen)) {
 						m_client->cl_connected = FALSE;
+						validLayout = false;
 						break;
 					}
 					int id = Swap32IfLE(eds.id);
@@ -4491,9 +4495,14 @@ vncClientThread::run(void* arg)
 					OutputDebugString(szText);
 #endif
 					//add some protection,
-					if (w * h <= 12582912)
+					if (w > maxScreenDim || h > maxScreenDim || (__int64)w * h > 12582912)
+						validLayout = false;
+					else
 						resolutionMap.insert(make_pair(make_pair(x, y), make_pair(w, h)));
 				}
+				m_client->m_lastDesktopSizeChangeError = validLayout ? rfbExtDesktopSize_Success : rfbExtDesktopSize_InvalidScreenLayout;
+				if (!validLayout)
+					break;
 				if (!m_server->m_virtualDisplaySupported)
 					flag = dmDisplay;
 				// Only the first Viewer can set the resolution
