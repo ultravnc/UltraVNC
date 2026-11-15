@@ -505,10 +505,14 @@ bool vncHTTPClaimBridgedPeer(VSocket* sock)
 // its own worker thread, so one slow or idle client cannot hold the listener.
 static omni_mutex g_httpWorkersMutex;
 static std::vector<std::string> g_httpWorkerPeers;
+static std::vector<VSocket*> g_httpWorkerSockets;
+static bool g_httpWorkersStopping = false;
 
-static bool AcquireHTTPWorkerSlot(const std::string& peer)
+static bool AcquireHTTPWorkerSlot(const std::string& peer, VSocket* socket)
 {
 	omni_mutex_lock l(g_httpWorkersMutex);
+	if (g_httpWorkersStopping)
+		return false;
 	if ((int)g_httpWorkerPeers.size() >= HTTP_MAX_WORKERS)
 		return false;
 	int perHost = 0;
@@ -518,12 +522,19 @@ static bool AcquireHTTPWorkerSlot(const std::string& peer)
 	if (perHost >= HTTP_MAX_WORKERS_PER_HOST)
 		return false;
 	g_httpWorkerPeers.push_back(peer);
+	g_httpWorkerSockets.push_back(socket);
 	return true;
 }
 
-static void ReleaseHTTPWorkerSlot(const std::string& peer)
+static void ReleaseHTTPWorkerSlot(const std::string& peer, VSocket* socket)
 {
 	omni_mutex_lock l(g_httpWorkersMutex);
+	for (std::vector<VSocket*>::iterator it = g_httpWorkerSockets.begin(); it != g_httpWorkerSockets.end(); ++it) {
+		if (*it == socket) {
+			g_httpWorkerSockets.erase(it);
+			break;
+		}
+	}
 	for (std::vector<std::string>::iterator it = g_httpWorkerPeers.begin(); it != g_httpWorkerPeers.end(); ++it) {
 		if (*it == peer) {
 			g_httpWorkerPeers.erase(it);
@@ -577,11 +588,13 @@ static unsigned __stdcall HTTPWorkerThread(void* arg)
 		http.DoHTTP(sock);
 	}
 
+	// Unregister before closing so vncHTTPStopWorkers never touches a closed socket.
+	ReleaseHTTPWorkerSlot(ctx->peer, sock);
+
 	// And close the client
 	sock->Shutdown();
 	sock->Close();
 	delete sock;
-	ReleaseHTTPWorkerSlot(ctx->peer);
 	delete ctx;
 	return 0;
 }
@@ -595,7 +608,7 @@ static bool StartHTTPWorker(VSocket* socket, vncServer* server, SchannelTLS* tls
 	ctx->tls = tls;
 	ctx->peer = socket->GetPeerName(false);
 
-	if (!AcquireHTTPWorkerSlot(ctx->peer))
+	if (!AcquireHTTPWorkerSlot(ctx->peer, socket))
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("HTTP: too many connections, dropping %s\n"), ctx->peer.c_str());
 		delete ctx;
@@ -605,12 +618,37 @@ static bool StartHTTPWorker(VSocket* socket, vncServer* server, SchannelTLS* tls
 	if (!h)
 	{
 		vnclog.Print(LL_CONNERR, VNCLOG("HTTP: failed to create worker thread\n"));
-		ReleaseHTTPWorkerSlot(ctx->peer);
+		ReleaseHTTPWorkerSlot(ctx->peer, socket);
 		delete ctx;
 		return false;
 	}
 	CloseHandle(h);
 	return true;
+}
+
+// Called from vncServer::ShutdownServer once the listeners are gone: unblocks
+// every HTTP worker (including /ws bridges) and waits for them to finish, so no
+// worker uses the server after it is torn down.
+void vncHTTPStopWorkers()
+{
+	{
+		omni_mutex_lock l(g_httpWorkersMutex);
+		g_httpWorkersStopping = true;
+		for (size_t i = 0; i < g_httpWorkerSockets.size(); i++)
+			g_httpWorkerSockets[i]->Interrupt();
+	}
+	for (int i = 0; i < 600; i++) {
+		{
+			omni_mutex_lock l(g_httpWorkersMutex);
+			if (g_httpWorkerPeers.empty())
+				break;
+		}
+		Sleep(50);
+	}
+	omni_mutex_lock l(g_httpWorkersMutex);
+	if (!g_httpWorkerPeers.empty())
+		vnclog.Print(LL_CONNERR, VNCLOG("HTTP: %d workers still running at shutdown\n"), (int)g_httpWorkerPeers.size());
+	g_httpWorkersStopping = false;
 }
 
 

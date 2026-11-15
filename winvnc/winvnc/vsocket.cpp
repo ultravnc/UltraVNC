@@ -849,7 +849,7 @@ VSocket::GetPeerName4(bool naam)
 		return name;
 }
 
-char straddr[INET6_ADDRSTRLEN];
+thread_local char straddr[INET6_ADDRSTRLEN];
 VString
 VSocket::GetPeerName6(bool naam)
 {
@@ -937,7 +937,7 @@ VSocket::GetSockName4()
 	else
 		return name;
 }
-char straddr2[INET6_ADDRSTRLEN];
+thread_local char straddr2[INET6_ADDRSTRLEN];
 VString
 VSocket::GetSockName6()
 {
@@ -1035,6 +1035,14 @@ VSocket::ConnectLoopback4(const VCard port)
 
 	SetDefaultSocketOptions4();
 	return VTrue;
+}
+
+void
+VSocket::Interrupt()
+{
+	if (sock != INVALID_SOCKET) shutdown(sock, SD_BOTH);
+	if (sock4 != INVALID_SOCKET) shutdown(sock4, SD_BOTH);
+	if (sock6 != INVALID_SOCKET) shutdown(sock6, SD_BOTH);
 }
 
 static VCard SocketPort(SOCKET s, bool peer)

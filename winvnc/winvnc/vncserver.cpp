@@ -33,6 +33,8 @@
 #include "Localization.h" // ACT : Add localization on messages
 #include "ScSelect.h"
 
+void vncHTTPStopWorkers();
+
 #pragma comment(lib, "iphlpapi.lib")
 
 extern bool g_Desktop_running;
@@ -203,6 +205,9 @@ vncServer::ShutdownServer()
 		delete m_httpsConn;
 		m_httpsConn = NULL;
 	}
+
+	// HTTP/WebSocket workers hold this server; stop them before tearing it down.
+	vncHTTPStopWorkers();
 
 	if (retrysock != NULL)
 		retrysock->Shutdown();

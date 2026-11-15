@@ -203,6 +203,9 @@ public:
   void SetForwardedPeerName(const char *name);
   bool IsForwarded() const { return m_forwardedPeer[0] != 0; }
 
+  // Unblock pending I/O from another thread without closing the socket handle.
+  void Interrupt();
+
 
 
  
