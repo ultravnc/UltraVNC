@@ -1864,6 +1864,9 @@ VSocket::SendExactIPV4(const char *buff, const VCard bufflen)
 	if (bufflen <=0) {
 		return VTrue;
 	}
+	// Native TLS: encrypt and send directly, bypassing DSMPlugin.
+	if (m_tlsCallbacks && m_tlsCallbacks->send)
+		return m_tlsCallbacks->send(buff, (int)bufflen) ? VTrue : VFalse;
 //	vnclog.Print(LL_SOCKERR, VNCLOG("SendExact %i\n") ,bufflen);
 	// sf@2002 - DSMPlugin
 	VCard nBufflen = bufflen;
