@@ -495,12 +495,39 @@ begin
       '-NoProfile -NonInteractive -ExecutionPolicy Bypass -File ' + AddQuotes(ScriptFile) + ' -Dir ' + AddQuotes(Dir));
 end;
 
-// Moves an untrusted {commonappdata}\UltraVNC aside, then (re)creates it with a
-// protected ACL: SYSTEM and Administrators full control, Users read-only.
+// Gives {commonappdata}\UltraVNC itself (not its children) a protected ACL:
+// SYSTEM and Administrators full control, Users read-only, no inheritance,
+// owner Administrators. Afterwards no non-admin can add or rename entries in it.
+function LockSharedConfigDir(const Dir, Icacls: String): Boolean;
+begin
+  Result := RunHidden(Icacls, AddQuotes(Dir) + ' /reset /L /Q') and
+    RunHidden(Icacls, AddQuotes(Dir) + ' /inheritance:r /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F *S-1-5-32-545:(OI)(CI)RX /L /Q') and
+    RunHidden(Icacls, AddQuotes(Dir) + ' /setowner *S-1-5-32-544 /L /Q');
+end;
+
+// Returns an empty string on success, otherwise the error to show.
+function QuarantineSharedConfigDir(const Dir: String): String;
+var
+  Quarantine: String;
+begin
+  Result := '';
+  Quarantine := Dir + '.untrusted-' + GetDateTimeString('yyyymmddhhnnss', #0, #0);
+  if not RenameFile(Dir, Quarantine) then
+  begin
+    Result := Dir + ' was created or can be modified by a non-administrator account and could not be moved aside. Remove it and run Setup again.';
+    Log(Result);
+    Exit;
+  end;
+  Log('Untrusted ProgramData configuration moved to ' + Quarantine);
+end;
+
+// Moves an untrusted {commonappdata}\UltraVNC aside and (re)creates it with a
+// protected ACL. The folder is locked before its ini files are vetted, so none
+// can be planted between the check and the ACL change.
 // Returns an empty string on success, otherwise the error to show.
 function SecureSharedConfigDir: String;
 var
-  Dir, Quarantine, Icacls: String;
+  Dir, Icacls: String;
 begin
   Result := '';
   Dir := ExpandConstant('{commonappdata}\UltraVNC');
@@ -508,14 +535,9 @@ begin
 
   if (DirExists(Dir) or FileExists(Dir)) and not IsSharedConfigDirTrusted(Dir) then
   begin
-    Quarantine := Dir + '.untrusted-' + GetDateTimeString('yyyymmddhhnnss', #0, #0);
-    if not RenameFile(Dir, Quarantine) then
-    begin
-      Result := Dir + ' was created or can be modified by a non-administrator account and could not be moved aside. Remove it and run Setup again.';
-      Log(Result);
+    Result := QuarantineSharedConfigDir(Dir);
+    if Result <> '' then
       Exit;
-    end;
-    Log('Untrusted ProgramData configuration moved to ' + Quarantine);
   end;
 
   if not DirExists(Dir) and not CreateDir(Dir) then
@@ -525,13 +547,30 @@ begin
     Exit;
   end;
 
-  if not RunHidden(Icacls, AddQuotes(Dir) + ' /reset /T /C /L /Q') or
-     not RunHidden(Icacls, AddQuotes(Dir) + ' /inheritance:r /grant:r *S-1-5-18:(OI)(CI)F *S-1-5-32-544:(OI)(CI)F *S-1-5-32-545:(OI)(CI)RX /L /Q') or
-     not RunHidden(Icacls, AddQuotes(Dir) + ' /setowner *S-1-5-32-544 /T /C /L /Q') then
+  if not LockSharedConfigDir(Dir, Icacls) then
   begin
     Result := 'Failed to secure the permissions of ' + Dir;
     Log(Result);
+    Exit;
   end;
+
+  if not IsSharedConfigDirTrusted(Dir) then
+  begin
+    Result := QuarantineSharedConfigDir(Dir);
+    if Result <> '' then
+      Exit;
+    if not CreateDir(Dir) or not LockSharedConfigDir(Dir, Icacls) then
+    begin
+      Result := 'Failed to create and secure ' + Dir;
+      Log(Result);
+      Exit;
+    end;
+  end;
+
+  // Best effort: the ini files were vetted above and nothing new can be added,
+  // this only drops leftover explicit ACEs and owners from other entries.
+  RunHidden(Icacls, AddQuotes(Dir + '\*') + ' /reset /T /C /L /Q');
+  RunHidden(Icacls, AddQuotes(Dir + '\*') + ' /setowner *S-1-5-32-544 /T /C /L /Q');
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
