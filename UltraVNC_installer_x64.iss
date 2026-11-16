@@ -228,6 +228,9 @@ Source: "ultravnc.cer"; DestDir: "{app}"; Flags: deleteafterinstall
 ; winvnc.exe needs to be first here because it triggers stopping UltraVNC Server service/app.
 Source: "64\xp\winvnc.exe"; DestDir: "{app}"; DestName: "winvnc.exe"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 
+Source: "64\xp\TokenSetup.exe"; DestDir: "{app}"; DestName: "TokenSetup.exe"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
+Source: "64\xp\TokenValidator.dll"; DestDir: "{app}"; DestName: "TokenValidator.dll"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
+
 Source: "64\xp\vnchooks.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\ddengine64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\UVncVirtualDisplay64\*"; DestDir: "{app}\UVncVirtualDisplay64"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
