@@ -699,10 +699,23 @@ DWORD WINAPI ThreadCheckCursorUpdates(LPVOID lpParam)
 {
 	vncDesktopThread *dt = (vncDesktopThread *)lpParam;
 	POINT cursorpos;
+	HCURSOR lastcursor = NULL;
 	while (dt->looping)
 	{
-		if (GetCursorPos(&cursorpos) &&  ((cursorpos.x != dt->oldcursorpos.x) || (cursorpos.y != dt->oldcursorpos.y)))
-				SetEvent(dt->m_desktop->trigger_events[0]);		
+		bool wake = GetCursorPos(&cursorpos) && ((cursorpos.x != dt->oldcursorpos.x) || (cursorpos.y != dt->oldcursorpos.y));
+		// An application can change the cursor shape a moment after the pointer
+		// stopped (e.g. Excel's move cursor at a cell border). Wake the desktop
+		// thread on a new cursor handle too, so the shape change is sent without
+		// waiting for the next screen change, pointer move or wait timeout.
+		CURSORINFO ci;
+		ci.cbSize = sizeof(ci);
+		if (GetCursorInfo(&ci) && ci.hCursor != NULL && ci.hCursor != lastcursor) {
+			if (lastcursor != NULL)
+				wake = true;
+			lastcursor = ci.hCursor;
+		}
+		if (wake)
+			SetEvent(dt->m_desktop->trigger_events[0]);
 		Sleep(50);
 	}
 	return 0;
@@ -994,6 +1007,16 @@ vncDesktopThread::run_undetached(void *arg)
 											MyGetCursorInfo(&cinfo);
 											m_desktop->m_hcursor = cinfo.hCursor;
 										}
+									}
+									else if (MyGetCursorInfo) {
+										// The pointer did not move, but the application may have
+										// changed the cursor shape since the last pass (see
+										// ThreadCheckCursorUpdates). Keep the last handle while
+										// the cursor is hidden (NULL).
+										MyCURSORINFO cinfo;
+										cinfo.cbSize=sizeof(MyCURSORINFO);
+										if (MyGetCursorInfo(&cinfo) && cinfo.hCursor != NULL)
+											m_desktop->m_hcursor = cinfo.hCursor;
 									}
 
 									//****************************************************************************
