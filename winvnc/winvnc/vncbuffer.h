@@ -92,8 +92,11 @@ public:
 	BOOL SetAccuracy(int accuracy);
 
 	// CURSOR HANDLING
-	BOOL IsCursorUpdatePending(){return m_cursorpending;};
-	void SetCursorPending(BOOL enable){m_cursorpending=enable;};
+	// Every cursor shape change bumps a serial number. Each client remembers the
+	// serial it has taken (vncEncodeMgr), so a client taking the change no longer
+	// hides it from the other clients.
+	LONG GetCursorSerial(){return InterlockedCompareExchange(&m_cursorserial, 0, 0);};
+	void SetCursorPending(BOOL enable){if (enable) InterlockedIncrement(&m_cursorserial);};
 
 	bool ClipRect(int *x, int *y, int *w, int *h, int cx, int cy, int cw, int ch);
 
@@ -123,7 +126,7 @@ protected:
 	int			nRowIndex;
 
 	// CURSOR HANDLING
-	BOOL			m_cursorpending;
+	volatile LONG	m_cursorserial;
 
 public:
 	rfbServerInitMsg	m_scrinfo;
