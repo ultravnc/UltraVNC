@@ -19,6 +19,7 @@
 #include "UltraVNCService.h"
 #include <userenv.h>
 #include <shlobj.h>
+#include <sddl.h>
 #include <direct.h>
 #include <errno.h>
 #include <fstream>
@@ -74,6 +75,19 @@ bool IsServicePortableMode(const char* appFolder) {
 	return isPortable;
 }
 
+// The SYSTEM service reads its config from this folder: create it so that only
+// SYSTEM and Administrators can write to it (Users get read-only access).
+static void CreateServiceConfigFolder(const char* folder)
+{
+	PSECURITY_DESCRIPTOR sd = NULL;
+	if (!ConvertStringSecurityDescriptorToSecurityDescriptorA("D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FRFX;;;BU)",
+		SDDL_REVISION_1, &sd, NULL))
+		return;
+	SECURITY_ATTRIBUTES sa = { sizeof(sa), sd, FALSE };
+	CreateDirectoryA(folder, &sa);
+	LocalFree(sd);
+}
+
 // Migrate INI file from install folder to ProgramData (service version)
 // Returns true if migration was performed or file already exists in target
 bool MigrateServiceIniToProgramData(const char* installFolderPath, const char* programDataPath, const char* configFileName) {
@@ -109,10 +123,7 @@ bool MigrateServiceIniToProgramData(const char* installFolderPath, const char* p
 	sourceFile.close();
 
 	// Create target directory if it doesn't exist
-	if (_mkdir(targetFolder) != 0 && errno != EEXIST) {
-		// Directory creation failed, but continue to try copying anyway
-		// in case the directory exists but _mkdir still failed
-	}
+	CreateServiceConfigFolder(targetFolder);
 
 	// Copy the file
 	if (CopyFileA(sourceIni, targetIni, FALSE)) {
@@ -191,9 +202,7 @@ void WINAPI UltraVNCService::service_main(DWORD argc, LPTSTR* argv) {
 		std::ifstream file(inifile);
 		if (!file.good()) {
 			// Config doesn't exist, ensure directory exists
-			if (_mkdir(programdataFolder) != 0 && errno != EEXIST) {
-				// Failed to create directory, continue anyway
-			}
+			CreateServiceConfigFolder(programdataFolder);
 		}
 	}
 
