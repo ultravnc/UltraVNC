@@ -42,7 +42,7 @@ vncBuffer::vncBuffer()
 	m_nAccuracyDiv = 4;
 
 	nRowIndex = 0;
-	m_cursorpending = false;
+	m_cursorserial = 0;
 	m_all_monitor = true;
 
 	// sf@2005 - Grey Palette

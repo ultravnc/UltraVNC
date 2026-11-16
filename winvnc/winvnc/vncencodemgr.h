@@ -188,6 +188,7 @@ protected:
 	// Tight - CURSOR HANDLING
 	BOOL			m_use_xcursor;
 	BOOL			m_use_richcursor;
+	LONG			m_cursor_serial_taken; // last vncBuffer cursor serial this client took
 
 	// Client detection
 	// if tight->tight zrle->zrle both=ultra
@@ -250,6 +251,7 @@ inline vncEncodeMgr::vncEncodeMgr()
 	// Tight CURSOR HANDLING
 	m_use_xcursor = FALSE;
 	m_use_richcursor = FALSE;
+	m_cursor_serial_taken = 0;
 	//	m_hcursor = NULL;
 
 	monitor_Offsetx = 0;
@@ -321,6 +323,10 @@ inline void
 vncEncodeMgr::SetBuffer(vncBuffer* buffer)
 {
 	m_buffer = buffer;
+	// Changes made before this client joined are not pending for it. It gets the
+	// shape when it enables cursor updates (SetEncodings clears the shape, and the
+	// desktop thread then bumps the serial)
+	m_cursor_serial_taken = m_buffer->GetCursorSerial();
 	CheckBuffer();
 }
 
@@ -898,16 +904,18 @@ inline BOOL
 vncEncodeMgr::IsCursorUpdatePending()
 {
 	if (m_use_xcursor || m_use_richcursor) {
-		return m_buffer->IsCursorUpdatePending();
+		return m_buffer->GetCursorSerial() != m_cursor_serial_taken;
 	}
 	return false;
 }
 
+// Takes the pending cursor shape change for this client only
 inline BOOL
 vncEncodeMgr::WasCursorUpdatePending()
 {
-	BOOL pending = m_buffer->IsCursorUpdatePending();
-	m_buffer->SetCursorPending(FALSE);
+	LONG serial = m_buffer->GetCursorSerial();
+	BOOL pending = serial != m_cursor_serial_taken;
+	m_cursor_serial_taken = serial;
 	return pending;
 }
 
