@@ -786,12 +786,12 @@ vncDesktopThread::run_undetached(void *arg)
 	POINT tempcursorpos;
 	GetCursorPos(&tempcursorpos);
 	oldcursorpos = rfb::Point(tempcursorpos);
-	// The driver gives smaller rectangles to check
-	// if Accuracy is 4 you eliminate pointer updates
+	// The driver gives exact rectangles to check: compare them in full
+	// (see the driver branch of the update loop)
 	if (m_desktop->VideoBuffer() && m_desktop->m_hookdriver)
 	{
 		m_server->SetBufferOffset(m_desktop->m_SWOffsetx, m_desktop->m_SWOffsety);
-		m_desktop->m_buffer.SetAccuracy(4);
+		m_desktop->m_buffer.SetAccuracy(1);
 	}
 
 	//init vars
@@ -1039,10 +1039,17 @@ vncDesktopThread::run_undetached(void *arg)
 									//************* driver  No polling
 									//****************************************************************************
 									else  {
-										if (cursormoved)
-											m_desktop->m_buffer.SetAccuracy(settings->getTurboMode() ? 2 : 1);
-										else
-											m_desktop->m_buffer.SetAccuracy(settings->getTurboMode() ? 4 : 2);
+										// Compare the driver's rectangles in full. With an accuracy
+										// divisor N, CheckRect compares only 1/N of each block row,
+										// moving the window by one step per row. A change that sits
+										// on every other row of a narrow column (the dotted XOR frame
+										// that Windows draws while dragging a window with "Show
+										// window contents while dragging" off) can then be missed
+										// on every row, and the stale pixels stay in the back buffer
+										// (and in every viewer, reconnects included) until something
+										// else repaints that area. The driver already limits the
+										// check to the changed rectangles, so sampling buys little.
+										m_desktop->m_buffer.SetAccuracy(1);
 									}
 									
 									
