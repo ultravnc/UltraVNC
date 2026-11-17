@@ -173,6 +173,10 @@ static keymap_t keymap[] = {
   { XK_Control_R,        VK_CONTROL, 1 },
   { XK_Alt_L,            VK_MENU, 0 },
   { XK_Alt_R,            VK_RMENU, 1 },
+  // AltGr arrives as ISO_Level3_Shift (TigerVNC, newer UltraVNC viewers)
+  // or Mode_switch; on Windows both are the physical Right-Alt key.
+  { XK_ISO_Level3_Shift, VK_RMENU, 1 },
+  { XK_Mode_switch,      VK_RMENU, 1 },
 
 // Left & Right Windows keys & Windows Menu Key
 
