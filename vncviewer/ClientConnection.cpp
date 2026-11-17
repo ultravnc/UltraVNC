@@ -395,7 +395,6 @@ void ClientConnection::Init(VNCviewerApp *pApp)
 	m_zlibbuf = NULL;
 	m_zlibbufsize = 0;
 	// adzm - 2010-07 - Fix clipboard hangs
-	m_hwndNextViewer = (HWND)INVALID_HANDLE_VALUE;
 	m_pApp = pApp;
 	m_dormant = 0;
 	m_hBitmapDC = NULL;
@@ -751,9 +750,11 @@ void ClientConnection::Run()
 
 	// sf@2007 - Autoreconnect - Must be done after windows creation, otherwise ReadServerInit does not initialise the title bar...
 	// Apply the auto-reconnect behaviour to the initial connection as well:
-	// an authentication failure retries so the user gets the password prompt
-	// again.  Failures before authentication (e.g. server not running) throw
-	// immediately instead of pointlessly retrying a host that isn't there.
+	// keep retrying while the reconnect counter allows and the user has not
+	// cancelled in the status window.  This covers both a host that is not
+	// up yet (e.g. PC still booting) and a rejected login, which retries so
+	// the user gets the password prompt again.  A QuietException means the
+	// user cancelled a prompt or pressed Cancel - that is never retried.
 	reconnectcounter = m_reconnectcounter;
 	while (true)
 	{
@@ -762,36 +763,46 @@ void ClientConnection::Run()
 			DoConnection();
 			break;
 		}
+		catch (QuietException &) {
+			throw;
+		}
 		catch (Exception &) {
-			if (m_Is_Listening || Pressed_Cancel || !m_bReachedAuth ||
+			if (m_Is_Listening || Pressed_Cancel || forcedexit ||
 				m_autoReconnect == 0 || reconnectcounter <= 0)
 				throw;
 			reconnectcounter--;
-			// Drop the rejected credentials so the retry prompts for a
-			// fresh password instead of resubmitting the wrong one.
-			// Normal auto-reconnect reuses the cached m_encPasswd/m_encPasswdMs,
-			// but here the cached password was rejected so it must be cleared.
-			m_clearPasswd[0] = '\0';
-			memset(m_encPasswd, 0, sizeof(m_encPasswd));
-			memset(m_encPasswdMs, 0, sizeof(m_encPasswdMs));
-			m_usedSavedVncPassword = false;
-			// A wrong password may also have been saved to Credential Manager
-			// (this session or earlier); remove it or the retry reads it back.
-			CredentialManager::DeleteVncPassword(m_host, m_port);
-			CredentialManager::DeleteMsLogonPassword(m_host, m_port);
-			vnclog.Print(0, _T("Authentication failed, retrying in %ds (%d attempt(s) left)\n"),
+			if (m_bReachedAuth) {
+				// Drop the rejected credentials so the retry prompts for a
+				// fresh password instead of resubmitting the wrong one.
+				// Normal auto-reconnect reuses the cached m_encPasswd/m_encPasswdMs,
+				// but here the cached password was rejected so it must be cleared.
+				m_clearPasswd[0] = '\0';
+				memset(m_encPasswd, 0, sizeof(m_encPasswd));
+				memset(m_encPasswdMs, 0, sizeof(m_encPasswdMs));
+				m_usedSavedVncPassword = false;
+				// A wrong password may also have been saved to Credential Manager
+				// (this session or earlier); remove it or the retry reads it back.
+				CredentialManager::DeleteVncPassword(m_host, m_port);
+				CredentialManager::DeleteMsLogonPassword(m_host, m_port);
+			}
+			vnclog.Print(0, _T("Initial connection failed, retrying in %ds (%d attempt(s) left)\n"),
 				m_autoReconnect, reconnectcounter);
 			if (m_hwndStatus) {
 				wchar_t szText[256];
 				_snwprintf_s(szText, 256, _TRUNCATE,
-					L"Authentication failed, retrying in %ds (%d attempt(s) left)",
+					L"Connection failed, retrying in %ds (%d attempt(s) left)",
 					m_autoReconnect, reconnectcounter);
 				SetDlgItemTextW(m_hwndStatus, IDC_STATUS, szText);
 				UpdateWindow(m_hwndStatus);
 			}
-			Sleep(m_autoReconnect * 1000);
+			// Interruptible wait: Cancel must stop the retry at once instead
+			// of running to the end of the countdown and throwing again.
+			for (DWORD waited = 0;
+				waited < (DWORD)m_autoReconnect * 1000 && !Pressed_Cancel && !forcedexit;
+				waited += 100)
+				Sleep(100);
 			if (Pressed_Cancel || forcedexit)
-				throw;
+				throw QuietException(L"Connection attempt cancelled");
 			// The failed attempt may leave an unconnected socket behind
 			if (m_sock != INVALID_SOCKET) {
 				closesocket(m_sock);
@@ -893,10 +904,22 @@ void ClientConnection::DoConnection(bool reconnect)
 DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 {
 	ClientConnection *cc=(ClientConnection*)lpParameter;
-	Sleep( cc->m_autoReconnect * 1000 );
+	// Interruptible wait: abort the reconnect when the user closed the
+	// viewer (forcedexit) or pressed Cancel - otherwise we would reconnect
+	// into a window that is being destroyed, or outlive the
+	// ClientConnection object after the WM_CLOSE handler stopped waiting
+	// for us.
+	for (DWORD waited = 0;
+		waited < (DWORD)cc->m_autoReconnect * 1000 && !forcedexit && !cc->Pressed_Cancel;
+		waited += 100)
+		Sleep(100);
+	if (forcedexit || cc->Pressed_Cancel)
+		return 0;
 	try
 	{
 		cc->DoConnection(true);
+		if (forcedexit || cc->Pressed_Cancel)
+			return 0; // WM_CLOSE is tearing the window down; leave m_bKillThread set
 		cc->m_bKillThread = false;
 		cc->m_running = true;
 		cc->m_pendingFormatChange=true;
@@ -905,12 +928,20 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 		if (cc->m_nServerScale > 1) cc->SendServerScale(cc->m_nServerScale);
 		cc->Internal_SendAppropriateFramebufferUpdateRequest();
 	}
+	catch (QuietException &)
+	{
+		// User cancelled a prompt during the reconnect - do not retry.
+	}
 	catch (Exception &e)
 	{
+		if (forcedexit || cc->Pressed_Cancel)
+			return 0;
 		if( cc->m_autoReconnect == 0)
 			e.Report();
 		cc->reconnectcounter--;
 		if (cc->reconnectcounter<0) cc->reconnectcounter=0;
+		if (cc->reconnectcounter == 0)
+			vnclog.Print(0, _T("Reconnect attempts exhausted, closing viewer (%s)\n"), e.GetInfo());
 		//Seems is needed, countdown stop
 		PostMessage(cc->m_hwndMain, WM_CLOSE, cc->reconnectcounter, 1);
 	}
@@ -919,10 +950,17 @@ DWORD WINAPI ReconnectThreadProc(LPVOID lpParameter)
 
 void ClientConnection::Reconnect()
 {
-	Sleep( m_autoReconnect * 1000 );
+	for (DWORD waited = 0;
+		waited < (DWORD)m_autoReconnect * 1000 && !forcedexit && !Pressed_Cancel;
+		waited += 100)
+		Sleep(100);
+	if (forcedexit || Pressed_Cancel)
+		return;
 	try
 	{
 		DoConnection();
+		if (forcedexit || Pressed_Cancel)
+			return;
 		m_bKillThread = false;
 		m_running = true;
 
@@ -931,12 +969,20 @@ void ClientConnection::Reconnect()
 		if (m_nServerScale > 1) SendServerScale(m_nServerScale);
 		Internal_SendAppropriateFramebufferUpdateRequest();
 	}
+	catch (QuietException &)
+	{
+		// User cancelled a prompt during the reconnect - do not retry.
+	}
 	catch (Exception &e)
 	{
+		if (forcedexit || Pressed_Cancel)
+			return;
 		if( m_autoReconnect == 0)
 			e.Report();
 		reconnectcounter--;
 		if (reconnectcounter<0) reconnectcounter=0;
+		if (reconnectcounter == 0)
+			vnclog.Print(0, _T("Reconnect attempts exhausted, closing viewer (%s)\n"), e.GetInfo());
 		PostMessage(m_hwndMain, WM_CLOSE, reconnectcounter, 1);
 	}
 }
@@ -1702,9 +1748,15 @@ void ClientConnection::WatchClipboard()
 	// the current state.
 	// We don't want to send that.
 	//m_initialClipboardSeen = false;
+	// Register as a clipboard format listener instead of joining the legacy
+	// clipboard viewer chain.  A viewer that exits without calling
+	// ChangeClipboardChain (crash, kill) breaks the chain for every window
+	// behind it, which is what made clipboard sync stop working when several
+	// vncviewer windows were opened and closed.  Format listeners get
+	// WM_CLIPBOARDUPDATE directly from the system and cannot break each other.
 	m_settingClipboardViewer = true;
-	m_hwndNextViewer = SetClipboardViewer(m_hwndcn);
-	vnclog.Print(6, _T("SetClipboardViewer to 0x%08x; next is 0x%08x. Last error 0x%08x"), m_hwndcn, m_hwndNextViewer, GetLastError());
+	BOOL added = AddClipboardFormatListener(m_hwndcn);
+	vnclog.Print(6, _T("AddClipboardFormatListener for 0x%08x returned %d. Last error 0x%08x"), m_hwndcn, added, GetLastError());
 	m_settingClipboardViewer = false;
 
 }
@@ -3165,6 +3217,7 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			if (!m_Is_Listening && !m_pApp->m_options.m_AllowUntrustedServers  &&
 				yesnoUVNCMessageBox(m_hInstResDLL, m_hwndMain, str50286, str50283, str50284, str50285, str50279, bCheckboxChecked) == false)
 			{
+				Pressed_Cancel = true;
 				throw WarningException(L"You refused a untrusted server.");
 			}
 			if (bCheckboxChecked)
@@ -3513,11 +3566,12 @@ void ClientConnection::AuthSecureVNCPlugin()
 		// cancelled
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"Authentication cancelled");
 		SetEvent(KillEvent);
+		Pressed_Cancel = true;
 		throw ErrorException(L"Authentication cancelled");
 	} else if (!bSuccess) {
 		// other failure
-		wchar_t _wles3[256]; 
-		MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->GetLastErrorString(),-1,_wles3,256); 
+		wchar_t _wles3[256];
+		MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->GetLastErrorString(),-1,_wles3,256);
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,_wles3);
 		SetEvent(KillEvent);
 		throw ErrorException(_wles3);
@@ -3628,10 +3682,11 @@ void ClientConnection::AuthSecureVNCPlugin_old()
 		// cancelled
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_STATUS,L"Authentication cancelled");
 		SetEvent(KillEvent);
+		Pressed_Cancel = true;
 		throw ErrorException(L"Authentication cancelled");
 	} else if (!bSuccess) {
 		// other failure
-		wchar_t _wles2[256]; 
+		wchar_t _wles2[256];
 		MultiByteToWideChar(CP_UTF8,0,m_pIntegratedPluginInterface->GetLastErrorString(),-1,_wles2,256); 
 		if (m_hwndStatus)SetDlgItemTextW(m_hwndStatus,IDC_PLUGIN_STATUS,_wles2);
 		SetEvent(KillEvent);
@@ -9712,12 +9767,6 @@ LRESULT CALLBACK ClientConnection::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, 
 
 				case WM_DESTROY:
 					{
-						// Remove us from the clipboard viewer chain
-						if (hwnd == _this->m_hwndcn && _this->m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
-							BOOL res = ChangeClipboardChain( _this->m_hwndcn, _this->m_hwndNextViewer);
-							_this->m_hwndNextViewer = NULL;
-							vnclog.Print(6, _T("WndProc ChangeClipboardChain m_hwndcn 0x%08x / hwnd 0x%08x, 0x%08x (%li)\n"), _this->m_hwndcn, hwnd, _this->m_hwndNextViewer, res);
-						}
 						if (_this->m_waitingOnEmulateTimer)
 						{
 							KillTimer(_this->m_hwndcn, _this->m_emulate3ButtonsTimer);
@@ -10505,11 +10554,11 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 
 			case WM_DESTROY:
 				{
-				// Remove us from the clipboard viewer chain
+				// Stop watching the clipboard (we are a format listener,
+				// not part of the legacy viewer chain)
 				if (hwnd == _this->m_hwndcn) {
-					BOOL res = ChangeClipboardChain( hwnd, _this->m_hwndNextViewer);
-					_this->m_hwndNextViewer = NULL;
-					vnclog.Print(6, _T("WndProchwnd ChangeClipboardChain hwnd 0x%08x / m_hwndcn 0x%08x, 0x%08x (%li)\n"), hwnd, _this->m_hwndcn, _this->m_hwndNextViewer, res);
+					BOOL res = RemoveClipboardFormatListener(hwnd);
+					vnclog.Print(6, _T("WndProchwnd RemoveClipboardFormatListener hwnd 0x%08x (%li)\n"), hwnd, res);
 				}
 #ifdef _Gii
 				UnregisterTouchWindow(hwnd);
@@ -10593,30 +10642,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				break;
 			}
 
-			case WM_DRAWCLIPBOARD:
+			case WM_CLIPBOARDUPDATE:
 				_this->ProcessLocalClipboardChange();
 				return 0;
-
-			case WM_CHANGECBCHAIN:
-				{
-					// The clipboard chain is changing
-					HWND hWndRemove = (HWND) wParam;     // handle of window being removed
-					HWND hWndNext = (HWND) lParam;       // handle of next window in chain
-					vnclog.Print(6, _T("WM_CHANGECBCHAIN remove 0x%08x, next 0x%08x (current m_hwndcn 0x%08x / hwnd 0x%08x, next 0x%08x)\n"), hWndRemove, hWndNext, _this->m_hwndcn, hwnd, _this->m_hwndNextViewer);
-					// If next window is closing, update our pointer.
-					if (hWndRemove == _this->m_hwndNextViewer)
-						_this->m_hwndNextViewer = hWndNext;
-					// Otherwise, pass the message to the next link.
-					else if (_this->m_hwndNextViewer != NULL && _this->m_hwndNextViewer != INVALID_HANDLE_VALUE) {
-						// adzm - 2010-07 - Fix clipboard hangs
-						// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
-						// (like ourself before this) won't cause our thread to hang.
-						::SendNotifyMessage(_this->m_hwndNextViewer, WM_CHANGECBCHAIN,
-							(WPARAM) hWndRemove,  (LPARAM) hWndNext );
-					}
-
-					return 0;
-				}
 
 			// Modif VNCon MultiView support
 			// Messages used by VNCon - Copyright (C) 2001-2003 - Alastair Burr

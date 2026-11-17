@@ -99,6 +99,24 @@ static DWORD CertKeyBits(PCCERT_CONTEXT ctx)
                                   &ctx->pCertInfo->SubjectPublicKeyInfo);
 }
 
+// The minimum acceptable public-key size depends on the algorithm.  The
+// OpenSSL 3 (security level 2) / GnuTLS rejection this guards against
+// applies to RSA moduli; for ECC CertGetPublicKeyLength returns the curve
+// size, so an ECDSA P-256 certificate reports 256 bits and must be
+// compared against an ECC floor, not the RSA one.  Unknown algorithms
+// get no floor (same as before the check existed).
+static DWORD MinCertKeyBitsForAlg(PCCERT_CONTEXT ctx)
+{
+    const char* algOid = ctx->pCertInfo->SubjectPublicKeyInfo.Algorithm.pszObjId;
+    if (algOid == nullptr)
+        return MinCertKeyBits;
+    if (strcmp(algOid, szOID_RSA_RSA) == 0)
+        return MinCertKeyBits;
+    if (strcmp(algOid, szOID_ECC_PUBLIC_KEY) == 0)
+        return 224;   // ECDSA P-224 or stronger (P-256, P-384, P-521)
+    return 0;
+}
+
 bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
 {
     if (!thumbprint || strlen(thumbprint) != 40)
@@ -145,10 +163,11 @@ bool SchannelTLS::LoadCertByThumbprint(const char* thumbprint)
             }
 
             const DWORD keyBits = CertKeyBits(m_certCtx);
-            if (keyBits < MinCertKeyBits)
+            const DWORD minBits = MinCertKeyBitsForAlg(m_certCtx);
+            if (keyBits < minBits)
             {
                 vnclog.Print(LL_CONNERR, VNCLOG("TLS: certificate key too weak (%lu bits, need %lu)\n"),
-                             keyBits, MinCertKeyBits);
+                             keyBits, minBits);
                 CertFreeCertificateContext(m_certCtx);
                 m_certCtx = nullptr;
                 return false;
@@ -249,7 +268,7 @@ bool SchannelTLS::EnsureSelfSignedCert(const char* subjectName, const char* cont
             FILETIME ftNow;
             GetSystemTimeAsFileTime(&ftNow);
             if (CompareFileTime(&cur->pCertInfo->NotAfter, &ftNow) > 0 &&
-                CertKeyBits(cur) >= MinCertKeyBits)
+                CertKeyBits(cur) >= MinCertKeyBitsForAlg(cur))
             {
                 existing = CertDuplicateCertificateContext(cur);
                 CertFreeCertificateContext(cur);
