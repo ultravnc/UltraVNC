@@ -7116,7 +7116,7 @@ void ClientConnection::ReadServerCutText()
 						m_clipboard.m_notifiedRemoteFormats = formats;
 						m_clipboard.m_requestedRemoteFormats = 0;
 					}
-					RequestRemoteClipboard(formats, true);
+					PostMessage(m_hwndcn, WM_REQUESTREMOTECLIPBOARD, formats, NULL);
 				}
 				break;
 			case clipRequest:
@@ -9929,6 +9929,9 @@ LRESULT CALLBACK ClientConnection::WndProchwnd(HWND hwnd, UINT iMsg, WPARAM wPar
 				return 0;
 			case WM_UPDATEREMOTECLIPBOARD:
 				_this->UpdateRemoteClipboard(wParam);
+				return 0;
+			case WM_REQUESTREMOTECLIPBOARD:
+				_this->RequestRemoteClipboard((CARD32)wParam, true);
 				return 0;
 
 			case WM_HIGHRESOLUTIONWHEEL:
