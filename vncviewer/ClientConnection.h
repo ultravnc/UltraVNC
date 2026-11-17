@@ -722,10 +722,8 @@ private:
 
 	// The number of bytes required to hold at least one pixel.
 	unsigned int m_minPixelBytes;
-	// Next window in clipboard chain
-	HWND m_hwndNextViewer; 
 	// adzm - 2010-07 - Fix clipboard hangs
-	//bool m_initialClipboardSeen;		
+	//bool m_initialClipboardSeen;
 	bool m_settingClipboardViewer;
 	void WatchClipboard();
 
