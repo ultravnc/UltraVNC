@@ -487,9 +487,17 @@ class KeyMap {
     void    SetKeyMapOption2(bool useUnicodeKeysymOpt);
     void    Reset();
     void    ReleaseAllKeys(ClientConnection* clientCon);
+    void    FlushAltGrCtrl(ClientConnection* clientCon);
 
   private:
     void    BuildUCS2KS_Map(void);
+    bool    hasAltGr();
+    bool    altGrCached;
+    HKL     altGrLayout;
+    bool    cachedHasAltGr;
+    bool    altGrArmed;
+    DWORD   altGrCtrlTime;
+    UINT    pendingCtrlVkey;
     std::map<WCHAR,CARD32> ucsLatinExtABMap;
     std::map<WCHAR,CARD32> ucsGreek_CopticMap;
     std::map<WCHAR,CARD32> ucsCyrillicMap;

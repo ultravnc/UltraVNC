@@ -5379,6 +5379,7 @@ void ClientConnection::ProcessMouseWheel(unsigned axis, int delta)
 
 void ClientConnection::SendWheelEvent(bool precise, unsigned axis, int delta)
 {
+	if (m_keymap) m_keymap->FlushAltGrCtrl(this);
 	if (precise) {
 		// A cached position can lie beyond an edge after a framebuffer resize.
 		int x = maximum(0, minimum(oldPointerX, (int)m_si.framebufferWidth - 1));
@@ -5402,6 +5403,7 @@ void ClientConnection::SendWheelEvent(bool precise, unsigned axis, int delta)
 inline void
 ClientConnection::SendPointerEvent(int x, int y, int buttonMask)
 {
+	if (m_keymap) m_keymap->FlushAltGrCtrl(this);
 	if (m_pFileTransfer->m_fFileTransferRunning && ( m_pFileTransfer->m_fVisible || m_pFileTransfer->UsingOldProtocol())) return;
 	if (m_pTextChat->m_fTextChatRunning && m_pTextChat->m_fVisible) return;
 

@@ -70,7 +70,9 @@ class ModifierKeyReleaser {
 
 
 KeyMap::KeyMap()
-  : storedDeadChar(0), sendDeadKey(true), useUnicodeKeysym(true)
+  : storedDeadChar(0), sendDeadKey(true), useUnicodeKeysym(true),
+    altGrCached(false), altGrLayout(NULL), cachedHasAltGr(false),
+    altGrArmed(false), altGrCtrlTime(0), pendingCtrlVkey(0)
 {
     BuildUCS2KS_Map();
 }
@@ -90,6 +92,7 @@ void KeyMap::Reset()
 {
    vnclog.Print(8, _T("Reset keyboard for first use\n"));
     storedDeadChar = 0;
+    altGrArmed = false;
     GetKeyboardState(KBKeysState);
     FlushDeadKey(KBKeysState);
 
@@ -102,9 +105,79 @@ void KeyMap::Reset()
     }
 }
 
+// Windows has no real AltGr key: on layouts that use one, the OS reports
+// AltGr as a fake Left-Ctrl followed by Right-Alt. Detect whether the
+// current layout actually uses AltGr by asking ToUnicode whether any
+// virtual key produces a printable character with Ctrl+Alt held.
+// Result is cached per keyboard layout (HKL).
+bool KeyMap::hasAltGr()
+{
+    BYTE origState[256];
+    BYTE altGrState[256];
+    WCHAR wstr[10];
+
+    HKL layout = GetKeyboardLayout(0);
+    if (altGrCached && altGrLayout == layout)
+        return cachedHasAltGr;
+
+    // Save current keyboard state so we can get things sane again after
+    // we're done
+    if (!GetKeyboardState(origState))
+        return false;
+
+    cachedHasAltGr = false;
+    memset(altGrState, 0, sizeof(altGrState));
+    altGrState[VK_CONTROL] = 0x80;
+    altGrState[VK_MENU] = 0x80;
+
+    for (UINT vkey = 0; vkey <= 0xff; vkey++) {
+        int ret;
+        // Skip this one as it is a bit magical and will trigger a
+        // false positive
+        if (vkey == VK_PACKET)
+            continue;
+        ret = ToUnicode(vkey, 0, altGrState, wstr,
+                        (sizeof(wstr) / sizeof(WCHAR)), 0);
+        if (ret == 1) {
+            cachedHasAltGr = true;
+            break;
+        }
+        if (ret < 0) {
+            // Dead key, need to clear out state before we proceed
+            do {
+                ret = ToUnicode(vkey, 0, altGrState, wstr,
+                                (sizeof(wstr) / sizeof(WCHAR)), 0);
+            } while (ret < 0);
+        }
+    }
+
+    SetKeyboardState(origState);
+    altGrLayout = layout;
+    altGrCached = true;
+   vnclog.Print(4, _T("Keyboard layout %s AltGr\n"),
+                (cachedHasAltGr ? _T("has") : _T("does not use")));
+    return cachedHasAltGr;
+}
+
+// A Left-Ctrl key press is not sent to the server immediately on AltGr
+// layouts: it may be the fake Ctrl that Windows emits ahead of the
+// Right-Alt part of an AltGr press. If it turns out not to be (any other
+// event arrives first), the delayed Ctrl press is flushed through here.
+void KeyMap::FlushAltGrCtrl(ClientConnection* clientCon)
+{
+    if (!altGrArmed)
+        return;
+    altGrArmed = false;
+   vnclog.Print(5, _T("Flushing delayed Ctrl press (not an AltGr sequence)\n"));
+    pressKey(clientCon, pendingCtrlVkey, XK_Control_L);
+}
+
 // When losing focus the client should send key release to server for all sent key presses
 void KeyMap::ReleaseAllKeys(ClientConnection* clientCon)
 {
+    // A pending (possibly fake) Ctrl was never sent to the server, so
+    // there is nothing to flush or release for it.
+    altGrArmed = false;
     for (int extVkey = 0; extVkey < (sizeof(downKeysym) / sizeof(CARD32)); extVkey++) {
         if (downKeysym[extVkey] != XK_VoidSymbol) {
            vnclog.Print(7, _T("\nReleasing %sVirtKey 0x%02x ->")
@@ -522,7 +595,37 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
     bool down = ((keyData & 0x80000000) == 0);
     bool extended = ((keyData & 0x1000000) != 0);
     bool repeated = ((keyData & 0xc0000000) == 0x40000000);
+    UINT scanCode = (keyData >> 16) & 0xFF;
+
+    // Windows' touch keyboard doesn't set a scan code for the Alt
+    // portion of the AltGr sequence, so we need to help it out
+    if (!extended && scanCode == 0x00 && virtKey == VK_MENU) {
+        extended = true;
+        scanCode = 0x38;
+    }
+
     UINT extVkey = virtKey + (extended ? 256 : 0);
+
+    // Windows doesn't have a proper AltGr, but handles it using fake
+    // Ctrl+Alt. The remote end might not be Windows, so merge those two
+    // events into a single AltGr (ISO_Level3_Shift) event, like
+    // TigerVNC does. A pending (possibly fake) Ctrl press is resolved
+    // here: a Right-Alt key down shortly after it means AltGr, so the
+    // Ctrl is dropped; anything else means it was a real Ctrl press and
+    // must be flushed first.
+    if (altGrArmed) {
+        bool altGrFollowUp = down && extended &&
+                             (scanCode == 0x38) &&
+                             (virtKey == VK_MENU) &&
+                             (((DWORD)(GetMessageTime() - altGrCtrlTime)) < 50);
+        altGrArmed = false;
+        if (!altGrFollowUp) {
+           vnclog.Print(5, _T("Not an AltGr sequence: sending delayed Ctrl press\n"));
+            pressKey(clientCon, pendingCtrlVkey, XK_Control_L);
+        } else {
+           vnclog.Print(5, _T("AltGr sequence: dropping fake Ctrl press\n"));
+        }
+    }
 
 	// exclude winkey when not scroll-lock
 	if (virtKey==91 || virtKey==92) return;
@@ -576,6 +679,24 @@ void KeyMap::PCtoX(BYTE virtKey, DWORD keyData, ClientConnection* clientCon)
     }
 
     if (foundXCode != XK_VoidSymbol) {
+        if (hasAltGr()) {
+            // On layouts with AltGr, the physical Right-Alt key is the
+            // level-3 shift: report it as ISO_Level3_Shift so X servers
+            // and passthrough clients (e.g. VDI sessions behind xvnc)
+            // treat it as AltGr rather than a plain Alt.
+            if (foundXCode == XK_Alt_R && extended && scanCode == 0x38)
+                foundXCode = XK_ISO_Level3_Shift;
+            // A Left-Ctrl press may be the fake Ctrl Windows emits as
+            // the first half of an AltGr press. Delay sending it until
+            // the next input event shows whether it was real.
+            if (foundXCode == XK_Control_L && !extended && scanCode == 0x1d) {
+                altGrArmed = true;
+                altGrCtrlTime = GetMessageTime();
+                pendingCtrlVkey = extVkey;
+               vnclog.Print(8, _T("-> delaying Ctrl press while checking for AltGr\n"));
+                return;
+            }
+        }
        vnclog.Print(8, _T("-> keyMap gives (from %s extended flag) KeySym %u (0x%08x)\n"),
                   (exactMatched ? _T("matched") : _T("opposite")),
                   foundXCode, foundXCode);
