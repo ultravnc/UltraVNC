@@ -38,10 +38,88 @@ local_resolve (const char *host, struct sockaddr_in *addr,
     return 0;					/* good */
 }
 
+/* Parse an allow/refuse rule host into a network+mask pair (network byte
+   order).  Accepted IPv4 forms:
+     a.b.c.d    exact address
+     a.b.c.d/n  CIDR prefix; missing trailing octets read as 0 ("10/8")
+     a.b.c.*    '*' marks a wildcard octet (trailing octets may be omitted)
+     a.b.c      leading-octet range, remaining octets wildcard - this is the
+                "ip or range" format the web GUI documents (10.0.0 = /24)
+   Returns FALSE when the rule is not IPv4 (e.g. a hostname). */
+static BOOL
+ParseIpMask(const char *rule, unsigned long *net, unsigned long *mask)
+{
+    char buf[64];
+    if (strlen(rule) >= sizeof(buf))
+        return FALSE;
+    strcpy_s(buf, rule);
+
+    int prefix = -1;
+    char *slash = strchr(buf, '/');
+    if (slash) {
+        *slash = '\0';
+        char *end = NULL;
+        long p = strtol(slash + 1, &end, 10);
+        if (end == slash + 1 || *end != '\0' || p < 0 || p > 32)
+            return FALSE;
+        prefix = (int)p;
+    }
+
+    /* strtok_s merges empty octets; reject them so a malformed rule does
+       not silently collapse into a wider subnet. */
+    size_t blen = strlen(buf);
+    if (blen == 0 || buf[0] == '.' || buf[blen - 1] == '.' || strstr(buf, ".."))
+        return FALSE;
+
+    unsigned char base[4] = {0, 0, 0, 0};
+    unsigned char oct_mask[4] = {0, 0, 0, 0};
+    int n = 0;
+    char *ctx = NULL;
+    for (char *tok = strtok_s(buf, ".", &ctx); tok; tok = strtok_s(NULL, ".", &ctx)) {
+        if (n >= 4)
+            return FALSE;
+        if (strcmp(tok, "*") == 0 && prefix < 0) {
+            /* wildcard octet: mask stays 0 */
+        } else {
+            char *end = NULL;
+            long v = strtol(tok, &end, 10);
+            if (end == tok || *end != '\0' || v < 0 || v > 255)
+                return FALSE;
+            base[n] = (unsigned char)v;
+            oct_mask[n] = 0xFF;
+        }
+        n++;
+    }
+    if (n == 0)
+        return FALSE;
+
+    memcpy(net, base, 4);
+    if (prefix >= 0) {
+        unsigned long m = prefix == 0 ? 0 : (0xFFFFFFFFu << (32 - prefix));
+        *mask = htonl(m);
+    } else {
+        memcpy(mask, oct_mask, 4);
+    }
+    return TRUE;
+}
+
+/* Compare the resolved destination address against one rule.  Subnet rules
+   match masked; anything else is resolved by name and compared exactly, so
+   a bare string prefix can no longer match (10.0.0.1 rule vs 10.0.0.150). */
+static BOOL
+MatchIpRule(const char *rule, const struct in_addr *addr)
+{
+    unsigned long net, mask;
+    if (ParseIpMask(rule, &net, &mask))
+        return (addr->s_addr & mask) == (net & mask);
+    struct sockaddr_in rule_addr;
+    return local_resolve(rule, &rule_addr, NULL) == 0 &&
+           rule_addr.sin_addr.s_addr == addr->s_addr;
+}
+
 SOCKET
 open_connection( const char *host, u_short port )
 {
-	char remote_host[1024];
 	BOOL found;
 	int i;
     SOCKET s;
@@ -54,7 +132,6 @@ open_connection( const char *host, u_short port )
     saddr.sin_port = htons(port);
 
     debug("connecting to %s:%u\n", inet_ntoa(saddr.sin_addr), port);
-	strcpy_s(remote_host,inet_ntoa(saddr.sin_addr));
 	found=FALSE;
 	if (!saved_allow) found=TRUE;
 	else
@@ -65,13 +142,11 @@ open_connection( const char *host, u_short port )
 			int myport=0;
 			if (ParseDisplay(temp1[i], sizeof(temp1[i]), myhost, 255, &myport))
 			{
-				struct sockaddr_in rule_addr;
-				// Compare the resolved 32-bit addresses exactly: a string
-				// prefix match would also allow e.g. 10.0.0.150 when only
-				// 10.0.0.1 was listed.
-				if (local_resolve(myhost, &rule_addr, NULL) == 0 &&
-					rule_addr.sin_addr.s_addr == saddr.sin_addr.s_addr &&
-					port == myport)
+				// Exact resolved-IP match or explicit subnet rule (CIDR,
+				// wildcard or leading-octet range, see MatchIpRule).  A bare
+				// string prefix no longer matches e.g. 10.0.0.150 when only
+				// 10.0.0.1 was listed; use 10.0.0.0/24 or 10.0.0.* instead.
+				if (port == myport && MatchIpRule(myhost, &saddr.sin_addr))
 					found=TRUE;
 			}
 		}
@@ -84,11 +159,9 @@ open_connection( const char *host, u_short port )
 			int myport=0;
 			if (ParseDisplay(temp2[i], sizeof(temp2[i]), myhost, 255, &myport))
 			{
-				struct sockaddr_in rule_addr;
-				// Exact IP match (port-insensitive, as before): a refused
-				// host is refused regardless of the requested port.
-				if (local_resolve(myhost, &rule_addr, NULL) == 0 &&
-					rule_addr.sin_addr.s_addr == saddr.sin_addr.s_addr)
+				// Port-insensitive, as before: a refused host or subnet is
+				// refused regardless of the requested port.
+				if (MatchIpRule(myhost, &saddr.sin_addr))
 					found=FALSE;
 			}
 		}

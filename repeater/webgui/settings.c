@@ -68,7 +68,7 @@ extern char saved_sample1[1025];
 extern char saved_sample2[1025];
 extern char saved_sample3[1025];
 extern char temp1[50][25];
-extern char temp2[50][16];
+extern char temp2[50][25];
 extern char temp3[50][16];
 extern int rule1;
 extern int rule2;
@@ -286,8 +286,8 @@ Read_settings()
 		while (test)
 		{
 		int len=test-pos;
-		if (len >= 16) len = 15;
-		strncpy_s(temp2[rule2], 16, pos,len);
+		if (len >= 25) len = 24;
+		strncpy_s(temp2[rule2], 25, pos,len);
 		temp2[rule2][len]=0;
 		rule2++;
 		if (rule2 > 48)
@@ -295,7 +295,7 @@ Read_settings()
 		pos+=len+1;
 		test=strchr(pos,ch);
 		}
-		strcpy_s(temp2[rule2], 16,pos);
+		strcpy_s(temp2[rule2], 25,pos);
 		rule2++;
 
 		test=strchr(saved_sample3,ch);

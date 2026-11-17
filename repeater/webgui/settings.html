@@ -87,10 +87,12 @@
 		</tr>
 		
 		<tr>
-			<td style="width: 275px">Only allow connections to:<br>Format ip or 
-			range&nbsp; :&nbsp; port&nbsp;&nbsp; ; 
-			123.123.123.123:5800;165.165.165:2300<br>165.165.165:2300 -&gt; <br>
-			allowed to 165.165.165.x port 2300<br></td>
+			<td style="width: 275px">Only allow connections to:<br>Format ip, 
+			range or mask&nbsp; :&nbsp; port&nbsp;&nbsp; ; 
+			123.123.123.123:5800;165.165.165:2300;10.0.0.0/24:5900;192.168.*:5900<br>
+			165.165.165:2300 -&gt; allowed to 165.165.165.x port 2300<br>
+			10.0.0.0/24:5900 -&gt; allowed to 10.0.0.x port 5900<br>
+			192.168.*:5900 -&gt; allowed to 192.168.x.x port 5900<br></td>
 			<td style="width: 32px"> <input type="checkbox" name="allow_on" value="allow_on" <!--#include file="acon.ssi" -->> </td>
 			<td style="width: 350px">
 			<input name="allow_con" type="text" <!--#include file="acons.ssi" --> style="width: 300px; height: 60px;"></td>

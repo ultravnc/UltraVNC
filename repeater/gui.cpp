@@ -104,7 +104,7 @@ BOOL saved_ip_service;
 
 char temp1[50][25];
 int rule1=0;
-char temp2[50][16];
+char temp2[50][25];
 int rule2=0;
 char temp3[50][16];
 int rule3=0;

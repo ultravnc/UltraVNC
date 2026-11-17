@@ -70,7 +70,7 @@ extern char saved_sample2[1025];
 extern char saved_sample3[1025];
 
 extern char temp1[50][25];
-extern char temp2[50][16];
+extern char temp2[50][25];
 extern char temp3[50][16];
 extern int rule1;
 extern int rule2;

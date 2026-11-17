@@ -19,7 +19,7 @@ extern em_file efslist[38];
 
 extern  unsigned char index_html1[1315];
 extern  unsigned char passwd_html2[1383];
-extern  unsigned char settings_html3[3876];
+extern  unsigned char settings_html3[4399];
 extern  unsigned char ok_html4[513];
 extern  unsigned char nok_html5[528];
 extern  unsigned char log_html6[867];
