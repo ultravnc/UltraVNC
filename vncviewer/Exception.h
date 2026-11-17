@@ -36,6 +36,11 @@ public:
 	virtual ~QuietException();
 };
 
+class CancelException : public QuietException {
+public:
+	explicit CancelException(const wchar_t *info) : QuietException(info) {}
+};
+
 // This indicates something the user should be told about.
 // In situations of ambiguity, the 'close' parameter can be used
 // to specify whether or not the connection is closed as a result.

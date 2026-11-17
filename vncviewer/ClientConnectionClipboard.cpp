@@ -58,15 +58,6 @@ void ClientConnection::ProcessLocalClipboardChange()
 	} else if (!m_opts->m_DisableClipboard && !m_opts->m_ViewOnly) {
 		UpdateRemoteClipboard();
 	}
-	// Pass the message to the next window in clipboard viewer chain
-	if (m_hwndNextViewer != NULL && m_hwndNextViewer != (HWND)INVALID_HANDLE_VALUE) {
-		vnclog.Print(6, _T("Passing WM_DRAWCLIPBOARD to 0x%08x\n"), m_hwndNextViewer);
-		// use SendNotifyMessage instead of SendMessage so misbehaving or hung applications
-		// (like ourself before this) won't cause our thread to hang.
-		::SendNotifyMessage(m_hwndNextViewer, WM_DRAWCLIPBOARD , 0,0); 
-	} else {
-		vnclog.Print(6, _T("No next window in chain; WM_DRAWCLIPBOARD will not be passed\n"), m_hwndNextViewer);
-	}
 }
 
 

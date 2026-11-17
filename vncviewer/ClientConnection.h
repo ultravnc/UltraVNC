@@ -15,6 +15,7 @@
 #pragma once
 
 #include "stdhdrs.h"
+#include <atomic>
 #include "omnithread/omnithread.h"
 #include "VNCOptions.h"
 #include "VNCviewerApp.h"
@@ -722,10 +723,8 @@ private:
 
 	// The number of bytes required to hold at least one pixel.
 	unsigned int m_minPixelBytes;
-	// Next window in clipboard chain
-	HWND m_hwndNextViewer; 
 	// adzm - 2010-07 - Fix clipboard hangs
-	//bool m_initialClipboardSeen;		
+	//bool m_initialClipboardSeen;
 	bool m_settingClipboardViewer;
 	void WatchClipboard();
 
@@ -847,7 +846,11 @@ private:
 	BOOL m_BigToolbar;
 	DWORD newtick;
 	DWORD oldtick;
-	bool Pressed_Cancel;
+	std::atomic_bool Pressed_Cancel{false};
+	std::atomic_bool forcedexit{false};
+	std::atomic_bool havetobekilled{false};
+	static DWORD WINAPI SocketTimeout(LPVOID lpParam);
+	void StopSocketTimeout();
 
 
 	// sf@2007 - AutoReconnect

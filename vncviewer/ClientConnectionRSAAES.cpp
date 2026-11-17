@@ -586,7 +586,7 @@ struct RSAKEX
 		tc.pszVerificationText = L"Don't ask anymore";
 		TaskDialogIndirect(&tc, &nButtonPressed, NULL, &bPersist);
 		if (nButtonPressed != IDOK)
-			throw QuietException(L"Authentication cancelled");
+			throw CancelException(L"Authentication cancelled");
 		if (bPersist)
 			conn.SaveFingerprint(hex);
 		return true;
@@ -763,7 +763,7 @@ struct RSAKEX
 			AuthDialog ad;
 			if (!ad.DoDialog((subtype == secTypeRA2UserPass) ? dtUserPassRSA  : dtPassRSA, host, port, hex, catchphrase))
 			{
-				throw QuietException(L"Authentication cancelled");
+				throw CancelException(L"Authentication cancelled");
 			}
 			if (subtype == secTypeRA2UserPass)
 				strcpy_s(cmdlnUser, 256, ad.m_user);
@@ -1021,7 +1021,7 @@ void ClientConnection::AuthAppleDH()
 		AuthDialog ad;
 		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 		if (!ad.DoDialog(dtUserPass, m_host, m_port)) {
-			throw WarningException(L"Authentication cancelled");
+			throw CancelException(L"Authentication cancelled");
 		}
 		strncpy_s(user, sizeof(user), ad.m_user, _TRUNCATE);
 		strncpy_s(passwd, sizeof(passwd), ad.m_passwd, _TRUNCATE);

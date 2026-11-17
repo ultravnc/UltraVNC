@@ -842,6 +842,7 @@ void ClientConnection::AuthVeNCrypt()
 					break;
 				}
 				case IDCANCEL:
+					Pressed_Cancel = true;
 					if (!session.Shutdown(outbuf))
 						return SetLastError(session.lastError);
 					size = outbuf.GetAvailable();
@@ -850,7 +851,7 @@ void ClientConnection::AuthVeNCrypt()
 						WriteExact((char *)outbuf.GetHead(), size);
 						outbuf.size = 0;
 					}
-					QuietException_helper(L"Authentication cancelled");
+					throw CancelException(L"Authentication cancelled");
 					break;
 				default:
 					if (bPersist)
@@ -916,7 +917,7 @@ void ClientConnection::AuthVeNCrypt()
 				AuthDialog ad;
 				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 				if (!ad.DoDialog(dtUserPass, m_host, m_port))
-					QuietException_helper(L"Authentication cancelled");
+					throw CancelException(L"Authentication cancelled");
 				strcpy_s(_tlsUser, 256, ad.m_user);
 				strcpy_s(_tlsPasswd, 256, ad.m_passwd);
 			} else {
@@ -950,7 +951,7 @@ void ClientConnection::AuthVeNCrypt()
 				AuthDialog ad;
 				ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 				if (!ad.DoDialog(dtUserToken, m_host, m_port))
-					QuietException_helper(L"Authentication cancelled");
+					throw CancelException(L"Authentication cancelled");
 				strcpy_s(_tlsUser, 256, ad.m_user);
 				strcpy_s(_tlsToken, 65, ad.m_passwd);
 				strcpy_s(m_opts->m_cmdlnUser, _countof(m_opts->m_cmdlnUser), ad.m_user);
@@ -1073,7 +1074,7 @@ void ClientConnection::AuthSasl(uint8_t* cbData, size_t cbDataLen)
 		AuthDialog ad;
 		ad.SetStatusWindow(m_hwndStatus, m_opts->m_ClassName);
 		if (!ad.DoDialog(dtUserPass, m_host, m_port))
-			QuietException_helper(L"Authentication cancelled");
+			throw CancelException(L"Authentication cancelled");
 		strcpy_s(user, ad.m_user);
 		strcpy_s(passwd, ad.m_passwd);
 	}
