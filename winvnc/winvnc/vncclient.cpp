@@ -1197,6 +1197,18 @@ vncClientThread::InitAuthenticate()
 	if (!CheckEmptyPasswd()) return FALSE;
 	if (!CheckLoopBack()) return FALSE;
 
+	// Refuse new connections before authentication when the server is full.
+	// At this point SendConnFailed still produces a valid protocol message
+	// (zero security types for RFB >= 3.8, rfbConnFailed for older viewers),
+	// so the viewer displays the reason instead of misparsing the next
+	// handshake bytes as a ServerInit message.
+	if (m_server->getNumberViewers() > settings->getMaxViewers() - 1
+		&& settings->getMaxViewerSetting() == 0)
+	{
+		SendConnFailed("Max viewers reached");
+		return FALSE;
+	}
+
 	//adzm 2010-09 - Do the actual authentication
 	if (m_minor >= 7) {
 		std::vector<CARD8> current_auth;
@@ -1218,23 +1230,18 @@ vncClientThread::InitAuthenticate()
 		}
 	}
 
-	if (m_server->getNumberViewers() > settings->getMaxViewers() - 1)
+	if (m_server->getNumberViewers() > settings->getMaxViewers() - 1
+		&& settings->getMaxViewerSetting() != 0)
 	{
-		if (settings->getMaxViewerSetting() == 0) {
-			SendConnFailed("Max viewers reached");
-			return FALSE;
-		}
-		else {
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
-			m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
+		m_server->AddAuthHostsBlacklist(m_client->GetClientNameAddress());
 
-			m_server->GetClient(m_server->getOldestViewer())->Kill();
-			m_client->forceBlacklist = true;
-		}
+		m_server->GetClient(m_server->getOldestViewer())->Kill();
+		m_client->forceBlacklist = true;
 	}
 
 	// Read the client's initialisation message
