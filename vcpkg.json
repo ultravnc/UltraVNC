@@ -12,5 +12,11 @@
     "libsodium",
     "minizip-ng"
   ],
-  "builtin-baseline": "2ec0f1747d8186a5c9babe276e2ad57cd2b12d2a"
+  "overrides": [
+    {
+      "name": "pkgconf",
+      "version": "2.5.1"
+    }
+  ],
+  "builtin-baseline": "8f363bdc11359ede4bc51e5eb32a2617538049c8"
 }
