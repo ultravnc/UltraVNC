@@ -1022,10 +1022,16 @@ BOOL PropertiesDialog::Init(vncServer* server)
 	if (strlen(plain) == 0)
 		if (!settings->getAllowProperties() || !settings->IsRunninAsAdministrator()) {
 			if (settings->getAuthRequired()) {
+				if (settings->RunningFromExternalService()) {
+					vnclog.Print(LL_INTERR, VNCLOG("%s\n"), sz_ID_NO_PASSWD_NO_OVERRIDE_ERR);
+					return TRUE;
+				}
 				MessageBoxSecure(NULL, sz_ID_NO_PASSWD_NO_OVERRIDE_ERR,
 					sz_ID_WINVNC_ERROR,
 					MB_OK | MB_ICONSTOP);
+				fShutdownOrdered = true;
 				PostQuitMessage(0);
+				return FALSE;
 			}
 		}
 		else {
