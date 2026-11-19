@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// SPDX-FileCopyrightText: Copyright (C) 2002-2025 UltraVNC Team Members. All Rights Reserved.
+// SPDX-FileCopyrightText: Copyright (C) 2002-2026 UltraVNC Team Members. All Rights Reserved.
 //
 -->
 
@@ -121,7 +121,7 @@ Contact:
 ---
 
 ### Compile and build in Visual Studio
-- 🛠️ Visual Studio: 2017 | 2019 | 2022
+- 🛠️ Visual Studio: 2017 | 2019 | 2022 | 2026
 - 🛠️ Netwide Assembler (NASM): https://nasm.us/
 - ⚙️ vncviewer.sln to build UltraVNC Viewer
 - ⚙️ winvnc.sln to build UltraVNC Server
@@ -129,7 +129,7 @@ Contact:
 ---
 
 <div align="center">
-  Copyright ©️ 2002-2025 <a href="https://uvnc.com/">UltraVNC</a> Team Members. All Rights Reserved.
+  Copyright ©️ 2002-2026 <a href="https://uvnc.com/">UltraVNC</a> Team Members. All Rights Reserved.
 </div>
 
 ---
