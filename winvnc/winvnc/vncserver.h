@@ -232,7 +232,7 @@ public:
 	virtual bool IsThereAUltraEncodingClient();
 	virtual bool IsThereAUltra2EncodingClient();
 	virtual bool IsEncoderSet();
-	virtual bool IsThereFileTransBusy();
+	virtual bool IsThereFileTransBusy(bool includeSession = true);
 
 
 	// sf@2003 - AutoReconnect

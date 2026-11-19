@@ -796,12 +796,12 @@ bool vncServer::IsEncoderSet()
 	return false;
 }
 
-bool vncServer::IsThereFileTransBusy()
+bool vncServer::IsThereFileTransBusy(bool includeSession)
 {
 	vncClientList::iterator i;
 	omni_mutex_lock l(m_clientsLock, 26);
 	for (i = m_authClients.begin(); i != m_authClients.end(); i++) {
-		if (GetClient(*i)->IsFileTransBusy()) {
+		if (GetClient(*i)->IsFileTransBusy(includeSession)) {
 			return true;
 		}
 	}

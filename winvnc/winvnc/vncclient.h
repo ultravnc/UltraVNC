@@ -36,6 +36,7 @@ typedef SHORT vncClientId;
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <atomic>
 #include "common/win32_helpers.h"
 
 typedef std::list<vncClientId> vncClientList;
@@ -260,7 +261,7 @@ public:
 	virtual bool IsUltraEncoding() {return m_encodemgr.IsUltraEncoding();};
 	virtual bool IsUltra2Encoding() {return m_encodemgr.IsUltra2Encoding();};
 	virtual bool IsEncoderSet() { return m_encodemgr.IsEncoderSet(); };
-	virtual bool IsFileTransBusy(){return (m_fFileUploadRunning||m_fFileDownloadRunning || m_fFileSessionOpen);};
+	virtual bool IsFileTransBusy(bool includeSession = true){return (m_fFileUploadRunning||m_fFileDownloadRunning || m_fCompressionRunning.load() || (includeSession && m_fFileSessionOpen));};
 	void SetProtocolVersion(rfbProtocolVersionMsg *protocolMsg);
 	void SetOutgoing(bool outgoing) {m_outgoing = outgoing;};
 	void Clear_Update_Tracker();
@@ -353,6 +354,7 @@ public:
 	int filetransferrequestPart2(int nDirZipRet);
 	char m_szSrcFileName[MAX_PATH * 4]; // Path + timestring
 	HANDLE ThreadHandleCompressFolder;
+	std::atomic<bool> m_fCompressionRunning{false};
 	// sf@2002 
 	// Update routines
 	char infoMsg[255] = { 0 };

@@ -329,7 +329,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 			vnclog.Print(LL_INTERR, VNCLOG("m_hookswitch \n"));
 		if (m_desktop->requested_all_monitor!=m_desktop->m_buffer.IsAllMonitors()) 
 			vnclog.Print(LL_INTERR, VNCLOG("desktop switch %i %i \n"),m_desktop->requested_all_monitor,m_desktop->m_buffer.IsAllMonitors());
-		if (!m_server->IsThereFileTransBusy())
+		if (!m_server->IsThereFileTransBusy(!settings->getFTUserImpersonation()))
 			if (desktopSelector::InputDesktopSelected()==0)
 				vnclog.Print(LL_INTERR, VNCLOG("++++InputDesktopSelected \n"));
 				
@@ -387,7 +387,7 @@ bool vncDesktopThread::handle_display_change(HANDLE& threadHandle, rfb::Region2D
 				// Reinitialize buffers,color, etc
 				// monitor change, for non driver, use another buffer
 				//*******************************************************
-				if (!m_server->IsThereFileTransBusy())
+				if (!m_server->IsThereFileTransBusy(!settings->getFTUserImpersonation()))
 					if (desktopSelector::InputDesktopSelected()==0 || m_desktop->m_hookswitch ||
 						m_desktop->m_displaychanged ||
 						(monitor_changed && !m_desktop->m_screenCapture && clients_support_resize)) {
@@ -975,7 +975,7 @@ vncDesktopThread::run_undetached(void *arg)
 								//*******************************************************
 								// SCREEN DISPLAY HAS CHANGED, RESTART DRIVER (IF Used)
 								//*******************************************************
-								if (!m_server->IsThereFileTransBusy() && (!handle_display_change(threadHandle, rgncache, clipped_updates, updates))) {
+								if (!m_server->IsThereFileTransBusy(!settings->getFTUserImpersonation()) && (!handle_display_change(threadHandle, rgncache, clipped_updates, updates))) {
 									//failed we need to quit thread
 									looping = false;
 									break;

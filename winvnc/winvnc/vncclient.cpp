@@ -74,6 +74,7 @@
 #include <iterator>
 #include <shlobj.h>
 #include <userenv.h>
+#include <wtsapi32.h>
 #include "vncOSVersion.h"
 #include "common/win32_helpers.h"
 #include "uvncUiAccess.h"
@@ -95,6 +96,43 @@ int calc_updates = 0;
 int old_calc_updates = 0;
 extern bool PreConnect;
 int PreConnectID = 0;
+
+static bool CheckFTDesktop(HDESK* inputDesktop, bool validateUser)
+{
+	HANDLE threadToken = NULL;
+	if (!OpenThreadToken(GetCurrentThread(), TOKEN_QUERY | TOKEN_IMPERSONATE, TRUE, &threadToken) &&
+		(GetLastError() != ERROR_NO_TOKEN || validateUser))
+		return false;
+	if (threadToken && !RevertToSelf()) {
+		CloseHandle(threadToken);
+		return false;
+	}
+
+	bool ok = true;
+	if (validateUser) {
+		DWORD processSession = 0, tokenSession = 0, size = 0;
+		HANDLE userToken = NULL;
+		TOKEN_STATISTICS original{}, current{};
+		ok = ProcessIdToSessionId(GetCurrentProcessId(), &processSession) &&
+			GetTokenInformation(threadToken, TokenSessionId, &tokenSession, sizeof(tokenSession), &size) &&
+			tokenSession == processSession && WTSQueryUserToken(processSession, &userToken);
+		if (ok)
+			ok = GetTokenInformation(threadToken, TokenStatistics, &original, sizeof(original), &size) &&
+				GetTokenInformation(userToken, TokenStatistics, &current, sizeof(current), &size) &&
+				original.AuthenticationId.LowPart == current.AuthenticationId.LowPart &&
+				original.AuthenticationId.HighPart == current.AuthenticationId.HighPart;
+		if (userToken)
+			CloseHandle(userToken);
+	}
+	if (ok && inputDesktop && desktopSelector::InputDesktopSelected() == 0)
+		ok = desktopSelector::SelectDesktop(NULL, inputDesktop) != FALSE;
+	if (threadToken) {
+		if (!SetThreadToken(NULL, threadToken))
+			ok = false;
+		CloseHandle(threadToken);
+	}
+	return ok;
+}
 
 // take a full path & file name, split it, prepend prefix to filename, then merge it back
 static std::string make_temp_filename(const char* szFullPath)
@@ -2826,14 +2864,15 @@ vncClientThread::run(void* arg)
 		rfbClientToServerMsg msg{};
 
 		// Ensure that we're running in the correct desktop
-		if (!m_client->IsFileTransBusy())
+		if (!m_client->IsFileTransBusy(!settings->getFTUserImpersonation())) {
+			if (m_client->m_fFTUserImpersonatedOk &&
+				(!m_client->m_hPToken || !ImpersonateLoggedOnUser(m_client->m_hPToken)))
+				break;
 			// This desktop switch is responsible for the keyboard input
-			if (desktopSelector::InputDesktopSelected() == 0)
-			{
-				vnclog.Print(LL_CONNERR, VNCLOG("vncClientThread \n"));
-				if (!desktopSelector::SelectDesktop(NULL, &input_desktop))
-					break;
-			}
+			if (!CheckFTDesktop(&input_desktop,
+				m_client->m_fFileSessionOpen && settings->RunningFromExternalService()))
+				break;
+		}
 		// added jeff
 		// 2 May 2008 jdp paquette@atnetsend.net moved so that we're on the right desktop  when we're a service
 		// Clear the CapsLock and NumLock keys
@@ -4341,6 +4380,12 @@ vncClientThread::run(void* arg)
 			}
 #endif // SC_20
 
+			if (settings->RunningFromExternalService() && settings->getFTUserImpersonation() &&
+				(!fUserOk || !CheckFTDesktop(NULL, true))) {
+				m_client->cl_connected = false;
+				break;
+			}
+
 			if (!m_client->m_keyboardenabled || !m_client->m_pointerenabled) fUserOk = false; //PGM
 
 			omni_mutex_lock l(m_client->GetUpdateLock(), 88);
@@ -4485,8 +4530,13 @@ vncClientThread::run(void* arg)
 						// and create the zip accordingly. This way we can generate the checksums for it.
 						// m_client->CheckAndZipDirectoryForChecksuming(m_client->m_szFullDestName);
 
-						if (m_client->m_hPToken)
-							ImpersonateLoggedOnUser(m_client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
+						if (m_client->m_hPToken) {
+							BOOL impersonated = ImpersonateLoggedOnUser(m_client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
+							if (!impersonated) {
+								m_client->cl_connected = false;
+								break;
+							}
+						}
 
 						// Create Local Dest file
 						// Convert UTF-8 filename to Unicode for Chinese character support
@@ -4846,7 +4896,10 @@ vncClientThread::run(void* arg)
 						{
 							// Impersonate logged-in user so Shell APIs return the correct user's folders
 							// (e.g. Desktop/Downloads) when running as a service (SYSTEM account)
-							if (m_client->m_hPToken) ImpersonateLoggedOnUser(m_client->m_hPToken);
+							if (m_client->m_hPToken && !ImpersonateLoggedOnUser(m_client->m_hPToken)) {
+								m_client->cl_connected = false;
+								break;
+							}
 							LPITEMIDLIST pidl = nullptr;
 							LPMALLOC pMalloc = nullptr;
 							HRESULT hrMalloc = SHGetMalloc(&pMalloc);
@@ -4866,12 +4919,18 @@ vncClientThread::run(void* arg)
 							else
 								fShortError = true;
 							if (pMalloc) pMalloc->Release();
-							if (m_client->m_hPToken) RevertToSelf();
+							if (m_client->m_hPToken && !ImpersonateLoggedOnUser(m_client->m_hPToken)) {
+								m_client->cl_connected = false;
+								break;
+							}
 						}
 						else if (nFolder != -1)
 						{
 							// ANSI branch: original behaviour
-							if (m_client->m_hPToken) ImpersonateLoggedOnUser(m_client->m_hPToken);
+							if (m_client->m_hPToken && !ImpersonateLoggedOnUser(m_client->m_hPToken)) {
+								m_client->cl_connected = false;
+								break;
+							}
 							if (m_client->GetSpecialFolderPath(nFolder, szP))
 							{
 								if (szP[strlen(szP) - 1] != '\\') strcat_s(szP, "\\");
@@ -4879,7 +4938,10 @@ vncClientThread::run(void* arg)
 							}
 							else
 								fShortError = true;
-							if (m_client->m_hPToken) RevertToSelf();
+							if (m_client->m_hPToken && !ImpersonateLoggedOnUser(m_client->m_hPToken)) {
+								m_client->cl_connected = false;
+								break;
+							}
 						}
 
 						// Enforce the configured file-transfer root on directory listings:
@@ -5305,6 +5367,12 @@ vncClientThread::run(void* arg)
 		Sleep(200);
 	}
 
+	if (m_client->ThreadHandleCompressFolder) {
+		WaitForSingleObject(m_client->ThreadHandleCompressFolder, INFINITE);
+		CloseHandle(m_client->ThreadHandleCompressFolder);
+		m_client->ThreadHandleCompressFolder = NULL;
+	}
+
 	if (m_client->m_fFileDownloadRunning)
 	{
 		m_client->m_fFileDownloadError = true;
@@ -5537,6 +5605,11 @@ vncClient::~vncClient()
 {
 	cl_connected = false;
 	vnclog.Print(LL_INTINFO, VNCLOG("~vncClient() executing...\n"));
+	if (ThreadHandleCompressFolder) {
+		WaitForSingleObject(ThreadHandleCompressFolder, INFINITE);
+		CloseHandle(ThreadHandleCompressFolder);
+		ThreadHandleCompressFolder = NULL;
+	}
 
 	// Modif sf@2002 - Text Chat
 	if (m_pTextChat)
@@ -5629,10 +5702,8 @@ vncClient::~vncClient()
 		counter++;
 		if (counter == 30) break;
 	}
-	if (ThreadHandleCompressFolder) {
-		WaitForSingleObject(ThreadHandleCompressFolder, INFINITE);
-		CloseHandle(ThreadHandleCompressFolder);
-	}
+	if (m_hPToken)
+		CloseHandle(m_hPToken);
 	if (simulateCursor)
 		delete simulateCursor;
 }
@@ -7613,18 +7684,17 @@ bool vncClient::DoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - Call\n"));
 	omni_mutex_lock l(GetUpdateLock(), 103);
 
-	if (m_fFileDownloadRunning) 
-		return true;
-	if (m_fFileUploadRunning) 
-		return true;
-	if (m_fFTUserImpersonatedOk) 
-		return true;
+	if (m_fFTUserImpersonatedOk)
+		return m_hPToken && ImpersonateLoggedOnUser(m_hPToken);
+	if (m_fFileDownloadRunning || m_fFileUploadRunning)
+		return !settings->RunningFromExternalService();
 	// if we're already impersonating the user and have a session open, do nothing.
 	if (m_fFileSessionOpen && m_fFTUserImpersonatedOk)
 		return true;
 
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - 1\n"));
 	bool fUserOk = true;
+	bool impersonated = false;
 
 	if (processHelper::IsWSLocked())
 	{
@@ -7638,14 +7708,32 @@ bool vncClient::DoFTUserImpersonation()
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - currentUser = %s\n"), username);
 	if (strcmp(username, "") != 0)
 	{
-		m_hPToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
+		if (!RevertToSelf()) {
+			cl_connected = false;
+			return false;
+		}
+		if (m_hPToken)
+			CloseHandle(m_hPToken);
+		m_hPToken = NULL;
+		if (settings->RunningFromExternalService()) {
+			DWORD sessionId = 0;
+			if (ProcessIdToSessionId(GetCurrentProcessId(), &sessionId))
+				WTSQueryUserToken(sessionId, &m_hPToken);
+		}
+		else {
+			HANDLE desktopToken = DesktopUsersToken::getInstance()->getDesktopUsersToken();
+			if (desktopToken)
+				DuplicateHandle(GetCurrentProcess(), desktopToken, GetCurrentProcess(), &m_hPToken,
+					0, FALSE, DUPLICATE_SAME_ACCESS);
+		}
 
 		if (!m_hPToken) {
 			vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - OpenProcessToken Error\n"));
 			fUserOk = false;
 		}
 		else {
-			if (!ImpersonateLoggedOnUser(m_hPToken))
+			impersonated = ImpersonateLoggedOnUser(m_hPToken) != FALSE;
+			if (!impersonated)
 			{
 				vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::DoFTUserImpersonation - ImpersonateLoggedOnUser Failed\n"));
 				fUserOk = false;
@@ -7665,7 +7753,11 @@ bool vncClient::DoFTUserImpersonation()
 
 	if (fUserOk)
 		m_lLastFTUserImpersonationTime = GetTimeFunction();
-	m_fFTUserImpersonatedOk = fUserOk;
+	m_fFTUserImpersonatedOk = impersonated;
+	if (!impersonated && m_hPToken) {
+		CloseHandle(m_hPToken);
+		m_hPToken = NULL;
+	}
 	return fUserOk;
 }
 
@@ -7686,8 +7778,13 @@ void vncClient::UndoFTUserImpersonation()
 	if (lTime - m_lLastFTUserImpersonationTime < 10000) return;
 	omni_mutex_lock l(GetUpdateLock(), 104);
 	vnclog.Print(LL_INTERR, VNCLOG("%%%%%%%%%%%%% vncClient::UNDoFTUserImpersonation - Impersonationtoken exists\n"));
-	RevertToSelf();
+	if (!RevertToSelf()) {
+		cl_connected = false;
+		return;
+	}
 	m_fFTUserImpersonatedOk = false;
+	if (m_hPToken)
+		CloseHandle(m_hPToken);
 	m_hPToken = 0;
 }
 #endif // SC_20
@@ -7789,12 +7886,29 @@ void vncClient::NotifyPluginStreamingSupport()
 	m_socket->SetPluginStreamingOut();
 }
 
+struct FTCompressionContext
+{
+	vncClient* client;
+	HANDLE token = NULL;
+	bool validateUser;
+
+	~FTCompressionContext()
+	{
+		if (token)
+			CloseHandle(token);
+		client->m_fCompressionRunning.store(false);
+	}
+};
+
 DWORD WINAPI CompressFolder(LPVOID lpParam)
 {
-	vncClient* client = (vncClient*)lpParam;
-	if (client->m_hPToken)
-		ImpersonateLoggedOnUser(client->m_hPToken); //need to set this thread's impersonation or can find mapped network or share files
-	int nDirZipRet = client->ZipPossibleDirectory(client->m_szSrcFileName);
+	std::unique_ptr<FTCompressionContext> context(static_cast<FTCompressionContext*>(lpParam));
+	vncClient* client = context->client;
+	bool impersonated = !context->token ||
+		ImpersonateLoggedOnUser(context->token); //need to set this thread's impersonation or can find mapped network or share files
+	int nDirZipRet = -1;
+	if (impersonated && (!context->validateUser || CheckFTDesktop(NULL, true)))
+		nDirZipRet = client->ZipPossibleDirectory(client->m_szSrcFileName);
 	if (client->m_socket)
 		return client->filetransferrequestPart2(nDirZipRet);
 	return 0;
@@ -7802,8 +7916,15 @@ DWORD WINAPI CompressFolder(LPVOID lpParam)
 
 int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 {
-	if (ThreadHandleCompressFolder != NULL)
-		return 0;
+	if (ThreadHandleCompressFolder != NULL) {
+		if (m_fCompressionRunning.load() ||
+			WaitForSingleObject(ThreadHandleCompressFolder, INFINITE) != WAIT_OBJECT_0) {
+			cl_connected = false;
+			return 0;
+		}
+		CloseHandle(ThreadHandleCompressFolder);
+		ThreadHandleCompressFolder = NULL;
+	}
 	bool fRejected = false;
 	{
 		omni_mutex_lock ll(GetUpdateLock(), 90);
@@ -7828,8 +7949,20 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 	}
 	if (fRejected)
 		return filetransferrequestPart2(-1);
+	std::unique_ptr<FTCompressionContext> context(new FTCompressionContext);
+	context->client = this;
+	context->validateUser = settings->RunningFromExternalService() && settings->getFTUserImpersonation();
+	m_fCompressionRunning.store(true);
+	if (!OpenThreadToken(GetCurrentThread(), TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE,
+		TRUE, &context->token) && (GetLastError() != ERROR_NO_TOKEN || context->validateUser))
+		return filetransferrequestPart2(-1);
 	DWORD dwTId;
-	ThreadHandleCompressFolder = CreateThread(NULL, 0, CompressFolder, this, 0, &dwTId);
+	FTCompressionContext* workerContext = context.release();
+	ThreadHandleCompressFolder = CreateThread(NULL, 0, CompressFolder, workerContext, 0, &dwTId);
+	if (!ThreadHandleCompressFolder) {
+		delete workerContext;
+		return filetransferrequestPart2(-1);
+	}
 	return 1;
 }
 
@@ -7858,9 +7991,7 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 		m_fFileUploadError = true;
 		m_fFileUploadRunning = false;
 		FTUploadFailureHook();
-		if (ThreadHandleCompressFolder)
-			CloseHandle(ThreadHandleCompressFolder);
-		ThreadHandleCompressFolder = NULL;
+		m_fCompressionRunning.store(false);
 		return 0;
 	}
 
@@ -7960,16 +8091,12 @@ int  vncClient::filetransferrequestPart2(int nDirZipRet)
 	{
 		//vnclog.Print(LL_INTINFO, VNCLOG("*** File Transfer: Wrong Src File size. Abort!\n"));
 		FTUploadFailureHook();
-		if (ThreadHandleCompressFolder)
-			CloseHandle(ThreadHandleCompressFolder);
-		ThreadHandleCompressFolder = NULL;
+		m_fCompressionRunning.store(false);
 		return 0;
 	}
 
 	FTUploadStartHook();
-	if (ThreadHandleCompressFolder)
-		CloseHandle(ThreadHandleCompressFolder);
-	ThreadHandleCompressFolder = NULL;
+	m_fCompressionRunning.store(false);
 	return 0;
 }
 
