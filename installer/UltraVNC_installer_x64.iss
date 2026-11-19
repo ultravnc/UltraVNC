@@ -12,6 +12,7 @@
 #define MyAppVersion GetVersionComponents('64\xp\winvnc.exe', Major, Minor, Rev, Build)
 #define MyAppOutputVersion Str(Major) + Str(Minor) + Str(Rev) + Str(Build) 
 
+
 [Setup]
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
@@ -54,7 +55,7 @@ WizardImageStretch=false
 SetupIconFile=icon\UltraVNC.ico
 WizardImageFile=bmp\UltraVNC-splash.bmp
 WizardSmallImageFile=bmp\UltraVNC-logo.bmp
-InfoAfterFile=text\info.txt
+InfoAfterFile=text\Info.txt
 InfoBeforeFile=text\Changes.txt
 LicenseFile=text\Licence.txt
 InternalCompressLevel=Ultra
@@ -100,7 +101,7 @@ en.AddingTrustedPublisher=Adding trusted publisher...
 en.InstallingVirtualDriver=Installing virtual driver...
 en.UninstallingVirtualDriver=Uninstalling virtual driver...
 en.RemovingTrustedPublisher=Removing trusted publisher...
-en.AddVirtualMonitorDriverWin10=Add virtual monitor driver (Win 10)
+en.AddVirtualMonitorDriverWin10=Add virtual monitor driver (Windows 10/11)
 en.ShowLatestVersions=Show latest versions
 
 de.firewall=Die Windows Firewall wird konfiguriert...
@@ -254,7 +255,6 @@ Source: "64\xp\createpassword.exe"; DestDir: "{app}"; Flags: ignoreversion resta
 ;Source: "64\xp\uvnc_settings.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "64\xp\testauth.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ;Source: "preconfig\ultravnc.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist; MinVersion: 0,5.01; Components: UltraVNC_Server
-
 Source: "64\xp\languages\*.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 
 
@@ -743,5 +743,3 @@ end;
 
 [InnoIDE_Settings]
 LogFileOverwrite=false
-
-

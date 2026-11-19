@@ -10,7 +10,7 @@
 #define Rev
 #define Build
 #define MyAppVersion GetVersionComponents('32\xp\winvnc.exe', Major, Minor, Rev, Build)
-#define MyAppOutputVersion Str(Major) + Str(Minor) + Str(Rev) + Str(Build)
+#define MyAppOutputVersion Str(Major) + Str(Minor) + Str(Rev) + Str(Build) 
 
 
 [Setup]
@@ -55,7 +55,7 @@ WizardImageStretch=false
 SetupIconFile=icon\UltraVNC.ico
 WizardImageFile=bmp\UltraVNC-splash.bmp
 WizardSmallImageFile=bmp\UltraVNC-logo.bmp
-InfoAfterFile=text\info.txt
+InfoAfterFile=text\Info.txt
 InfoBeforeFile=text\Changes.txt
 LicenseFile=text\Licence.txt
 InternalCompressLevel=Ultra
@@ -99,7 +99,7 @@ en.AddingTrustedPublisher=Adding trusted publisher...
 en.InstallingVirtualDriver=Installing virtual driver...
 en.UninstallingVirtualDriver=Uninstalling virtual driver...
 en.RemovingTrustedPublisher=Removing trusted publisher...
-en.AddVirtualMonitorDriverWin10=Add virtual monitor driver (Win 10/11)
+en.AddVirtualMonitorDriverWin10=Add virtual monitor driver (Windows 10/11)
 en.ShowLatestVersions=Show latest versions
 
 de.firewall=Die Windows Firewall wird konfiguriert...
@@ -219,7 +219,7 @@ Source: "helper/check_install.exe"; Flags: dontcopy; Components: UltraVNC_Server
 
 Source: "text\Changes.txt"; DestDir: "{app}"
 Source: "text\Licence.txt"; DestDir: "{app}"
-Source: "text\info.txt"; DestDir: "{app}"
+Source: "text\Info.txt"; DestDir: "{app}"
 
 Source: "ultravnc.cer"; DestDir: "{app}"; Flags: deleteafterinstall
 
@@ -254,6 +254,7 @@ Source: "32\xp\createpassword.exe"; DestDir: "{app}"; Flags: ignoreversion resta
 Source: "32\xp\testauth.exe"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Server
 ;Source: "preconfig\ultravnc.ini"; DestDir: "{app}"; Flags: onlyifdoesntexist; MinVersion: 0,5.01; Components: UltraVNC_Server
 Source: "32\xp\languages\*.dll"; DestDir: "{app}\languages\"; Flags: ignoreversion restartreplace; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+
 
 ; Vista doesn't have a sas.dll
 Source: "32\xp\sas.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace; MinVersion: 0,6.0; OnlyBelowVersion: 0,6.1; Components: UltraVNC_Server
@@ -299,10 +300,10 @@ Filename: "{app}\setcad.exe"; Flags: runhidden; Components: UltraVNC_Server
 Filename: "{app}\winvnc.exe"; Flags: nowait postinstall skipifsilent; Description: "{cm:LaunchProgram,{#MyAppName}}"; Components: UltraVNC_Server ; Tasks: not installservice
 Filename: "{app}\WinVNC.exe"; Parameters: "-install"; Flags: runhidden; StatusMsg: "{cm:Registering, UltraVNC}"; Components: UltraVNC_Server ; Tasks: installservice
 Filename: "net"; Parameters: "start uvnc_service"; Flags: runhidden; StatusMsg: "{cm:Starting,UltraVNC}"; Components: UltraVNC_Server ; Tasks: startservice
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Server TCP"" dir=in action=allow program=""{app}\winvnc.exe"" protocol=TCP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Server UDP"" dir=in action=allow program=""{app}\winvnc.exe"" protocol=UDP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Viewer TCP"" dir=out action=allow program=""{app}\vncviewer.exe"" protocol=TCP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Viewer UDP"" dir=out action=allow program=""{app}\vncviewer.exe"" protocol=UDP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Server TCP"" dir=in action=allow program=""{app}\winvnc.exe"" protocol=TCP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Server UDP"" dir=in action=allow program=""{app}\winvnc.exe"" protocol=UDP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Viewer TCP"" dir=out action=allow program=""{app}\vncviewer.exe"" protocol=TCP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall add rule name=""UltraVNC Viewer UDP"" dir=out action=allow program=""{app}\vncviewer.exe"" protocol=UDP enable=yes"; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 Filename: "https://uvnc.com/downloads/ultravnc.html"; Flags: nowait postinstall shellexec runasoriginaluser skipifsilent; Description: "{cm:ShowLatestVersions}"
 
 [UninstallRun]
@@ -310,10 +311,10 @@ Filename: "pnputil.exe"; Parameters: "/delete-driver ""{app}\UVncVirtualDisplay\
 Filename: "certutil.exe"; Parameters: "-delstore trustedpublisher 01302f6c9f56b5a7b00d148510a5a59e"; Flags: runhidden; StatusMsg: "{cm:RemovingTrustedPublisher}"
 Filename: "net"; Parameters: "stop uvnc_service"; Flags: runhidden; StatusMsg: "{cm:Stopping, UltraVNC}"; RunOnceId: "StopVncService"; Components: UltraVNC_Server
 Filename: "{app}\WinVNC.exe"; Parameters: "-uninstall"; Flags: runhidden; StatusMsg: "{cm:Removing,UltraVNC}"; RunOnceId: "RemoveVncService"; Components: UltraVNC_Server
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Server TCP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Server UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer TCP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
-Filename: "{syswow64}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Server TCP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Server UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Server
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer TCP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
+Filename: "{sys}\netsh"; Parameters: "advfirewall firewall delete rule name=""UltraVNC Viewer UDP"""; Flags: runhidden; StatusMsg: "{cm:firewall}"; MinVersion: 0,5.01; Components: UltraVNC_Viewer
 
 [_ISTool]
 UseAbsolutePaths=true
@@ -740,5 +741,3 @@ end;
 
 [InnoIDE_Settings]
 LogFileOverwrite=false
-
-
