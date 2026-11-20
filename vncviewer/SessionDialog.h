@@ -111,6 +111,7 @@ public:
 	bool fAutoAcceptNoDSM;
 	bool fRequireEncryption;
 	bool fUseTokenTLS;
+	bool fPreferVncAuth;
 	bool fUseOnlyDefaultConfigFile;
 	bool restricted;
 	bool ipv6;

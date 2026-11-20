@@ -212,6 +212,7 @@ VNCOptions::VNCOptions()
 	m_token[0] = '\0';				// VeNCrypt token (64 ASCII chars)
 	m_sessionToken[0] = '\0';		// Server-issued session token (not persisted)
 	m_fUseTokenTLS = false;
+	m_fPreferVncAuth = false;
 	m_quickoption = 1;				// sf@2002 - Auto Mode as default
 	m_fUseDSMPlugin = false;
 	m_oldplugin = false;
@@ -449,6 +450,7 @@ VNCOptions& VNCOptions::operator=(VNCOptions& s)
 
 	//adzm 2010-05-12
 	m_fRequireEncryption = s.m_fRequireEncryption;
+	m_fPreferVncAuth = s.m_fPreferVncAuth;
 	m_UseOnlyDefaultConfigFile = s.m_UseOnlyDefaultConfigFile;
 
 	//adzm 2010-07-04
@@ -1041,6 +1043,11 @@ void VNCOptions::SetFromCommandLine(LPTSTR szCmdLine) {
 			// Prefer VeNCrypt TLS auth when the server offers it
 			m_fUseTokenTLS = true;
 		}
+		else if (SwitchMatch(args[j], _T("prefervncauth")))
+		{
+			// Prefer password-only VNC auth over user/pass schemes (e.g. AppleDH)
+			m_fPreferVncAuth = true;
+		}
 		else if (SwitchMatch(args[j], _T("preemptiveupdates")))
 		{
 			//adzm 2010-07-04
@@ -1288,6 +1295,7 @@ void VNCOptions::SaveOptions(const wchar_t* fname)
 	saveInt(L"AutoAcceptNoDSM", m_fAutoAcceptNoDSM, fname);
 	saveInt(L"RequireEncryption", m_fRequireEncryption, fname);
 	saveInt(L"UseVeNCryptTLS", m_fUseTokenTLS, fname);
+	saveInt(L"PreferVncAuth", m_fPreferVncAuth, fname);
 	saveInt(L"UseOnlyDefaultConfigFile", m_UseOnlyDefaultConfigFile, fname);
 	saveInt(L"PreemptiveUpdates", m_preemptiveUpdates, fname);
 }
@@ -1406,6 +1414,7 @@ void VNCOptions::LoadOptions(const wchar_t* fname)
 	//adzm 2010-05-12
 	m_fRequireEncryption = readInt(L"RequireEncryption", (int)m_fRequireEncryption, fname) ? true : false;
 	m_fUseTokenTLS = readInt(L"UseVeNCryptTLS", (int)m_fUseTokenTLS, fname) ? true : false;
+	m_fPreferVncAuth = readInt(L"PreferVncAuth", (int)m_fPreferVncAuth, fname) ? true : false;
 	m_UseOnlyDefaultConfigFile = readInt(L"UseOnlyDefaultConfigFile", (int)m_UseOnlyDefaultConfigFile, fname) ? true : false;
 	
 

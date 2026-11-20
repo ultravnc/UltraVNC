@@ -1072,6 +1072,8 @@ void SessionDialog::InitDlgProcSecurity()
 	SendMessage(hfRequireEncryption, BM_SETCHECK, fRequireEncryption, 0);
 	if (GetDlgItem(hwnd, IDC_USE_VENCRYPT))
 		SendMessage(GetDlgItem(hwnd, IDC_USE_VENCRYPT), BM_SETCHECK, fUseTokenTLS, 0);
+	if (GetDlgItem(hwnd, IDC_PREFER_VNCAUTH))
+		SendMessage(GetDlgItem(hwnd, IDC_PREFER_VNCAUTH), BM_SETCHECK, fPreferVncAuth, 0);
 	HWND hAllowUntrustedServers = GetDlgItem(hwnd, IDC_ONLYPASSWORD);
 	SendMessage(hAllowUntrustedServers, BM_SETCHECK, !AllowUntrustedServers, 0);
 
@@ -1334,6 +1336,8 @@ void SessionDialog::ReadDlgProcSecurity()
 	fRequireEncryption = (SendMessage(GetDlgItem(hwnd, IDC_ONLYENCRYPTED), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	if (GetDlgItem(hwnd, IDC_USE_VENCRYPT))
 		fUseTokenTLS = (SendMessage(GetDlgItem(hwnd, IDC_USE_VENCRYPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
+	if (GetDlgItem(hwnd, IDC_PREFER_VNCAUTH))
+		fPreferVncAuth = (SendMessage(GetDlgItem(hwnd, IDC_PREFER_VNCAUTH), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	AllowUntrustedServers = !(SendMessage(GetDlgItem(hwnd, IDC_ONLYPASSWORD), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptIncoming = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPT), BM_GETCHECK, 0, 0) == BST_CHECKED);
 	fAutoAcceptNoDSM = (SendMessage(GetDlgItem(hwnd, IDC_AUTOACCEPTNOWARN), BM_GETCHECK, 0, 0) == BST_CHECKED);
@@ -1681,6 +1685,7 @@ void SessionDialog::StartListener()
 	m_pOpt->m_fAutoAcceptNoDSM = fAutoAcceptNoDSM;
 	m_pOpt->m_fRequireEncryption = fRequireEncryption;
 	m_pOpt->m_fUseTokenTLS = fUseTokenTLS;
+	m_pOpt->m_fPreferVncAuth = fPreferVncAuth;
 	m_pOpt->m_UseOnlyDefaultConfigFile = fUseOnlyDefaultConfigFile;
 	m_pOpt->m_restricted = restricted;
 	m_pOpt->m_ipv6 = ipv6;

@@ -59,6 +59,7 @@ public:
 	char   m_token[65];          // VeNCrypt token (64 ASCII chars + null)
 	char   m_sessionToken[65];   // Server-issued session token for reconnect (not persisted)
 	bool   m_fUseTokenTLS;       // Prefer VeNCrypt token-TLS auth
+	bool   m_fPreferVncAuth;     // Prefer password-only VNC auth over user/pass schemes (e.g. AppleDH)
 	int     m_quickoption; // Modif sf@2002 - v1.1.2
 	TCHAR   m_configFilename[_MAX_PATH];
 	bool	m_restricted;

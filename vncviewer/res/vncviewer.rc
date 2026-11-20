@@ -685,7 +685,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,65,262,10
     CONTROL         "Ignore no encryption warning (listener mode)",IDC_AUTOACCEPTNOWARN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,75,262,10
-    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,262,10
+    CONTROL         "Hide menu",IDC_HIDEMENU,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,85,120,10
+    CONTROL         "Prefer VNC password auth",IDC_PREFER_VNCAUTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,131,85,135,10
     EDITTEXT        IDC_EDITCUSTOMMESSAGE,4,116,262,25,ES_MULTILINE
     LTEXT           "Notification on connect",IDC_STATIC,4,108,262,8
     CONTROL         "Only servers with password",IDC_ONLYPASSWORD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,35,131,10

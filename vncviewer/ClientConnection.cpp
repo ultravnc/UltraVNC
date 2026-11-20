@@ -3146,6 +3146,10 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 			auth_priority.push_back(rfbUltraVNC_MsLogonIIAuth);  // Fallback to legacy 31-bit DH
 				if (!m_opts->m_fUseTokenTLS && m_opts->m_token[0] == '\0')
 					auth_priority.push_back(rfbVeNCypt);
+				// When set, prefer password-only VNC auth over user/pass
+				// schemes like RSA-AES and AppleDH (macOS Screen Sharing).
+				if (m_opts->m_fPreferVncAuth)
+					auth_priority.push_back(rfbVncAuth);
 				auth_priority.push_back(rfbRSAAES_256);
 				auth_priority.push_back(rfbRSAAES);
 				auth_priority.push_back(rfbRSAAESne_256);
