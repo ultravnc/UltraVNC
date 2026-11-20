@@ -672,25 +672,27 @@ struct ThumbHost
 
 	ThumbHost(TCHAR *k, TCHAR *f) : key(k), fname(f) { }
 
-	bool CompareThumbprint(char *hex)
+	bool CompareThumbprint(TCHAR *hex)
 	{ 
 		TCHAR buf[64] = { 0 };
 		GetPrivateProfileString(ThumbprintSection, key, NULL, buf, _countof(buf), fname);
-		return _tcscmp((LPCTSTR)hex, buf) == 0;
+		return _tcscmp(hex, buf) == 0;
 	}
 	
-	void SaveThumbprint(char *hex) { WritePrivateProfileString(ThumbprintSection, key, (LPCTSTR)hex, fname); }
+	void SaveThumbprint(TCHAR *hex) { WritePrivateProfileString(ThumbprintSection, key, hex, fname); }
 };
 
-static bool GetCertificateThumbprint(PCCERT_CONTEXT pCert, char *hex, int hexsize)
+static bool GetCertificateThumbprint(PCCERT_CONTEXT pCert, TCHAR *hex, int hexsize)
 {
 	BYTE thumb[64] = { 0 };
 	DWORD size = sizeof(thumb);
 	if (!pCert || !CertGetCertificateContextProperty(pCert, CERT_HASH_PROP_ID, thumb, &size))
 		return false;
-	snprintf(hex, hexsize, "%02x", thumb[0]);
+	if (hexsize <= 0 || size == 0 || size > static_cast<DWORD>(hexsize / 3))
+		return false;
+	_stprintf_s(hex, hexsize, _T("%02x"), thumb[0]);
 	for (DWORD i = 1; i < size; i++)
-		snprintf(hex + strlen(hex), hexsize - strlen(hex), "-%02x", thumb[i]);
+		_stprintf_s(hex + _tcslen(hex), hexsize - _tcslen(hex), _T("-%02x"), thumb[i]);
 	return true;
 }
 
@@ -804,9 +806,9 @@ void ClientConnection::AuthVeNCrypt()
 			TCHAR key[MAX_HOST_NAME_LEN];
 			_stprintf_s(key, MAX_HOST_NAME_LEN, _T("%s:%d"), m_host, m_port);
 			ThumbHost host(key, m_opts->getDefaultOptionsFileName());
-			char hex[64];
+			TCHAR hex[64] = { 0 };
 			bool done = false;
-			if (GetCertificateThumbprint(session.pRemoteCert, hex, sizeof(hex)) && host.CompareThumbprint(hex))
+			if (GetCertificateThumbprint(session.pRemoteCert, hex, _countof(hex)) && host.CompareThumbprint(hex))
 				done = true;
 			while (!done)
 			{
