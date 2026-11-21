@@ -3111,10 +3111,13 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 
 			if (!auth_supported.empty()) {
 				std::vector<CARD8> auth_priority;
+				// rfbUltraVNC is only the UltraVNC identification marker (the server
+				// answers Continue and offers its list again), so take it first even
+				// in VeNCrypt mode: skipping it hides file transfer and text chat.
+				auth_priority.push_back(rfbUltraVNC);
 				// If the user supplied a token, prefer native VeNCrypt TLS token auth.
 				if (m_opts->m_fUseTokenTLS || m_opts->m_token[0] != '\0')
 					auth_priority.push_back(rfbVeNCypt);
-				auth_priority.push_back(rfbUltraVNC);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth_new);
 				auth_priority.push_back(rfbUltraVNC_SecureVNCPluginAuth);				
 				auth_priority.push_back(rfbUltraVNC_SCPrompt); // adzm 2010-10	
