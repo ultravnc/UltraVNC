@@ -641,7 +641,7 @@ BEGIN
     CONTROL         "Save position on exit",IDC_SAVEPOS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,129,141,10
     CONTROL         "Start in full screen mode",IDC_FULLSCREEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,85,112,10
     CONTROL         "Auto scale Even",IDC_SCALINGEVEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,96,112,10
-    CONTROL         "GNOME Remote Desttop \nQEMU",IDC_GNOME,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,154,108,112,16
+    CONTROL         "GNOME Remote Desktop \nQEMU",IDC_GNOME,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,154,108,112,16
     CONTROL         "Save size on exit",IDC_SAVESIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,129,112,10
 END
 
@@ -702,7 +702,7 @@ BEGIN
     CONTROL         "Don't show remote cursor",IDC_CSHAPE_IGNORE_RADIO,
                     "Button",BS_AUTORADIOBUTTON,6,30,260,10
     CONTROL         "View only, no input",IDC_VIEWONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,47,260,10
-    CONTROL         "Disable hockeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
+    CONTROL         "Disable hotkeys",IDC_NOHOTKEYS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,58,260,10
     CONTROL         "Emulate 3 Buttons (with 2-button click)",IDC_EMULATECHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,260,10
     CONTROL         "Swap mouse buttons 2 and 3",ID_SESSION_SWAPMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,80,260,10
