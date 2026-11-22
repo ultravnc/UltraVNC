@@ -3107,8 +3107,16 @@ void ClientConnection::Authenticate(std::vector<CARD32>& current_auth)
 				case rfbClientInitExtraMsgSupportNew:
 					brfbClientInitExtraMsgSupportNew = true;
 					break;
-				case rfbClientInitExtraMsgSupport:
 				case rfbUltraVNC:
+					// Only an UltraVNC server advertises this type. Mark the
+					// capability even when another scheme (e.g. VeNCrypt, kept
+					// first by token auth) is selected, or file transfer and
+					// chat stay hidden on a server that supports them.
+					new_ultra_server = true;
+					m_fServerKnowsFileTransfer = true;
+					auth_supported.push_back(authAllowed[i]);
+					break;
+				case rfbClientInitExtraMsgSupport:
 				case rfbUltraVNC_SecureVNCPluginAuth:
 				case rfbUltraVNC_SecureVNCPluginAuth_new:
 				case rfbUltraVNC_SCPrompt: // adzm 2010-10				
