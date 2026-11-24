@@ -74,6 +74,9 @@ char* vncServer::generateCode() {
 	PIP_ADAPTER_INFO AdapterInfo{};
 	DWORD dwBufLen = sizeof(IP_ADAPTER_INFO);
 	char* mac_addr = (char*)malloc(18);
+	if (mac_addr == NULL)
+		return NULL;
+	mac_addr[0] = '\0';
 
 	AdapterInfo = (IP_ADAPTER_INFO*)malloc(sizeof(IP_ADAPTER_INFO));
 	if (AdapterInfo == NULL) {
@@ -154,7 +157,7 @@ vncServer::vncServer()
 	m_fIdReconnect = false;
 	m_AutoReconnectPort = 0;
 	strcpy_s(m_szAutoReconnectAdr, "");
-	strcpy_s(m_szAutoReconnectId, "");
+	memset(m_szAutoReconnectId, 0, sizeof(m_szAutoReconnectId));
 	m_impersonationtoken = NULL; //byteboon
 	OS_Shutdown = false;
 	startTime = GetTickCount();
@@ -171,8 +174,10 @@ vncServer::vncServer()
 	sethook = false;
 	m_pendingDSMPlugin = FALSE;
 	char* generatedcode = generateCode();
-	strcpy_s(code, generatedcode);
-	free(generatedcode);
+	if (generatedcode != NULL) {
+		strcpy_s(code, generatedcode);
+		free(generatedcode);
+	}
 
 }
 
@@ -2045,14 +2050,14 @@ void vncServer::actualRetryThread()
 					retrysock->SetTimeout(0);
 					// adzm 2009-07-05 - repeater IDs
 					// Add the new client to this server
-					AddClient(retrysock, !settings->getAuthRequired(), TRUE, 0, NULL, m_szAutoReconnectId, m_szAutoReconnectAdr, m_AutoReconnectPort, true);
+					AddClient(retrysock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, m_szAutoReconnectId, m_szAutoReconnectAdr, m_AutoReconnectPort, true);
 					vnclog.Print(LL_INTINFO, VNCLOG("leaving reconnectThread....\n"));
 					return;
 				}
 				else {
 					// Add the new client to this server
 					// adzm 2009-08-02
-					AddClient(retrysock, !settings->getAuthRequired(), TRUE, 0, NULL, NULL, m_szAutoReconnectAdr, m_AutoReconnectPort, true);
+					AddClient(retrysock, !settings->getReverseAuthRequired(), TRUE, 0, NULL, NULL, m_szAutoReconnectAdr, m_AutoReconnectPort, true);
 					vnclog.Print(LL_INTINFO, VNCLOG("leaving reconnectThread....\n"));
 					return;
 				}
