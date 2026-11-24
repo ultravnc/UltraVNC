@@ -674,7 +674,7 @@ struct ThumbHost
 
 	bool CompareThumbprint(TCHAR *hex)
 	{ 
-		TCHAR buf[64] = { 0 };
+		TCHAR buf[256] = { 0 };
 		GetPrivateProfileString(ThumbprintSection, key, NULL, buf, _countof(buf), fname);
 		return _tcscmp(hex, buf) == 0;
 	}
@@ -806,7 +806,7 @@ void ClientConnection::AuthVeNCrypt()
 			TCHAR key[MAX_HOST_NAME_LEN];
 			_stprintf_s(key, MAX_HOST_NAME_LEN, _T("%s:%d"), m_host, m_port);
 			ThumbHost host(key, m_opts->getDefaultOptionsFileName());
-			TCHAR hex[64] = { 0 };
+			TCHAR hex[256] = { 0 };
 			bool done = false;
 			if (GetCertificateThumbprint(session.pRemoteCert, hex, _countof(hex)) && host.CompareThumbprint(hex))
 				done = true;
