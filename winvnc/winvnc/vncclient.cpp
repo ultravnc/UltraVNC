@@ -297,6 +297,91 @@ static void MakeLongPath(const char* utf8, WCHAR* outW, int outLen)
 		wcscpy_s(outW, outLen, tmp);
 }
 
+// File-transfer hardening helpers (ported from the RED EPOS UltraVNC fork,
+// GPL-3.0, Copyright (C) 2026 David Lyons).
+
+// Reads and throws away len bytes the viewer sent, so that a refused request
+// leaves the RFB stream in step. More than kFtDrainMax bytes is a broken or
+// hostile viewer: the caller disconnects it.
+static const UINT kFtDrainMax = 65536;
+static bool FtDrain(VSocket* s, UINT len)
+{
+	if (len > kFtDrainMax)
+		return false;
+	char buf[4096];
+	while (len > 0)
+	{
+		UINT n = len < sizeof(buf) ? len : (UINT)sizeof(buf);
+		if (!s->ReadExact(buf, n))
+			return false;
+		len -= n;
+	}
+	return true;
+}
+
+// true if the last part of path (after the last '\\') starts with prefix.
+// NULL-safe, unlike strncmp(strrchr(path, '\\') + 1, ...).
+static bool FtFileNameStartsWith(const char* path, const char* prefix)
+{
+	if (path == NULL)
+		return false;
+	const char* slash = strrchr(const_cast<char*>(path), '\\');
+	const char* name = slash ? slash + 1 : path;
+	return strncmp(name, prefix, strlen(prefix)) == 0;
+}
+
+// A folder-upload zip's name must be exactly "!UVNCDIR-<hex>.zip" (an even number of
+// hex digits); the pointer arithmetic in the callers wrote through NULL pointers
+// on anything else (e.g. "!UVNCDIR-41" has no '.').
+static bool FtFolderZipNameOk(const char* path)
+{
+	if (path == NULL)
+		return false;
+	const char* slash = strrchr(const_cast<char*>(path), '\\');
+	const char* n = slash ? slash + 1 : path;
+	size_t pre = strlen(rfbZipDirectoryPrefix), len = strlen(n);
+	if (len < pre + 2 + 4 || strncmp(n, rfbZipDirectoryPrefix, pre) != 0 || _stricmp(n + len - 4, ".zip") != 0)
+		return false;
+	size_t hex = len - pre - 4;
+	if (hex % 2 != 0)
+		return false;
+	for (size_t i = 0; i < hex; i++)
+		if (!isxdigit((unsigned char)n[pre + i]))
+			return false;
+	return true;
+}
+
+// The offer timestamp must be exactly "MM/DD/YYYY HH:MM"; a longer suffix made
+// strcpy_s fast-fail on the 18-byte m_szFileTime.
+static bool FtTimestampOk(const char* s)
+{
+	static const char form[] = "00/00/0000 00:00";
+	if (s == NULL || strlen(s) != sizeof(form) - 1)
+		return false;
+	for (size_t i = 0; i < sizeof(form) - 1; i++) {
+		if (form[i] == '0' ? !isdigit((unsigned char)s[i]) : s[i] != form[i])
+			return false;
+	}
+	return true;
+}
+
+// Cryptographically random 16-hex-digit name for the folder-extraction temp dir
+// (GetTickCount() was predictable: another local user could pre-create the dir).
+extern "C" BOOLEAN WINAPI SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength);
+#pragma comment(lib, "advapi32.lib")
+static bool FtRandomName(char* out, size_t outSize)
+{
+	if (outSize < 17)
+		return false;
+	unsigned char b[8];
+	if (!SystemFunction036(b, sizeof(b)))
+		return false;
+	for (int i = 0; i < 8; i++)
+		_snprintf_s(out + 2 * i, outSize - 2 * i, _TRUNCATE, "%02X", b[i]);
+	out[16] = '\0';
+	return true;
+}
+
 bool replaceFile(const char* src, const char* dst)
 {
 	// src and dst are UTF-8 paths - use \\?\ prefix for long path support
@@ -355,7 +440,7 @@ bool isDirectory(const char* name)
 }
 bool isDirectoryTransfer(const char* szFileName)
 {
-	return (strncmp(strrchr(const_cast<char*>(szFileName), '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)) == 0);
+	return FtFileNameStartsWith(szFileName, rfbZipDirectoryPrefix);
 }
 
 void GetZippedFolderPathName(const char* szZipFile, char* path)
@@ -4407,11 +4492,18 @@ vncClientThread::run(void* arg)
 				case rfbFileTransferOffer:
 				{
 					omni_mutex_lock ll(m_client->GetUpdateLock(), 89);
-					if (!settings->getEnableFileTransfer() || !fUserOk) break;
 					// bool fError = false;
 					const UINT length = Swap32IfLE(msg.ft.length);
+					// The offer's name (length bytes) and sizeH (4 bytes) follow the header.
+					// A refusal must still read them, or the stream desyncs.
+					if (!settings->getEnableFileTransfer() || !fUserOk ||
+						length > sizeof(m_client->m_szFullDestName) - 12) // needed for temp_prefix
+					{
+						if (!FtDrain(m_socket, length + (UINT)sizeof(CARD32)))
+							m_client->cl_connected = FALSE;
+						break;
+					}
 					memset(m_client->m_szFullDestName, 0, sizeof(m_client->m_szFullDestName));
-					if (length > sizeof(m_client->m_szFullDestName) - 12) break; // needed for temp_prefix
 					// Read in the Name of the file to create
 					if (!m_socket->ReadExact(m_client->m_szFullDestName, length))
 					{
@@ -4430,13 +4522,14 @@ vncClientThread::run(void* arg)
 					}
 					sizeH = Swap32IfLE(sizeHtmp);
 
-					// Parse the FileTime
+					// Parse the FileTime. Only the exact "MM/DD/YYYY HH:MM" form is
+					// used: a longer suffix made strcpy_s fast-fail on the 18-byte field.
 					char* p = strrchr(m_client->m_szFullDestName, ',');
-					if (p == NULL)
-						m_client->m_szFileTime[0] = '\0';
-					else
+					m_client->m_szFileTime[0] = '\0';
+					if (p != NULL)
 					{
-						strcpy_s(m_client->m_szFileTime, p + 1);
+						if (FtTimestampOk(p + 1))
+							strcpy_s(m_client->m_szFileTime, p + 1);
 						*p = '\0';
 					}
 
@@ -4715,7 +4808,14 @@ vncClientThread::run(void* arg)
 				break;
 
 				case rfbFilePacket:
-					if (!settings->getEnableFileTransfer() || !fUserOk) break;
+					if (!settings->getEnableFileTransfer() || !fUserOk)
+					{
+						// The packet's data is still in the stream: drain it or the
+						// stream desyncs.
+						if (!FtDrain(m_socket, Swap32IfLE(msg.ft.length)))
+							m_client->cl_connected = FALSE;
+						break;
+					}
 					m_client->cl_connected = m_client->ReceiveFileChunk(Swap32IfLE(msg.ft.length), Swap32IfLE(msg.ft.size));
 					m_client->SendKeepAlive();
 					break;
@@ -4860,7 +4960,12 @@ vncClientThread::run(void* arg)
 
 						const UINT length = Swap32IfLE(msg.ft.length);
 						char szDir[MAX_PATH * 3 + 2];
-						if (length > sizeof(szDir) - 1) break;
+						if (length > sizeof(szDir) - 1)
+						{
+							if (!FtDrain(m_socket, length))
+								m_client->cl_connected = FALSE;
+							break;
+						}
 
 						// Read in the Name of Dir to explore
 						if (!m_socket->ReadExact(szDir, length)) break;
@@ -5159,7 +5264,12 @@ vncClientThread::run(void* arg)
 					{
 						const UINT length = Swap32IfLE(msg.ft.length);
 						char szDir[MAX_PATH * 3 + 1];
-						if (length > sizeof(szDir) - 1) break;
+						if (length > sizeof(szDir) - 1)
+						{
+							if (!FtDrain(m_socket, length))
+								m_client->cl_connected = FALSE;
+							break;
+						}
 
 						// Read in the Name of Dir to explore
 						if (!m_socket->ReadExact(szDir, length))
@@ -5203,7 +5313,12 @@ vncClientThread::run(void* arg)
 					{
 						UINT length = Swap32IfLE(msg.ft.length);
 						char szFile[MAX_PATH * 3 + 1];
-						if (length > sizeof(szFile) - 1) break;
+						if (length > sizeof(szFile) - 1)
+						{
+							if (!FtDrain(m_socket, length))
+								m_client->cl_connected = FALSE;
+							break;
+						}
 
 						// Read in the Name of the File
 						if (!m_socket->ReadExact(szFile, length))
@@ -5256,7 +5371,12 @@ vncClientThread::run(void* arg)
 					{
 						const UINT length = Swap32IfLE(msg.ft.length);
 						char szNames[(2 * MAX_PATH * 3) + 1];
-						if (length > sizeof(szNames) - 1) break;
+						if (length > sizeof(szNames) - 1)
+						{
+							if (!FtDrain(m_socket, length))
+								m_client->cl_connected = FALSE;
+							break;
+						}
 
 						// Read in the Names
 						if (!m_socket->ReadExact(szNames, length))
@@ -7326,7 +7446,7 @@ void vncClient::FinishFileSending()
 
 	// sf@2003 - Directory Transfer trick
 	// If the transfered file is a Directory zip, we delete it locally, whatever the result of the transfer
-	if (!strncmp(strrchr(m_szSrcFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix)))
+	if (FtFileNameStartsWith(m_szSrcFileName, rfbZipDirectoryPrefix))
 	{
 		char* p = strrchr(m_szSrcFileName, ',');
 		if (p != NULL) *p = '\0'; // Remove the time stamp we've added above from the file name
@@ -7465,12 +7585,16 @@ int vncClient::CheckAndZipDirectoryForChecksuming(LPSTR szSrcFileName)
 {
 	if (!m_fFileDownloadError
 		&&
-		!strncmp(strrchr(szSrcFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
+		FtFileNameStartsWith(szSrcFileName, rfbZipDirectoryPrefix)
 		)
 	{
 		char szPath[MAX_PATH + MAX_PATH];
 		char szDirName[MAX_PATH];
 		char szDirectoryName[MAX_PATH * 2];
+		// The name must be exactly "!UVNCDIR-<hex>.zip" before the pointer
+		// arithmetic below ("!UVNCDIR-41" has no '.': strrchr returns NULL).
+		if (strlen(szSrcFileName) >= sizeof(szPath) - 64 || !FtFolderZipNameOk(szSrcFileName))
+			return -1;
 		strcpy_s(szPath, szSrcFileName);
 		char* p = strrchr(szPath, '\\') + 1;
 		char* p2 = strchr(p, '-') + 1;
@@ -7513,11 +7637,26 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 	
 	if (!m_fFileDownloadError
 		&&
-		!strncmp(strrchr(szFileName, '\\') + 1, rfbZipDirectoryPrefix, strlen(rfbZipDirectoryPrefix))
+		FtFileNameStartsWith(szFileName, rfbZipDirectoryPrefix)
 		)
 	{
 		char szPath[MAX_PATH * 3];
 		char szDirName[MAX_PATH * 3];
+		// strcpy_s below ended the process for a name longer than szPath (a folder
+		// upload with a long name gets through the offer's own limit).
+		if (strlen(szFileName) >= sizeof(szPath) - 64)
+		{
+			m_fFileDownloadError = true;
+			return true;
+		}
+		// The name must be exactly "!UVNCDIR-<hex>.zip" before the pointer
+		// arithmetic below ("!UVNCDIR-41" has no '.': strrchr returns NULL and
+		// *p3 = '\0' wrote through it).
+		if (!FtFolderZipNameOk(szFileName))
+		{
+			m_fFileDownloadError = true;
+			return true;
+		}
 		strcpy_s(szPath, szFileName);
 		char* p = strrchr(szPath, '\\') + 1;
 		char* p2 = strchr(p, '-') + 1; // rfbZipDirectoryPrefix MUST have a "-" at the end...
@@ -7570,9 +7709,17 @@ bool vncClient::UnzipPossibleDirectory(LPSTR szFileName)
 			return true;
 		}
 
-		// Use a short ASCII temp name for extraction, then rename to Unicode
+		// Use a short ASCII temp name for extraction, then rename to Unicode.
+		// Random, not GetTickCount(): a predictable name let another local user
+		// pre-create the directory first.
 		char szExtractName[64];
-		sprintf_s(szExtractName, "UVNCTMP%08X", GetTickCount());
+		char rnd[17];
+		if (!FtRandomName(rnd, sizeof(rnd)))
+		{
+			m_fFileDownloadError = true;
+			return true;
+		}
+		sprintf_s(szExtractName, "UVNCTMP%s", rnd);
 		strcat_s(szPath, MAX_PATH * 3, szExtractName);
 
 		// Create the Directory - wrap in SEH for safety
@@ -7932,7 +8079,12 @@ int  vncClient::filetransferrequestPart1(rfbClientToServerMsg msg, bool fUserOk)
 		const UINT length = Swap32IfLE(msg.ft.length);
 		memset(m_szSrcFileName, 0, sizeof(m_szSrcFileName));
 		if (length > sizeof(m_szSrcFileName) - 2)
+		{
+			// The name is still in the stream: drain it or the stream desyncs.
+			if (!FtDrain(m_socket, length))
+				cl_connected = false;
 			return 0;
+		}
 		// Read in the Name of the file to create
 		if (!m_socket->ReadExact(m_szSrcFileName, length))
 			return 0;
