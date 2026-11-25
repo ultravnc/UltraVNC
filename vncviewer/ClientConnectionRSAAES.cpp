@@ -568,7 +568,7 @@ struct RSAKEX
 		sprintf_s(hex, "%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x", f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7]);
 		mn_encode(f, 8, catchphrase, 1024, "x x x. x x x. x x x\n");
 		strcat(catchphrase, ".");
-		vnclog.Print(0, _T("RSAKEX: Server fingerprint is %s\n"), hex);
+		vnclog.Print(0, _T("RSAKEX: Server fingerprint is %hs\n"), hex);
 		if (conn.CompareFingerprint(hex))
 			return true;
 		int nButtonPressed = 0;
@@ -853,12 +853,19 @@ struct KEXHost : public RSAKEX::IConnection
 	
 	virtual bool CompareFingerprint(char *hex)
 	{ 
-		TCHAR buf[32] = { 0 };
-		GetPrivateProfileString(FingerprintSection, key, NULL, buf, sizeof(buf), fname);
-		return _tcscmp((LPCTSTR)hex, buf) == 0;
+		TCHAR whex[64] = { 0 }, buf[64] = { 0 };
+		if (!MultiByteToWideChar(CP_ACP, 0, hex, -1, whex, _countof(whex)))
+			return false;
+		GetPrivateProfileString(FingerprintSection, key, NULL, buf, _countof(buf), fname);
+		return _tcscmp(whex, buf) == 0;
 	}
 	
-	virtual void SaveFingerprint(char *hex) { WritePrivateProfileString(FingerprintSection, key, (LPCTSTR)hex, fname); }
+	virtual void SaveFingerprint(char *hex)
+	{
+		TCHAR whex[64] = { 0 };
+		if (MultiByteToWideChar(CP_ACP, 0, hex, -1, whex, _countof(whex)))
+			WritePrivateProfileString(FingerprintSection, key, whex, fname);
+	}
 };
 
 void ClientConnection::AuthRSAAES(int keySize, bool encrypted)
