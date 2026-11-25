@@ -31,6 +31,24 @@ static void receive(ExtendedClipboardDataMessage& message)
 	CHECK(message.SetReceivedLength(length));
 }
 
+// Inflates a clipProvide payload the way UltraVNC 1.0.9.x rdr::ZlibInStream does:
+// every inflate call must return Z_OK, so a finished stream (Z_STREAM_END) is fatal.
+static size_t legacyInflate(ExtendedClipboardDataMessage& message, BYTE* raw, size_t size)
+{
+	z_stream stream = {};
+	CHECK(inflateInit(&stream) == Z_OK);
+	stream.next_in = (Bytef*)message.GetData() + 4;
+	stream.avail_in = message.GetDataLength() - 4;
+	stream.next_out = raw;
+	stream.avail_out = (uInt)size;
+	int result = inflate(&stream, Z_SYNC_FLUSH);
+	size_t length = stream.total_out;
+	bool consumed = stream.avail_in == 0;
+	inflateEnd(&stream);
+	CHECK(result == Z_OK && consumed);
+	return length;
+}
+
 static void caps(ClipboardSettings& settings, CARD32 flags, CARD32 text = 0, CARD32 rtf = 0, CARD32 html = 0, CARD32 dib = 0)
 {
 	ExtendedClipboardDataMessage message;
@@ -165,10 +183,8 @@ static void testLimitsAndOldPeers()
 	clipboard.settings.m_nLimitDIB = 1;
 	CHECK(clipboard.UpdateClipTextEx(data, clipProvide));
 	CHECK(clipboard.extendedClipboardDataMessage.GetFlags() == (clipProvide | clipText | clipRTF | clipHTML | clipDIB));
-	uLongf length = 4096;
 	BYTE raw[4096];
-	CHECK(uncompress(raw, &length, clipboard.extendedClipboardDataMessage.GetData() + 4,
-		clipboard.extendedClipboardDataMessage.GetDataLength() - 4) == Z_OK);
+	size_t length = legacyInflate(clipboard.extendedClipboardDataMessage, raw, sizeof(raw));
 	CHECK(length == 16 + data.m_lengthText + data.m_lengthRTF + data.m_lengthHTML + data.m_lengthDIB);
 	caps(clipboard.settings, clipText | clipNotify | clipRequest);
 	CHECK(clipboard.UpdateClipTextEx(data, clipProvide));
@@ -317,6 +333,22 @@ static void testLegacyServerNotifyRequest()
 	viewer.settings.m_nLimitHTML = 0;
 	CHECK(viewer.UpdateClipTextEx(data, clipRequest | clipText));
 	CHECK(viewer.m_bNeedToProvide && !viewer.m_bNeedToNotify);
+	BYTE raw[4096];
+	CHECK(legacyInflate(viewer.extendedClipboardDataMessage, raw, sizeof(raw)) == 4 + (size_t)data.m_lengthText);
+
+	// Copying text on the viewer side sends an automatic clipProvide that a
+	// 1.0.9.x server must be able to inflate without hitting Z_STREAM_END.
+	ClipboardData copied;
+	bytes(copied.m_pDataText, copied.m_lengthText, "copied from Notepad++");
+	copied.m_crc = crc32(0, copied.m_pDataText, copied.m_lengthText);
+	CHECK(viewer.UpdateClipTextEx(copied));
+	CHECK(viewer.m_bNeedToProvide);
+	CHECK(viewer.extendedClipboardDataMessage.GetFlags() == (clipProvide | clipText));
+	CHECK(legacyInflate(viewer.extendedClipboardDataMessage, raw, sizeof(raw)) == 4 + (size_t)copied.m_lengthText);
+	receive(viewer.extendedClipboardDataMessage);
+	ClipboardData decoded;
+	CHECK(decoded.Decode(viewer.extendedClipboardDataMessage));
+	CHECK(decoded.m_lengthText == copied.m_lengthText);
 }
 
 static void testLegacy()
