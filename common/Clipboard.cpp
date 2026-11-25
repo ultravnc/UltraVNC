@@ -762,13 +762,23 @@ bool Clipboard::UpdateExtended(ClipboardData& data, CARD32 overrideFlags)
 		provided |= format;
 	}
 	if (provided || (requested && (settings.m_remoteCaps & clipProvide))) {
-		uLongf size = compressBound(plain.length());
-		std::vector<BYTE> compressed(size);
-		if (compress2(compressed.data(), &size, (const Bytef*)plain.data(), plain.length(), Z_BEST_COMPRESSION) == Z_OK &&
-			size <= ExtendedClipboardDataMessage::maxPayload - 4) {
-			extendedClipboardDataMessage.AddFlag(provided);
-			extendedClipboardDataMessage.AppendBytes(compressed.data(), (int)size);
-			m_bNeedToProvide = true;
+		// Z_SYNC_FLUSH without Z_FINISH: older peers (e.g. 1.0.9.6) treat Z_STREAM_END as an inflate error
+		z_stream stream = {};
+		if (deflateInit(&stream, Z_BEST_COMPRESSION) == Z_OK) {
+			std::vector<BYTE> compressed(deflateBound(&stream, plain.length()) + 16);
+			stream.next_in = (Bytef*)plain.data();
+			stream.avail_in = plain.length();
+			stream.next_out = compressed.data();
+			stream.avail_out = (uInt)compressed.size();
+			int result = deflate(&stream, Z_SYNC_FLUSH);
+			uLong size = stream.total_out;
+			deflateEnd(&stream);
+			if (result == Z_OK && stream.avail_in == 0 && stream.avail_out != 0 &&
+				size <= ExtendedClipboardDataMessage::maxPayload - 4) {
+				extendedClipboardDataMessage.AddFlag(provided);
+				extendedClipboardDataMessage.AppendBytes(compressed.data(), (int)size);
+				m_bNeedToProvide = true;
+			}
 		}
 	}
 	if (!m_bNeedToProvide)
