@@ -288,6 +288,10 @@ em_fread(char * buf, unsigned size1, unsigned size2, void * fd)
       return 0;
    }
 
+   /* C variables and other code-only entries have no file data */
+   if(emf->em_data == NULL)
+      return 0;
+
    /* handle server push */
    if(emf->em_flags & EMF_PUSH)
    {
