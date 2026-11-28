@@ -137,6 +137,8 @@ DWORD WINAPI ThreadStartWeb(LPVOID lpParam)
 
 		while(notwebstopped)
 			{
+				/* wi_poll() uses cticks to drop idle sessions */
+				cticks = (u_long)(GetTickCount64() / (1000 / TPS));
 				sessions = wi_poll();
 				if( sessions < 0 )
 					{

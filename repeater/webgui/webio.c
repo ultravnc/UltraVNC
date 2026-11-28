@@ -620,7 +620,7 @@ wi_parseheader( wi_sess * sess )
       else     /* Have auth info, parse it and check */
       {
          char name[32];
-         char pass[32];
+         char pass[65];    /* passwords can be up to 64 chars */
 
          wi_decode_auth(sess, name, sizeof(name), pass, sizeof(pass));
 
