@@ -832,7 +832,7 @@ void
 wi_uudecode(char * bufcoded, BYTE * pbuffdecoded, size_t outbufsize)
 {
     int     nbytesdecoded;
-    char *  bufin;
+    unsigned char *  bufin;
     BYTE *  bufout;
     int     nprbytes;
 
@@ -844,9 +844,9 @@ wi_uudecode(char * bufcoded, BYTE * pbuffdecoded, size_t outbufsize)
      * If this would decode into more bytes than would fit into
      * the output buffer, adjust the number of input bytes downwards.
      */
-    bufin = bufcoded;
+    bufin = (unsigned char *)bufcoded;
     while(pr2six[*(bufin++)] <= 63);
-    nprbytes = (int)(bufin - bufcoded - 1);
+    nprbytes = (int)(bufin - (unsigned char *)bufcoded - 1);
     nbytesdecoded = ((nprbytes+3)/4) * 3;
 
     /* Ensure we don't overflow the output buffer */
@@ -856,7 +856,7 @@ wi_uudecode(char * bufcoded, BYTE * pbuffdecoded, size_t outbufsize)
     }
 
     bufout = pbuffdecoded;
-    bufin = bufcoded;
+    bufin = (unsigned char *)bufcoded;
 
     while (nprbytes > 0) {
         *(bufout++) =
